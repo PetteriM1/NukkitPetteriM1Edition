@@ -10,8 +10,8 @@ public class BlockCopperCutWeathered extends BlockCopperCut {
     }
 
     @Override
-    public String getName() {
-        return "Weathered Cut Copper";
+    public BlockColor getColor() {
+        return BlockColor.WARPED_STEM_BLOCK_COLOR;
     }
 
     @Override
@@ -20,8 +20,8 @@ public class BlockCopperCutWeathered extends BlockCopperCut {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.WARPED_STEM_BLOCK_COLOR;
+    public String getName() {
+        return "Weathered Cut Copper";
     }
 
     @Override

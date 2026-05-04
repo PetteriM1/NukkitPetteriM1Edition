@@ -19,43 +19,8 @@ public class CampfireInventory extends ContainerInventory {
     }
 
     @Override
-    public void onSlotChange(int index, Item before, boolean send) {
-        super.onSlotChange(index, before, send);
-
-        this.getHolder().scheduleUpdate();
-        this.getHolder().spawnToAll();
-
-        this.getHolder().chunk.setChanged();
-    }
-
-    @Override
     public int getMaxStackSize() {
         return 1;
-    }
-
-    @Override // Max stack size 1
-    public boolean canAddItem(Item item) {
-        int count = item.getCount();
-        boolean checkDamage = item.hasMeta();
-        boolean checkTag = item.getCompoundTag() != null;
-        int i1 = this.getSize();
-        for (int i = 0; i < i1; ++i) {
-            Item slot = this.getItemFast(i);
-            if (item.equals(slot, checkDamage, checkTag)) {
-                int diff;
-                if ((diff = 1 - slot.getCount()) > 0) {
-                    count -= diff;
-                }
-            } else if (slot.getId() == Item.AIR) {
-                count -= 1;
-            }
-
-            if (count <= 0) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     @Override // Max stack size 1
@@ -111,5 +76,40 @@ public class CampfireInventory extends ContainerInventory {
         }
 
         return itemSlots.toArray(new Item[0]);
+    }
+
+    @Override // Max stack size 1
+    public boolean canAddItem(Item item) {
+        int count = item.getCount();
+        boolean checkDamage = item.hasMeta();
+        boolean checkTag = item.getCompoundTag() != null;
+        int i1 = this.getSize();
+        for (int i = 0; i < i1; ++i) {
+            Item slot = this.getItemFast(i);
+            if (item.equals(slot, checkDamage, checkTag)) {
+                int diff;
+                if ((diff = 1 - slot.getCount()) > 0) {
+                    count -= diff;
+                }
+            } else if (slot.getId() == Item.AIR) {
+                count -= 1;
+            }
+
+            if (count <= 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    public void onSlotChange(int index, Item before, boolean send) {
+        super.onSlotChange(index, before, send);
+
+        this.getHolder().scheduleUpdate();
+        this.getHolder().spawnToAll();
+
+        this.getHolder().chunk.setChanged();
     }
 }

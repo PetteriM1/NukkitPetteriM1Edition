@@ -1,5 +1,7 @@
 package cn.nukkit.item;
 
+import cn.nukkit.network.protocol.ProtocolInfo;
+
 public class ItemPickaxeNetherite extends ItemTool {
 
     public ItemPickaxeNetherite() {
@@ -15,13 +17,13 @@ public class ItemPickaxeNetherite extends ItemTool {
     }
 
     @Override
-    public boolean isPickaxe() {
-        return true;
+    public int getAttackDamage() {
+        return 6;
     }
 
     @Override
-    public int getAttackDamage() {
-        return 6;
+    public int getMaxDurability() {
+        return ItemTool.DURABILITY_NETHERITE;
     }
 
     @Override
@@ -30,7 +32,12 @@ public class ItemPickaxeNetherite extends ItemTool {
     }
 
     @Override
-    public int getMaxDurability() {
-        return ItemTool.DURABILITY_NETHERITE;
+    public boolean isPickaxe() {
+        return true;
+    }
+
+    @Override
+    public boolean isSupportedOn(int protocol) {
+        return protocol >= ProtocolInfo.v1_16_0;
     }
 }

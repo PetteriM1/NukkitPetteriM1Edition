@@ -16,19 +16,19 @@ public class Sha256 {
         }
     }
 
-    public void update(byte[] input, int offset, int len) {
-        this.digest.update(input, offset, len);
-    }
-
-    public void update(ByteBuffer buffer) {
-        this.digest.update(buffer);
-    }
-
     public byte[] digest() {
         return this.digest.digest();
     }
 
     public void reset() {
         this.digest.reset();
+    }
+
+    public void update(byte[] input, int offset, int len) {
+        this.digest.update(input, offset, len);
+    }
+
+    public void update(ByteBuffer buffer) {
+        this.digest.update(buffer);
     }
 }

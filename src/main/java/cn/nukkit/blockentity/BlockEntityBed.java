@@ -16,26 +16,8 @@ public class BlockEntityBed extends BlockEntitySpawnable {
         super(chunk, nbt);
     }
 
-    @Override
-    protected void initBlockEntity() {
-        if (!this.namedTag.contains("color")) {
-            this.namedTag.putByte("color", 0);
-        }
-
-        this.color = this.namedTag.getByte("color");
-
-        super.initBlockEntity();
-    }
-
-    @Override
-    public boolean isBlockEntityValid() {
-        return level.getBlockIdAt(chunk, (int) x, (int) y, (int) z) == Item.BED_BLOCK;
-    }
-
-    @Override
-    public void saveNBT() {
-        super.saveNBT();
-        this.namedTag.putByte("color", this.color);
+    public DyeColor getDyeColor() {
+        return DyeColor.getByWoolData(color);
     }
 
     @Override
@@ -48,7 +30,25 @@ public class BlockEntityBed extends BlockEntitySpawnable {
                 .putByte("color", this.color);
     }
 
-    public DyeColor getDyeColor() {
-        return DyeColor.getByWoolData(color);
+    @Override
+    public boolean isBlockEntityValid() {
+        return level.getBlockIdAt(chunk, (int) x, (int) y, (int) z) == Item.BED_BLOCK;
+    }
+
+    @Override
+    protected void initBlockEntity() {
+        if (!this.namedTag.contains("color")) {
+            this.namedTag.putByte("color", 0);
+        }
+
+        this.color = this.namedTag.getByte("color");
+
+        super.initBlockEntity();
+    }
+
+    @Override
+    public void saveNBT() {
+        super.saveNBT();
+        this.namedTag.putByte("color", this.color);
     }
 }

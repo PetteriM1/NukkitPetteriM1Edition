@@ -1,5 +1,6 @@
 package cn.nukkit.event.server;
 
+import cn.nukkit.Nukkit;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.event.HandlerList;
@@ -18,11 +19,6 @@ import java.util.*;
 public class QueryRegenerateEvent extends ServerEvent {
 
     private static final HandlerList handlers = new HandlerList();
-
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private int timeout;
     private String serverName;
     private boolean listPlugins;
@@ -46,7 +42,7 @@ public class QueryRegenerateEvent extends ServerEvent {
         this.serverName = server.getMotd();
         this.listPlugins = server.queryPlugins;
         this.plugins = server.getPluginManager().getPlugins().values().toArray(new Plugin[0]);
-        this.players = server.getOnlinePlayers().values().toArray(new Player[0]);
+        this.players = server.getOnlinePlayersList().toArray(new Player[0]);
         this.gameType = server.getGamemode() == 1 ? "CMP" : "SMP";
         this.version = server.getVersion();
         this.map = server.getDefaultLevel() == null ? "unknown" : server.getDefaultLevel().getName();
@@ -57,73 +53,45 @@ public class QueryRegenerateEvent extends ServerEvent {
         this.ip = server.getIp();
     }
 
-    public int getTimeout() {
-        return timeout;
-    }
-
-    public void setTimeout(int timeout) {
-        this.timeout = timeout;
-    }
-
-    public String getServerName() {
-        return serverName;
-    }
-
-    public void setServerName(String serverName) {
-        this.serverName = serverName;
-    }
-
-    public boolean canListPlugins() {
-        return this.listPlugins;
-    }
-
     public void setListPlugins(boolean listPlugins) {
         this.listPlugins = listPlugins;
-    }
-
-    public Plugin[] getPlugins() {
-        return plugins;
-    }
-
-    public void setPlugins(Plugin[] plugins) {
-        this.plugins = plugins;
-    }
-
-    public Player[] getPlayerList() {
-        return players;
-    }
-
-    public void setPlayerList(Player[] players) {
-        this.players = players;
-    }
-
-    public int getPlayerCount() {
-        return this.numPlayers;
-    }
-
-    public void setPlayerCount(int count) {
-        this.numPlayers = count;
-    }
-
-    public int getMaxPlayerCount() {
-        return this.maxPlayers;
     }
 
     public void setMaxPlayerCount(int count) {
         this.maxPlayers = count;
     }
 
-    public String getWorld() {
-        return map;
+    public void setPlayerCount(int count) {
+        this.numPlayers = count;
+    }
+
+    public void setPlayerList(Player[] players) {
+        this.players = players;
+    }
+
+    public void setPlugins(Plugin[] plugins) {
+        this.plugins = plugins;
+    }
+
+    public void setServerName(String serverName) {
+        this.serverName = serverName;
+    }
+
+    public void setTimeout(int timeout) {
+        this.timeout = timeout;
     }
 
     public void setWorld(String world) {
         this.map = world;
     }
 
+    public static HandlerList getHandlers() {
+        return handlers;
+    }
+
     public byte[] getLongQuery() {
         ByteBuffer query = ByteBuffer.allocate(65536);
-        StringBuilder plist = new StringBuilder("Nukkit");
+        StringBuilder plist = new StringBuilder(Nukkit.NUKKIT_PM1E);
         if (this.listPlugins && this.plugins.length > 0) {
             plist.append(':');
             for (Plugin p : this.plugins) {
@@ -143,7 +111,7 @@ public class QueryRegenerateEvent extends ServerEvent {
         KVdata.put("gametype", this.gameType);
         KVdata.put("game_id", "MINECRAFTPE");
         KVdata.put("version", this.version);
-        KVdata.put("server_engine", "Nukkit");
+        KVdata.put("server_engine", Nukkit.NUKKIT_PM1E);
         KVdata.put("plugins", plist.toString());
         KVdata.put("map", this.map);
         KVdata.put("numplayers", String.valueOf(this.numPlayers));
@@ -170,6 +138,26 @@ public class QueryRegenerateEvent extends ServerEvent {
         return Arrays.copyOf(query.array(), query.position());
     }
 
+    public int getMaxPlayerCount() {
+        return this.maxPlayers;
+    }
+
+    public int getPlayerCount() {
+        return this.numPlayers;
+    }
+
+    public Player[] getPlayerList() {
+        return players;
+    }
+
+    public Plugin[] getPlugins() {
+        return plugins;
+    }
+
+    public String getServerName() {
+        return serverName;
+    }
+
     public byte[] getShortQuery() {
         ByteBuffer query = ByteBuffer.allocate(65536);
         query.put(this.serverName.getBytes(StandardCharsets.UTF_8));
@@ -186,5 +174,17 @@ public class QueryRegenerateEvent extends ServerEvent {
         query.put(this.ip.getBytes(StandardCharsets.UTF_8));
         query.put((byte) 0x00);
         return Arrays.copyOf(query.array(), query.position());
+    }
+
+    public int getTimeout() {
+        return timeout;
+    }
+
+    public String getWorld() {
+        return map;
+    }
+
+    public boolean canListPlugins() {
+        return this.listPlugins;
     }
 }

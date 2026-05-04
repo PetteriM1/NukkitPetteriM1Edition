@@ -4,7 +4,10 @@ import cn.nukkit.Player;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.DyeColor;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockMossCarpet extends BlockTransparent {
 
@@ -12,18 +15,8 @@ public class BlockMossCarpet extends BlockTransparent {
     }
 
     @Override
-    public int getId() {
-        return MOSS_CARPET;
-    }
-
-    @Override
-    public String getName() {
-        return "Moss Carpet";
-    }
-
-    @Override
-    public boolean canBeFlowedInto() {
-        return true;
+    public BlockColor getColor() {
+        return BlockColor.GREEN_BLOCK_COLOR;
     }
 
     @Override
@@ -32,12 +25,47 @@ public class BlockMossCarpet extends BlockTransparent {
     }
 
     @Override
+    public int getId() {
+        return MOSS_CARPET;
+    }
+
+    @Override
+    public double getMaxY() {
+        return this.y + 0.0625;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_17_0;
+    }
+
+    @Override
+    public String getName() {
+        return "Moss Carpet";
+    }
+
+    @Override
     public double getResistance() {
-        return 0.5;
+        return 2.5;
+    }
+
+    @Override
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.WHEN_PLACED_IN_WATER;
     }
 
     @Override
     public boolean isSolid() {
+        return true;
+    }
+
+    @Override
+    public boolean breakWhenPushed() {
+        return true;
+    }
+
+    @Override
+    public boolean canBeFlowedInto() {
         return true;
     }
 
@@ -47,18 +75,13 @@ public class BlockMossCarpet extends BlockTransparent {
     }
 
     @Override
-    public double getMaxY() {
-        return this.y + 0.0625;
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.CARPET;
     }
 
     @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        Block down = this.down();
-        if (down.getId() != Item.AIR) {
-            this.getLevel().setBlock(block, this, true, true);
-            return true;
-        }
-        return false;
+    public int getAlternateMeta(int protocol) {
+        return DyeColor.GREEN.getWoolData();
     }
 
     @Override
@@ -73,17 +96,12 @@ public class BlockMossCarpet extends BlockTransparent {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.GREEN_BLOCK_COLOR;
-    }
-
-    @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.WHEN_PLACED_IN_WATER;
-    }
-
-    @Override
-    public boolean breakWhenPushed() {
-        return true;
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        Block down = this.down();
+        if (down.getId() != Item.AIR) {
+            this.getLevel().setBlock(block, this, true, true);
+            return true;
+        }
+        return false;
     }
 }

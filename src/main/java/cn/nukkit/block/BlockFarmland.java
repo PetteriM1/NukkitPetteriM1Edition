@@ -22,18 +22,8 @@ public class BlockFarmland extends BlockTransparentMeta {
     }
 
     @Override
-    public String getName() {
-        return "Farmland";
-    }
-
-    @Override
-    public int getId() {
-        return FARMLAND;
-    }
-
-    @Override
-    public double getResistance() {
-        return 3;
+    public BlockColor getColor() {
+        return BlockColor.DIRT_BLOCK_COLOR;
     }
 
     @Override
@@ -42,13 +32,28 @@ public class BlockFarmland extends BlockTransparentMeta {
     }
 
     @Override
-    public int getToolType() {
-        return ItemTool.TYPE_SHOVEL;
+    public int getId() {
+        return FARMLAND;
     }
 
     @Override
     public double getMaxY() {
         return this.y + 0.9375;
+    }
+
+    @Override
+    public String getName() {
+        return "Farmland";
+    }
+
+    @Override
+    public double getResistance() {
+        return 3;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_SHOVEL;
     }
 
     @Override
@@ -124,10 +129,5 @@ public class BlockFarmland extends BlockTransparentMeta {
     @Override
     public Item toItem() {
         return new ItemBlock(Block.get(BlockID.DIRT));
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.DIRT_BLOCK_COLOR;
     }
 }

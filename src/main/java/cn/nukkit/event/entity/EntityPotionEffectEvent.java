@@ -15,11 +15,6 @@ import javax.annotation.Nullable;
 public class EntityPotionEffectEvent extends EntityEvent implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
-
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     /**
      * Gets the old potion effect of the changed type, which will be removed. Null if Action == ADDED.
      */
@@ -179,5 +174,9 @@ public class EntityPotionEffectEvent extends EntityEvent implements Cancellable 
          * When nearby elder guardian gives mining fatigue to player.
          */
         ELDER_GUARDIAN
+    }
+
+    public static HandlerList getHandlers() {
+        return handlers;
     }
 }

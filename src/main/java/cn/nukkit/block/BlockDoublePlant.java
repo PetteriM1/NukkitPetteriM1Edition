@@ -45,14 +45,13 @@ public class BlockDoublePlant extends BlockFlowable {
     }
 
     @Override
-    public int getId() {
-        return DOUBLE_PLANT;
+    public BlockColor getColor() {
+        return BlockColor.FOLIAGE_BLOCK_COLOR;
     }
 
     @Override
-    public boolean canBeReplaced() {
-        int damage = this.getDamage() & 0x7;
-        return damage == TALL_GRASS || damage == LARGE_FERN;
+    public int getId() {
+        return DOUBLE_PLANT;
     }
 
     @Override
@@ -61,58 +60,24 @@ public class BlockDoublePlant extends BlockFlowable {
     }
 
     @Override
-    public int onUpdate(int type) {
-        if (type == Level.BLOCK_UPDATE_NORMAL) {
-            if ((this.getDamage() & TOP_HALF_BITMASK) == TOP_HALF_BITMASK) {
-                // Top
-                if (!(this.down().getId() == DOUBLE_PLANT)) {
-                    this.getLevel().setBlock(this, Block.get(BlockID.AIR), false, true);
-                    return Level.BLOCK_UPDATE_NORMAL;
-                }
-            } else {
-                // Bottom
-                Block down = this.down();
-                if ((down.isTransparent() && down.getId() != FARMLAND) || this.up().getId() != DOUBLE_PLANT) {
-                    this.getLevel().useBreakOn(this);
-                    return Level.BLOCK_UPDATE_NORMAL;
-                }
-            }
-        }
-        return 0;
+    public int getToolType() {
+        return ItemTool.TYPE_SHEARS;
     }
 
     @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        Block down = down();
-        Block up = up();
-
-        int id = down.getId();
-        if (up.getId() == AIR && (id == GRASS || id == DIRT || id == PODZOL || id == FARMLAND || id == MYCELIUM || id == MOSS_BLOCK)) {
-            // Place top half first in order to call block updates on bottom part, but do not update to prevent breaking.
-            this.getLevel().setBlock(up, Block.get(DOUBLE_PLANT, getDamage() ^ TOP_HALF_BITMASK), true, false);
-            this.getLevel().setBlock(block, this, true, true);
-            return true;
-        }
-
-        return false;
-    }
-
-    @Override
-    public boolean onBreak(Item item) {
-        if ((this.getDamage() & TOP_HALF_BITMASK) == TOP_HALF_BITMASK) { // Top half
-            Block down = down();
-            if (down instanceof BlockDoublePlant) {
-                this.getLevel().useBreakOn(down, item, null, true);
-            }
-        } else {
-            Block up = up();
-            if (up instanceof BlockDoublePlant) {
-                this.getLevel().addParticle(new DestroyBlockParticle(this.add(0.5, 1), this));
-            }
-            this.getLevel().setBlock(this, Block.get(BlockID.AIR), true, true);
-        }
-
+    public boolean breakWhenPushed() {
         return true;
+    }
+
+    @Override
+    public boolean canBeActivated() {
+        return true;
+    }
+
+    @Override
+    public boolean canBeReplaced() {
+        int damage = this.getDamage() & 0x7;
+        return damage == TALL_GRASS || damage == LARGE_FERN;
     }
 
     @Override
@@ -152,16 +117,6 @@ public class BlockDoublePlant extends BlockFlowable {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.FOLIAGE_BLOCK_COLOR;
-    }
-
-    @Override
-    public boolean canBeActivated() {
-        return true;
-    }
-
-    @Override
     public boolean onActivate(Item item, Player player) {
         if (item.getId() == Item.DYE && item.getDamage() == ItemDye.BONE_MEAL) {
             int type = this.getDamage() & 0x07;
@@ -179,17 +134,62 @@ public class BlockDoublePlant extends BlockFlowable {
         return false;
     }
 
+    @Override
+    public boolean onBreak(Item item) {
+        if ((this.getDamage() & TOP_HALF_BITMASK) == TOP_HALF_BITMASK) { // Top half
+            Block down = down();
+            if (down instanceof BlockDoublePlant) {
+                this.getLevel().useBreakOn(down, item, null, true);
+            }
+        } else {
+            Block up = up();
+            if (up instanceof BlockDoublePlant) {
+                this.getLevel().addParticle(new DestroyBlockParticle(this.add(0.5, 1), this));
+            }
+            this.getLevel().setBlock(this, Block.get(BlockID.AIR), true, true);
+        }
+
+        return true;
+    }
+
+    @Override
+    public int onUpdate(int type) {
+        if (type == Level.BLOCK_UPDATE_NORMAL) {
+            if ((this.getDamage() & TOP_HALF_BITMASK) == TOP_HALF_BITMASK) {
+                // Top
+                if (!(this.down().getId() == DOUBLE_PLANT)) {
+                    this.getLevel().setBlock(this, Block.get(BlockID.AIR), false, true);
+                    return Level.BLOCK_UPDATE_NORMAL;
+                }
+            } else {
+                // Bottom
+                Block down = this.down();
+                if ((down.isTransparent() && down.getId() != FARMLAND) || this.up().getId() != DOUBLE_PLANT) {
+                    this.getLevel().useBreakOn(this);
+                    return Level.BLOCK_UPDATE_NORMAL;
+                }
+            }
+        }
+        return 0;
+    }
+
+    @Override
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        Block down = down();
+        Block up = up();
+
+        int id = down.getId();
+        if (up.getId() == AIR && (id == GRASS || id == DIRT || id == PODZOL || id == FARMLAND || id == MYCELIUM || id == MOSS_BLOCK)) {
+            // Place top half first in order to call block updates on bottom part, but do not update to prevent breaking.
+            this.getLevel().setBlock(up, Block.get(DOUBLE_PLANT, getDamage() ^ TOP_HALF_BITMASK), true, false);
+            this.getLevel().setBlock(block, this, true, true);
+            return true;
+        }
+
+        return false;
+    }
+
     public Item toItem() {
         return new ItemBlock(this, this.getDamage() & 0x07, 1);
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_SHEARS;
-    }
-
-    @Override
-    public boolean breakWhenPushed() {
-        return true;
     }
 }

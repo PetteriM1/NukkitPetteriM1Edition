@@ -7,17 +7,12 @@ import cn.nukkit.event.HandlerList;
 /**
  * @author Box
  * Nukkit Project
- * 
+ * <p>
  * Called when a entity decides to explode
  */
 public class ExplosionPrimeEvent extends EntityEvent implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
-
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     protected double force;
     private boolean blockBreaking;
 
@@ -27,20 +22,23 @@ public class ExplosionPrimeEvent extends EntityEvent implements Cancellable {
         this.blockBreaking = true;
     }
 
-    public double getForce() {
-        return this.force;
+    public void setBlockBreaking(boolean affectsBlocks) {
+        this.blockBreaking = affectsBlocks;
     }
 
     public void setForce(double force) {
         this.force = force;
     }
 
-    public boolean isBlockBreaking() {
-        return this.blockBreaking;
+    public double getForce() {
+        return this.force;
     }
 
+    public static HandlerList getHandlers() {
+        return handlers;
+    }
 
-    public void setBlockBreaking(boolean affectsBlocks) {
-        this.blockBreaking = affectsBlocks;
+    public boolean isBlockBreaking() {
+        return this.blockBreaking;
     }
 }

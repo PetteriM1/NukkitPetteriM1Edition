@@ -10,18 +10,8 @@ import cn.nukkit.utils.BlockColor;
 public class BlockGlassPane extends BlockThin {
 
     @Override
-    public String getName() {
-        return "Glass Pane";
-    }
-
-    @Override
-    public int getId() {
-        return GLASS_PANE;
-    }
-
-    @Override
-    public double getResistance() {
-        return 1.5;
+    public BlockColor getColor() {
+        return BlockColor.AIR_BLOCK_COLOR;
     }
 
     @Override
@@ -30,13 +20,23 @@ public class BlockGlassPane extends BlockThin {
     }
 
     @Override
-    public Item[] getDrops(Item item) {
-        return new Item[0];
+    public int getId() {
+        return GLASS_PANE;
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.AIR_BLOCK_COLOR;
+    public String getName() {
+        return "Glass Pane";
+    }
+
+    @Override
+    public double getResistance() {
+        return 1.5;
+    }
+
+    @Override
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.WHEN_PLACED_IN_WATER;
     }
 
     @Override
@@ -45,7 +45,7 @@ public class BlockGlassPane extends BlockThin {
     }
 
     @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.WHEN_PLACED_IN_WATER;
+    public Item[] getDrops(Item item) {
+        return new Item[0];
     }
 }

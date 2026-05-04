@@ -11,12 +11,12 @@ public class BlockBlackstoneWall extends BlockWall {
     }
 
     @Override
-    public String getName() {
-        return "Blackstone Wall";
+    public int getId() {
+        return BLACKSTONE_WALL;
     }
 
     @Override
-    public int getId() {
-        return BLACKSTONE_WALL;
+    public String getName() {
+        return "Blackstone Wall";
     }
 }

@@ -15,8 +15,8 @@ public class BlockTrapdoorBirch extends BlockTrapdoor {
     }
 
     @Override
-    public String getName() {
-        return "Birch Trapdoor";
+    public BlockColor getColor() {
+        return BlockColor.SAND_BLOCK_COLOR;
     }
 
     @Override
@@ -25,12 +25,12 @@ public class BlockTrapdoorBirch extends BlockTrapdoor {
     }
 
     @Override
-    public Item toItem() {
-        return new ItemBlock(Block.get(this.getId(), 0), 0);
+    public String getName() {
+        return "Birch Trapdoor";
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.SAND_BLOCK_COLOR;
+    public Item toItem() {
+        return new ItemBlock(Block.get(this.getId(), 0), 0);
     }
 }

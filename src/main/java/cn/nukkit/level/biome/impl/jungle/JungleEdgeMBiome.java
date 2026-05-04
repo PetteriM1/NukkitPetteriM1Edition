@@ -5,6 +5,12 @@ package cn.nukkit.level.biome.impl.jungle;
  */
 public class JungleEdgeMBiome extends JungleEdgeBiome {
 
+    public JungleEdgeMBiome() {
+        super();
+
+
+    }
+
     @Override
     public String getName() {
         return "Jungle Edge M";

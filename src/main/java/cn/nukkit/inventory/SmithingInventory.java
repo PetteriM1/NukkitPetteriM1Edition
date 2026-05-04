@@ -24,6 +24,26 @@ public class SmithingInventory extends FakeBlockUIComponent {
         super(playerUI, InventoryType.SMITHING_TABLE, 51, position);
     }
 
+    public void setEquipment(Item equipment) {
+        setItem(EQUIPMENT, equipment);
+    }
+
+    public void setIngredient(Item ingredient) {
+        setItem(INGREDIENT, ingredient);
+    }
+
+    public void setTemplate(Item template) {
+        setItem(TEMPLATE, template);
+    }
+
+    public Item getEquipment() {
+        return getItem(EQUIPMENT);
+    }
+
+    public Item getIngredient() {
+        return getItem(INGREDIENT);
+    }
+
     public Item getResult() {
         Item trimOutput = this.getTrimOutputItem();
         if (trimOutput != null) {
@@ -36,6 +56,10 @@ public class SmithingInventory extends FakeBlockUIComponent {
         }
 
         return recipe.getFinalResult(getEquipment(), getTemplate());
+    }
+
+    public Item getTemplate() {
+        return getItem(TEMPLATE);
     }
 
     private Item getTrimOutputItem() {
@@ -51,30 +75,6 @@ public class SmithingInventory extends FakeBlockUIComponent {
         }
 
         return null;
-    }
-
-    public Item getEquipment() {
-        return getItem(EQUIPMENT);
-    }
-
-    public void setEquipment(Item equipment) {
-        setItem(EQUIPMENT, equipment);
-    }
-
-    public Item getIngredient() {
-        return getItem(INGREDIENT);
-    }
-
-    public void setIngredient(Item ingredient) {
-        setItem(INGREDIENT, ingredient);
-    }
-
-    public Item getTemplate() {
-        return getItem(TEMPLATE);
-    }
-
-    public void setTemplate(Item template) {
-        setItem(TEMPLATE, template);
     }
 
     @Override

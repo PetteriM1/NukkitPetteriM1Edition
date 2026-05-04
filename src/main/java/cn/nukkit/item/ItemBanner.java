@@ -21,27 +21,31 @@ public class ItemBanner extends Item {
         this.block = Block.get(Block.STANDING_BANNER);
     }
 
-    @Override
-    public int getMaxStackSize() {
-        return 16;
-    }
-
-    public int getBaseColor() {
-        return this.getDamage() & 0x0f;
-    }
-
     public void setBaseColor(DyeColor color) {
         this.setDamage(color.getDyeData() & 0x0f);
-    }
-
-    public int getType() {
-        return this.getNamedTag().getInt("Type");
     }
 
     public void setType(int type) {
         CompoundTag tag = this.hasCompoundTag() ? this.getNamedTag() : new CompoundTag();
         tag.putInt("Type", type);
         this.setNamedTag(tag);
+    }
+
+    public int getBaseColor() {
+        return this.getDamage() & 0x0f;
+    }
+
+    @Override
+    public int getMaxStackSize() {
+        return 16;
+    }
+
+    public int getPatternsSize() {
+        return (this.hasCompoundTag() ? this.getNamedTag() : new CompoundTag()).getList("Patterns").size();
+    }
+
+    public int getType() {
+        return this.getNamedTag().getInt("Type");
     }
 
     public void addPattern(BannerPattern pattern) {
@@ -59,6 +63,10 @@ public class ItemBanner extends Item {
         return BannerPattern.fromCompoundTag(tag.getList("Patterns").size() > index && index >= 0 ? tag.getList("Patterns", CompoundTag.class).get(index) : new CompoundTag());
     }
 
+    public boolean hasPattern() {
+        return (this.hasCompoundTag() ? this.getNamedTag() : new CompoundTag()).contains("Patterns");
+    }
+
     public void removePattern(int index) {
         CompoundTag tag = this.hasCompoundTag() ? this.getNamedTag() : new CompoundTag();
         ListTag<CompoundTag> patterns = tag.getList("Patterns", CompoundTag.class);
@@ -66,13 +74,5 @@ public class ItemBanner extends Item {
             patterns.remove(index);
         }
         this.setNamedTag(tag);
-    }
-
-    public int getPatternsSize() {
-        return (this.hasCompoundTag() ? this.getNamedTag() : new CompoundTag()).getList("Patterns").size();
-    }
-
-    public boolean hasPattern() {
-        return (this.hasCompoundTag() ? this.getNamedTag() : new CompoundTag()).contains("Patterns");
     }
 }

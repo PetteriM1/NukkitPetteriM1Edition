@@ -17,6 +17,10 @@ public class FurnaceInventory extends ContainerInventory {
         super(furnace, type); // For blast furnace
     }
 
+    public Item getFuel() {
+        return this.getItem(1);
+    }
+
     @Override
     public BlockEntityFurnace getHolder() {
         return (BlockEntityFurnace) this.holder;
@@ -26,24 +30,8 @@ public class FurnaceInventory extends ContainerInventory {
         return this.getItem(2);
     }
 
-    public Item getFuel() {
-        return this.getItem(1);
-    }
-
     public Item getSmelting() {
         return this.getItem(0);
-    }
-
-    public boolean setResult(Item item) {
-        return this.setItem(2, item);
-    }
-
-    public boolean setFuel(Item item) {
-        return this.setItem(1, item);
-    }
-
-    public boolean setSmelting(Item item) {
-        return this.setItem(0, item);
     }
 
     @Override
@@ -53,5 +41,17 @@ public class FurnaceInventory extends ContainerInventory {
         this.getHolder().scheduleUpdate();
 
         this.getHolder().chunk.setChanged();
+    }
+
+    public boolean setFuel(Item item) {
+        return this.setItem(1, item);
+    }
+
+    public boolean setResult(Item item) {
+        return this.setItem(2, item);
+    }
+
+    public boolean setSmelting(Item item) {
+        return this.setItem(0, item);
     }
 }

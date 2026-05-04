@@ -23,17 +23,6 @@ public class CreativeInventoryAction extends InventoryAction {
     }
 
     /**
-     * Checks that the player is in creative, and (if creating an item) that the item exists in the creative inventory.
-     *
-     * @param source player
-     * @return valid
-     */
-    public boolean isValid(Player source) {
-        return source.isCreative() &&
-                (this.actionType == TYPE_DELETE_ITEM || Item.isCreativeItem(this.sourceItem));
-    }
-
-    /**
      * Returns the type of the action.
      *
      * @return action type
@@ -52,9 +41,20 @@ public class CreativeInventoryAction extends InventoryAction {
         return true;
     }
 
-    public void onExecuteSuccess(Player source) {
+    /**
+     * Checks that the player is in creative, and (if creating an item) that the item exists in the creative inventory.
+     *
+     * @param source player
+     * @return valid
+     */
+    public boolean isValid(Player source) {
+        return source.isCreative() &&
+                (this.actionType == TYPE_DELETE_ITEM || Item.isCreativeItem(this.sourceItem));
     }
 
     public void onExecuteFail(Player source) {
+    }
+
+    public void onExecuteSuccess(Player source) {
     }
 }

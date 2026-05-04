@@ -20,12 +20,7 @@ public class BlockSlabRedSandstone extends BlockSlab {
         super(meta, DOUBLE_RED_SANDSTONE_SLAB);
     }
 
-    @Override
-    public int getId() {
-        return RED_SANDSTONE_SLAB;
-    }
-
-    private static final String[] NAMES = {
+    private static final String[] names = {
             "Red Sandstone",
             "Purpur",
             "",
@@ -35,33 +30,6 @@ public class BlockSlabRedSandstone extends BlockSlab {
             "",
             ""
     };
-
-    @Override
-    public String getName() {
-        return ((this.getDamage() & 0x08) > 0 ? "Upper " : "") + NAMES[this.getDamage() & 0x07] + " Slab";
-    }
-
-    @Override
-    public Item[] getDrops(Item item) {
-        if (item.isPickaxe()) {
-            return new Item[]{
-                    toItem()
-            };
-        } else {
-            return new Item[0];
-        }
-    }
-
-    @Override
-    public Item toItem() {
-        int damage = this.getDamage() & 0x07;
-        return new ItemBlock(Block.get(this.getId(), damage), damage);
-    }
-
-    @Override
-    public boolean canHarvestWithHand() {
-        return false;
-    }
 
     @Override
     public BlockColor getColor() {
@@ -85,5 +53,37 @@ public class BlockSlabRedSandstone extends BlockSlab {
                 return BlockColor.NETHERRACK_BLOCK_COLOR;
         }
         return BlockColor.STONE_BLOCK_COLOR;
+    }
+
+    @Override
+    public int getId() {
+        return RED_SANDSTONE_SLAB;
+    }
+
+    @Override
+    public String getName() {
+        return ((this.getDamage() & 0x08) > 0 ? "Upper " : "") + names[this.getDamage() & 0x07] + " Slab";
+    }
+
+    @Override
+    public boolean canHarvestWithHand() {
+        return false;
+    }
+
+    @Override
+    public Item[] getDrops(Item item) {
+        if (item.isPickaxe()) {
+            return new Item[]{
+                    toItem()
+            };
+        } else {
+            return new Item[0];
+        }
+    }
+
+    @Override
+    public Item toItem() {
+        int damage = this.getDamage() & 0x07;
+        return new ItemBlock(Block.get(this.getId(), damage), damage);
     }
 }

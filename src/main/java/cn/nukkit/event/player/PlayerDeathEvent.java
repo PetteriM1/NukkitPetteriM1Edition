@@ -13,11 +13,6 @@ import cn.nukkit.lang.TextContainer;
 public class PlayerDeathEvent extends EntityDeathEvent implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
-
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private TextContainer deathMessage;
     private boolean keepInventory = false;
     private boolean keepExperience = false;
@@ -33,15 +28,6 @@ public class PlayerDeathEvent extends EntityDeathEvent implements Cancellable {
         this(player, drops, new TextContainer(deathMessage), experience);
     }
 
-    @Override
-    public Player getEntity() {
-        return (Player) super.getEntity();
-    }
-
-    public TextContainer getDeathMessage() {
-        return deathMessage;
-    }
-
     public void setDeathMessage(TextContainer deathMessage) {
         this.deathMessage = deathMessage;
     }
@@ -50,27 +36,40 @@ public class PlayerDeathEvent extends EntityDeathEvent implements Cancellable {
         this.deathMessage = new TextContainer(deathMessage);
     }
 
-    public boolean getKeepInventory() {
-        return keepInventory;
-    }
-
-    public void setKeepInventory(boolean keepInventory) {
-        this.keepInventory = keepInventory;
-    }
-
-    public boolean getKeepExperience() {
-        return keepExperience;
+    public void setExperience(int experience) {
+        this.experience = experience;
     }
 
     public void setKeepExperience(boolean keepExperience) {
         this.keepExperience = keepExperience;
     }
 
+    public void setKeepInventory(boolean keepInventory) {
+        this.keepInventory = keepInventory;
+    }
+
+    public TextContainer getDeathMessage() {
+        return deathMessage;
+    }
+
+    @Override
+    public Player getEntity() {
+        return (Player) super.getEntity();
+    }
+
     public int getExperience() {
         return experience;
     }
 
-    public void setExperience(int experience) {
-        this.experience = experience;
+    public static HandlerList getHandlers() {
+        return handlers;
+    }
+
+    public boolean getKeepExperience() {
+        return keepExperience;
+    }
+
+    public boolean getKeepInventory() {
+        return keepInventory;
     }
 }

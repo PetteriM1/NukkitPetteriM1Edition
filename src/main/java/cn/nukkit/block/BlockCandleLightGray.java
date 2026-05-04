@@ -11,12 +11,12 @@ public class BlockCandleLightGray extends BlockCandle {
     }
 
     @Override
-    public String getName() {
-        return "Light Gray Candle";
+    public int getId() {
+        return LIGHT_GRAY_CANDLE;
     }
 
     @Override
-    public int getId() {
-        return LIGHT_GRAY_CANDLE;
+    public String getName() {
+        return "Light Gray Candle";
     }
 }

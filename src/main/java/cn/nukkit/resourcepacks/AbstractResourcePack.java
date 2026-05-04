@@ -11,17 +11,17 @@ public abstract class AbstractResourcePack implements ResourcePack {
     protected UUID id;
 
     @Override
-    public String getPackName() {
-        return this.manifest.getAsJsonObject("header")
-                .get("name").getAsString();
-    }
-
-    @Override
     public UUID getPackId() {
         if (id == null) {
             id = UUID.fromString(this.manifest.getAsJsonObject("header").get("uuid").getAsString());
         }
         return id;
+    }
+
+    @Override
+    public String getPackName() {
+        return this.manifest.getAsJsonObject("header")
+                .get("name").getAsString();
     }
 
     @Override
@@ -32,6 +32,18 @@ public abstract class AbstractResourcePack implements ResourcePack {
         return String.join(".", version.get(0).getAsString(),
                 version.get(1).getAsString(),
                 version.get(2).getAsString());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof ResourcePack)) return false;
+        ResourcePack anotherPack = (ResourcePack) obj;
+        return this.id.equals(anotherPack.getPackId());
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
     }
 
     protected boolean verifyManifest() {
@@ -45,17 +57,5 @@ public abstract class AbstractResourcePack implements ResourcePack {
         } else {
             return false;
         }
-    }
-
-    @Override
-    public int hashCode() {
-        return id.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof ResourcePack)) return false;
-        ResourcePack anotherPack = (ResourcePack) obj;
-        return this.id.equals(anotherPack.getPackId());
     }
 }

@@ -6,11 +6,6 @@ import cn.nukkit.event.HandlerList;
 
 public class PlayerChunkRequestEvent extends PlayerEvent implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
-
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private final int chunkX;
     private final int chunkZ;
 
@@ -26,5 +21,9 @@ public class PlayerChunkRequestEvent extends PlayerEvent implements Cancellable 
 
     public int getChunkZ() {
         return chunkZ;
+    }
+
+    public static HandlerList getHandlers() {
+        return handlers;
     }
 }

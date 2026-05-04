@@ -12,11 +12,11 @@ public class FormResponseSimple extends FormResponse {
         this.clickedButton = clickedButton;
     }
 
-    public int getClickedButtonId() {
-        return clickedButtonId;
-    }
-
     public ElementButton getClickedButton() {
         return clickedButton;
+    }
+
+    public int getClickedButtonId() {
+        return clickedButtonId;
     }
 }

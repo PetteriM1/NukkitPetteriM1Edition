@@ -13,13 +13,8 @@ import cn.nukkit.utils.BlockColor;
 public class BlockSoulSand extends BlockSolid {
 
     @Override
-    public String getName() {
-        return "Soul Sand";
-    }
-
-    @Override
-    public int getId() {
-        return SOUL_SAND;
+    public BlockColor getColor() {
+        return BlockColor.BROWN_BLOCK_COLOR;
     }
 
     @Override
@@ -28,18 +23,28 @@ public class BlockSoulSand extends BlockSolid {
     }
 
     @Override
-    public double getResistance() {
-        return 0.5;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_SHOVEL;
+    public int getId() {
+        return SOUL_SAND;
     }
 
     @Override
     public double getMaxY() {
         return this.y + 0.875;
+    }
+
+    @Override
+    public String getName() {
+        return "Soul Sand";
+    }
+
+    @Override
+    public double getResistance() {
+        return 2.5;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_SHOVEL;
     }
 
     @Override
@@ -51,11 +56,6 @@ public class BlockSoulSand extends BlockSolid {
     public void onEntityCollide(Entity entity) {
         entity.motionX *= 0.4d;
         entity.motionZ *= 0.4d;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.BROWN_BLOCK_COLOR;
     }
 
     @Override

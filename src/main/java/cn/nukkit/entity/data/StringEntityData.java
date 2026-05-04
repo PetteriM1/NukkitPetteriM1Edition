@@ -16,13 +16,13 @@ public class StringEntityData extends EntityData<String> {
         this.data = data;
     }
 
-    public String getData() {
-        return data;
-    }
-
     public void setData(String data) {
         if (data == null) throw new NullPointerException("data must not be null");
         this.data = data;
+    }
+
+    public String getData() {
+        return data;
     }
 
     @Override

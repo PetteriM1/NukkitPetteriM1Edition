@@ -7,6 +7,11 @@ import cn.nukkit.math.NukkitRandom;
 public class ObjectAzaleaTree extends ObjectTree {
 
     @Override
+    public int getLeafBlock() {
+        return BlockID.AZALEA_LEAVES;
+    }
+
+    @Override
     protected boolean overridable(int id) {
         switch (id) {
             case BlockID.AIR:
@@ -22,9 +27,20 @@ public class ObjectAzaleaTree extends ObjectTree {
         }
     }
 
-    @Override
-    public int getLeafBlock() {
-        return BlockID.AZALEA_LEAVES;
+    private void placeLeafAt(ChunkManager level, int x, int y, int z, NukkitRandom random) {
+        if (level.getBlockIdAt(x, y, z) == BlockID.AIR) {
+            if (random.nextBoundedInt(3) == 0) {
+                level.setBlockAt(x, y, z, BlockID.AZALEA_LEAVES_FLOWERED, 0);
+            } else {
+                level.setBlockAt(x, y, z, BlockID.AZALEA_LEAVES, 0);
+            }
+        }
+    }
+
+    private void placeLogAt(ChunkManager level, int x, int y, int z) {
+        if (overridable(level.getBlockIdAt(x, y, z))) {
+            level.setBlockAt(x, y, z, this.getTrunkBlock(), 0);
+        }
     }
 
     @Override
@@ -83,21 +99,5 @@ public class ObjectAzaleaTree extends ObjectTree {
 
         // Always hide trunk
         this.placeLeafAt(level, x, i2 + 2, z, random);
-    }
-
-    private void placeLogAt(ChunkManager level, int x, int y, int z) {
-        if (overridable(level.getBlockIdAt(x, y, z))) {
-            level.setBlockAt(x, y, z, this.getTrunkBlock(), 0);
-        }
-    }
-
-    private void placeLeafAt(ChunkManager level, int x, int y, int z, NukkitRandom random) {
-        if (level.getBlockIdAt(x, y, z) == BlockID.AIR) {
-            if (random.nextBoundedInt(3) == 0) {
-                level.setBlockAt(x, y, z, BlockID.AZALEA_LEAVES_FLOWERED, 0);
-            } else {
-                level.setBlockAt(x, y, z, BlockID.AZALEA_LEAVES, 0);
-            }
-        }
     }
 }

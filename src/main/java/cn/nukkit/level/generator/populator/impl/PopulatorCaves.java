@@ -34,28 +34,6 @@ public class PopulatorCaves extends Populator {
 
     public int worldHeightCap = 128;
 
-    @Override
-    public void populate(ChunkManager level, int chunkX, int chunkZ, NukkitRandom random, FullChunk chunk) {
-        this.random = new Random();
-        this.random.setSeed(level.getSeed());
-        long worldLong1 = this.random.nextLong();
-        long worldLong2 = this.random.nextLong();
-
-        int size = this.checkAreaSize;
-
-        for (int x = chunkX - size; x <= chunkX + size; x++)
-            for (int z = chunkZ - size; z <= chunkZ + size; z++) {
-                long randomX = x * worldLong1;
-                long randomZ = z * worldLong2;
-                this.random.setSeed(randomX ^ randomZ ^ level.getSeed());
-                generateChunk(x, z, chunk);
-            }
-    }
-
-    protected void generateLargeCaveNode(long seed, FullChunk chunk, double x, double y, double z) {
-        generateCaveNode(seed, chunk, x, y, z, 1.0F + this.random.nextFloat() * 6.0F, 0.0F, 0.0F, -1, -1, 0.5D);
-    }
-
     protected void generateCaveNode(long seed, FullChunk chunk, double x, double y, double z, float radius, float angelOffset, float angel, int angle, int maxAngle, double scale) {
         int chunkX = chunk.getX();
         int chunkZ = chunk.getZ();
@@ -258,5 +236,27 @@ public class PopulatorCaves extends Populator {
                 generateCaveNode(this.random.nextLong(), generatingChunkBuffer, x, y, z, f3, f1, f2, 0, 0, 1.0D);
             }
         }
+    }
+
+    protected void generateLargeCaveNode(long seed, FullChunk chunk, double x, double y, double z) {
+        generateCaveNode(seed, chunk, x, y, z, 1.0F + this.random.nextFloat() * 6.0F, 0.0F, 0.0F, -1, -1, 0.5D);
+    }
+
+    @Override
+    public void populate(ChunkManager level, int chunkX, int chunkZ, NukkitRandom random, FullChunk chunk) {
+        this.random = new Random();
+        this.random.setSeed(level.getSeed());
+        long worldLong1 = this.random.nextLong();
+        long worldLong2 = this.random.nextLong();
+
+        int size = this.checkAreaSize;
+
+        for (int x = chunkX - size; x <= chunkX + size; x++)
+            for (int z = chunkZ - size; z <= chunkZ + size; z++) {
+                long randomX = x * worldLong1;
+                long randomZ = z * worldLong2;
+                this.random.setSeed(randomX ^ randomZ ^ level.getSeed());
+                generateChunk(x, z, chunk);
+            }
     }
 }

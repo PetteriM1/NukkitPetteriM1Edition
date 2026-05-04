@@ -22,14 +22,21 @@ public class BlockTripWireHook extends BlockFlowable {
         super(meta);
     }
 
-    @Override
-    public String getName() {
-        return "Tripwire Hook";
+    public void setAttached(boolean value) {
+        if (value ^ this.isAttached()) {
+            this.setDamage(this.getDamage() ^ 0x04);
+        }
     }
 
-    @Override
-    public int getId() {
-        return TRIPWIRE_HOOK;
+    public void setFace(BlockFace face) {
+        this.setDamage(this.getDamage() - this.getDamage() % 4);
+        this.setDamage(this.getDamage() | face.getHorizontalIndex());
+    }
+
+    public void setPowered(boolean value) {
+        if (value ^ this.isPowered()) {
+            this.setDamage(this.getDamage() ^ 0x08);
+        }
     }
 
     public BlockFace getFacing() {
@@ -37,62 +44,49 @@ public class BlockTripWireHook extends BlockFlowable {
     }
 
     @Override
-    public int onUpdate(int type) {
-        if (type == Level.BLOCK_UPDATE_NORMAL) {
-            if (!isSupportValid(this.getSide(this.getFacing().getOpposite()))) {
-                this.level.useBreakOn(this);
-            }
-
-            return type;
-        } else if (type == Level.BLOCK_UPDATE_SCHEDULED) {
-            this.calculateState(false, true, -1, null);
-            return type;
-        }
-
-        return 0;
+    public int getId() {
+        return TRIPWIRE_HOOK;
     }
 
     @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        if (face == BlockFace.DOWN || face == BlockFace.UP) {
-            return false;
-        }
+    public String getName() {
+        return "Tripwire Hook";
+    }
 
-        if (face.getAxis().isHorizontal()) {
-            this.setFace(face);
-        }
+    @Override
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.FLOW_INTO_BLOCK;
+    }
 
-        if (!isSupportValid(this.getSide(this.getFacing().getOpposite()))) {
-            return false;
-        }
+    public boolean isAttached() {
+        return (getDamage() & 0x04) > 0;
+    }
 
-        this.level.setBlock(this, this);
-
-        if (player != null) {
-            this.calculateState(false, false, -1, null);
-        }
+    @Override
+    public boolean isPowerSource() {
         return true;
     }
 
-    private static boolean isSupportValid(Block block) {
-        return !block.isTransparent() || Block.canConnectToFullSolid(block);
+    public boolean isPowered() {
+        return (this.getDamage() & 0x08) > 0;
+    }
+
+    private void addSound(Vector3 pos, boolean canConnect, boolean nextPowered, boolean attached, boolean powered) {
+        if (nextPowered && !powered) {
+            this.level.addLevelSoundEvent(pos, LevelSoundEventPacket.SOUND_POWER_ON);
+            this.level.getServer().getPluginManager().callEvent(new BlockRedstoneEvent(this, 0, 15));
+        } else if (!nextPowered && powered) {
+            this.level.addLevelSoundEvent(pos, LevelSoundEventPacket.SOUND_POWER_OFF);
+            this.level.getServer().getPluginManager().callEvent(new BlockRedstoneEvent(this, 15, 0));
+        } else if (canConnect && !attached) {
+            this.level.addLevelSoundEvent(pos, LevelSoundEventPacket.SOUND_ATTACH);
+        } else if (!canConnect && attached) {
+            this.level.addLevelSoundEvent(pos, LevelSoundEventPacket.SOUND_DETACH);
+        }
     }
 
     @Override
-    public boolean onBreak(Item item) {
-        super.onBreak(item);
-        boolean attached = isAttached();
-        boolean powered = isPowered();
-
-        if (attached || powered) {
-            this.calculateState(true, false, -1, null);
-        }
-
-        if (powered) {
-            this.level.updateAroundRedstone(this, null);
-            this.level.updateAroundRedstone(this.getSideVec(getFacing().getOpposite()), null);
-        }
-
+    public boolean breakWhenPushed() {
         return true;
     }
 
@@ -182,53 +176,9 @@ public class BlockTripWireHook extends BlockFlowable {
         }
     }
 
-    private void addSound(Vector3 pos, boolean canConnect, boolean nextPowered, boolean attached, boolean powered) {
-        if (nextPowered && !powered) {
-            this.level.addLevelSoundEvent(pos, LevelSoundEventPacket.SOUND_POWER_ON);
-            this.level.getServer().getPluginManager().callEvent(new BlockRedstoneEvent(this, 0, 15));
-        } else if (!nextPowered && powered) {
-            this.level.addLevelSoundEvent(pos, LevelSoundEventPacket.SOUND_POWER_OFF);
-            this.level.getServer().getPluginManager().callEvent(new BlockRedstoneEvent(this, 15, 0));
-        } else if (canConnect && !attached) {
-            this.level.addLevelSoundEvent(pos, LevelSoundEventPacket.SOUND_ATTACH);
-        } else if (!canConnect && attached) {
-            this.level.addLevelSoundEvent(pos, LevelSoundEventPacket.SOUND_DETACH);
-        }
-    }
-
-    public boolean isAttached() {
-        return (getDamage() & 0x04) > 0;
-    }
-
-    public boolean isPowered() {
-        return (this.getDamage() & 0x08) > 0;
-    }
-
-    public void setPowered(boolean value) {
-        if (value ^ this.isPowered()) {
-            this.setDamage(this.getDamage() ^ 0x08);
-        }
-    }
-
-    public void setAttached(boolean value) {
-        if (value ^ this.isAttached()) {
-            this.setDamage(this.getDamage() ^ 0x04);
-        }
-    }
-
-    public void setFace(BlockFace face) {
-        this.setDamage(this.getDamage() - this.getDamage() % 4);
-        this.setDamage(this.getDamage() | face.getHorizontalIndex());
-    }
-
     @Override
-    public boolean isPowerSource() {
-        return true;
-    }
-
-    @Override
-    public int getWeakPower(BlockFace face) {
-        return isPowered() ? 15 : 0;
+    public boolean canBeFlowedInto() {
+        return false;
     }
 
     @Override
@@ -237,22 +187,72 @@ public class BlockTripWireHook extends BlockFlowable {
     }
 
     @Override
+    public int getWeakPower(BlockFace face) {
+        return isPowered() ? 15 : 0;
+    }
+
+    private static boolean isSupportValid(Block block) {
+        return !block.isTransparent() || Block.canConnectToFullSolid(block);
+    }
+
+    @Override
+    public boolean onBreak(Item item) {
+        super.onBreak(item);
+        boolean attached = isAttached();
+        boolean powered = isPowered();
+
+        if (attached || powered) {
+            this.calculateState(true, false, -1, null);
+        }
+
+        if (powered) {
+            this.level.updateAroundRedstone(this, null);
+            this.level.updateAroundRedstone(this.getSideVec(getFacing().getOpposite()), null);
+        }
+
+        return true;
+    }
+
+    @Override
+    public int onUpdate(int type) {
+        if (type == Level.BLOCK_UPDATE_NORMAL) {
+            if (!isSupportValid(this.getSide(this.getFacing().getOpposite()))) {
+                this.level.useBreakOn(this);
+            }
+
+            return type;
+        } else if (type == Level.BLOCK_UPDATE_SCHEDULED) {
+            this.calculateState(false, true, -1, null);
+            return type;
+        }
+
+        return 0;
+    }
+
+    @Override
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        if (face == BlockFace.DOWN || face == BlockFace.UP) {
+            return false;
+        }
+
+        if (face.getAxis().isHorizontal()) {
+            this.setFace(face);
+        }
+
+        if (!isSupportValid(this.getSide(this.getFacing().getOpposite()))) {
+            return false;
+        }
+
+        this.level.setBlock(this, this);
+
+        if (player != null) {
+            this.calculateState(false, false, -1, null);
+        }
+        return true;
+    }
+
+    @Override
     public Item toItem() {
         return new ItemBlock(Block.get(this.getId(), 0), 0);
-    }
-
-    @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.FLOW_INTO_BLOCK;
-    }
-
-    @Override
-    public boolean canBeFlowedInto() {
-        return false;
-    }
-
-    @Override
-    public boolean breakWhenPushed() {
-        return true;
     }
 }

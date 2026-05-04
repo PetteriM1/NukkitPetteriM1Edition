@@ -28,8 +28,33 @@ public class PlayerFood {
         this.foodSaturationLevel = foodSaturationLevel;
     }
 
-    public Player getPlayer() {
-        return this.player;
+    /**
+     * @param foodLevel level
+     * @deprecated use {@link #setLevel(int)} instead
+     **/
+    @Deprecated
+    public void setFoodLevel(int foodLevel) {
+        setLevel(foodLevel);
+    }
+
+    public void setFoodSaturationLevel(float fsl) {
+        if (fsl > this.foodLevel) fsl = this.foodLevel;
+        if (fsl < 0) fsl = 0;
+        PlayerFoodLevelChangeEvent ev = new PlayerFoodLevelChangeEvent(this.player, this.foodLevel, fsl);
+        this.player.getServer().getPluginManager().callEvent(ev);
+        if (ev.isCancelled()) {
+            return;
+        }
+        fsl = ev.getFoodSaturationLevel();
+        this.foodSaturationLevel = fsl;
+    }
+
+    public void setLevel(int foodLevel) {
+        this.setLevel(foodLevel, -1);
+    }
+
+    public float getFoodSaturationLevel() {
+        return this.foodSaturationLevel;
     }
 
     public int getLevel() {
@@ -40,8 +65,44 @@ public class PlayerFood {
         return 20;
     }
 
-    public void setLevel(int foodLevel) {
-        this.setLevel(foodLevel, -1);
+    public Player getPlayer() {
+        return this.player;
+    }
+
+    public void addFoodLevel(Food food) {
+        this.addFoodLevel(food.getRestoreFood(), food.getRestoreSaturation());
+    }
+
+    public void addFoodLevel(int foodLevel, float fsl) {
+        this.setLevel(this.foodLevel + foodLevel, this.foodSaturationLevel + fsl);
+    }
+
+    public void reset() {
+        this.foodLevel = 20;
+        this.foodSaturationLevel = 20;
+        this.foodExpLevel = 0;
+        this.foodTickTimer = 0;
+        this.sendFoodLevel();
+    }
+
+    public void sendFoodLevel() {
+        this.sendFoodLevel(this.foodLevel);
+    }
+
+    public void sendFoodLevel(int foodLevel) {
+        if (this.player.spawned) {
+            this.player.setAttribute(Attribute.getAttribute(Attribute.MAX_HUNGER).setValue(foodLevel).setDefaultValue(getMaxLevel()));
+        }
+    }
+
+    /**
+     * @param foodLevel       level
+     * @param saturationLevel saturation
+     * @deprecated use {@link #setLevel(int, float)} instead
+     **/
+    @Deprecated
+    public void setFoodLevel(int foodLevel, float saturationLevel) {
+        setLevel(foodLevel, saturationLevel);
     }
 
     public void setLevel(int foodLevel, float saturationLevel) {
@@ -76,62 +137,9 @@ public class PlayerFood {
         this.sendFoodLevel();
     }
 
-    public float getFoodSaturationLevel() {
-        return this.foodSaturationLevel;
-    }
-
-    public void setFoodSaturationLevel(float fsl) {
-        if (fsl > this.foodLevel) fsl = this.foodLevel;
-        if (fsl < 0) fsl = 0;
-        PlayerFoodLevelChangeEvent ev = new PlayerFoodLevelChangeEvent(this.player, this.foodLevel, fsl);
-        this.player.getServer().getPluginManager().callEvent(ev);
-        if (ev.isCancelled()) {
-            return;
-        }
-        fsl = ev.getFoodSaturationLevel();
-        this.foodSaturationLevel = fsl;
-    }
-
-    public void useHunger() {
-        this.useHunger(1);
-    }
-
-    public void useHunger(int amount) {
-        float sfl = this.foodSaturationLevel;
-        int foodLevel = this.foodLevel;
-        if (sfl > 0) {
-            float newSfl = sfl - amount;
-            if (newSfl < 0) newSfl = 0;
-            this.setFoodSaturationLevel(newSfl);
-        } else {
-            this.setLevel(foodLevel - amount);
-        }
-    }
-
-    public void addFoodLevel(Food food) {
-        this.addFoodLevel(food.getRestoreFood(), food.getRestoreSaturation());
-    }
-
-    public void addFoodLevel(int foodLevel, float fsl) {
-        this.setLevel(this.foodLevel + foodLevel, this.foodSaturationLevel + fsl);
-    }
-
-    public void sendFoodLevel() {
-        this.sendFoodLevel(this.foodLevel);
-    }
-
-    public void reset() {
-        this.foodLevel = 20;
-        this.foodSaturationLevel = 20;
-        this.foodExpLevel = 0;
-        this.foodTickTimer = 0;
-        this.sendFoodLevel();
-    }
-
-    public void sendFoodLevel(int foodLevel) {
-        if (this.player.spawned) {
-            this.player.setAttribute(Attribute.getAttribute(Attribute.MAX_HUNGER).setValue(foodLevel).setDefaultValue(getMaxLevel()));
-        }
+    @Override
+    public String toString() {
+        return "PlayerFood(player= " + player + ", foodLevel=" + foodLevel + ", foodSaturationLevel=" + foodSaturationLevel + ", foodTickTimer=" + foodTickTimer + ", foodExpLevel=" + foodExpLevel + ")";
     }
 
     public void update(int tickDiff) {
@@ -182,27 +190,19 @@ public class PlayerFood {
         }
     }
 
-    /**
-     * @deprecated use {@link #setLevel(int)} instead
-     * @param foodLevel level
-     **/
-    @Deprecated
-    public void setFoodLevel(int foodLevel) {
-        setLevel(foodLevel);
+    public void useHunger() {
+        this.useHunger(1);
     }
 
-    /**
-     * @deprecated use {@link #setLevel(int, float)} instead
-     * @param foodLevel level
-     * @param saturationLevel saturation
-     **/
-    @Deprecated
-    public void setFoodLevel(int foodLevel, float saturationLevel) {
-        setLevel(foodLevel, saturationLevel);
-    }
-
-    @Override
-    public String toString() {
-        return "PlayerFood(player= " + player + ", foodLevel=" + foodLevel + ", foodSaturationLevel=" + foodSaturationLevel + ", foodTickTimer=" + foodTickTimer + ", foodExpLevel=" + foodExpLevel + ")";
+    public void useHunger(int amount) {
+        float sfl = this.foodSaturationLevel;
+        int foodLevel = this.foodLevel;
+        if (sfl > 0) {
+            float newSfl = sfl - amount;
+            if (newSfl < 0) newSfl = 0;
+            this.setFoodSaturationLevel(newSfl);
+        } else {
+            this.setLevel(foodLevel - amount);
+        }
     }
 }

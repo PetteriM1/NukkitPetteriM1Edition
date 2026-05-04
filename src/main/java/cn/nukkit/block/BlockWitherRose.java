@@ -21,9 +21,40 @@ public class BlockWitherRose extends BlockFlower {
     public int getId() {
         return WITHER_ROSE;
     }
+
+    @Override
+    public double getMaxX() {
+        return this.x + 0.8;
+    }
+
+    @Override
+    public double getMaxY() {
+        return this.y + 0.8;
+    }
+
+    @Override
+    public double getMaxZ() {
+        return this.z + 0.8;
+    }
+
+    @Override
+    public double getMinX() {
+        return this.x + 0.2;
+    }
+
+    @Override
+    public double getMinZ() {
+        return this.z + 0.2;
+    }
+
     @Override
     public boolean canBeActivated() {
         return false;
+    }
+
+    @Override
+    public boolean hasEntityCollision() {
+        return true;
     }
 
     @Override
@@ -40,37 +71,7 @@ public class BlockWitherRose extends BlockFlower {
     }
 
     @Override
-    public boolean hasEntityCollision() {
-        return true;
-    }
-
-    @Override
     protected AxisAlignedBB recalculateBoundingBox() {
         return this;
-    }
-
-    @Override
-    public double getMinX() {
-        return this.x + 0.2;
-    }
-
-    @Override
-    public double getMinZ() {
-        return this.z + 0.2;
-    }
-
-    @Override
-    public double getMaxX() {
-        return this.x + 0.8;
-    }
-
-    @Override
-    public double getMaxY() {
-        return this.y + 0.8;
-    }
-
-    @Override
-    public double getMaxZ() {
-        return this.z + 0.8;
     }
 }

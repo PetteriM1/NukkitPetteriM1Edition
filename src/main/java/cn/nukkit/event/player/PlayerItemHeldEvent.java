@@ -12,11 +12,6 @@ import cn.nukkit.item.Item;
 public class PlayerItemHeldEvent extends PlayerEvent implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
-
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private final Item item;
     private final int hotbarSlot;
 
@@ -26,8 +21,8 @@ public class PlayerItemHeldEvent extends PlayerEvent implements Cancellable {
         this.hotbarSlot = hotbarSlot;
     }
 
-    public int getSlot() {
-        return this.hotbarSlot;
+    public static HandlerList getHandlers() {
+        return handlers;
     }
 
     @Deprecated
@@ -37,5 +32,9 @@ public class PlayerItemHeldEvent extends PlayerEvent implements Cancellable {
 
     public Item getItem() {
         return item;
+    }
+
+    public int getSlot() {
+        return this.hotbarSlot;
     }
 }

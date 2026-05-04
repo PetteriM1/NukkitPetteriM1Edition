@@ -19,6 +19,26 @@ public class BlockStairsWood extends BlockStairs {
     }
 
     @Override
+    public int getBurnAbility() {
+        return 20;
+    }
+
+    @Override
+    public int getBurnChance() {
+        return 5;
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.WOOD_BLOCK_COLOR;
+    }
+
+    @Override
+    public double getHardness() {
+        return 2;
+    }
+
+    @Override
     public int getId() {
         return WOOD_STAIRS;
     }
@@ -29,39 +49,19 @@ public class BlockStairsWood extends BlockStairs {
     }
 
     @Override
-    public int getToolType() {
-        return ItemTool.TYPE_AXE;
-    }
-
-    @Override
-    public double getHardness() {
-        return 2;
-    }
-
-    @Override
     public double getResistance() {
         return 15;
     }
 
     @Override
-    public int getBurnChance() {
-        return 5;
-    }
-
-    @Override
-    public int getBurnAbility() {
-        return 20;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.WOOD_BLOCK_COLOR;
+    public int getToolType() {
+        return ItemTool.TYPE_AXE;
     }
 
     @Override
     public Item[] getDrops(Item item) {
-         return new Item[]{
-            toItem()
-            };
+        return new Item[]{
+                toItem()
+        };
     }
 }

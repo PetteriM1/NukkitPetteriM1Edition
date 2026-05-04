@@ -79,6 +79,184 @@ public abstract class Enchantment implements Cloneable {
     public static final int ID_DENSITY = 39;
     public static final int ID_BREACH = 40;
     public static final int ID_LUNGE = 41;
+    public final int id;
+    private final Rarity rarity;
+    public EnchantmentType type;
+    protected int level = 1;
+    protected final String name;
+
+    protected Enchantment(int id, String name, Rarity rarity, EnchantmentType type) {
+        this.id = id;
+        this.rarity = rarity;
+        this.type = type;
+
+        this.name = name;
+    }
+
+    public static final String[] words = {"the", "elder", "scrolls", "klaatu", "berata", "niktu", "xyzzy", "bless", "curse", "light", "darkness", "fire", "air", "earth", "water", "hot", "dry", "cold", "wet", "ignite", "snuff", "embiggen", "twist", "shorten", "stretch", "fiddle", "destroy", "imbue", "galvanize", "enchant", "free", "limited", "range", "of", "towards", "inside", "sphere", "cube", "self", "other", "ball", "mental", "physical", "grow", "shrink", "demon", "elemental", "spirit", "animal", "creature", "beast", "humanoid", "undead", "fresh", "stale"};
+
+    private static class UnknownEnchantment extends Enchantment {
+
+        protected UnknownEnchantment(int id) {
+            super(id, "unknown", Rarity.VERY_RARE, EnchantmentType.ALL);
+        }
+    }
+
+    public enum Rarity {
+        COMMON(10),
+        UNCOMMON(5),
+        RARE(2),
+        VERY_RARE(1);
+
+        private final int weight;
+
+        Rarity(int weight) {
+            this.weight = weight;
+        }
+
+        public int getWeight() {
+            return this.weight;
+        }
+
+        public static Rarity fromWeight(int weight) {
+            if (weight < 2) {
+                return VERY_RARE;
+            } else if (weight < 5) {
+                return RARE;
+            } else if (weight < 10) {
+                return UNCOMMON;
+            }
+            return COMMON;
+        }
+    }
+
+    public Enchantment setLevel(int level) {
+        return this.setLevel(level, true);
+    }
+
+    public static Enchantment[] getEnchantments() {
+        ArrayList<Enchantment> list = new ArrayList<>();
+        for (Enchantment enchantment : enchantments) {
+            if (enchantment == null) {
+                break;
+            }
+
+            list.add(enchantment);
+        }
+
+        return list.toArray(new Enchantment[0]);
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public int getMaxEnchantableLevel() {
+        return getMaxLevel();
+    }
+
+    public int getMaxLevel() {
+        return 1;
+    }
+
+    public int getMinLevel() {
+        return 1;
+    }
+
+    public String getName() {
+        return "%enchantment." + this.name;
+    }
+
+    public static String getRandomName() {
+        HashSet<String> set = new HashSet<>();
+        while (set.size() < ThreadLocalRandom.current().nextInt(3, 6)) {
+            set.add(Enchantment.words[ThreadLocalRandom.current().nextInt(0, Enchantment.words.length)]);
+        }
+
+        String[] words = set.toArray(new String[0]);
+        return String.join(" ", words);
+    }
+
+    public Rarity getRarity() {
+        return this.rarity;
+    }
+
+    @Deprecated
+    public int getWeight() {
+        return this.rarity.getWeight();
+    }
+
+    public boolean isMajor() {
+        return false;
+    }
+
+    public boolean isTreasure() {
+        return false;
+    }
+
+    public boolean canEnchant(Item item) {
+        return this.type.canEnchantItem(item);
+    }
+
+    protected boolean checkCompatibility(Enchantment enchantment) {
+        return this != enchantment;
+    }
+
+    @Override
+    protected Enchantment clone() {
+        try {
+            return (Enchantment) super.clone();
+        } catch (CloneNotSupportedException e) {
+            return null;
+        }
+    }
+
+    public void doAttack(Entity attacker, Entity entity) {
+
+    }
+
+    public void doPostAttack(Entity attacker, Entity entity) {
+
+    }
+
+    public void doPostHurt(Entity attacker, Entity entity) {
+
+    }
+
+    public static Enchantment get(int id) {
+        Enchantment enchantment = null;
+        if (id >= 0 && id < enchantments.length) {
+            enchantment = enchantments[id];
+        }
+        if (enchantment == null) {
+            return new UnknownEnchantment(id);
+        }
+        return enchantment;
+    }
+
+    public double getDamageBonus(Entity entity) {
+        return 0;
+    }
+
+    public static Enchantment getEnchantment(int id) {
+        return get(id).clone();
+    }
+
+    public int getMaxEnchantAbility(int level) {
+        return this.getMinEnchantAbility(level) + 5;
+    }
+
+    public int getMinEnchantAbility(int level) {
+        return 1 + level * 10;
+    }
+
+    public float getProtectionFactor(EntityDamageEvent event) {
+        return 0;
+    }
 
     public static void init() {
         enchantments[ID_PROTECTION_ALL] = new EnchantmentProtectionAll();
@@ -125,56 +303,8 @@ public abstract class Enchantment implements Cloneable {
         enchantments[ID_LUNGE] = new EnchantmentLunge();
     }
 
-    public static Enchantment get(int id) {
-        Enchantment enchantment = null;
-        if (id >= 0 && id < enchantments.length) {
-            enchantment = enchantments[id];
-        }
-        if (enchantment == null) {
-            return new UnknownEnchantment(id);
-        }
-        return enchantment;
-    }
-
-    public static Enchantment getEnchantment(int id) {
-        return get(id).clone();
-    }
-
-    public static Enchantment[] getEnchantments() {
-        ArrayList<Enchantment> list = new ArrayList<>();
-        for (Enchantment enchantment : enchantments) {
-            if (enchantment == null) {
-                break;
-            }
-
-            list.add(enchantment);
-        }
-
-        return list.toArray(new Enchantment[0]);
-    }
-
-    public final int id;
-    private final Rarity rarity;
-    public EnchantmentType type;
-
-    protected int level = 1;
-
-    protected final String name;
-
-    protected Enchantment(int id, String name, Rarity rarity, EnchantmentType type) {
-        this.id = id;
-        this.rarity = rarity;
-        this.type = type;
-
-        this.name = name;
-    }
-
-    public int getLevel() {
-        return level;
-    }
-
-    public Enchantment setLevel(int level) {
-        return this.setLevel(level, true);
+    public final boolean isCompatibleWith(Enchantment enchantment) {
+        return this.checkCompatibility(enchantment) && enchantment.checkCompatibility(this);
     }
 
     public Enchantment setLevel(int level, boolean safe) {
@@ -188,141 +318,5 @@ public abstract class Enchantment implements Cloneable {
         } else this.level = Math.max(level, this.getMinLevel());
 
         return this;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public Rarity getRarity() {
-        return this.rarity;
-    }
-
-    /**
-     * @deprecated use {@link Rarity#getWeight()} instead
-     */
-    @Deprecated
-    public int getWeight() {
-        return this.rarity.getWeight();
-    }
-
-    public int getMinLevel() {
-        return 1;
-    }
-
-    public int getMaxLevel() {
-        return 1;
-    }
-
-    public int getMaxEnchantableLevel() {
-        return getMaxLevel();
-    }
-
-    public int getMinEnchantAbility(int level) {
-        return 1 + level * 10;
-    }
-
-    public int getMaxEnchantAbility(int level) {
-        return this.getMinEnchantAbility(level) + 5;
-    }
-
-    public float getProtectionFactor(EntityDamageEvent event) {
-        return 0;
-    }
-
-    public double getDamageBonus(Entity entity) {
-        return 0;
-    }
-
-    public void doPostAttack(Entity attacker, Entity entity) {
-
-    }
-
-    public void doAttack(Entity attacker, Entity entity) {
-
-    }
-
-    public void doPostHurt(Entity attacker, Entity entity) {
-
-    }
-
-    public final boolean isCompatibleWith(Enchantment enchantment) {
-        return this.checkCompatibility(enchantment) && enchantment.checkCompatibility(this);
-    }
-
-    protected boolean checkCompatibility(Enchantment enchantment) {
-        return this != enchantment;
-    }
-
-    public String getName() {
-        return "%enchantment." + this.name;
-    }
-
-    public boolean canEnchant(Item item) {
-        return this.type.canEnchantItem(item);
-    }
-
-    public boolean isMajor() {
-        return false;
-    }
-
-    public boolean isTreasure() {
-        return false;
-    }
-
-    @Override
-    protected Enchantment clone() {
-        try {
-            return (Enchantment) super.clone();
-        } catch (CloneNotSupportedException e) {
-            return null;
-        }
-    }
-
-    public static final String[] words = {"the", "elder", "scrolls", "klaatu", "berata", "niktu", "xyzzy", "bless", "curse", "light", "darkness", "fire", "air", "earth", "water", "hot", "dry", "cold", "wet", "ignite", "snuff", "embiggen", "twist", "shorten", "stretch", "fiddle", "destroy", "imbue", "galvanize", "enchant", "free", "limited", "range", "of", "towards", "inside", "sphere", "cube", "self", "other", "ball", "mental", "physical", "grow", "shrink", "demon", "elemental", "spirit", "animal", "creature", "beast", "humanoid", "undead", "fresh", "stale"};
-
-    public static String getRandomName() {
-        HashSet<String> set = new HashSet<>();
-        while (set.size() < ThreadLocalRandom.current().nextInt(3, 6)) {
-            set.add(Enchantment.words[ThreadLocalRandom.current().nextInt(0, Enchantment.words.length)]);
-        }
-
-        String[] words = set.toArray(new String[0]);
-        return String.join(" ", words);
-    }
-
-    private static class UnknownEnchantment extends Enchantment {
-
-        protected UnknownEnchantment(int id) {
-            super(id, "unknown", Rarity.VERY_RARE, EnchantmentType.ALL);
-        }
-    }
-
-    public enum Rarity {
-        COMMON(10),
-        UNCOMMON(5),
-        RARE(2),
-        VERY_RARE(1);
-
-        private final int weight;
-
-        Rarity(int weight) {
-            this.weight = weight;
-        }
-
-        public int getWeight() {
-            return this.weight;
-        }
-
-        public static Rarity fromWeight(int weight) {
-            if (weight < 2) {
-                return VERY_RARE;
-            } else if (weight < 5) {
-                return RARE;
-            } else if (weight < 10) {
-                return UNCOMMON;
-            }
-            return COMMON;
-        }
     }
 }

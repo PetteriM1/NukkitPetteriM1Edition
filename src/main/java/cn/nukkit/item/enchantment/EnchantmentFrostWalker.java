@@ -7,11 +7,6 @@ public class EnchantmentFrostWalker extends Enchantment {
     }
 
     @Override
-    public int getMaxEnchantAbility(int level) {
-        return this.getMinEnchantAbility(level) + 15;
-    }
-
-    @Override
     public int getMaxLevel() {
         return 2;
     }
@@ -24,5 +19,10 @@ public class EnchantmentFrostWalker extends Enchantment {
     @Override
     public boolean checkCompatibility(Enchantment enchantment) {
         return super.checkCompatibility(enchantment) && enchantment.id != ID_WATER_WALKER;
+    }
+
+    @Override
+    public int getMaxEnchantAbility(int level) {
+        return this.getMinEnchantAbility(level) + 15;
     }
 }

@@ -29,6 +29,20 @@ public class PopulatorUnderwaterFloor extends PopulatorCount {
     }
 
     @Override
+    protected int getHighestWorkableBlock(ChunkManager level, int x, int z, FullChunk chunk) {
+        int y;
+        x &= 0xF;
+        z &= 0xF;
+        for (y = Normal.seaHeight - 1; y >= 0; --y) {
+            if (!PopulatorHelpers.isNonOceanSolid(chunk.getBlockId(x, y, z))) {
+                break;
+            }
+        }
+
+        return y == 0 ? -1 : ++y;
+    }
+
+    @Override
     public void populateCount(ChunkManager level, int chunkX, int chunkZ, NukkitRandom random, FullChunk chunk) {
         if (random.nextDouble() >= probability) {
             return;
@@ -59,19 +73,5 @@ public class PopulatorUnderwaterFloor extends PopulatorCount {
                 }
             }
         }
-    }
-
-    @Override
-    protected int getHighestWorkableBlock(ChunkManager level, int x, int z, FullChunk chunk) {
-        int y;
-        x &= 0xF;
-        z &= 0xF;
-        for (y = Normal.seaHeight - 1; y >= 0; --y) {
-            if (!PopulatorHelpers.isNonOceanSolid(chunk.getBlockId(x, y, z))) {
-                break;
-            }
-        }
-
-        return y == 0 ? -1 : ++y;
     }
 }

@@ -13,20 +13,26 @@ public abstract class BlockDoubleSlabBase extends BlockSolidMeta {
         super(meta);
     }
 
+    public abstract int getItemDamage();
+
     @Override
     public String getName() {
         return "Double " + this.getSlabName() + " Slab";
     }
 
-    public abstract String getSlabName();
-
     public abstract int getSingleSlabId();
 
-    public abstract int getItemDamage();
+    public abstract String getSlabName();
 
     @Override
-    public Item toItem() {
-        return new ItemBlock(Block.get(this.getSingleSlabId(), this.getItemDamage()), this.getItemDamage(), 1);
+    public Item[] getDrops(Item item) {
+        if (isCorrectTool(item)) {
+            Item slab = toItem();
+            slab.setCount(2);
+            return new Item[]{slab};
+        } else {
+            return new Item[0];
+        }
     }
 
     protected boolean isCorrectTool(Item item) {
@@ -34,13 +40,7 @@ public abstract class BlockDoubleSlabBase extends BlockSolidMeta {
     }
 
     @Override
-    public Item[] getDrops(Item item) {
-        if (isCorrectTool(item)) {
-            Item slab = toItem();
-            slab.setCount(2);
-            return new Item[]{ slab };
-        } else {
-            return new Item[0];
-        }
+    public Item toItem() {
+        return new ItemBlock(Block.get(this.getSingleSlabId(), this.getItemDamage()), this.getItemDamage(), 1);
     }
 }

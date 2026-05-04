@@ -7,11 +7,6 @@ import cn.nukkit.event.HandlerList;
 
 public class EntityBlockChangeEvent extends EntityEvent implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
-
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private final Block from;
     private final Block to;
 
@@ -23,6 +18,10 @@ public class EntityBlockChangeEvent extends EntityEvent implements Cancellable {
 
     public Block getFrom() {
         return from;
+    }
+
+    public static HandlerList getHandlers() {
+        return handlers;
     }
 
     public Block getTo() {

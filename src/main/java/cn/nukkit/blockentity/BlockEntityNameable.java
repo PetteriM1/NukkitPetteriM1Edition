@@ -10,20 +10,20 @@ package cn.nukkit.blockentity;
 public interface BlockEntityNameable {
 
     /**
-     * 返回这个事物的名字。<br>
-     * Gets the name of this object.
-     *
-     * @return 这个事物的名字。<br>The name of this object.
-     */
-    String getName();
-
-    /**
      * 设置或更改这个事物的名字。<br>
      * Changes the name of this object, or names it.
      *
      * @param name 这个事物的新名字。<br>The new name of this object.
      */
     void setName(String name);
+
+    /**
+     * 返回这个事物的名字。<br>
+     * Gets the name of this object.
+     *
+     * @return 这个事物的名字。<br>The name of this object.
+     */
+    String getName();
 
     /**
      * 返回这个事物是否有名字。<br>

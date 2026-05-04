@@ -15,8 +15,8 @@ public class EnchantmentProtectionAll extends EnchantmentProtection {
     }
 
     @Override
-    public int getMinEnchantAbility(int level) {
-        return 1 + (level - 1) * 11;
+    public double getTypeModifier() {
+        return 1;
     }
 
     @Override
@@ -25,8 +25,8 @@ public class EnchantmentProtectionAll extends EnchantmentProtection {
     }
 
     @Override
-    public double getTypeModifier() {
-        return 1;
+    public int getMinEnchantAbility(int level) {
+        return 1 + (level - 1) * 11;
     }
 
     @Override

@@ -9,11 +9,6 @@ import cn.nukkit.item.Item;
 public class LoomItemEvent extends InventoryEvent implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
-
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private final Item newItem;
     private final Player player;
 
@@ -21,6 +16,10 @@ public class LoomItemEvent extends InventoryEvent implements Cancellable {
         super(inventory);
         this.newItem = newItem;
         this.player = player;
+    }
+
+    public static HandlerList getHandlers() {
+        return handlers;
     }
 
     public Item getNewItem() {

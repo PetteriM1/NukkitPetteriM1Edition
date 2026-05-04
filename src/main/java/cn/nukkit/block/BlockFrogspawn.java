@@ -3,6 +3,8 @@ package cn.nukkit.block;
 import cn.nukkit.Player;
 import cn.nukkit.item.Item;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockFrogspawn extends BlockFlowable {
 
@@ -15,8 +17,18 @@ public class BlockFrogspawn extends BlockFlowable {
     }
 
     @Override
+    public int getDropExp() {
+        return 1;
+    }
+
+    @Override
     public int getId() {
         return FROG_SPAWN;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_19_0;
     }
 
     @Override
@@ -25,13 +37,13 @@ public class BlockFrogspawn extends BlockFlowable {
     }
 
     @Override
-    public Item[] getDrops(Item item) {
-        return new Item[0];
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.AIR;
     }
 
     @Override
-    public int getDropExp() {
-        return 1;
+    public Item[] getDrops(Item item) {
+        return new Item[0];
     }
 
     @Override

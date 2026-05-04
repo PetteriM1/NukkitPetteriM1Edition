@@ -24,8 +24,8 @@ public class BlockBubbleColumn extends BlockTransparentMeta {
     }
 
     @Override
-    public String getName() {
-        return "Bubble Column";
+    public double getHardness() {
+        return 0;
     }
 
     @Override
@@ -34,18 +34,23 @@ public class BlockBubbleColumn extends BlockTransparentMeta {
     }
 
     @Override
+    public String getName() {
+        return "Bubble Column";
+    }
+
+    @Override
     public double getResistance() {
         return 100;
     }
 
     @Override
-    public double getHardness() {
-        return 0;
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.FLOW_INTO_BLOCK;
     }
 
     @Override
-    public boolean canHarvestWithHand() {
-        return false;
+    public boolean breakWhenPushed() {
+        return true;
     }
 
     @Override
@@ -54,7 +59,22 @@ public class BlockBubbleColumn extends BlockTransparentMeta {
     }
 
     @Override
+    public boolean canHarvestWithHand() {
+        return false;
+    }
+
+    @Override
     public boolean canPassThrough() {
+        return true;
+    }
+
+    @Override
+    public Item[] getDrops(Item item) {
+        return new Item[0];
+    }
+
+    @Override
+    public boolean hasEntityCollision() {
         return true;
     }
 
@@ -64,32 +84,44 @@ public class BlockBubbleColumn extends BlockTransparentMeta {
     }
 
     @Override
-    public Item toItem() {
-        return Item.get(0);
-    }
+    public void onEntityCollide(Entity entity) {
+        if (entity.canBeMovedByCurrents()) {
+            if (this.level.getBlockIdAt((int) this.x, (int) this.y + 1, (int) this.z) == AIR) {
+                double motY = entity.motionY;
 
-    @Override
-    public Item[] getDrops(Item item) {
-        return new Item[0];
-    }
+                if (this.getDamage() == 1) {
+                    motY = Math.max(-0.9, motY - 0.03);
+                } else {
+                    if ((entity instanceof EntityCreature) && motY < -0.64f) {
+                        motY = -0.16f;
+                    }
+                    motY = Math.min(1.8, motY + 0.1);
+                }
 
-    @Override
-    public boolean breakWhenPushed() {
-        return true;
-    }
+                if (entity instanceof Player) {
+                    ((Player) entity).setMotionLocally(entity.getMotion().setY(motY));
+                } else {
+                    entity.motionY = motY;
+                }
+            } else {
+                double motY = entity.motionY;
 
-    @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        if (this.getLevel().setBlock(this, this, true, true)) {
-            this.getLevel().setBlock(this, Block.LAYER_WATERLOGGED, Block.get(Block.STILL_WATER), true, true);
-            return true;
+                if (this.getDamage() == 1) {
+                    motY = Math.max(-0.3, motY - 0.3);
+                } else {
+                    motY = Math.min(0.7, motY + 0.06);
+                }
+
+                if (entity instanceof Player) {
+                    ((Player) entity).setMotionLocally(entity.getMotion().setY(motY));
+                } else {
+                    entity.motionY = motY;
+                }
+            }
+            if (entity instanceof EntityItem) {
+                entity.collisionBlocks = null;
+            }
         }
-        return false;
-    }
-
-    @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.FLOW_INTO_BLOCK;
     }
 
     @Override
@@ -133,48 +165,16 @@ public class BlockBubbleColumn extends BlockTransparentMeta {
     }
 
     @Override
-    public boolean hasEntityCollision() {
-        return true;
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        if (this.getLevel().setBlock(this, this, true, true)) {
+            this.getLevel().setBlock(this, Block.LAYER_WATERLOGGED, Block.get(Block.STILL_WATER), true, true);
+            return true;
+        }
+        return false;
     }
 
     @Override
-    public void onEntityCollide(Entity entity) {
-        if (entity.canBeMovedByCurrents()) {
-            if (this.level.getBlockIdAt((int) this.x, (int) this.y + 1, (int) this.z) == AIR) {
-                double motY = entity.motionY;
-
-                if (this.getDamage() == 1) {
-                    motY = Math.max(-0.9, motY - 0.03);
-                } else {
-                    if ((entity instanceof EntityCreature) && motY < -0.64f) {
-                        motY = -0.16f;
-                    }
-                    motY = Math.min(1.8, motY + 0.1);
-                }
-
-                if (entity instanceof Player) {
-                    ((Player) entity).setMotionLocally(entity.getMotion().setY(motY));
-                } else {
-                    entity.motionY = motY;
-                }
-            } else {
-                double motY = entity.motionY;
-
-                if (this.getDamage() == 1) {
-                    motY = Math.max(-0.3, motY - 0.3);
-                } else {
-                    motY = Math.min(0.7, motY + 0.06);
-                }
-
-                if (entity instanceof Player) {
-                    ((Player) entity).setMotionLocally(entity.getMotion().setY(motY));
-                } else {
-                    entity.motionY = motY;
-                }
-            }
-            if (entity instanceof EntityItem) {
-                entity.collisionBlocks = null;
-            }
-        }
+    public Item toItem() {
+        return Item.get(0);
     }
 }

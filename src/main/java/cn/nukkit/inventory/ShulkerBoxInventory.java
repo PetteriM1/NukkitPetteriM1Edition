@@ -20,23 +20,14 @@ public class ShulkerBoxInventory extends ContainerInventory {
     }
 
     @Override
-    public void onOpen(Player who) {
-        super.onOpen(who);
+    public boolean allowedToAdd(Item item) {
+        int itemId = item.getId();
+        return itemId != BlockID.SHULKER_BOX && itemId != BlockID.UNDYED_SHULKER_BOX;
+    }
 
-        if (this.getViewers().size() == 1) {
-            BlockEventPacket pk = new BlockEventPacket();
-            pk.x = (int) this.getHolder().getX();
-            pk.y = (int) this.getHolder().getY();
-            pk.z = (int) this.getHolder().getZ();
-            pk.case1 = 1;
-            pk.case2 = 2;
-
-            Level level = this.getHolder().getLevel();
-            if (level != null) {
-                level.addLevelSoundEvent(this.getHolder().add(0.5, 0.5, 0.5), LevelSoundEventPacket.SOUND_SHULKERBOX_OPEN);
-                level.addChunkPacket((int) this.getHolder().getX() >> 4, (int) this.getHolder().getZ() >> 4, pk);
-            }
-        }
+    @Override
+    public boolean canAddItem(Item item) {
+        return this.allowedToAdd(item) && super.canAddItem(item);
     }
 
     @Override
@@ -60,14 +51,23 @@ public class ShulkerBoxInventory extends ContainerInventory {
     }
 
     @Override
-    public boolean canAddItem(Item item) {
-        return this.allowedToAdd(item) && super.canAddItem(item);
-    }
+    public void onOpen(Player who) {
+        super.onOpen(who);
 
-    @Override
-    public boolean allowedToAdd(Item item) {
-        int itemId = item.getId();
-        return itemId != BlockID.SHULKER_BOX && itemId != BlockID.UNDYED_SHULKER_BOX;
+        if (this.getViewers().size() == 1) {
+            BlockEventPacket pk = new BlockEventPacket();
+            pk.x = (int) this.getHolder().getX();
+            pk.y = (int) this.getHolder().getY();
+            pk.z = (int) this.getHolder().getZ();
+            pk.case1 = 1;
+            pk.case2 = 2;
+
+            Level level = this.getHolder().getLevel();
+            if (level != null) {
+                level.addLevelSoundEvent(this.getHolder().add(0.5, 0.5, 0.5), LevelSoundEventPacket.SOUND_SHULKERBOX_OPEN);
+                level.addChunkPacket((int) this.getHolder().getX() >> 4, (int) this.getHolder().getZ() >> 4, pk);
+            }
+        }
     }
 
     @Override

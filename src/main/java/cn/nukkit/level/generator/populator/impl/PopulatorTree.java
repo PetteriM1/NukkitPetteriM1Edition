@@ -10,6 +10,8 @@ import cn.nukkit.level.generator.populator.type.PopulatorCount;
 import cn.nukkit.math.NukkitMath;
 import cn.nukkit.math.NukkitRandom;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.nbt.tag.ListTag;
+import cn.nukkit.utils.Utils;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -28,6 +30,20 @@ public class PopulatorTree extends PopulatorCount {
 
     public PopulatorTree(int type) {
         this.type = type;
+    }
+
+    private int getHighestWorkableBlock(int x, int z) {
+        int y;
+        for (y = 254; y > 0; --y) {
+            int b = this.level.getBlockIdAt(x, y, z);
+            if (b == Block.DIRT || b == Block.GRASS || (this.type == BlockSapling.SPRUCE && b == Block.PODZOL)) {
+                break;
+            } else if (b != Block.AIR && b != Block.SNOW_LAYER) {
+                return -1;
+            }
+        }
+
+        return ++y;
     }
 
     @Override
@@ -72,25 +88,17 @@ public class PopulatorTree extends PopulatorCount {
             level.getBlockIdAt(bx, by, bz);
             level.setBlockAt(bx, by, bz, Block.BEE_NEST);
 
+            ListTag<CompoundTag> occupantsTag = new ListTag<>("Occupants");
+            for (int i = 0; i < Utils.rand(2, 3); i++) {
+                occupantsTag.add(new CompoundTag().putCompound("SaveData", new CompoundTag()));
+            }
+
             BlockEntity.createBlockEntity(BlockEntity.BEEHIVE, level.getChunk(chunkX, chunkZ), new CompoundTag()
                     .putString("id", BlockEntity.BEEHIVE)
                     .putInt("x", bx)
                     .putInt("y", by)
-                    .putInt("z", bz));
+                    .putInt("z", bz)
+                    .putList(occupantsTag));
         }
-    }
-
-    private int getHighestWorkableBlock(int x, int z) {
-        int y;
-        for (y = 254; y > 0; --y) {
-            int b = this.level.getBlockIdAt(x, y, z);
-            if (b == Block.DIRT || b == Block.GRASS || (this.type == BlockSapling.SPRUCE && b == Block.PODZOL)) {
-                break;
-            } else if (b != Block.AIR && b != Block.SNOW_LAYER) {
-                return -1;
-            }
-        }
-
-        return ++y;
     }
 }

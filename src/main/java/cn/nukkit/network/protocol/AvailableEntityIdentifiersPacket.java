@@ -7,11 +7,6 @@ public class AvailableEntityIdentifiersPacket extends DataPacket {
     public static final byte NETWORK_ID = ProtocolInfo.AVAILABLE_ENTITY_IDENTIFIERS_PACKET;
 
     @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
-    @Override
     public void decode() {
         this.decodeUnsupported();
     }
@@ -19,6 +14,11 @@ public class AvailableEntityIdentifiersPacket extends DataPacket {
     @Override
     public void encode() {
         this.reset();
-        this.put(EntityManager.get().createNetworkTag());
+        this.put(EntityManager.get().createNetworkTag(this.protocol));
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

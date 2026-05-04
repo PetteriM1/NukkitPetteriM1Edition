@@ -19,13 +19,18 @@ public class BlockFenceNetherBrick extends BlockFence {
     }
 
     @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
+    public int getBurnAbility() {
+        return 0;
     }
 
     @Override
-    public String getName() {
-        return "Nether Brick Fence";
+    public int getBurnChance() {
+        return 0;
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.NETHERRACK_BLOCK_COLOR;
     }
 
     @Override
@@ -34,8 +39,28 @@ public class BlockFenceNetherBrick extends BlockFence {
     }
 
     @Override
+    public String getName() {
+        return "Nether Brick Fence";
+    }
+
+    @Override
     public double getResistance() {
         return 10;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
+    }
+
+    @Override
+    public boolean canConnect(Block block) {
+        return (block instanceof BlockFenceNetherBrick || block instanceof BlockFenceGate) || block.isSolid() && !block.isTransparent();
+    }
+
+    @Override
+    public boolean canHarvestWithHand() {
+        return false;
     }
 
     @Override
@@ -47,30 +72,5 @@ public class BlockFenceNetherBrick extends BlockFence {
         } else {
             return new Item[0];
         }
-    }
-
-    @Override
-    public boolean canConnect(Block block) {
-        return (block instanceof BlockFenceNetherBrick || block instanceof BlockFenceGate) || block.isSolid() && !block.isTransparent();
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.NETHERRACK_BLOCK_COLOR;
-    }
-
-    @Override
-    public boolean canHarvestWithHand() {
-        return false;
-    }
-
-    @Override
-    public int getBurnChance() {
-        return 0;
-    }
-
-    @Override
-    public int getBurnAbility() {
-        return 0;
     }
 }

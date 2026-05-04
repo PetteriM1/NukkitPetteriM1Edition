@@ -2,7 +2,9 @@ package cn.nukkit.block;
 
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockSuspiciousGravel extends BlockFallableMeta {
 
@@ -15,13 +17,28 @@ public class BlockSuspiciousGravel extends BlockFallableMeta {
     }
 
     @Override
-    public int getId() {
-        return SUSPICIOUS_GRAVEL;
+    public BlockColor getColor() {
+        return BlockColor.GRAY_BLOCK_COLOR;
     }
 
     @Override
     public double getHardness() {
         return 0.25;
+    }
+
+    @Override
+    public int getId() {
+        return SUSPICIOUS_GRAVEL;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_20_0_23;
+    }
+
+    @Override
+    public String getName() {
+        return "Suspicious Gravel";
     }
 
     @Override
@@ -35,13 +52,8 @@ public class BlockSuspiciousGravel extends BlockFallableMeta {
     }
 
     @Override
-    public String getName() {
-        return "Suspicious Gravel";
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.GRAY_BLOCK_COLOR;
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.GRAVEL;
     }
 
     @Override

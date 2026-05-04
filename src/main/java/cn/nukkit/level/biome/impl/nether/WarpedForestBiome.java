@@ -20,8 +20,8 @@ public class WarpedForestBiome extends CoveredBiome {
     }
 
     @Override
-    public int getSurfaceId(int x, int y, int z) {
-        return Block.WARPED_NYLIUM << Block.DATA_BITS;
+    public boolean canRain() {
+        return false;
     }
 
     @Override
@@ -30,7 +30,7 @@ public class WarpedForestBiome extends CoveredBiome {
     }
 
     @Override
-    public boolean canRain() {
-        return false;
+    public int getSurfaceId(int x, int y, int z) {
+        return Block.WARPED_NYLIUM << Block.DATA_BITS;
     }
 }

@@ -34,6 +34,60 @@ public class RepairItemTransaction extends InventoryTransaction {
         super(source, actions);
     }
 
+    public int getCost() {
+        return this.cost;
+    }
+
+    public Item getInputItem() {
+        return this.inputItem;
+    }
+
+    public Item getMaterialItem() {
+        return this.materialItem;
+    }
+
+    public Item getOutputItem() {
+        return this.outputItem;
+    }
+
+    private boolean isMapRecipe() {
+        return this.hasMaterial() && (this.inputItem.getId() == Item.MAP || this.inputItem.getId() == Item.EMPTY_MAP)
+                && (this.materialItem.getId() == Item.EMPTY_MAP || this.materialItem.getId() == Item.PAPER || this.materialItem.getId() == Item.COMPASS);
+    }
+
+    @Override
+    public void addAction(InventoryAction action) {
+        if (action instanceof RepairItemAction) {
+            switch (((RepairItemAction) action).getType()) {
+                case NetworkInventoryAction.SOURCE_TYPE_ANVIL_INPUT:
+                    if (this.inputItem != null) {
+                        this.invalid = true;
+                        source.getServer().getLogger().debug("Duplicate addAction for inputItem");
+                        return;
+                    }
+                    this.inputItem = action.getTargetItem();
+                    break;
+                case NetworkInventoryAction.SOURCE_TYPE_ANVIL_RESULT:
+                    if (this.outputItem != null) {
+                        this.invalid = true;
+                        source.getServer().getLogger().debug("Duplicate addAction for outputItem");
+                        return;
+                    }
+                    this.outputItem = action.getSourceItem();
+                    break;
+                case NetworkInventoryAction.SOURCE_TYPE_ANVIL_MATERIAL:
+                    if (this.materialItem != null) {
+                        this.invalid = true;
+                        source.getServer().getLogger().debug("Duplicate addAction for materialItem");
+                        return;
+                    }
+                    this.materialItem = action.getTargetItem();
+                    break;
+            }
+        }
+        super.addAction(action);
+    }
+
     @Override
     public boolean canExecute() {
         if (!super.canExecute()) {
@@ -75,102 +129,13 @@ public class RepairItemTransaction extends InventoryTransaction {
     }
 
     @Override
-    public boolean execute() {
-        if (this.hasExecuted() || !this.canExecute() || this.invalid) {
-            this.source.removeAllWindows(false);
-            this.sendInventories();
-            return false;
-        }
-        AnvilInventory inventory = (AnvilInventory) getSource().getWindowById(Player.ANVIL_WINDOW_ID);
-
-        if (inventory.getCost() != this.cost && !this.source.isCreative()) {
-            this.source.getServer().getLogger().debug("Got unexpected cost " + inventory.getCost() + " from " + this.source.getName() + " (expected " + this.cost + ')');
-        }
-
-        RepairItemEvent event = new RepairItemEvent(inventory, this.inputItem, this.outputItem, this.materialItem, this.cost, this.source);
-        this.source.getServer().getPluginManager().callEvent(event);
-        if (event.isCancelled()) {
-            this.sendInventories();
-            source.setNeedSendInventory(true);
-            return true;
-        }
-
-        for (InventoryAction action : this.actions) {
-            if (action.execute(this.source)) {
-                action.onExecuteSuccess(this.source);
-            } else {
-                action.onExecuteFail(this.source);
+    public boolean checkForItemPart(List<InventoryAction> actions) {
+        for (InventoryAction action : actions) {
+            if (action instanceof RepairItemAction) {
+                return true;
             }
         }
-
-        FakeBlockMenu holder = inventory.getHolder();
-        Block block = this.source.level.getBlock(holder.getFloorX(), holder.getFloorY(), holder.getFloorZ());
-        if (block.getId() == Block.ANVIL) {
-            int oldDamage = block.getDamage() >= 8 ? 2 : block.getDamage() >= 4 ? 1 : 0;
-            int newDamage = !this.source.isCreative() && ThreadLocalRandom.current().nextInt(100) < 12 ? oldDamage + 1 : oldDamage;
-
-            AnvilDamageEvent ev = new AnvilDamageEvent(block, oldDamage, newDamage, DamageCause.USE, this.source);
-            ev.setCancelled(oldDamage == newDamage);
-            this.source.getServer().getPluginManager().callEvent(ev);
-            if (!ev.isCancelled()) {
-                newDamage = ev.getNewDamage();
-                if (newDamage > 2) {
-                    this.source.level.setBlock(block, Block.get(Block.AIR), true);
-                    this.source.level.addLevelEvent(block, LevelEventPacket.EVENT_SOUND_ANVIL_BREAK);
-                } else {
-                    if (newDamage < 0) {
-                        newDamage = 0;
-                    }
-                    if (newDamage != oldDamage) {
-                        block.setDamage((newDamage << 2) | (block.getDamage() & 0x3));
-                        this.source.level.setBlock(block, block, true);
-                    }
-                    this.source.level.addLevelEvent(block, LevelEventPacket.EVENT_SOUND_ANVIL_USE);
-                }
-            } else {
-                this.source.level.addLevelEvent(block, LevelEventPacket.EVENT_SOUND_ANVIL_USE);
-            }
-        }
-
-        if (!this.source.isCreative()) {
-            this.source.setExperience(this.source.getExperience(), this.source.getExperienceLevel() - event.getCost());
-        }
-
-        this.hasExecuted = true;
-        return true;
-    }
-
-    @Override
-    public void addAction(InventoryAction action) {
-        if (action instanceof RepairItemAction) {
-            switch (((RepairItemAction) action).getType()) {
-                case NetworkInventoryAction.SOURCE_TYPE_ANVIL_INPUT:
-                    if (this.inputItem != null) {
-                        this.invalid = true;
-                        source.getServer().getLogger().debug("Duplicate addAction for inputItem");
-                        return;
-                    }
-                    this.inputItem = action.getTargetItem();
-                    break;
-                case NetworkInventoryAction.SOURCE_TYPE_ANVIL_RESULT:
-                    if (this.outputItem != null) {
-                        this.invalid = true;
-                        source.getServer().getLogger().debug("Duplicate addAction for outputItem");
-                        return;
-                    }
-                    this.outputItem = action.getSourceItem();
-                    break;
-                case NetworkInventoryAction.SOURCE_TYPE_ANVIL_MATERIAL:
-                    if (this.materialItem != null) {
-                        this.invalid = true;
-                        source.getServer().getLogger().debug("Duplicate addAction for materialItem");
-                        return;
-                    }
-                    this.materialItem = action.getTargetItem();
-                    break;
-            }
-        }
-        super.addAction(action);
+        return false;
     }
 
     private boolean checkRecipeValid() {
@@ -366,13 +331,74 @@ public class RepairItemTransaction extends InventoryTransaction {
         return true;
     }
 
-    private boolean hasMaterial() {
-        return this.materialItem != null && !this.materialItem.isNull();
+    @Override
+    public boolean execute() {
+        if (this.hasExecuted() || !this.canExecute() || this.invalid) {
+            this.source.removeAllWindows(false);
+            this.sendInventories();
+            return false;
+        }
+        AnvilInventory inventory = (AnvilInventory) getSource().getWindowById(Player.ANVIL_WINDOW_ID);
+
+        if (inventory.getCost() != this.cost && !this.source.isCreative()) {
+            this.source.getServer().getLogger().debug("Got unexpected cost " + inventory.getCost() + " from " + this.source.getName() + " (expected " + this.cost + ')');
+        }
+
+        RepairItemEvent event = new RepairItemEvent(inventory, this.inputItem, this.outputItem, this.materialItem, this.cost, this.source);
+        this.source.getServer().getPluginManager().callEvent(event);
+        if (event.isCancelled()) {
+            this.sendInventories();
+            source.setNeedSendInventory(true);
+            return true;
+        }
+
+        for (InventoryAction action : this.actions) {
+            if (action.execute(this.source)) {
+                action.onExecuteSuccess(this.source);
+            } else {
+                action.onExecuteFail(this.source);
+            }
+        }
+
+        FakeBlockMenu holder = inventory.getHolder();
+        Block block = this.source.level.getBlock(holder.getFloorX(), holder.getFloorY(), holder.getFloorZ());
+        if (block.getId() == Block.ANVIL) {
+            int oldDamage = block.getDamage() >= 8 ? 2 : block.getDamage() >= 4 ? 1 : 0;
+            int newDamage = !this.source.isCreative() && ThreadLocalRandom.current().nextInt(100) < 12 ? oldDamage + 1 : oldDamage;
+
+            AnvilDamageEvent ev = new AnvilDamageEvent(block, oldDamage, newDamage, DamageCause.USE, this.source);
+            ev.setCancelled(oldDamage == newDamage);
+            this.source.getServer().getPluginManager().callEvent(ev);
+            if (!ev.isCancelled()) {
+                newDamage = ev.getNewDamage();
+                if (newDamage > 2) {
+                    this.source.level.setBlock(block, Block.get(Block.AIR), true);
+                    this.source.level.addLevelEvent(block, LevelEventPacket.EVENT_SOUND_ANVIL_BREAK);
+                } else {
+                    if (newDamage < 0) {
+                        newDamage = 0;
+                    }
+                    if (newDamage != oldDamage) {
+                        block.setDamage((newDamage << 2) | (block.getDamage() & 0x3));
+                        this.source.level.setBlock(block, block, true);
+                    }
+                    this.source.level.addLevelEvent(block, LevelEventPacket.EVENT_SOUND_ANVIL_USE);
+                }
+            } else {
+                this.source.level.addLevelEvent(block, LevelEventPacket.EVENT_SOUND_ANVIL_USE);
+            }
+        }
+
+        if (!this.source.isCreative()) {
+            this.source.setExperience(this.source.getExperience(), this.source.getExperienceLevel() - event.getCost());
+        }
+
+        this.hasExecuted = true;
+        return true;
     }
 
-    private boolean isMapRecipe() {
-        return this.hasMaterial() && (this.inputItem.getId() == Item.MAP || this.inputItem.getId() == Item.EMPTY_MAP)
-                && (this.materialItem.getId() == Item.EMPTY_MAP || this.materialItem.getId() == Item.PAPER || this.materialItem.getId() == Item.COMPASS);
+    private boolean hasMaterial() {
+        return this.materialItem != null && !this.materialItem.isNull();
     }
 
     private boolean matchMapRecipe() {
@@ -459,32 +485,6 @@ public class RepairItemTransaction extends InventoryTransaction {
                 return this.materialItem.getId() == Item.SCUTE;
             case Item.ELYTRA:
                 return this.materialItem.getId() == Item.PHANTOM_MEMBRANE;
-        }
-        return false;
-    }
-
-    public Item getInputItem() {
-        return this.inputItem;
-    }
-
-    public Item getMaterialItem() {
-        return this.materialItem;
-    }
-
-    public Item getOutputItem() {
-        return this.outputItem;
-    }
-
-    public int getCost() {
-        return this.cost;
-    }
-
-    @Override
-    public boolean checkForItemPart(List<InventoryAction> actions) {
-        for (InventoryAction action : actions) {
-            if (action instanceof RepairItemAction) {
-                return true;
-            }
         }
         return false;
     }

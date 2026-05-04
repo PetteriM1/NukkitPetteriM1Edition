@@ -46,35 +46,6 @@ abstract public class PluginBase implements Plugin {
     private File file;
     private PluginLogger logger;
 
-
-    public void onLoad() {
-
-    }
-
-    public void onEnable() {
-
-    }
-
-    public void onDisable() {
-
-    }
-
-    public final boolean isEnabled() {
-        return isEnabled;
-    }
-
-    /**
-     * 加载这个插件。<br>
-     * Enables this plugin.
-     * <p>
-     * 如果你需要卸载这个插件，建议使用{@link #setEnabled(boolean)}<br>
-     * If you need to disable this plugin, it's recommended to use {@link #setEnabled(boolean)}
-     *
-     */
-    public final void setEnabled() {
-        this.setEnabled(true);
-    }
-
     /**
      * 加载或卸载这个插件。<br>
      * Enables or disables this plugin.
@@ -95,8 +66,12 @@ abstract public class PluginBase implements Plugin {
         }
     }
 
-    public final boolean isDisabled() {
-        return !isEnabled;
+    @Override
+    public Config getConfig() {
+        if (this.config == null) {
+            this.reloadConfig();
+        }
+        return this.config;
     }
 
     public final File getDataFolder() {
@@ -105,6 +80,89 @@ abstract public class PluginBase implements Plugin {
 
     public final PluginDescription getDescription() {
         return description;
+    }
+
+    /**
+     * 返回这个插件的文件{@code File}对象。对于jar格式的插件，就是jar文件本身。<br>
+     * Returns the {@code File} object of this plugin itself. For jar-packed plugins, it is the jar file itself.
+     *
+     * @return 这个插件的文件 {@code File}对象。<br>The {@code File} object of this plugin itself.
+     */
+    public File getFile() {
+        return file;
+    }
+
+    /**
+     * 返回这个插件完整的名字。<br>
+     * Returns the full name of this plugin.
+     * <p>
+     * 一个插件完整的名字由{@code 名字+" v"+版本号}组成。比如：<br>
+     * A full name of a plugin is composed by {@code name+" v"+version}.for example:
+     * {@code HelloWorld v1.0.0}
+     *
+     * @return 这个插件完整的名字。<br>The full name of this plugin.
+     * @see cn.nukkit.plugin.PluginDescription#getFullName
+     */
+    public final String getFullName() {
+        return this.description.getFullName();
+    }
+
+    public PluginLogger getLogger() {
+        return logger;
+    }
+
+    @Override
+    public String getName() {
+        return this.description.getName();
+    }
+
+    @Override
+    public PluginLoader getPluginLoader() {
+        return this.loader;
+    }
+
+    @Override
+    public Server getServer() {
+        return server;
+    }
+
+    public final boolean isDisabled() {
+        return !isEnabled;
+    }
+
+    public final boolean isEnabled() {
+        return isEnabled;
+    }
+
+    /**
+     * 返回这个插件是否已经初始化。<br>
+     * Returns if this plugin is initialized.
+     *
+     * @return 这个插件是否已初始化。<br>if this plugin is initialized.
+     */
+    public final boolean isInitialized() {
+        return initialized;
+    }
+
+    /**
+     * TODO: FINISH JAVADOC
+     */
+    public PluginIdentifiableCommand getCommand(String name) {
+        PluginIdentifiableCommand command = this.server.getPluginCommand(name);
+        if (command == null || !command.getPlugin().equals(this)) {
+            command = this.server.getPluginCommand(this.description.getName().toLowerCase(Locale.ROOT) + ':' + name);
+        }
+
+        if (command != null && command.getPlugin().equals(this)) {
+            return command;
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public InputStream getResource(String filename) {
+        return this.getClass().getClassLoader().getResourceAsStream(filename);
     }
 
     /**
@@ -138,44 +196,53 @@ abstract public class PluginBase implements Plugin {
         }
     }
 
-    public PluginLogger getLogger() {
-        return logger;
-    }
-
-    /**
-     * 返回这个插件是否已经初始化。<br>
-     * Returns if this plugin is initialized.
-     *
-     * @return 这个插件是否已初始化。<br>if this plugin is initialized.
-     */
-    public final boolean isInitialized() {
-        return initialized;
-    }
-
-    /**
-     * TODO: FINISH JAVADOC
-     */
-    public PluginIdentifiableCommand getCommand(String name) {
-        PluginIdentifiableCommand command = this.server.getPluginCommand(name);
-        if (command == null || !command.getPlugin().equals(this)) {
-            command = this.server.getPluginCommand(this.description.getName().toLowerCase(Locale.ROOT) + ':' + name);
-        }
-
-        if (command != null && command.getPlugin().equals(this)) {
-            return command;
-        } else {
-            return null;
-        }
-    }
-
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         return false;
     }
 
+    public void onDisable() {
+
+    }
+
+    public void onEnable() {
+
+    }
+
+    public void onLoad() {
+
+    }
+
     @Override
-    public InputStream getResource(String filename) {
-        return this.getClass().getClassLoader().getResourceAsStream(filename);
+    public void reloadConfig() {
+        this.config = new Config(this.configFile);
+        InputStream configStream = this.getResource("config.yml");
+        if (configStream != null) {
+            DumperOptions dumperOptions = new DumperOptions();
+            dumperOptions.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+            LoaderOptions loaderOptions = new LoaderOptions();
+            loaderOptions.setCodePointLimit(104857600); // Allow over 3mb config files
+            Yaml yaml = new Yaml(new Constructor(loaderOptions), new Representer(dumperOptions), dumperOptions, loaderOptions, new Resolver());
+            try {
+                this.config.setDefault(yaml.loadAs(Utils.readFile(this.configFile), LinkedHashMap.class));
+            } catch (IOException e) {
+                Server.getInstance().getLogger().logException(e);
+            }
+        }
+    }
+
+    @Override
+    public void saveConfig() {
+        if (!this.getConfig().save()) {
+            this.logger.critical("Could not save config to " + this.configFile.toString());
+        }
+    }
+
+    @Override
+    public void saveDefaultConfig() {
+        if (!this.configFile.exists()) {
+            this.saveResource("config.yml", false);
+        }
     }
 
     @Override
@@ -212,83 +279,15 @@ abstract public class PluginBase implements Plugin {
         return false;
     }
 
-    @Override
-    public Config getConfig() {
-        if (this.config == null) {
-            this.reloadConfig();
-        }
-        return this.config;
-    }
-
-    @Override
-    public void saveConfig() {
-        if (!this.getConfig().save()) {
-            this.logger.critical("Could not save config to " + this.configFile.toString());
-        }
-    }
-
-    @Override
-    public void saveDefaultConfig() {
-        if (!this.configFile.exists()) {
-            this.saveResource("config.yml", false);
-        }
-    }
-
-    @Override
-    public void reloadConfig() {
-        this.config = new Config(this.configFile);
-        InputStream configStream = this.getResource("config.yml");
-        if (configStream != null) {
-            DumperOptions dumperOptions = new DumperOptions();
-            dumperOptions.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-            LoaderOptions loaderOptions = new LoaderOptions();
-            loaderOptions.setCodePointLimit(104857600); // Allow over 3mb config files
-            Yaml yaml = new Yaml(new Constructor(loaderOptions), new Representer(dumperOptions), dumperOptions, loaderOptions, new Resolver());
-            try {
-                this.config.setDefault(yaml.loadAs(Utils.readFile(this.configFile), LinkedHashMap.class));
-            } catch (IOException e) {
-                Server.getInstance().getLogger().logException(e);
-            }
-        }
-    }
-
-    @Override
-    public Server getServer() {
-        return server;
-    }
-
-    @Override
-    public String getName() {
-        return this.description.getName();
-    }
-
     /**
-     * 返回这个插件完整的名字。<br>
-     * Returns the full name of this plugin.
+     * 加载这个插件。<br>
+     * Enables this plugin.
      * <p>
-     * 一个插件完整的名字由{@code 名字+" v"+版本号}组成。比如：<br>
-     * A full name of a plugin is composed by {@code name+" v"+version}.for example:
-     * {@code HelloWorld v1.0.0}
+     * 如果你需要卸载这个插件，建议使用{@link #setEnabled(boolean)}<br>
+     * If you need to disable this plugin, it's recommended to use {@link #setEnabled(boolean)}
      *
-     * @return 这个插件完整的名字。<br>The full name of this plugin.
-     * @see cn.nukkit.plugin.PluginDescription#getFullName
      */
-    public final String getFullName() {
-        return this.description.getFullName();
-    }
-
-    /**
-     * 返回这个插件的文件{@code File}对象。对于jar格式的插件，就是jar文件本身。<br>
-     * Returns the {@code File} object of this plugin itself. For jar-packed plugins, it is the jar file itself.
-     *
-     * @return 这个插件的文件 {@code File}对象。<br>The {@code File} object of this plugin itself.
-     */
-    public File getFile() {
-        return file;
-    }
-
-    @Override
-    public PluginLoader getPluginLoader() {
-        return this.loader;
+    public final void setEnabled() {
+        this.setEnabled(true);
     }
 }

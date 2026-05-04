@@ -1,12 +1,14 @@
 package cn.nukkit.entity.mob;
 
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemBow;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class EntityStray extends EntitySkeleton {
 
@@ -14,11 +16,6 @@ public class EntityStray extends EntitySkeleton {
 
     public EntityStray(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
-    }
-
-    @Override
-    public int getNetworkId() {
-        return NETWORK_ID;
     }
 
     @Override
@@ -37,6 +34,20 @@ public class EntityStray extends EntitySkeleton {
             drops.add(Item.get(Item.ARROW, 18, 1));
         }
 
+        if (this.getTool() instanceof ItemBow && ThreadLocalRandom.current().nextInt(1000) < 85) {
+            drops.add(Item.get(Item.BOW, Utils.rand(100, 380), 1));
+        }
+
         return drops.toArray(new Item[0]);
+    }
+
+    @Override
+    protected float getFreezingDamage() {
+        return 0f;
+    }
+
+    @Override
+    public int getNetworkId() {
+        return NETWORK_ID;
     }
 }

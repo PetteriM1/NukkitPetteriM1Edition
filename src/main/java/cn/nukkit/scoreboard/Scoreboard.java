@@ -114,49 +114,18 @@ public class Scoreboard {
     private final List<QueuedScoreUpdate> queuedUpdates = new ArrayList<>();
 
     /**
-     * Update score for given scorer.
-     * @param scorer scorer name / line text
-     * @param newScore new score
-     * @return true if a score was changed or removed
+     * Returns unmodifiable view of internal scorers and scores. Plugin developers who are making their plugin to
+     * only display text can use this information to efficiently update only changed lines.
+     *
+     * @return unmodifiable map
      */
-    public boolean setScore(String scorer, int newScore) {
-        Score score = this.scores.get(scorer);
-
-        if (score == null) {
-            score = new Score(++this.scoreId, newScore);
-            this.scores.put(scorer, score);
-
-            this.sendScore(scorer, score, SetScorePacket.Action.SET);
-        } else if (score.score != newScore) {
-            score.score = newScore;
-
-            this.sendScore(scorer, score, SetScorePacket.Action.SET);
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Remove score of given scorer.
-     * @param scorer scorer name / line text
-     * @return true if score did exist
-     */
-    public boolean removeScore(String scorer) {
-        Score oldScore = this.scores.remove(scorer);
-
-        if (oldScore != null) {
-            this.sendScore(scorer, oldScore, SetScorePacket.Action.REMOVE);
-
-            return true;
-        }
-
-        return false;
+    public Map<String, Score> getScores() {
+        return Collections.unmodifiableMap(this.scores);
     }
 
     /**
      * Remove all scores and scorer names from the scoreboard.
+     *
      * @return true if scores did exist
      */
     public boolean clear() {
@@ -171,21 +140,8 @@ public class Scoreboard {
     }
 
     /**
-     * Show the scoreboard to a player. Remember to call hideFor(player) when the player quits.
-     * @param player player
-     * @return true if player did not see the scoreboard already
-     */
-    public boolean showTo(Player player) {
-        if (this.viewers.add(player)) {
-            this.sendShowPacket(player);
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
      * Hide the scoreboard for a player.
+     *
      * @param player player
      * @return true if player did see the scoreboard
      */
@@ -202,6 +158,7 @@ public class Scoreboard {
 
     /**
      * Pause automatic sending of score updates to allow efficient bulk modifications. Queued updates are sent on unholdUpdates().
+     *
      * @return true if successful, false if already on hold
      */
     public boolean holdUpdates() {
@@ -214,68 +171,21 @@ public class Scoreboard {
     }
 
     /**
-     * Send all queued updates and continue sending updates automatically.
-     * @return true if successful, false if not on hold
+     * Remove score of given scorer.
+     *
+     * @param scorer scorer name / line text
+     * @return true if score did exist
      */
-    public boolean unholdUpdates() {
-        if (!this.isHoldingUpdates) {
-            return false;
+    public boolean removeScore(String scorer) {
+        Score oldScore = this.scores.remove(scorer);
+
+        if (oldScore != null) {
+            this.sendScore(scorer, oldScore, SetScorePacket.Action.REMOVE);
+
+            return true;
         }
 
-        this.isHoldingUpdates = false;
-
-        SetScorePacket pk = null;
-        SetScorePacket.Action lastAction = null;
-
-        for (QueuedScoreUpdate update : this.queuedUpdates) {
-            if (update.action != lastAction) {
-                if (pk != null) {
-                    Server.broadcastPacket(this.viewers, pk);
-                }
-                pk = new SetScorePacket();
-            }
-            lastAction = update.action;
-            pk.action = update.action;
-            pk.infos.add(new SetScorePacket.ScoreInfo(update.currentScoreId, this.objectiveId, update.currentScoreValue, update.scorer));
-        }
-
-        if (pk != null) {
-            Server.broadcastPacket(this.viewers, pk);
-        }
-
-        this.queuedUpdates.clear();
-        return true;
-    }
-
-    /**
-     * Returns unmodifiable view of internal scorers and scores. Plugin developers who are making their plugin to
-     * only display text can use this information to efficiently update only changed lines.
-     * @return unmodifiable map
-     */
-    public Map<String, Score> getScores() {
-        return Collections.unmodifiableMap(this.scores);
-    }
-
-    /**
-     * Send updated score to viewers.
-     * @param scorer scorer
-     * @param score score
-     * @param action set or remove
-     */
-    private void sendScore(String scorer, Score score, SetScorePacket.Action action) {
-        if (this.viewers.isEmpty()) {
-            return;
-        }
-
-        if (this.isHoldingUpdates) {
-            this.queuedUpdates.add(new QueuedScoreUpdate(scorer, score.id, score.score, action));
-            return;
-        }
-
-        SetScorePacket pk = new SetScorePacket();
-        pk.action = action;
-        pk.infos.add(new SetScorePacket.ScoreInfo(score.id, this.objectiveId, score.score, scorer));
-        Server.broadcastPacket(this.viewers, pk);
+        return false;
     }
 
     /**
@@ -306,7 +216,42 @@ public class Scoreboard {
     }
 
     /**
+     * Send scoreboard removal to the player
+     *
+     * @param player player
+     */
+    private void sendHidePacket(Player player) {
+        RemoveObjectivePacket pk = new RemoveObjectivePacket();
+        pk.objectiveId = this.objectiveId;
+        player.dataPacket(pk);
+    }
+
+    /**
+     * Send updated score to viewers.
+     *
+     * @param scorer scorer
+     * @param score  score
+     * @param action set or remove
+     */
+    private void sendScore(String scorer, Score score, SetScorePacket.Action action) {
+        if (this.viewers.isEmpty()) {
+            return;
+        }
+
+        if (this.isHoldingUpdates) {
+            this.queuedUpdates.add(new QueuedScoreUpdate(scorer, score.id, score.score, action));
+            return;
+        }
+
+        SetScorePacket pk = new SetScorePacket();
+        pk.action = action;
+        pk.infos.add(new SetScorePacket.ScoreInfo(score.id, this.objectiveId, score.score, scorer));
+        Server.broadcastPacket(this.viewers, pk);
+    }
+
+    /**
      * Send scoreboard creation to the player
+     *
      * @param player player
      */
     private void sendShowPacket(Player player) {
@@ -329,12 +274,78 @@ public class Scoreboard {
     }
 
     /**
-     * Send scoreboard removal to the player
-     * @param player player
+     * Update score for given scorer.
+     *
+     * @param scorer   scorer name / line text
+     * @param newScore new score
+     * @return true if a score was changed or removed
      */
-    private void sendHidePacket(Player player) {
-        RemoveObjectivePacket pk = new RemoveObjectivePacket();
-        pk.objectiveId = this.objectiveId;
-        player.dataPacket(pk);
+    public boolean setScore(String scorer, int newScore) {
+        Score score = this.scores.get(scorer);
+
+        if (score == null) {
+            score = new Score(++this.scoreId, newScore);
+            this.scores.put(scorer, score);
+
+            this.sendScore(scorer, score, SetScorePacket.Action.SET);
+        } else if (score.score != newScore) {
+            score.score = newScore;
+
+            this.sendScore(scorer, score, SetScorePacket.Action.SET);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Show the scoreboard to a player. Remember to call hideFor(player) when the player quits.
+     *
+     * @param player player
+     * @return true if player did not see the scoreboard already
+     */
+    public boolean showTo(Player player) {
+        if (this.viewers.add(player)) {
+            this.sendShowPacket(player);
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Send all queued updates and continue sending updates automatically.
+     *
+     * @return true if successful, false if not on hold
+     */
+    public boolean unholdUpdates() {
+        if (!this.isHoldingUpdates) {
+            return false;
+        }
+
+        this.isHoldingUpdates = false;
+
+        SetScorePacket pk = null;
+        SetScorePacket.Action lastAction = null;
+
+        for (QueuedScoreUpdate update : this.queuedUpdates) {
+            if (update.action != lastAction) {
+                if (pk != null) {
+                    Server.broadcastPacket(this.viewers, pk);
+                }
+                pk = new SetScorePacket();
+            }
+            lastAction = update.action;
+            pk.action = update.action;
+            pk.infos.add(new SetScorePacket.ScoreInfo(update.currentScoreId, this.objectiveId, update.currentScoreValue, update.scorer));
+        }
+
+        if (pk != null) {
+            Server.broadcastPacket(this.viewers, pk);
+        }
+
+        this.queuedUpdates.clear();
+        return true;
     }
 }

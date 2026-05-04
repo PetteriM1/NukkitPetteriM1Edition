@@ -18,13 +18,23 @@ public class BlockStairsQuartz extends BlockStairs {
     }
 
     @Override
+    public BlockColor getColor() {
+        return BlockColor.QUARTZ_BLOCK_COLOR;
+    }
+
+    @Override
+    public double getHardness() {
+        return 0.8; //2
+    }
+
+    @Override
     public int getId() {
         return QUARTZ_STAIRS;
     }
 
     @Override
-    public double getHardness() {
-        return 2;
+    public String getName() {
+        return "Quartz Stairs";
     }
 
     @Override
@@ -35,16 +45,6 @@ public class BlockStairsQuartz extends BlockStairs {
     @Override
     public int getToolType() {
         return ItemTool.TYPE_PICKAXE;
-    }
-
-    @Override
-    public String getName() {
-        return "Quartz Stairs";
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.QUARTZ_BLOCK_COLOR;
     }
 
     @Override

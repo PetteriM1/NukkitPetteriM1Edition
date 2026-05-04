@@ -1,7 +1,9 @@
 package cn.nukkit.block;
 
 import cn.nukkit.block.properties.OxidizationLevel;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockCopperBulbExposed extends BlockCopperBulb {
 
@@ -10,8 +12,8 @@ public class BlockCopperBulbExposed extends BlockCopperBulb {
     }
 
     @Override
-    public String getName() {
-        return "Exposed Copper Bulb";
+    public BlockColor getColor() {
+        return BlockColor.LIGHT_GRAY_TERRACOTA_BLOCK_COLOR;
     }
 
     @Override
@@ -20,12 +22,20 @@ public class BlockCopperBulbExposed extends BlockCopperBulb {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.LIGHT_GRAY_TERRACOTA_BLOCK_COLOR;
+    public String getName() {
+        return "Exposed Copper Bulb";
     }
 
     @Override
     public OxidizationLevel getOxidizationLevel() {
         return OxidizationLevel.EXPOSED;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        if (protocol >= ProtocolInfo.v1_17_0) {
+            return BlockTypes.EXPOSED_COPPER;
+        }
+        return BlockTypes.IRON_BLOCK;
     }
 }

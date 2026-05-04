@@ -8,12 +8,12 @@ public class BlockPropertyNotFoundException extends NoSuchElementException {
     private final String propertyName;
 
     public BlockPropertyNotFoundException(String propertyName) {
-        super("The property \""+propertyName+"\" was not found.");
+        super("The property \"" + propertyName + "\" was not found.");
         this.propertyName = propertyName;
     }
 
     public BlockPropertyNotFoundException(String propertyName, String details) {
-        super(propertyName+": " + details);
+        super(propertyName + ": " + details);
         this.propertyName = propertyName;
     }
 

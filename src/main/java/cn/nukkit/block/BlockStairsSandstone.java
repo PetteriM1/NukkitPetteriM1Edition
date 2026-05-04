@@ -18,13 +18,23 @@ public class BlockStairsSandstone extends BlockStairs {
     }
 
     @Override
-    public int getId() {
-        return SANDSTONE_STAIRS;
+    public BlockColor getColor() {
+        return BlockColor.SAND_BLOCK_COLOR;
     }
 
     @Override
     public double getHardness() {
         return 0.8;
+    }
+
+    @Override
+    public int getId() {
+        return SANDSTONE_STAIRS;
+    }
+
+    @Override
+    public String getName() {
+        return "Sandstone Stairs";
     }
 
     @Override
@@ -35,16 +45,6 @@ public class BlockStairsSandstone extends BlockStairs {
     @Override
     public int getToolType() {
         return ItemTool.TYPE_PICKAXE;
-    }
-
-    @Override
-    public String getName() {
-        return "Sandstone Stairs";
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.SAND_BLOCK_COLOR;
     }
 
     @Override

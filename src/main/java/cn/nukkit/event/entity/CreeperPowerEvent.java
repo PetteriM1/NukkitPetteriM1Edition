@@ -11,11 +11,6 @@ import cn.nukkit.event.HandlerList;
  */
 public class CreeperPowerEvent extends EntityEvent implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
-
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private final PowerCause cause;
     private EntityLightningStrike bolt;
 
@@ -27,29 +22,6 @@ public class CreeperPowerEvent extends EntityEvent implements Cancellable {
     public CreeperPowerEvent(final EntityCreeper creeper, final PowerCause cause) {
         this.entity = creeper;
         this.cause = cause;
-    }
-
-    @Override
-    public EntityCreeper getEntity() {
-        return (EntityCreeper) super.getEntity();
-    }
-
-    /**
-     * Gets the lightning bolt which is striking the Creeper.
-     *
-     * @return The Entity for the lightning bolt which is striking the Creeper
-     */
-    public EntityLightningStrike getLightning() {
-        return bolt;
-    }
-
-    /**
-     * Gets the cause of the creeper being (un)powered.
-     *
-     * @return A PowerCause value detailing the cause of change in power.
-     */
-    public PowerCause getCause() {
-        return cause;
     }
 
     /**
@@ -75,5 +47,32 @@ public class CreeperPowerEvent extends EntityEvent implements Cancellable {
          * Powered state: false
          */
         SET_OFF
+    }
+
+    /**
+     * Gets the cause of the creeper being (un)powered.
+     *
+     * @return A PowerCause value detailing the cause of change in power.
+     */
+    public PowerCause getCause() {
+        return cause;
+    }
+
+    @Override
+    public EntityCreeper getEntity() {
+        return (EntityCreeper) super.getEntity();
+    }
+
+    public static HandlerList getHandlers() {
+        return handlers;
+    }
+
+    /**
+     * Gets the lightning bolt which is striking the Creeper.
+     *
+     * @return The Entity for the lightning bolt which is striking the Creeper
+     */
+    public EntityLightningStrike getLightning() {
+        return bolt;
     }
 }

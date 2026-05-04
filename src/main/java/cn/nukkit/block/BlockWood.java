@@ -27,7 +27,7 @@ public class BlockWood extends BlockSolidMeta {
             0b0100
     };
 
-    private static final int[] STRIPPED_IDS = {
+    private static final int[] strippedIds = {
             STRIPPED_OAK_LOG,
             STRIPPED_SPRUCE_LOG,
             STRIPPED_BIRCH_LOG,
@@ -42,22 +42,7 @@ public class BlockWood extends BlockSolidMeta {
         super(meta);
     }
 
-    @Override
-    public int getId() {
-        return WOOD;
-    }
-
-    @Override
-    public double getHardness() {
-        return 2;
-    }
-
-    @Override
-    public double getResistance() {
-        return 2;
-    }
-
-    private static final String[] NAMES = {
+    private static final String[] names = {
             "Oak Wood",
             "Spruce Wood",
             "Birch Wood",
@@ -65,39 +50,13 @@ public class BlockWood extends BlockSolidMeta {
     };
 
     @Override
-    public String getName() {
-        return NAMES[this.getDamage() & 0x03];
-    }
-
-    @Override
-    public int getBurnChance() {
-        return 5;
-    }
-
-    @Override
     public int getBurnAbility() {
         return 10;
     }
 
     @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        this.setDamage(((this.getDamage() & 0x03) | FACES[face.getIndex()]));
-        this.getLevel().setBlock(block, this, true, true);
-        return true;
-    }
-
-    @Override
-    public Item toItem() {
-        if (this.getDamage() > 11) {
-            int variant = this.getDamage() & 0x03;
-            return new ItemBlock(Block.get(WOOD_BARK, variant), variant);
-        }
-        return new ItemBlock(this, this.getDamage() & 0x03);
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_AXE;
+    public int getBurnChance() {
+        return 5;
     }
 
     @Override
@@ -116,6 +75,49 @@ public class BlockWood extends BlockSolidMeta {
     }
 
     @Override
+    public double getHardness() {
+        return 2;
+    }
+
+    @Override
+    public int getId() {
+        return WOOD;
+    }
+
+    @Override
+    public String getName() {
+        return names[this.getDamage() & 0x03];
+    }
+
+    @Override
+    public double getResistance() {
+        return 10;
+    }
+
+    protected int getStrippedDamage() {
+        int damage = getDamage();
+        if ((damage & 0b1100) == 0b1100) { // Only bark
+            return damage & 0x03 | 0x8;
+        }
+
+        return damage >> 2;
+    }
+
+    protected int getStrippedId() {
+        int damage = getDamage();
+        if ((damage & 0b1100) == 0b1100) { // Only bark
+            return WOOD_BARK;
+        }
+
+        return strippedIds[damage & 0x03];
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_AXE;
+    }
+
+    @Override
     public boolean canBeActivated() {
         return true;
     }
@@ -131,21 +133,19 @@ public class BlockWood extends BlockSolidMeta {
         return false;
     }
 
-    protected int getStrippedId() {
-        int damage = getDamage();
-        if ((damage & 0b1100) == 0b1100) { // Only bark
-            return WOOD_BARK;
-        }
-
-        return STRIPPED_IDS[damage & 0x03];
+    @Override
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        this.setDamage(((this.getDamage() & 0x03) | FACES[face.getIndex()]));
+        this.getLevel().setBlock(block, this, true, true);
+        return true;
     }
 
-    protected int getStrippedDamage() {
-        int damage = getDamage();
-        if ((damage & 0b1100) == 0b1100) { // Only bark
-            return damage & 0x03 | 0x8;
+    @Override
+    public Item toItem() {
+        if (this.getDamage() > 11) {
+            int variant = this.getDamage() & 0x03;
+            return new ItemBlock(Block.get(WOOD_BARK, variant), variant);
         }
-
-        return damage >> 2;
+        return new ItemBlock(this, this.getDamage() & 0x03);
     }
 }

@@ -17,29 +17,58 @@ public class PlayerSkinPacket extends DataPacket {
     public boolean premium;
 
     @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
-    @Override
     public void decode() {
         uuid = getUUID();
-        skin = getSkin();
-        newSkinName = getString();
-        oldSkinName = getString();
-        if (!feof()) { // -facepalm-
-            getBoolean(); // skin.setTrusted(getBoolean());
+        if (protocol < 388) {
+            skin = new Skin();
+            skin.setSkinId(getString());
+            newSkinName = getString();
+            oldSkinName = getString();
+            skin.setSkinData(getByteArray());
+            skin.setCapeData(getByteArray());
+            skin.setGeometryName(getString());
+            skin.setGeometryData(getString());
+            if (protocol > 274) {
+                premium = getBoolean();
+            }
+        } else {
+            skin = getSkin(protocol);
+            newSkinName = getString();
+            oldSkinName = getString();
+            if (!feof()) {
+                getBoolean(); // skin.setTrusted(getBoolean());
+            }
+            skin.setTrusted(false); // Don't trust player skins
         }
-        skin.setTrusted(false); // Don't trust player skins
     }
 
     @Override
     public void encode() {
         reset();
         putUUID(uuid);
-        putSkin(skin);
-        putString(newSkinName);
-        putString(oldSkinName);
-        putBoolean(skin.isTrusted());
+        if (protocol < 388) {
+            putString(skin.isLegacySlim ? "geometry.humanoid.customSlim" : "geometry.humanoid.custom");
+            putString(newSkinName);
+            putString(oldSkinName);
+            putByteArray(skin.getSkinData().data);
+            putByteArray(skin.getCapeData().data);
+            putString(skin.isLegacySlim ? "geometry.humanoid.customSlim" : "geometry.humanoid.custom");
+            putString(skin.getGeometryData());
+            if (protocol > 274) {
+                putBoolean(premium);
+            }
+        } else {
+            putSkin(protocol, skin);
+            putString(newSkinName);
+            putString(oldSkinName);
+            if (protocol >= ProtocolInfo.v1_14_60) {
+                putBoolean(skin.isTrusted());
+            }
+        }
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

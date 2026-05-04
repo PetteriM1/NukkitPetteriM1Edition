@@ -81,199 +81,6 @@ public enum BlockFace {
         this.unitVector = unitVector;
     }
 
-    /**
-     * Get a BlockFace by it's index (0-5). The order is D-U-N-S-W-E
-     *
-     * @param index BlockFace index
-     * @return block face
-     */
-    public static BlockFace fromIndex(int index) {
-        return VALUES[MathHelper.abs(index % VALUES.length)];
-    }
-
-    /**
-     * Get a BlockFace by it's horizontal index (0-3). The order is S-W-N-E
-     *
-     * @param index BlockFace index
-     * @return block face
-     */
-    public static BlockFace fromHorizontalIndex(int index) {
-        return HORIZONTALS[MathHelper.abs(index % HORIZONTALS.length)];
-    }
-
-    /**
-     * Get the BlockFace corresponding to the given angle (0-360). An angle of 0 is SOUTH, an angle of 90 would be WEST
-     *
-     * @param angle horizontal angle
-     * @return block face
-     */
-    public static BlockFace fromHorizontalAngle(double angle) {
-        return fromHorizontalIndex(NukkitMath.floorDouble(angle / 90.0D + 0.5D) & 3);
-    }
-
-    public static BlockFace fromAxis(AxisDirection axisDirection, Axis axis) {
-        for (BlockFace face : VALUES) {
-            if (face.axisDirection == axisDirection && face.axis == axis) {
-                return face;
-            }
-        }
-
-        throw new RuntimeException("Unable to get face from axis: " + axisDirection + ' ' + axis);
-    }
-
-    /**
-     * Choose a random BlockFace using the given Random
-     *
-     * @param rand random number generator
-     * @return block face
-     */
-    public static BlockFace random(Random rand) {
-        return VALUES[rand.nextInt(VALUES.length)];
-    }
-
-    /**
-     * Get the index of this BlockFace (0-5). The order is D-U-N-S-W-E
-     *
-     * @return index
-     */
-    public int getIndex() {
-        return index;
-    }
-
-    /**
-     * Get the horizontal index of this BlockFace (0-3). The order is S-W-N-E
-     *
-     * @return horizontal index
-     */
-    public int getHorizontalIndex() {
-        return horizontalIndex;
-    }
-
-    /**
-     * Get the angle of this BlockFace (0-360)
-     *
-     * @return horizontal angle
-     */
-    public float getHorizontalAngle() {
-        return (float) ((horizontalIndex & 3) * 90);
-    }
-
-    /**
-     * Get the name of this BlockFace (up, down, north, etc.)
-     *
-     * @return name
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Get the Axis of this BlockFace
-     *
-     * @return axis
-     */
-    public Axis getAxis() {
-        return axis;
-    }
-
-    /**
-     * Get the AxisDirection of this BlockFace
-     *
-     * @return axis direction
-     */
-    public AxisDirection getAxisDirection() {
-        return axisDirection;
-    }
-
-    /**
-     * Get the unit vector of this BlockFace
-     *
-     * @return vector
-     */
-    public Vector3 getUnitVector() {
-        return unitVector;
-    }
-
-    /**
-     * Returns an offset that addresses the block in front of this BlockFace
-     *
-     * @return x offset
-     */
-    public int getXOffset() {
-        return axis == Axis.X ? axisDirection.getOffset() : 0;
-    }
-
-    /**
-     * Returns an offset that addresses the block in front of this BlockFace
-     *
-     * @return y offset
-     */
-    public int getYOffset() {
-        return axis == Axis.Y ? axisDirection.getOffset() : 0;
-    }
-
-    /**
-     * Returns an offset that addresses the block in front of this BlockFace
-     *
-     * @return z offset
-     */
-    public int getZOffset() {
-        return axis == Axis.Z ? axisDirection.getOffset() : 0;
-    }
-
-    /**
-    * Get the opposite BlockFace (e.g. DOWN ==&gt; UP)
-    *
-    * @return block face
-     */
-    public BlockFace getOpposite() {
-        return fromIndex(opposite);
-    }
-
-    /**
-    * Rotate this BlockFace around the Y axis clockwise (NORTH =&gt; EAST =&gt; SOUTH =&gt; WEST =&gt; NORTH)
-    *
-    * @return block face
-     */
-    public BlockFace rotateY() {
-        switch (this) {
-            case NORTH:
-                return EAST;
-            case EAST:
-                return SOUTH;
-            case SOUTH:
-                return WEST;
-            case WEST:
-                return NORTH;
-            default:
-                throw new RuntimeException("Unable to get Y-rotated face of " + this);
-        }
-    }
-
-    /**
-    * Rotate this BlockFace around the Y axis counter-clockwise (NORTH =&gt; WEST =&gt; SOUTH =&gt; EAST =&gt; NORTH)
-    *
-    * @return block face
-     */
-    public BlockFace rotateYCCW() {
-        switch (this) {
-            case NORTH:
-                return WEST;
-            case EAST:
-                return NORTH;
-            case SOUTH:
-                return EAST;
-            case WEST:
-                return SOUTH;
-            default:
-                throw new RuntimeException("Unable to get counter-clockwise Y-rotated face of " + this);
-        }
-    }
-
-    public String toString() {
-        return name;
-    }
-
     public enum Axis implements Predicate<BlockFace> {
         X("x"),
         Y("y"),
@@ -292,20 +99,20 @@ public enum BlockFace {
             this.name = name;
         }
 
-        public boolean isVertical() {
-            return plane == Plane.VERTICAL;
-        }
-
-        public boolean isHorizontal() {
-            return plane == Plane.HORIZONTAL;
+        public String getName() {
+            return name;
         }
 
         public Plane getPlane() {
             return plane;
         }
 
-        public String getName() {
-            return name;
+        public boolean isHorizontal() {
+            return plane == Plane.HORIZONTAL;
+        }
+
+        public boolean isVertical() {
+            return plane == Plane.VERTICAL;
         }
 
         public boolean test(BlockFace face) {
@@ -349,20 +156,213 @@ public enum BlockFace {
 
         private BlockFace[] faces;
 
-        public BlockFace random(NukkitRandom rand) {
-            return faces[rand.nextBoundedInt(faces.length)];
+        public Iterator<BlockFace> iterator() {
+            return Iterators.forArray(faces);
         }
 
         public BlockFace random() {
             return faces[ThreadLocalRandom.current().nextInt(faces.length)];
         }
 
+        public BlockFace random(NukkitRandom rand) {
+            return faces[rand.nextBoundedInt(faces.length)];
+        }
+
         public boolean test(BlockFace face) {
             return face != null && face.getAxis().getPlane() == this;
         }
+    }
 
-        public Iterator<BlockFace> iterator() {
-            return Iterators.forArray(faces);
+    /**
+     * Get the Axis of this BlockFace
+     *
+     * @return axis
+     */
+    public Axis getAxis() {
+        return axis;
+    }
+
+    /**
+     * Get the AxisDirection of this BlockFace
+     *
+     * @return axis direction
+     */
+    public AxisDirection getAxisDirection() {
+        return axisDirection;
+    }
+
+    /**
+     * Get the angle of this BlockFace (0-360)
+     *
+     * @return horizontal angle
+     */
+    public float getHorizontalAngle() {
+        return (float) ((horizontalIndex & 3) * 90);
+    }
+
+    /**
+     * Get the horizontal index of this BlockFace (0-3). The order is S-W-N-E
+     *
+     * @return horizontal index
+     */
+    public int getHorizontalIndex() {
+        return horizontalIndex;
+    }
+
+    /**
+     * Get the index of this BlockFace (0-5). The order is D-U-N-S-W-E
+     *
+     * @return index
+     */
+    public int getIndex() {
+        return index;
+    }
+
+    /**
+     * Get the name of this BlockFace (up, down, north, etc.)
+     *
+     * @return name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Get the opposite BlockFace (e.g. DOWN ==&gt; UP)
+     *
+     * @return block face
+     */
+    public BlockFace getOpposite() {
+        return fromIndex(opposite);
+    }
+
+    /**
+     * Get the unit vector of this BlockFace
+     *
+     * @return vector
+     */
+    public Vector3 getUnitVector() {
+        return unitVector;
+    }
+
+    /**
+     * Returns an offset that addresses the block in front of this BlockFace
+     *
+     * @return x offset
+     */
+    public int getXOffset() {
+        return axis == Axis.X ? axisDirection.getOffset() : 0;
+    }
+
+    /**
+     * Returns an offset that addresses the block in front of this BlockFace
+     *
+     * @return y offset
+     */
+    public int getYOffset() {
+        return axis == Axis.Y ? axisDirection.getOffset() : 0;
+    }
+
+    /**
+     * Returns an offset that addresses the block in front of this BlockFace
+     *
+     * @return z offset
+     */
+    public int getZOffset() {
+        return axis == Axis.Z ? axisDirection.getOffset() : 0;
+    }
+
+    public static BlockFace fromAxis(AxisDirection axisDirection, Axis axis) {
+        for (BlockFace face : VALUES) {
+            if (face.axisDirection == axisDirection && face.axis == axis) {
+                return face;
+            }
         }
+
+        throw new RuntimeException("Unable to get face from axis: " + axisDirection + ' ' + axis);
+    }
+
+    /**
+     * Get the BlockFace corresponding to the given angle (0-360). An angle of 0 is SOUTH, an angle of 90 would be WEST
+     *
+     * @param angle horizontal angle
+     * @return block face
+     */
+    public static BlockFace fromHorizontalAngle(double angle) {
+        return fromHorizontalIndex(NukkitMath.floorDouble(angle / 90.0D + 0.5D) & 3);
+    }
+
+    /**
+     * Get a BlockFace by it's horizontal index (0-3). The order is S-W-N-E
+     *
+     * @param index BlockFace index
+     * @return block face
+     */
+    public static BlockFace fromHorizontalIndex(int index) {
+        return HORIZONTALS[MathHelper.abs(index % HORIZONTALS.length)];
+    }
+
+    /**
+     * Get a BlockFace by it's index (0-5). The order is D-U-N-S-W-E
+     *
+     * @param index BlockFace index
+     * @return block face
+     */
+    public static BlockFace fromIndex(int index) {
+        return VALUES[MathHelper.abs(index % VALUES.length)];
+    }
+
+    /**
+     * Choose a random BlockFace using the given Random
+     *
+     * @param rand random number generator
+     * @return block face
+     */
+    public static BlockFace random(Random rand) {
+        return VALUES[rand.nextInt(VALUES.length)];
+    }
+
+    /**
+     * Rotate this BlockFace around the Y axis clockwise (NORTH =&gt; EAST =&gt; SOUTH =&gt; WEST =&gt; NORTH)
+     *
+     * @return block face
+     */
+    public BlockFace rotateY() {
+        switch (this) {
+            case NORTH:
+                return EAST;
+            case EAST:
+                return SOUTH;
+            case SOUTH:
+                return WEST;
+            case WEST:
+                return NORTH;
+            default:
+                throw new RuntimeException("Unable to get Y-rotated face of " + this);
+        }
+    }
+
+    /**
+     * Rotate this BlockFace around the Y axis counter-clockwise (NORTH =&gt; WEST =&gt; SOUTH =&gt; EAST =&gt; NORTH)
+     *
+     * @return block face
+     */
+    public BlockFace rotateYCCW() {
+        switch (this) {
+            case NORTH:
+                return WEST;
+            case EAST:
+                return NORTH;
+            case SOUTH:
+                return EAST;
+            case WEST:
+                return SOUTH;
+            default:
+                throw new RuntimeException("Unable to get counter-clockwise Y-rotated face of " + this);
+        }
+    }
+
+    public String toString() {
+        return name;
     }
 }

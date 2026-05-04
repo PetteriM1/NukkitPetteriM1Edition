@@ -11,18 +11,13 @@ import cn.nukkit.utils.BlockColor;
 public class BlockClay extends BlockSolid {
 
     @Override
+    public BlockColor getColor() {
+        return BlockColor.CLAY_BLOCK_COLOR;
+    }
+
+    @Override
     public double getHardness() {
         return 0.6;
-    }
-
-    @Override
-    public double getResistance() {
-        return 3;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_SHOVEL;
     }
 
     @Override
@@ -36,6 +31,21 @@ public class BlockClay extends BlockSolid {
     }
 
     @Override
+    public double getResistance() {
+        return 3;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_SHOVEL;
+    }
+
+    @Override
+    public boolean canSilkTouch() {
+        return true;
+    }
+
+    @Override
     public Item[] getDrops(Item item) {
         if (item.hasEnchantment(Enchantment.ID_SILK_TOUCH)) {
             return new Item[]{this.toItem()};
@@ -43,15 +53,5 @@ public class BlockClay extends BlockSolid {
         return new Item[]{
                 Item.get(Item.CLAY, 0, 4)
         };
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.CLAY_BLOCK_COLOR;
-    }
-
-    @Override
-    public boolean canSilkTouch() {
-        return true;
     }
 }

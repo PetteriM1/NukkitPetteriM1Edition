@@ -19,14 +19,29 @@ public class SwampTreePopulator extends Populator {
         this(BlockSapling.OAK);
     }
 
-    public SwampTreePopulator(int type) {}
+    public SwampTreePopulator(int type) {
+    }
+
+    public void setBaseAmount(int baseAmount) {
+        this.baseAmount = baseAmount;
+    }
 
     public void setRandomAmount(int randomAmount) {
         this.randomAmount = randomAmount;
     }
 
-    public void setBaseAmount(int baseAmount) {
-        this.baseAmount = baseAmount;
+    private int getHighestWorkableBlock(int x, int z) {
+        int y;
+        for (y = 127; y > 0; --y) {
+            int b = this.level.getBlockIdAt(x, y, z);
+            if (b == Block.DIRT || b == Block.GRASS) {
+                break;
+            } else if (b != Block.AIR && b != Block.SNOW_LAYER) {
+                return -1;
+            }
+        }
+
+        return ++y;
     }
 
     @Override
@@ -44,19 +59,5 @@ public class SwampTreePopulator extends Populator {
             }
             new ObjectSwampTree().generate(level, random, v.setComponents(x, y, z));
         }
-    }
-
-    private int getHighestWorkableBlock(int x, int z) {
-        int y;
-        for (y = 127; y > 0; --y) {
-            int b = this.level.getBlockIdAt(x, y, z);
-            if (b == Block.DIRT || b == Block.GRASS) {
-                break;
-            } else if (b != Block.AIR && b != Block.SNOW_LAYER) {
-                return -1;
-            }
-        }
-
-        return ++y;
     }
 }

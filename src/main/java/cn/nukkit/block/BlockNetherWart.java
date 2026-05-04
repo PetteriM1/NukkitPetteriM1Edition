@@ -24,13 +24,36 @@ public class BlockNetherWart extends BlockFlowable {
     }
 
     @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        Block down = this.down();
-        if (down.getId() == SOUL_SAND) {
-            this.getLevel().setBlock(block, this, true, true);
-            return true;
+    public BlockColor getColor() {
+        return BlockColor.FOLIAGE_BLOCK_COLOR;
+    }
+
+    @Override
+    public int getId() {
+        return NETHER_WART_BLOCK;
+    }
+
+    @Override
+    public String getName() {
+        return "Nether Wart Block";
+    }
+
+    @Override
+    public boolean breakWhenPushed() {
+        return true;
+    }
+
+    @Override
+    public Item[] getDrops(Item item) {
+        if (this.getDamage() == 0x03) {
+            return new Item[]{
+                    Item.get(Item.NETHER_WART, 0, 2 + (int) (ThreadLocalRandom.current().nextDouble() * (3)))
+            };
+        } else {
+            return new Item[]{
+                    Item.get(Item.NETHER_WART)
+            };
         }
-        return false;
     }
 
     @Override
@@ -63,40 +86,17 @@ public class BlockNetherWart extends BlockFlowable {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.FOLIAGE_BLOCK_COLOR;
-    }
-
-    @Override
-    public String getName() {
-        return "Nether Wart Block";
-    }
-
-    @Override
-    public int getId() {
-        return NETHER_WART_BLOCK;
-    }
-
-    @Override
-    public Item[] getDrops(Item item) {
-        if (this.getDamage() == 0x03) {
-            return new Item[]{
-                    Item.get(Item.NETHER_WART, 0, 2 + (int) (ThreadLocalRandom.current().nextDouble() * (3)))
-            };
-        } else {
-            return new Item[]{
-                    Item.get(Item.NETHER_WART)
-            };
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        Block down = this.down();
+        if (down.getId() == SOUL_SAND) {
+            this.getLevel().setBlock(block, this, true, true);
+            return true;
         }
+        return false;
     }
 
     @Override
     public Item toItem() {
         return Item.get(Item.NETHER_WART);
-    }
-
-    @Override
-    public boolean breakWhenPushed() {
-        return true;
     }
 }

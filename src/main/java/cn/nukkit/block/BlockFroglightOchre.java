@@ -13,8 +13,8 @@ public class BlockFroglightOchre extends BlockFroglight {
     }
 
     @Override
-    public String getName() {
-        return "Ochre Froglight";
+    public BlockColor getColor() {
+        return BlockColor.SAND_BLOCK_COLOR;
     }
 
     @Override
@@ -23,7 +23,7 @@ public class BlockFroglightOchre extends BlockFroglight {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.SAND_BLOCK_COLOR;
+    public String getName() {
+        return "Ochre Froglight";
     }
 }

@@ -34,29 +34,19 @@ public class BlockLadder extends BlockTransparentMeta implements Faceable {
         this.calculateOffsets();
     }
 
+    private double offMinX;
+    private double offMinZ;
+    private double offMaxX;
+    private double offMaxZ;
+
     @Override
-    public String getName() {
-        return "Ladder";
+    public BlockFace getBlockFace() {
+        return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
     }
 
     @Override
-    public int getId() {
-        return LADDER;
-    }
-
-    @Override
-    public boolean hasEntityCollision() {
-        return true;
-    }
-
-    @Override
-    public boolean canBeClimbed() {
-        return true;
-    }
-
-    @Override
-    public boolean isSolid() {
-        return false;
+    public BlockColor getColor() {
+        return BlockColor.AIR_BLOCK_COLOR;
     }
 
     @Override
@@ -65,14 +55,59 @@ public class BlockLadder extends BlockTransparentMeta implements Faceable {
     }
 
     @Override
+    public int getId() {
+        return LADDER;
+    }
+
+    @Override
+    public double getMaxX() {
+        return this.x + offMaxX;
+    }
+
+    @Override
+    public double getMaxZ() {
+        return this.z + offMaxZ;
+    }
+
+    @Override
+    public double getMinX() {
+        return this.x + offMinX;
+    }
+
+    @Override
+    public double getMinZ() {
+        return this.z + offMinZ;
+    }
+
+    @Override
+    public String getName() {
+        return "Ladder";
+    }
+
+    @Override
     public double getResistance() {
         return 2;
     }
 
-    private double offMinX;
-    private double offMinZ;
-    private double offMaxX;
-    private double offMaxZ;
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_AXE;
+    }
+
+    @Override
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.WHEN_PLACED_IN_WATER;
+    }
+
+    @Override
+    public boolean isSolid() {
+        return false;
+    }
+
+    @Override
+    public boolean breakWhenPushed() {
+        return true;
+    }
 
     private void calculateOffsets() {
         double f = 0.1875;
@@ -112,35 +147,25 @@ public class BlockLadder extends BlockTransparentMeta implements Faceable {
     }
 
     @Override
-    public double getMinX() {
-        return this.x + offMinX;
+    public boolean canBeClimbed() {
+        return true;
     }
 
     @Override
-    public double getMinZ() {
-        return this.z + offMinZ;
+    public Item[] getDrops(Item item) {
+        return new Item[]{
+                Item.get(Item.LADDER)
+        };
     }
 
     @Override
-    public double getMaxX() {
-        return this.x + offMaxX;
+    public boolean hasEntityCollision() {
+        return true;
     }
 
     @Override
-    public double getMaxZ() {
-        return this.z + offMaxZ;
-    }
-
-    @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        if (!target.isTransparent()) {
-            if (face.getIndex() >= 2 && face.getIndex() <= 5) {
-                this.setDamage(face.getIndex());
-                this.getLevel().setBlock(this, this, true, true);
-                return true;
-            }
-        }
-        return false;
+    public void onEntityCollide(Entity entity) {
+        entity.resetFallDistance();
     }
 
     @Override
@@ -155,39 +180,14 @@ public class BlockLadder extends BlockTransparentMeta implements Faceable {
     }
 
     @Override
-    public int getToolType() {
-        return ItemTool.TYPE_AXE;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.AIR_BLOCK_COLOR;
-    }
-
-    @Override
-    public Item[] getDrops(Item item) {
-        return new Item[]{
-                Item.get(Item.LADDER)
-        };
-    }
-
-    @Override
-    public BlockFace getBlockFace() {
-        return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
-    }
-
-    @Override
-    public void onEntityCollide(Entity entity) {
-        entity.resetFallDistance();
-    }
-
-    @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.WHEN_PLACED_IN_WATER;
-    }
-
-    @Override
-    public boolean breakWhenPushed() {
-        return true;
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        if (!target.isTransparent()) {
+            if (face.getIndex() >= 2 && face.getIndex() <= 5) {
+                this.setDamage(face.getIndex());
+                this.getLevel().setBlock(this, this, true, true);
+                return true;
+            }
+        }
+        return false;
     }
 }

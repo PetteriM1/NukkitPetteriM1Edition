@@ -24,12 +24,12 @@ public class ItemHoeStone extends ItemTool {
     }
 
     @Override
-    public boolean isHoe() {
-        return true;
+    public int getTier() {
+        return ItemTool.TIER_STONE;
     }
 
     @Override
-    public int getTier() {
-        return ItemTool.TIER_STONE;
+    public boolean isHoe() {
+        return true;
     }
 }

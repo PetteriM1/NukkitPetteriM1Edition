@@ -19,13 +19,23 @@ public class BlockStairsRedSandstone extends BlockStairs {
     }
 
     @Override
-    public int getId() {
-        return RED_SANDSTONE_STAIRS;
+    public BlockColor getColor() {
+        return BlockColor.ORANGE_BLOCK_COLOR;
     }
 
     @Override
     public double getHardness() {
         return 0.8;
+    }
+
+    @Override
+    public int getId() {
+        return RED_SANDSTONE_STAIRS;
+    }
+
+    @Override
+    public String getName() {
+        return "Red Sandstone Stairs";
     }
 
     @Override
@@ -39,8 +49,8 @@ public class BlockStairsRedSandstone extends BlockStairs {
     }
 
     @Override
-    public String getName() {
-        return "Red Sandstone Stairs";
+    public boolean canHarvestWithHand() {
+        return false;
     }
 
     @Override
@@ -57,15 +67,5 @@ public class BlockStairsRedSandstone extends BlockStairs {
     @Override
     public Item toItem() {
         return new ItemBlock(this, this.getDamage() & 0x07);
-    }
-
-    @Override
-    public boolean canHarvestWithHand() {
-        return false;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.ORANGE_BLOCK_COLOR;
     }
 }

@@ -10,7 +10,9 @@ import cn.nukkit.item.ItemTool;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.SimpleAxisAlignedBB;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockTarget extends BlockSolid {
 
@@ -19,18 +21,8 @@ public class BlockTarget extends BlockSolid {
     }
 
     @Override
-    public String getName() {
-        return "Target";
-    }
-
-    @Override
-    public int getId() {
-        return TARGET;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_HOE;
+    public int getBurnAbility() {
+        return 15;
     }
 
     @Override
@@ -39,8 +31,8 @@ public class BlockTarget extends BlockSolid {
     }
 
     @Override
-    public int getBurnAbility() {
-        return 15;
+    public BlockColor getColor() {
+        return BlockColor.QUARTZ_BLOCK_COLOR;
     }
 
     @Override
@@ -49,23 +41,43 @@ public class BlockTarget extends BlockSolid {
     }
 
     @Override
+    public int getId() {
+        return TARGET;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_16_0;
+    }
+
+    @Override
+    public String getName() {
+        return "Target";
+    }
+
+    @Override
     public double getResistance() {
-        return 0.5;
+        return 2.5;
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.QUARTZ_BLOCK_COLOR;
-    }
-
-    @Override
-    public Item[] getDrops(Item item) {
-        return new Item[]{new ItemBlock(Block.get(TARGET))};
+    public int getToolType() {
+        return ItemTool.TYPE_HOE;
     }
 
     @Override
     public boolean isPowerSource() {
         return true;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.HAY_BALE;
+    }
+
+    @Override
+    public Item[] getDrops(Item item) {
+        return new Item[]{new ItemBlock(Block.get(TARGET))};
     }
 
     @Override

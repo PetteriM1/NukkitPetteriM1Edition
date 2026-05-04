@@ -39,6 +39,16 @@ public class BlockComposter extends BlockTransparentMeta implements ItemID {
     }
 
     @Override
+    public int getComparatorInputOverride() {
+        return getDamage();
+    }
+
+    @Override
+    public double getHardness() {
+        return 0.6;
+    }
+
+    @Override
     public int getId() {
         return COMPOSTER;
     }
@@ -49,13 +59,8 @@ public class BlockComposter extends BlockTransparentMeta implements ItemID {
     }
 
     @Override
-    public double getHardness() {
-        return 0.6;
-    }
-
-    @Override
     public double getResistance() {
-        return 0.6;
+        return 3;
     }
 
     @Override
@@ -63,9 +68,51 @@ public class BlockComposter extends BlockTransparentMeta implements ItemID {
         return ItemTool.TYPE_AXE;
     }
 
+    public boolean isEmpty() {
+        return getDamage() == 0;
+    }
+
+    public boolean isFull() {
+        return getDamage() == 8;
+    }
+
     @Override
-    public Item toItem() {
-        return new ItemBlock(Block.get(this.getId(), 0), 0);
+    public boolean canBeActivated() {
+        return true;
+    }
+
+    public Item empty() {
+        return empty(null, null);
+    }
+
+    public Item empty(Player player) {
+        return this.empty(null, player);
+    }
+
+    public Item empty(Item item, Player player) {
+        if (isEmpty()) {
+            return null;
+        }
+        ComposterEmptyEvent event = new ComposterEmptyEvent(this, player, item, new ItemDye(DyeColor.WHITE), 0);
+        this.level.getServer().getPluginManager().callEvent(event);
+        if (!event.isCancelled()) {
+            this.setDamage(event.getNewLevel());
+            this.level.setBlock(this, this, true, true);
+            if (item != null) {
+                this.level.dropItem(add(0.5, 0.85, 0.5), event.getDrop());
+            }
+            this.level.addSound(add(0.5, 0.5, 0.5), Sound.BLOCK_COMPOSTER_EMPTY);
+            return event.getDrop();
+        }
+        return null;
+    }
+
+    public static int getChance(Item item) {
+        int chance = ITEMS.get(item.getId() << 6 | item.getDamage());
+        if (chance == 0) {
+            chance = ITEMS.get(item.getId() << 6);
+        }
+        return chance;
     }
 
     @Override
@@ -73,24 +120,11 @@ public class BlockComposter extends BlockTransparentMeta implements ItemID {
         return true;
     }
 
-    @Override
-    public int getComparatorInputOverride() {
-        return getDamage();
-    }
-
     public boolean incrementLevel() {
         int fillLevel = getDamage() + 1;
         setDamage(fillLevel);
         this.level.setBlock(this, this, true, true);
         return fillLevel == 8;
-    }
-
-    public boolean isFull() {
-        return getDamage() == 8;
-    }
-
-    public boolean isEmpty() {
-        return getDamage() == 0;
     }
 
     @Override
@@ -134,30 +168,25 @@ public class BlockComposter extends BlockTransparentMeta implements ItemID {
         return true;
     }
 
-    public Item empty() {
-        return empty(null, null);
+    public static void register(int chance, Item item) {
+        registerItem(chance, item.getId(), item.getDamage());
     }
 
-    public Item empty(Player player) {
-        return this.empty(null, player);
+    public static void registerBlock(int chance, int blockId) {
+        registerBlock(chance, blockId, 0);
     }
 
-    public Item empty(Item item, Player player) {
-        if (isEmpty()) {
-            return null;
+    public static void registerBlock(int chance, int blockId, int meta) {
+        if (blockId > 255) {
+            blockId = 255 - blockId;
         }
-        ComposterEmptyEvent event = new ComposterEmptyEvent(this, player, item, new ItemDye(DyeColor.WHITE), 0);
-        this.level.getServer().getPluginManager().callEvent(event);
-        if (!event.isCancelled()) {
-            this.setDamage(event.getNewLevel());
-            this.level.setBlock(this, this, true, true);
-            if (item != null) {
-                this.level.dropItem(add(0.5, 0.85, 0.5), event.getDrop());
-            }
-            this.level.addSound(add(0.5 , 0.5, 0.5), Sound.BLOCK_COMPOSTER_EMPTY);
-            return event.getDrop();
+        registerItem(chance, blockId, meta);
+    }
+
+    public static void registerBlocks(int chance, int... blockIds) {
+        for (int blockId : blockIds) {
+            registerBlock(chance, blockId, 0);
         }
-        return null;
     }
 
     public static void registerItem(int chance, int itemId) {
@@ -174,37 +203,8 @@ public class BlockComposter extends BlockTransparentMeta implements ItemID {
         }
     }
 
-    public static void registerBlocks(int chance, int... blockIds) {
-        for (int blockId : blockIds) {
-            registerBlock(chance, blockId, 0);
-        }
-    }
-
-    public static void registerBlock(int chance, int blockId) {
-        registerBlock(chance, blockId, 0);
-    }
-
-    public static void registerBlock(int chance, int blockId, int meta) {
-        if (blockId > 255) {
-            blockId = 255 - blockId;
-        }
-        registerItem(chance, blockId, meta);
-    }
-
-    public static void register(int chance, Item item) {
-        registerItem(chance, item.getId(), item.getDamage());
-    }
-
-    public static int getChance(Item item) {
-        int chance = ITEMS.get(item.getId() << 6 | item.getDamage());
-        if (chance == 0) {
-            chance = ITEMS.get(item.getId() << 6);
-        }
-        return chance;
-    }
-
     @Override
-    public boolean canBeActivated() {
-        return true;
+    public Item toItem() {
+        return new ItemBlock(Block.get(this.getId(), 0), 0);
     }
 }

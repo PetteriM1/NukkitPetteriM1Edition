@@ -11,11 +11,6 @@ import cn.nukkit.level.Level;
 public class BlockRedstoneLampLit extends BlockRedstoneLamp {
 
     @Override
-    public String getName() {
-        return "Lit Redstone Lamp";
-    }
-
-    @Override
     public int getId() {
         return LIT_REDSTONE_LAMP;
     }
@@ -26,8 +21,8 @@ public class BlockRedstoneLampLit extends BlockRedstoneLamp {
     }
 
     @Override
-    public Item toItem() {
-        return new ItemBlock(Block.get(REDSTONE_LAMP));
+    public String getName() {
+        return "Lit Redstone Lamp";
     }
 
     @Override
@@ -46,5 +41,10 @@ public class BlockRedstoneLampLit extends BlockRedstoneLamp {
             this.level.setBlock(this, Block.get(REDSTONE_LAMP), false, true);
         }
         return 0;
+    }
+
+    @Override
+    public Item toItem() {
+        return new ItemBlock(Block.get(REDSTONE_LAMP));
     }
 }

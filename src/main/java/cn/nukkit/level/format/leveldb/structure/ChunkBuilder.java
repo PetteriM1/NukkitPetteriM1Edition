@@ -1,5 +1,6 @@
 package cn.nukkit.level.format.leveldb.structure;
 
+import cn.nukkit.Server;
 import cn.nukkit.level.format.leveldb.LevelDBConstants;
 import cn.nukkit.level.format.leveldb.LevelDBProvider;
 import cn.nukkit.level.format.leveldb.serializer.ChunkDataLoader;
@@ -41,35 +42,12 @@ public class ChunkBuilder {
         this.provider = provider;
     }
 
-    public static short blockKey(Vector3 vector) {
-        return blockKey((int) vector.getX(), (int) vector.getY(), (int) vector.getZ());
+    public int getChunkVersion() {
+        return this.chunkVersion;
     }
 
-    public static short blockKey(int x, int y, int z) {
-        return (short) ((x & 0xf) | ((z & 0xf) << 4) | ((y & 0xff) << 9));
-    }
-
-    public static Vector3 fromKey(long chunkKey, short blockKey) {
-        int x = (blockKey & 0xf) | (fromKeyX(chunkKey) << 4);
-        int z = ((blockKey >>> 4) & 0xf) | (fromKeyZ(chunkKey) << 4);
-        int y = (blockKey >>> 8) & 0xff;
-        return new Vector3(x, y, z);
-    }
-
-    public static long key(int x, int z) {
-        return (((long) x) << 32) | (z & 0xffffffffL);
-    }
-
-    public static int fromKeyX(long key) {
-        return (int) (key >> 32);
-    }
-
-    public static int fromKeyZ(long key) {
-        return (int) key;
-    }
-
-    public static int getSectionIndex(int x, int y, int z) {
-        return (x << 8) + (z << 4) + y;
+    public LevelDBProvider getProvider() {
+        return this.provider;
     }
 
     public int getX() {
@@ -78,20 +56,6 @@ public class ChunkBuilder {
 
     public int getZ() {
         return z;
-    }
-
-    public ChunkBuilder sections(LevelDBChunkSection[] sections) {
-        if (sections == null) throw new NullPointerException();
-        this.sections = sections;
-        return this;
-    }
-
-    public ChunkBuilder extraData(int key, short value) {
-        if (this.extraData == null) {
-            this.extraData = new Int2IntOpenHashMap();
-        }
-        this.extraData.put(key, value);
-        return this;
     }
 
     public ChunkBuilder biomes(byte[] biomes) {
@@ -107,31 +71,12 @@ public class ChunkBuilder {
         return this;
     }
 
-    public ChunkBuilder heightMap(int[] heightMap) {
-        if (heightMap == null) throw new NullPointerException();
-        this.heightMap = heightMap;
-        return this;
+    public static short blockKey(Vector3 vector) {
+        return blockKey((int) vector.getX(), (int) vector.getY(), (int) vector.getZ());
     }
 
-    public ChunkBuilder dataLoader(ChunkDataLoader chunkDataLoader) {
-        if (chunkDataLoader == null) throw new NullPointerException();
-        this.chunkDataLoaders.add(chunkDataLoader);
-        return this;
-    }
-
-    public ChunkBuilder state(int state) {
-        this.state = state;
-        return this;
-    }
-
-    public ChunkBuilder dirty() {
-        this.dirty = true;
-        return this;
-    }
-
-    public ChunkBuilder chunkVersion(int chunkVersion) {
-        this.chunkVersion = chunkVersion;
-        return this;
+    public static short blockKey(int x, int y, int z) {
+        return (short) ((x & 0xf) | ((z & 0xf) << 4) | ((y & 0xff) << 9));
     }
 
     public LevelDBChunk build() {
@@ -147,25 +92,81 @@ public class ChunkBuilder {
         }
 
         this.chunkDataLoaders.forEach(loader -> loader.initChunk(chunk, this.provider));
-        if (this.dirty) {
+        if (this.dirty && !Server.getInstance().suomiCraftPEMode()) {
             chunk.setChanged();
         }
         return chunk;
     }
 
-    public LevelDBProvider getProvider() {
-        return this.provider;
+    public ChunkBuilder chunkVersion(int chunkVersion) {
+        this.chunkVersion = chunkVersion;
+        return this;
+    }
+
+    public ChunkBuilder dataLoader(ChunkDataLoader chunkDataLoader) {
+        if (chunkDataLoader == null) throw new NullPointerException();
+        this.chunkDataLoaders.add(chunkDataLoader);
+        return this;
+    }
+
+    public String debugString() {
+        return this.provider.getName() + "(x=" + this.x + ", z=" + this.z + ")";
+    }
+
+    public ChunkBuilder dirty() {
+        this.dirty = true;
+        return this;
+    }
+
+    public ChunkBuilder extraData(int key, short value) {
+        if (this.extraData == null) {
+            this.extraData = new Int2IntOpenHashMap();
+        }
+        this.extraData.put(key, value);
+        return this;
+    }
+
+    public static Vector3 fromKey(long chunkKey, short blockKey) {
+        int x = (blockKey & 0xf) | (fromKeyX(chunkKey) << 4);
+        int z = ((blockKey >>> 4) & 0xf) | (fromKeyZ(chunkKey) << 4);
+        int y = (blockKey >>> 8) & 0xff;
+        return new Vector3(x, y, z);
+    }
+
+    public static int fromKeyX(long key) {
+        return (int) (key >> 32);
+    }
+
+    public static int fromKeyZ(long key) {
+        return (int) key;
+    }
+
+    public static int getSectionIndex(int x, int y, int z) {
+        return (x << 8) + (z << 4) + y;
     }
 
     public boolean has3dBiomes() {
         return this.has3dBiomes;
     }
 
-    public int getChunkVersion() {
-        return this.chunkVersion;
+    public ChunkBuilder heightMap(int[] heightMap) {
+        if (heightMap == null) throw new NullPointerException();
+        this.heightMap = heightMap;
+        return this;
     }
 
-    public String debugString() {
-        return this.provider.getName() + "(x=" + this.x + ", z=" + this.z + ")";
+    public static long key(int x, int z) {
+        return (((long) x) << 32) | (z & 0xffffffffL);
+    }
+
+    public ChunkBuilder sections(LevelDBChunkSection[] sections) {
+        if (sections == null) throw new NullPointerException();
+        this.sections = sections;
+        return this;
+    }
+
+    public ChunkBuilder state(int state) {
+        this.state = state;
+        return this;
     }
 }

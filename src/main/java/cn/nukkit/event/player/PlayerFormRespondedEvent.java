@@ -8,11 +8,6 @@ import cn.nukkit.form.window.FormWindow;
 public class PlayerFormRespondedEvent extends PlayerEvent {
 
     private static final HandlerList handlers = new HandlerList();
-
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     protected int formID;
     protected FormWindow window;
 
@@ -26,8 +21,8 @@ public class PlayerFormRespondedEvent extends PlayerEvent {
         return this.formID;
     }
 
-    public FormWindow getWindow() {
-        return window;
+    public static HandlerList getHandlers() {
+        return handlers;
     }
 
     /**
@@ -37,6 +32,10 @@ public class PlayerFormRespondedEvent extends PlayerEvent {
      */
     public FormResponse getResponse() {
         return window.getResponse();
+    }
+
+    public FormWindow getWindow() {
+        return window;
     }
 
     /**

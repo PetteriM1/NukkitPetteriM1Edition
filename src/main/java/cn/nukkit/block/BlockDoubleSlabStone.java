@@ -7,7 +7,7 @@ import cn.nukkit.utils.BlockColor;
  * @author MagicDroidX
  * Nukkit Project
  */
-public class BlockDoubleSlabStone extends BlockDoubleSlabBase  {
+public class BlockDoubleSlabStone extends BlockDoubleSlabBase {
 
     public static final int STONE = 0;
     public static final int SANDSTONE = 1;
@@ -38,41 +38,6 @@ public class BlockDoubleSlabStone extends BlockDoubleSlabBase  {
     }
 
     @Override
-    public int getId() {
-        return DOUBLE_SLAB;
-    }
-
-    @Override
-    public int getSingleSlabId() {
-        return STONE_SLAB;
-    }
-
-    @Override
-    public double getResistance() {
-        return getToolType() > ItemTool.TIER_WOODEN ? 30 : 15;
-    }
-
-    @Override
-    public double getHardness() {
-        return 2;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
-    }
-
-    @Override
-    public String getSlabName() {
-        return NAMES[this.getDamage() & 0x07];
-    }
-
-    @Override
-    public int getItemDamage() {
-        return this.getDamage() & 0x07;
-    }
-
-    @Override
     public BlockColor getColor() {
         switch (this.getDamage() & 0x07) {
             default:
@@ -90,6 +55,41 @@ public class BlockDoubleSlabStone extends BlockDoubleSlabBase  {
             case BlockDoubleSlabStone.NETHER_BRICK:
                 return BlockColor.NETHERRACK_BLOCK_COLOR;
         }
+    }
+
+    @Override
+    public double getHardness() {
+        return 2;
+    }
+
+    @Override
+    public int getId() {
+        return DOUBLE_SLAB;
+    }
+
+    @Override
+    public int getItemDamage() {
+        return this.getDamage() & 0x07;
+    }
+
+    @Override
+    public double getResistance() {
+        return getToolType() > ItemTool.TIER_WOODEN ? 30 : 15;
+    }
+
+    @Override
+    public int getSingleSlabId() {
+        return STONE_SLAB;
+    }
+
+    @Override
+    public String getSlabName() {
+        return NAMES[this.getDamage() & 0x07];
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
     }
 
     @Override

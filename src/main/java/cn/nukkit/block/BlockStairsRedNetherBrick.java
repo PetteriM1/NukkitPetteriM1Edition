@@ -11,12 +11,12 @@ public class BlockStairsRedNetherBrick extends BlockStairsNetherBrick {
     }
 
     @Override
-    public String getName() {
-        return "Red Nether Brick Stairs";
+    public int getId() {
+        return RED_NETHER_BRICK_STAIRS;
     }
 
     @Override
-    public int getId() {
-        return RED_NETHER_BRICK_STAIRS;
+    public String getName() {
+        return "Red Nether Brick Stairs";
     }
 }

@@ -15,7 +15,7 @@ public class BlockSlabStone3 extends BlockSlabStone {
     public static final int GRANITE = 6;
     public static final int POLISHED_GRANITE = 7;
 
-    private static final String[] NAMES = {
+    private static final String[] names = {
             "End Stone Brick",
             "Smooth Red Sandstone",
             "Polished Andesite",
@@ -32,16 +32,6 @@ public class BlockSlabStone3 extends BlockSlabStone {
 
     public BlockSlabStone3(int meta) {
         super(meta, DOUBLE_STONE_SLAB3);
-    }
-
-    @Override
-    public String getName() {
-        return ((this.getDamage() & 0x08) > 0 ? "Upper " : "") + NAMES[this.getDamage() & 0x07] + " Slab";
-    }
-
-    @Override
-    public int getId() {
-        return STONE_SLAB3;
     }
 
     @Override
@@ -62,6 +52,16 @@ public class BlockSlabStone3 extends BlockSlabStone {
             case POLISHED_GRANITE:
                 return BlockColor.DIRT_BLOCK_COLOR;
         }
+    }
+
+    @Override
+    public int getId() {
+        return STONE_SLAB3;
+    }
+
+    @Override
+    public String getName() {
+        return ((this.getDamage() & 0x08) > 0 ? "Upper " : "") + names[this.getDamage() & 0x07] + " Slab";
     }
 
     @Override

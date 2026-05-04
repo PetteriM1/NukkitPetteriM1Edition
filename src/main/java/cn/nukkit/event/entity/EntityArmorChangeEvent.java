@@ -11,11 +11,6 @@ import cn.nukkit.item.Item;
  */
 public class EntityArmorChangeEvent extends EntityEvent implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
-
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private final Item oldItem;
     private Item newItem;
     private final int slot;
@@ -27,19 +22,23 @@ public class EntityArmorChangeEvent extends EntityEvent implements Cancellable {
         this.slot = slot;
     }
 
-    public int getSlot() {
-        return slot;
+    public void setNewItem(Item newItem) {
+        this.newItem = newItem;
+    }
+
+    public static HandlerList getHandlers() {
+        return handlers;
     }
 
     public Item getNewItem() {
         return newItem;
     }
 
-    public void setNewItem(Item newItem) {
-        this.newItem = newItem;
-    }
-
     public Item getOldItem() {
         return oldItem;
+    }
+
+    public int getSlot() {
+        return slot;
     }
 }

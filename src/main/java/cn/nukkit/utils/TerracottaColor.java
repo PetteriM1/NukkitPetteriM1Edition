@@ -45,6 +45,16 @@ public enum TerracottaColor {
         this.dyeName = dyeName;
     }
 
+    static {
+        BY_DYE_DATA = values();
+        BY_TERRACOTA_DATA = values();
+
+        for (TerracottaColor color : values()) {
+            BY_TERRACOTA_DATA[color.terracottaColorMeta & 0x0f] = color;
+            BY_DYE_DATA[color.dyeColorMeta & 0x0f] = color;
+        }
+    }
+
     /**
      * Get as BlockColor
      *
@@ -64,12 +74,12 @@ public enum TerracottaColor {
     }
 
     /**
-     * Get as terracotta block meta value
+     * Get dye name
      *
-     * @return terracotta block meta value of the TerracottaColor
+     * @return dye name
      */
-    public int getTerracottaData() {
-        return this.terracottaColorMeta;
+    public String getDyeName() {
+        return this.dyeName;
     }
 
     /**
@@ -82,26 +92,17 @@ public enum TerracottaColor {
     }
 
     /**
-     * Get dye name
+     * Get as terracotta block meta value
      *
-     * @return dye name
+     * @return terracotta block meta value of the TerracottaColor
      */
-    public String getDyeName() {
-        return this.dyeName;
-    }
-
-    static {
-        BY_DYE_DATA = values();
-        BY_TERRACOTA_DATA = values();
-
-        for (TerracottaColor color : values()) {
-            BY_TERRACOTA_DATA[color.terracottaColorMeta & 0x0f] = color;
-            BY_DYE_DATA[color.dyeColorMeta & 0x0f] = color;
-        }
+    public int getTerracottaData() {
+        return this.terracottaColorMeta;
     }
 
     /**
      * Get TerracottaColor by dye item meta value
+     *
      * @param dyeColorMeta dye item meta value
      * @return TerracottaColor
      */
@@ -111,6 +112,7 @@ public enum TerracottaColor {
 
     /**
      * Get TerracottaColor by terracotta block meta value
+     *
      * @param terracottaColorMeta terracotta block meta value
      * @return TerracottaColor
      */

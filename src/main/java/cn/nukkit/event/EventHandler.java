@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
  * 一个处理器的重要程度被称作处理器的<b>优先级</b>，优先级高的处理器有更多的决定权。参见：{@link #priority()}<br>
  * The importance of a handler is called its <b>priority</b>, handlers with higher priority speaks louder then
  * lower ones. See: {@link #priority()}
- * 
+ * <p>
  * 处理器可以选择忽略或不忽略被取消的事件，这种特性可以在{@link #ignoreCancelled()}中定义。<br>
  * A handler can choose to ignore a cancelled event or not, that can be defined in {@link #ignoreCancelled()}.
  *
@@ -25,6 +25,18 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface EventHandler {
+    /**
+     * 定义这个处理器是否忽略被取消的事件。<br>
+     * Define if the handler ignores a cancelled event.
+     * <p>
+     * 如果为{@code true}而且事件发生，这个处理器不会被调用，反之相反。<br>
+     * If ignoreCancelled is {@code true} and the event is cancelled, the method is
+     * not called. Otherwise, the method is always called.
+     *
+     * @return 这个处理器是否忽略被取消的事件。<br>Whether cancelled events should be ignored.
+     */
+    boolean ignoreCancelled() default false;
+
     /**
      * 定义这个处理器的优先级。<br>
      * Define the priority of the handler.
@@ -46,16 +58,4 @@ public @interface EventHandler {
      * @return 这个处理器的优先级。<br>The priority of this handler.
      */
     EventPriority priority() default EventPriority.NORMAL;
-
-    /**
-     * 定义这个处理器是否忽略被取消的事件。<br>
-     * Define if the handler ignores a cancelled event.
-     * <p>
-     * 如果为{@code true}而且事件发生，这个处理器不会被调用，反之相反。<br>
-     * If ignoreCancelled is {@code true} and the event is cancelled, the method is
-     * not called. Otherwise, the method is always called.
-     *
-     * @return 这个处理器是否忽略被取消的事件。<br>Whether cancelled events should be ignored.
-     */
-    boolean ignoreCancelled() default false;
 }

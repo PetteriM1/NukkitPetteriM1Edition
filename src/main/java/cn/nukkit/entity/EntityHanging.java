@@ -19,6 +19,19 @@ public abstract class EntityHanging extends Entity {
     }
 
     @Override
+    public BlockFace getDirection() {
+        return BlockFace.fromIndex(this.direction);
+    }
+
+    protected boolean isSurfaceValid() {
+        return true;
+    }
+
+    protected void dropItem() {
+
+    }
+
+    @Override
     protected void initEntity() {
         this.setMaxHealth(1);
         super.initEntity();
@@ -34,21 +47,6 @@ public abstract class EntityHanging extends Entity {
                 this.direction = 2;
             }
         }
-    }
-
-    @Override
-    public void saveNBT() {
-        super.saveNBT();
-
-        this.namedTag.putByte("Direction", this.getDirection().getHorizontalIndex());
-        this.namedTag.putInt("TileX", (int) this.x);
-        this.namedTag.putInt("TileY", (int) this.y);
-        this.namedTag.putInt("TileZ", (int) this.z);
-    }
-
-    @Override
-    public BlockFace getDirection() {
-        return BlockFace.fromIndex(this.direction);
     }
 
     @Override
@@ -100,11 +98,13 @@ public abstract class EntityHanging extends Entity {
         return false;
     }
 
-    protected void dropItem() {
+    @Override
+    public void saveNBT() {
+        super.saveNBT();
 
-    }
-
-    protected boolean isSurfaceValid() {
-        return true;
+        this.namedTag.putByte("Direction", this.getDirection().getHorizontalIndex());
+        this.namedTag.putInt("TileX", (int) this.x);
+        this.namedTag.putInt("TileY", (int) this.y);
+        this.namedTag.putInt("TileZ", (int) this.z);
     }
 }

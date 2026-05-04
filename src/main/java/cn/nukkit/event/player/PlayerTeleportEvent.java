@@ -10,11 +10,6 @@ import cn.nukkit.math.Vector3;
 
 public class PlayerTeleportEvent extends PlayerEvent implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
-
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private TeleportCause cause;
     private Location from;
     private Location to;
@@ -37,25 +32,6 @@ public class PlayerTeleportEvent extends PlayerEvent implements Cancellable {
         this.cause = cause;
     }
 
-    public Location getFrom() {
-        return from;
-    }
-
-    public Location getTo() {
-        return to;
-    }
-
-    public TeleportCause getCause() {
-        return cause;
-    }
-
-    private static Location vectorToLocation(Level baseLevel, Vector3 vector) {
-        if (vector instanceof Location) return (Location) vector;
-        if (vector instanceof Position) return ((Position) vector).getLocation();
-        return new Location(vector.getX(), vector.getY(), vector.getZ(), 0, 0, baseLevel);
-    }
-
-
     public enum TeleportCause {
         COMMAND,       // For Nukkit tp command only
         PLUGIN,        // Every plugin
@@ -64,5 +40,27 @@ public class PlayerTeleportEvent extends PlayerEvent implements Cancellable {
         ENDER_PEARL,   // Teleport by ender pearl
         CHORUS_FRUIT,  // Teleport by chorus fruit
         UNKNOWN        // Unknown cause
+    }
+
+    public TeleportCause getCause() {
+        return cause;
+    }
+
+    public Location getFrom() {
+        return from;
+    }
+
+    public static HandlerList getHandlers() {
+        return handlers;
+    }
+
+    public Location getTo() {
+        return to;
+    }
+
+    private static Location vectorToLocation(Level baseLevel, Vector3 vector) {
+        if (vector instanceof Location) return (Location) vector;
+        if (vector instanceof Position) return ((Position) vector).getLocation();
+        return new Location(vector.getX(), vector.getY(), vector.getZ(), 0, 0, baseLevel);
     }
 }

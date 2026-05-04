@@ -24,8 +24,8 @@ public class BlockSugarcane extends BlockFlowable {
     }
 
     @Override
-    public String getName() {
-        return "Sugar Cane";
+    public BlockColor getColor() {
+        return BlockColor.FOLIAGE_BLOCK_COLOR;
     }
 
     @Override
@@ -34,8 +34,13 @@ public class BlockSugarcane extends BlockFlowable {
     }
 
     @Override
-    public Item toItem() {
-        return Item.get(Item.SUGARCANE);
+    public String getName() {
+        return "Sugar Cane";
+    }
+
+    @Override
+    public boolean breakWhenPushed() {
+        return true;
     }
 
     @Override
@@ -146,12 +151,7 @@ public class BlockSugarcane extends BlockFlowable {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.FOLIAGE_BLOCK_COLOR;
-    }
-
-    @Override
-    public boolean breakWhenPushed() {
-        return true;
+    public Item toItem() {
+        return Item.get(Item.SUGARCANE);
     }
 }

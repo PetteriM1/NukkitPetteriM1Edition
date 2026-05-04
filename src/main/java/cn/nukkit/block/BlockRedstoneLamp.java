@@ -15,8 +15,13 @@ import cn.nukkit.utils.BlockColor;
 public class BlockRedstoneLamp extends BlockSolid {
 
     @Override
-    public String getName() {
-        return "Redstone Lamp";
+    public BlockColor getColor() {
+        return BlockColor.ORANGE_TERRACOTA_BLOCK_COLOR;
+    }
+
+    @Override
+    public double getHardness() {
+        return 0.3D;
     }
 
     @Override
@@ -25,8 +30,8 @@ public class BlockRedstoneLamp extends BlockSolid {
     }
 
     @Override
-    public double getHardness() {
-        return 0.3D;
+    public String getName() {
+        return "Redstone Lamp";
     }
 
     @Override
@@ -40,13 +45,10 @@ public class BlockRedstoneLamp extends BlockSolid {
     }
 
     @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        if (this.level.isBlockPowered(this)) {
-            this.level.setBlock(this, Block.get(LIT_REDSTONE_LAMP), false, true);
-        } else {
-            this.level.setBlock(this, this, false, true);
-        }
-        return true;
+    public Item[] getDrops(Item item) {
+        return new Item[]{
+                new ItemBlock(Block.get(REDSTONE_LAMP))
+        };
     }
 
     @Override
@@ -59,7 +61,7 @@ public class BlockRedstoneLamp extends BlockSolid {
                 return 0;
             }
             if (this.level.isBlockPowered(this)) {
-                this.level.setBlock(this, Block.get(LIT_REDSTONE_LAMP), false, false);
+                this.level.setBlock(this, Block.get(LIT_REDSTONE_LAMP), false, true);
                 return 1;
             }
         }
@@ -68,14 +70,12 @@ public class BlockRedstoneLamp extends BlockSolid {
     }
 
     @Override
-    public Item[] getDrops(Item item) {
-        return new Item[]{
-                new ItemBlock(Block.get(REDSTONE_LAMP))
-        };
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.ORANGE_TERRACOTA_BLOCK_COLOR;
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        if (this.level.isBlockPowered(this)) {
+            this.level.setBlock(this, Block.get(LIT_REDSTONE_LAMP), false, true);
+        } else {
+            this.level.setBlock(this, this, false, true);
+        }
+        return true;
     }
 }

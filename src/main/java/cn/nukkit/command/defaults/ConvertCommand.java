@@ -68,12 +68,12 @@ public class ConvertCommand extends VanillaCommand {
 
         Anvil2LevelDBConverter converter = new Anvil2LevelDBConverter(level);
         converter.convert().whenComplete((ignore, error) -> {
-           if (error != null) {
-               sender.sendMessage("Error during conversion!");
-               Server.getInstance().getLogger().logException(error);
-           }
+            if (error != null) {
+                sender.sendMessage("Error during conversion!");
+                Server.getInstance().getLogger().logException(error);
+            }
 
-           CONVERSION_IN_PROGRESS.remove(worldName);
+            CONVERSION_IN_PROGRESS.remove(worldName);
         });
         return true;
     }

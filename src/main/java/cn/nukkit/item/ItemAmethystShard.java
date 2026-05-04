@@ -1,5 +1,7 @@
 package cn.nukkit.item;
 
+import cn.nukkit.network.protocol.ProtocolInfo;
+
 public class ItemAmethystShard extends Item implements ItemTrimMaterial {
 
     public ItemAmethystShard() {
@@ -17,5 +19,10 @@ public class ItemAmethystShard extends Item implements ItemTrimMaterial {
     @Override
     public ItemTrimMaterial.Type getMaterial() {
         return ItemTrimMaterial.Type.AMETHYST;
+    }
+
+    @Override
+    public boolean isSupportedOn(int protocol) {
+        return protocol >= ProtocolInfo.v1_17_0;
     }
 }

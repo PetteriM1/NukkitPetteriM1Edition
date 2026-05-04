@@ -19,16 +19,6 @@ public class ItemBootsIron extends ItemArmor {
     }
 
     @Override
-    public int getTier() {
-        return ItemArmor.TIER_IRON;
-    }
-
-    @Override
-    public boolean isBoots() {
-        return true;
-    }
-
-    @Override
     public int getArmorPoints() {
         return 2;
     }
@@ -36,5 +26,15 @@ public class ItemBootsIron extends ItemArmor {
     @Override
     public int getMaxDurability() {
         return 196;
+    }
+
+    @Override
+    public int getTier() {
+        return ItemArmor.TIER_IRON;
+    }
+
+    @Override
+    public boolean isBoots() {
+        return true;
     }
 }

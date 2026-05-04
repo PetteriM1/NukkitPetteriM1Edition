@@ -19,13 +19,13 @@ public class ItemAxeStone extends ItemTool {
     }
 
     @Override
-    public int getMaxDurability() {
-        return ItemTool.DURABILITY_STONE;
+    public int getAttackDamage() {
+        return 4;
     }
 
     @Override
-    public boolean isAxe() {
-        return true;
+    public int getMaxDurability() {
+        return ItemTool.DURABILITY_STONE;
     }
 
     @Override
@@ -34,7 +34,7 @@ public class ItemAxeStone extends ItemTool {
     }
 
     @Override
-    public int getAttackDamage() {
-        return 4;
+    public boolean isAxe() {
+        return true;
     }
 }

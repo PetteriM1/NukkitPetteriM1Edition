@@ -11,13 +11,13 @@ public class BlockCopperDoorOxidizedWaxed extends BlockCopperDoorOxidized {
     }
 
     @Override
-    public String getName() {
-        return "Waxed Oxidized Copper Door";
+    public int getId() {
+        return WAXED_OXIDIZED_COPPER_DOOR_BLOCK;
     }
 
     @Override
-    public int getId() {
-        return WAXED_OXIDIZED_COPPER_DOOR_BLOCK;
+    public String getName() {
+        return "Waxed Oxidized Copper Door";
     }
 
     @Override

@@ -19,16 +19,6 @@ public class ItemLeggingsLeather extends ItemColorArmor {
     }
 
     @Override
-    public int getTier() {
-        return ItemArmor.TIER_LEATHER;
-    }
-
-    @Override
-    public boolean isLeggings() {
-        return true;
-    }
-
-    @Override
     public int getArmorPoints() {
         return 2;
     }
@@ -36,5 +26,15 @@ public class ItemLeggingsLeather extends ItemColorArmor {
     @Override
     public int getMaxDurability() {
         return 76;
+    }
+
+    @Override
+    public int getTier() {
+        return ItemArmor.TIER_LEATHER;
+    }
+
+    @Override
+    public boolean isLeggings() {
+        return true;
     }
 }

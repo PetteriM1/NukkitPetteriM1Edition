@@ -13,6 +13,13 @@ public class BlockStateUpdaterChunker implements BlockStateUpdater {
     // This is updater for worlds converted using chunker.app
     public static final BlockStateUpdater INSTANCE = new BlockStateUpdaterChunker();
 
+    private void addProperty(CompoundTagUpdaterContext ctx, String identifier, String propertyName, Object value) {
+        ctx.addUpdater(STATE_MAYOR_VERSION, STATE_MINOR_VERSION, STATE_PATCH_VERSION, true)
+                .match("name", identifier)
+                .visit("states")
+                .tryAdd(propertyName, value);
+    }
+
     @Override
     public void registerUpdaters(CompoundTagUpdaterContext ctx) {
         this.addProperty(ctx, "minecraft:anvil", "damage", "undamaged");
@@ -75,12 +82,5 @@ public class BlockStateUpdaterChunker implements BlockStateUpdater {
         this.addProperty(ctx, "minecraft:wooden_slab", "wood_type", "oak");
         this.addProperty(ctx, "minecraft:quartz_block", "chisel_type", "default");
         this.addProperty(ctx, "minecraft:quartz_block", "pillar_axis", "y");
-    }
-
-    private void addProperty(CompoundTagUpdaterContext ctx, String identifier, String propertyName, Object value) {
-        ctx.addUpdater(STATE_MAYOR_VERSION, STATE_MINOR_VERSION, STATE_PATCH_VERSION, true)
-                .match("name", identifier)
-                .visit("states")
-                .tryAdd(propertyName, value);
     }
 }

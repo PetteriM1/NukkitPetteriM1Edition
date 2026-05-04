@@ -15,8 +15,8 @@ public class HellBiome extends CoveredBiome {
     }
 
     @Override
-    public int getSurfaceId(int x, int y, int z) {
-        return Block.NETHERRACK << Block.DATA_BITS;
+    public boolean canRain() {
+        return false;
     }
 
     @Override
@@ -25,7 +25,7 @@ public class HellBiome extends CoveredBiome {
     }
 
     @Override
-    public boolean canRain() {
-        return false;
+    public int getSurfaceId(int x, int y, int z) {
+        return Block.NETHERRACK << Block.DATA_BITS;
     }
 }

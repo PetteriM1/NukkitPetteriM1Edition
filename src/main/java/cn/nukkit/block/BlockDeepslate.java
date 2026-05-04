@@ -5,7 +5,9 @@ import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockDeepslate extends BlockSolidMeta {
 
@@ -15,33 +17,6 @@ public class BlockDeepslate extends BlockSolidMeta {
 
     public BlockDeepslate(int meta) {
         super(meta);
-    }
-
-    @Override
-    public String getName() {
-        return "Deepslate";
-    }
-
-    @Override
-    public int getId() {
-        return DEEPSLATE;
-    }
-
-    @Override
-    public double getHardness() {
-        return 3;
-    }
-
-    @Override
-    public double getResistance() {
-        return 30;
-    }
-
-    @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        this.setPillarAxis(face.getAxis());
-        this.getLevel().setBlock(block, this, true, true);
-        return true;
     }
 
     public void setPillarAxis(BlockFace.Axis axis) {
@@ -58,6 +33,31 @@ public class BlockDeepslate extends BlockSolidMeta {
         }
     }
 
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.DEEPSLATE_GRAY_BLOCK_COLOR;
+    }
+
+    @Override
+    public double getHardness() {
+        return 3;
+    }
+
+    @Override
+    public int getId() {
+        return DEEPSLATE;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_17_0;
+    }
+
+    @Override
+    public String getName() {
+        return "Deepslate";
+    }
+
     public BlockFace.Axis getPillarAxis() {
         switch (this.getDamage() % 3) {
             case 2:
@@ -71,6 +71,11 @@ public class BlockDeepslate extends BlockSolidMeta {
     }
 
     @Override
+    public double getResistance() {
+        return 30;
+    }
+
+    @Override
     public int getToolType() {
         return ItemTool.TYPE_PICKAXE;
     }
@@ -81,8 +86,13 @@ public class BlockDeepslate extends BlockSolidMeta {
     }
 
     @Override
-    public Item toItem() {
-        return new ItemBlock(Block.get(DEEPSLATE), 0);
+    public boolean canSilkTouch() {
+        return true;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.STONE;
     }
 
     @Override
@@ -95,12 +105,14 @@ public class BlockDeepslate extends BlockSolidMeta {
     }
 
     @Override
-    public boolean canSilkTouch() {
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        this.setPillarAxis(face.getAxis());
+        this.getLevel().setBlock(block, this, true, true);
         return true;
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.DEEPSLATE_GRAY_BLOCK_COLOR;
+    public Item toItem() {
+        return new ItemBlock(Block.get(DEEPSLATE), 0);
     }
 }

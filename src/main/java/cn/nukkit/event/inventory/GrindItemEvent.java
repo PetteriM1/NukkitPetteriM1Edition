@@ -10,11 +10,6 @@ import lombok.Getter;
 public class GrindItemEvent extends InventoryEvent implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
-
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     @Getter
     private final Item oldItem;
     @Getter
@@ -30,5 +25,9 @@ public class GrindItemEvent extends InventoryEvent implements Cancellable {
         this.newItem = newItem;
         this.materialItem = materialItem;
         this.player = player;
+    }
+
+    public static HandlerList getHandlers() {
+        return handlers;
     }
 }

@@ -14,8 +14,8 @@ public class BlockCopperTrapdoorWeathered extends BlockCopperTrapdoor {
     }
 
     @Override
-    public String getName() {
-        return "Weathered Copper Trapdoor";
+    public BlockColor getColor() {
+        return BlockColor.WARPED_STEM_BLOCK_COLOR;
     }
 
     @Override
@@ -24,8 +24,8 @@ public class BlockCopperTrapdoorWeathered extends BlockCopperTrapdoor {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.WARPED_STEM_BLOCK_COLOR;
+    public String getName() {
+        return "Weathered Copper Trapdoor";
     }
 
     @Override

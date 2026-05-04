@@ -10,11 +10,6 @@ public class SetHealthPacket extends DataPacket {
     public int health;
 
     @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
-    @Override
     public void decode() {
         this.decodeUnsupported();
     }
@@ -23,5 +18,10 @@ public class SetHealthPacket extends DataPacket {
     public void encode() {
         this.reset();
         this.putUnsignedVarInt(this.health);
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

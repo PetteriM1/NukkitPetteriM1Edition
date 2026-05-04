@@ -9,8 +9,13 @@ public class EnchantmentCrossbowPiercing extends EnchantmentCrossbow {
     }
 
     @Override
-    public int getMinEnchantAbility(int level) {
-        return 1 + 10 * (level - 1);
+    public int getMaxLevel() {
+        return 4;
+    }
+
+    @Override
+    public boolean checkCompatibility(Enchantment enchantment) {
+        return super.checkCompatibility(enchantment) && enchantment.id != ID_CROSSBOW_MULTISHOT;
     }
 
     @Override
@@ -19,12 +24,7 @@ public class EnchantmentCrossbowPiercing extends EnchantmentCrossbow {
     }
 
     @Override
-    public int getMaxLevel() {
-        return 4;
-    }
-
-    @Override
-    public boolean checkCompatibility(Enchantment enchantment) {
-        return super.checkCompatibility(enchantment) && enchantment.id != ID_CROSSBOW_MULTISHOT;
+    public int getMinEnchantAbility(int level) {
+        return 1 + 10 * (level - 1);
     }
 }

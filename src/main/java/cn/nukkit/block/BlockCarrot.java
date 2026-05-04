@@ -17,13 +17,13 @@ public class BlockCarrot extends BlockCrops {
     }
 
     @Override
-    public String getName() {
-        return "Carrot Block";
+    public int getId() {
+        return CARROT_BLOCK;
     }
 
     @Override
-    public int getId() {
-        return CARROT_BLOCK;
+    public String getName() {
+        return "Carrot Block";
     }
 
     @Override

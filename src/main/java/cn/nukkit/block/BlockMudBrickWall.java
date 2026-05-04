@@ -1,7 +1,9 @@
 package cn.nukkit.block;
 
 import cn.nukkit.item.Item;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockMudBrickWall extends BlockWall {
 
@@ -14,13 +16,33 @@ public class BlockMudBrickWall extends BlockWall {
     }
 
     @Override
-    public String getName() {
-        return "Mud Brick Wall";
+    public BlockColor getColor() {
+        return BlockColor.LIGHT_GRAY_TERRACOTA_BLOCK_COLOR;
     }
 
     @Override
     public int getId() {
         return MUD_BRICK_WALL;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_19_0;
+    }
+
+    @Override
+    public String getName() {
+        return "Mud Brick Wall";
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.STONE_WALL;
+    }
+
+    @Override
+    public int getAlternateMeta(int protocol) {
+        return BlockWall.SANDSTONE;
     }
 
     @Override
@@ -32,10 +54,5 @@ public class BlockMudBrickWall extends BlockWall {
         } else {
             return new Item[0];
         }
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.LIGHT_GRAY_TERRACOTA_BLOCK_COLOR;
     }
 }

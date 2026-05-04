@@ -1,5 +1,6 @@
 package cn.nukkit.plugin;
 
+import cn.nukkit.Server;
 import cn.nukkit.permission.Permission;
 import cn.nukkit.utils.PluginException;
 import org.yaml.snakeyaml.DumperOptions;
@@ -40,7 +41,7 @@ import java.util.regex.Pattern;
  * When using plugin.yml file to define your plugin, it's REQUIRED to fill these items:
  * {@code name},{@code main},{@code version} and {@code api}.You are supposed to fill these items to make sure
  * your plugin can be normally loaded by Nukkit.<br>
- *
+ * <p>
  * 接下来对所有的字段做一些说明，<b>加粗</b>的字段表示必需，<i>斜体</i>表示可选：（来自
  * <a href="http://www.cnblogs.com/xtypr/p/nukkit_plugin_start_from_0_about_config.html">粉鞋大妈的博客文章</a>）<br>
  * Here are some instructions for there items, <b>bold</b> means required, <i>italic</i> means optional: (From
@@ -128,103 +129,6 @@ public class PluginDescription {
 
     private static final Pattern FILTER = Pattern.compile("[^A-Za-z0-9 _.-]");
 
-    private void loadMap(Map<String, Object> plugin) throws PluginException {
-        this.name = FILTER.matcher((String) plugin.get("name")).replaceAll("");
-        if (this.name.isEmpty()) {
-            throw new PluginException("plugin.yml must contain 'name'");
-        }
-
-        this.name = this.name.replace(" ", "_");
-        this.version = String.valueOf(plugin.get("version"));
-        this.main = (String) plugin.get("main");
-
-        Object api = plugin.get("api");
-        if (api instanceof List) {
-            this.api = (List<String>) api;
-        } else {
-            List<String> list = new ArrayList<>();
-            list.add((String) api);
-            this.api = list;
-        }
-
-        if (this.main.startsWith("cn.nukkit.")) {
-            throw new PluginException(this.name + " has an invalid 'main' in plugin.yml (plugins can't be in cn.nukkit): " + this.main);
-        }
-
-        if (plugin.containsKey("commands") && plugin.get("commands") instanceof Map) {
-            this.commands = (Map<String, Object>) plugin.get("commands");
-        }
-
-        if (plugin.containsKey("depend")) {
-            this.depend = (List<String>) plugin.get("depend");
-        }
-
-        if (plugin.containsKey("softdepend")) {
-            this.softDepend = (List<String>) plugin.get("softdepend");
-        }
-
-        if (plugin.containsKey("loadbefore")) {
-            this.loadBefore = (List<String>) plugin.get("loadbefore");
-        }
-
-        if (plugin.containsKey("website")) {
-            this.website = (String) plugin.get("website");
-        }
-
-        if (plugin.containsKey("description")) {
-            this.description = (String) plugin.get("description");
-        }
-
-        if (plugin.containsKey("prefix")) {
-            this.prefix = (String) plugin.get("prefix");
-        }
-
-        if (plugin.containsKey("load")) {
-            String order = (String) plugin.get("load");
-            try {
-                this.order = PluginLoadOrder.valueOf(order);
-            } catch (Exception e) {
-                throw new PluginException(this.name + " has an invalid 'load' in plugin.yml: " + order);
-            }
-        }
-
-        if (plugin.containsKey("author")) {
-            this.authors.add((String) plugin.get("author"));
-        }
-
-        if (plugin.containsKey("authors")) {
-            this.authors.addAll((Collection<? extends String>) plugin.get("authors"));
-        }
-
-        if (plugin.containsKey("permissions")) {
-            this.permissions = Permission.loadPermissions((Map<String, Object>) plugin.get("permissions"));
-        }
-    }
-
-    /**
-     * 返回这个插件完整的名字。<br>
-     * Returns the full name of this plugin.
-     * <p>
-     * 一个插件完整的名字由{@code 名字+" v"+版本号}组成。比如：<br>
-     * A full name of a plugin is composed by {@code name+" v"+version}.for example:
-     * {@code HelloWorld v1.0.0}
-     *
-     * @return 这个插件完整的名字。<br>The full name of this plugin.
-     */
-    public String getFullName() {
-        return this.name + " v" + this.version;
-    }
-
-    /**
-     * 返回这个插件支持的Nukkit API版本列表。<br>
-     * Returns all Nukkit API versions this plugin supports.
-     *
-     * @return 这个插件支持的Nukkit API版本列表。<br>A list of all Nukkit API versions String this plugin supports.
-     */
-    public List<String> getCompatibleAPIs() {
-        return api;
-    }
-
     /**
      * 返回这个插件的作者列表。<br>
      * Returns all the authors of this plugin.
@@ -236,22 +140,6 @@ public class PluginDescription {
     }
 
     /**
-     * 返回这个插件的信息前缀。<br>
-     * Returns the message title of this plugin.
-     * <p>
-     * 插件的信息前缀在记录器记录信息时，会作为信息头衔使用。如果没有定义记录器，会使用插件的名字作为信息头衔。<br>
-     * When a PluginLogger logs, the message title is used as the prefix of message. If prefix is undefined,
-     * the plugin name will be used instead. 
-     *
-     * @return 这个插件的作信息前缀。如果没定义，返回{@code null}。<br>
-     * The message title of this plugin, or{@code null} if undefined.
-     * @see PluginLogger
-     */
-    public String getPrefix() {
-        return prefix;
-    }
-
-    /**
      * 返回这个插件定义的命令列表。<br>
      * Returns all the defined commands of this plugin.
      *
@@ -259,6 +147,16 @@ public class PluginDescription {
      */
     public Map<String, Object> getCommands() {
         return commands;
+    }
+
+    /**
+     * 返回这个插件支持的Nukkit API版本列表。<br>
+     * Returns all Nukkit API versions this plugin supports.
+     *
+     * @return 这个插件支持的Nukkit API版本列表。<br>A list of all Nukkit API versions String this plugin supports.
+     */
+    public List<String> getCompatibleAPIs() {
+        return api;
     }
 
     /**
@@ -275,7 +173,7 @@ public class PluginDescription {
      * When the required dependency plugin does not exists, Nukkit won't load this plugin, but will tell the
      * user that this dependency is required.</li>
      * </ul>
-     * 
+     * <p>
      * 举个例子，如果A插件依赖于B插件，在没有安装B插件而安装A插件的情况下，Nukkit会阻止A插件的加载。
      * 只有在安装B插件前安装了它所依赖的A插件，Nukkit才会允许加载B插件。<br>
      * For example, there is a Plugin A which relies on Plugin B. If you installed A without installing B,
@@ -296,6 +194,20 @@ public class PluginDescription {
      */
     public String getDescription() {
         return description;
+    }
+
+    /**
+     * 返回这个插件完整的名字。<br>
+     * Returns the full name of this plugin.
+     * <p>
+     * 一个插件完整的名字由{@code 名字+" v"+版本号}组成。比如：<br>
+     * A full name of a plugin is composed by {@code name+" v"+version}.for example:
+     * {@code HelloWorld v1.0.0}
+     *
+     * @return 这个插件完整的名字。<br>The full name of this plugin.
+     */
+    public String getFullName() {
+        return this.name + " v" + this.version;
     }
 
     /**
@@ -352,6 +264,22 @@ public class PluginDescription {
     }
 
     /**
+     * 返回这个插件的信息前缀。<br>
+     * Returns the message title of this plugin.
+     * <p>
+     * 插件的信息前缀在记录器记录信息时，会作为信息头衔使用。如果没有定义记录器，会使用插件的名字作为信息头衔。<br>
+     * When a PluginLogger logs, the message title is used as the prefix of message. If prefix is undefined,
+     * the plugin name will be used instead.
+     *
+     * @return 这个插件的作信息前缀。如果没定义，返回{@code null}。<br>
+     * The message title of this plugin, or{@code null} if undefined.
+     * @see PluginLogger
+     */
+    public String getPrefix() {
+        return prefix;
+    }
+
+    /**
      * TODO finish javadoc
      */
     public List<String> getSoftDepend() {
@@ -376,5 +304,83 @@ public class PluginDescription {
      */
     public String getWebsite() {
         return website;
+    }
+
+    private void loadMap(Map<String, Object> plugin) throws PluginException {
+        this.name = FILTER.matcher((String) plugin.get("name")).replaceAll("");
+        if (this.name.isEmpty()) {
+            throw new PluginException("plugin.yml must contain 'name'");
+        }
+
+        this.name = this.name.replace(" ", "_");
+        this.version = String.valueOf(plugin.get("version"));
+        this.main = (String) plugin.get("main");
+
+        Object api = plugin.get("api");
+        if (api instanceof List) {
+            this.api = (List<String>) api;
+        } else {
+            List<String> list = new ArrayList<>();
+            if (api == null) {
+                Server.getInstance().getLogger().warning(this.name + " didn't specify API version in plugin.yml"); // We don't check it but it should still be there
+                list.add("1.0.0");
+            } else {
+                list.add((String) api);
+            }
+            this.api = list;
+        }
+
+        if (this.main.startsWith("cn.nukkit.")) {
+            throw new PluginException(this.name + " has an invalid 'main' in plugin.yml (plugins can't be in cn.nukkit): " + this.main);
+        }
+
+        if (plugin.containsKey("commands") && plugin.get("commands") instanceof Map) {
+            this.commands = (Map<String, Object>) plugin.get("commands");
+        }
+
+        if (plugin.containsKey("depend")) {
+            this.depend = (List<String>) plugin.get("depend");
+        }
+
+        if (plugin.containsKey("softdepend")) {
+            this.softDepend = (List<String>) plugin.get("softdepend");
+        }
+
+        if (plugin.containsKey("loadbefore")) {
+            this.loadBefore = (List<String>) plugin.get("loadbefore");
+        }
+
+        if (plugin.containsKey("website")) {
+            this.website = (String) plugin.get("website");
+        }
+
+        if (plugin.containsKey("description")) {
+            this.description = (String) plugin.get("description");
+        }
+
+        if (plugin.containsKey("prefix")) {
+            this.prefix = (String) plugin.get("prefix");
+        }
+
+        if (plugin.containsKey("load")) {
+            String order = (String) plugin.get("load");
+            try {
+                this.order = PluginLoadOrder.valueOf(order);
+            } catch (Exception e) {
+                throw new PluginException(this.name + " has an invalid 'load' in plugin.yml: " + order);
+            }
+        }
+
+        if (plugin.containsKey("author")) {
+            this.authors.add((String) plugin.get("author"));
+        }
+
+        if (plugin.containsKey("authors")) {
+            this.authors.addAll((Collection<? extends String>) plugin.get("authors"));
+        }
+
+        if (plugin.containsKey("permissions")) {
+            this.permissions = Permission.loadPermissions((Map<String, Object>) plugin.get("permissions"));
+        }
     }
 }

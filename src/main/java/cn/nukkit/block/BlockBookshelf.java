@@ -10,8 +10,23 @@ import cn.nukkit.utils.BlockColor;
 public class BlockBookshelf extends BlockSolid {
 
     @Override
-    public String getName() {
-        return "Bookshelf";
+    public int getBurnAbility() {
+        return 20;
+    }
+
+    @Override
+    public int getBurnChance() {
+        return 30;
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.WOOD_BLOCK_COLOR;
+    }
+
+    @Override
+    public double getHardness() {
+        return 1.5D;
     }
 
     @Override
@@ -20,8 +35,8 @@ public class BlockBookshelf extends BlockSolid {
     }
 
     @Override
-    public double getHardness() {
-        return 1.5D;
+    public String getName() {
+        return "Bookshelf";
     }
 
     @Override
@@ -35,13 +50,8 @@ public class BlockBookshelf extends BlockSolid {
     }
 
     @Override
-    public int getBurnChance() {
-        return 30;
-    }
-
-    @Override
-    public int getBurnAbility() {
-        return 20;
+    public boolean canSilkTouch() {
+        return true;
     }
 
     @Override
@@ -49,15 +59,5 @@ public class BlockBookshelf extends BlockSolid {
         return new Item[]{
                 Item.get(Item.BOOK, 0, 3)
         };
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.WOOD_BLOCK_COLOR;
-    }
-
-    @Override
-    public boolean canSilkTouch() {
-        return true;
     }
 }

@@ -14,20 +14,20 @@ public abstract class EntityData<T> {
         this.id = id;
     }
 
-    public abstract int getType();
-
-    public abstract T getData();
-
     public abstract void setData(T data);
-
-    public int getId() {
-        return id;
-    }
 
     public EntityData setId(int id) {
         this.id = id;
         return this;
     }
+
+    public abstract T getData();
+
+    public int getId() {
+        return id;
+    }
+
+    public abstract int getType();
 
     @Override
     public boolean equals(Object obj) {

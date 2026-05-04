@@ -24,32 +24,7 @@ public class BlockPlanks extends BlockSolidMeta {
         super(meta % 6);
     }
 
-    @Override
-    public int getId() {
-        return WOODEN_PLANKS;
-    }
-
-    @Override
-    public double getHardness() {
-        return 2;
-    }
-
-    @Override
-    public double getResistance() {
-        return 15;
-    }
-
-    @Override
-    public int getBurnChance() {
-        return 5;
-    }
-
-    @Override
-    public int getBurnAbility() {
-        return 20;
-    }
-
-    private static final String[] NAMES = {
+    private static final String[] names = {
             "Oak Planks",
             "Spruce Planks",
             "Birch Planks",
@@ -59,13 +34,13 @@ public class BlockPlanks extends BlockSolidMeta {
     };
 
     @Override
-    public String getName() {
-        return NAMES[this.getDamage() & 0x07];
+    public int getBurnAbility() {
+        return 20;
     }
 
     @Override
-    public int getToolType() {
-        return ItemTool.TYPE_AXE;
+    public int getBurnChance() {
+        return 5;
     }
 
     @Override
@@ -85,5 +60,30 @@ public class BlockPlanks extends BlockSolidMeta {
             case DARK_OAK:
                 return BlockColor.BROWN_BLOCK_COLOR;
         }
+    }
+
+    @Override
+    public double getHardness() {
+        return 2;
+    }
+
+    @Override
+    public int getId() {
+        return WOODEN_PLANKS;
+    }
+
+    @Override
+    public String getName() {
+        return names[this.getDamage() & 0x07];
+    }
+
+    @Override
+    public double getResistance() {
+        return 15;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_AXE;
     }
 }

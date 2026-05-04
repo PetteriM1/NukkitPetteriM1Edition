@@ -53,6 +53,74 @@ public class RCONServer extends Thread {
         this.password = password;
     }
 
+    public void close() {
+        this.running = false;
+        this.selector.wakeup();
+    }
+
+    private void handle(SocketChannel channel, RCONPacket packet) {
+        switch (packet.getType()) {
+            case SERVERDATA_AUTH:
+                byte[] payload = new byte[1];
+
+                if (new String(packet.getPayload(), StandardCharsets.UTF_8).equals(this.password)) {
+                    this.rconSessions.add(channel);
+                    this.send(channel, new RCONPacket(packet.getId(), SERVERDATA_AUTH_RESPONSE, payload));
+                    try {
+                        Server.getInstance().getLogger().info("[RCON] " + channel.getRemoteAddress().toString() + " connected");
+                    } catch (Exception ignored) {
+                    }
+                    return;
+                }
+
+                try {
+                    Server.getInstance().getLogger().info("[RCON] Authentication failed for " + channel.getRemoteAddress().toString());
+                } catch (Exception ignored) {
+                }
+                this.send(channel, new RCONPacket(-1, SERVERDATA_AUTH_RESPONSE, payload));
+                break;
+            case SERVERDATA_EXECCOMMAND:
+                if (!this.rconSessions.contains(channel)) {
+                    return;
+                }
+
+                String command = new String(packet.getPayload(), StandardCharsets.UTF_8).trim();
+                synchronized (this.receiveQueue) {
+                    this.receiveQueue.add(new RCONCommand(channel, packet.getId(), command));
+                }
+                break;
+        }
+    }
+
+    private void read(SelectionKey key) throws IOException {
+        SocketChannel channel = (SocketChannel) key.channel();
+        ByteBuffer buffer = ByteBuffer.allocate(4096);
+        buffer.order(ByteOrder.LITTLE_ENDIAN);
+
+        int bytesRead;
+        try {
+            bytesRead = channel.read(buffer);
+        } catch (IOException exception) {
+            key.cancel();
+            channel.close();
+            this.rconSessions.remove(channel);
+            this.sendQueues.remove(channel);
+            return;
+        }
+
+        if (bytesRead == -1) {
+            key.cancel();
+            channel.close();
+            this.rconSessions.remove(channel);
+            this.sendQueues.remove(channel);
+            return;
+        }
+
+        //noinspection RedundantCast
+        ((Buffer) buffer).flip(); // do not remove the cast
+        this.handle(channel, new RCONPacket(buffer));
+    }
+
     public RCONCommand receive() {
         synchronized (this.receiveQueue) {
             if (!this.receiveQueue.isEmpty()) {
@@ -67,11 +135,6 @@ public class RCONServer extends Thread {
 
     public void respond(SocketChannel channel, int id, String response) {
         this.send(channel, new RCONPacket(id, SERVERDATA_RESPONSE_VALUE, response.getBytes(StandardCharsets.UTF_8)));
-    }
-
-    public void close() {
-        this.running = false;
-        this.selector.wakeup();
     }
 
     public void run() {
@@ -122,61 +185,17 @@ public class RCONServer extends Thread {
         }
     }
 
-    private void read(SelectionKey key) throws IOException {
-        SocketChannel channel = (SocketChannel) key.channel();
-        ByteBuffer buffer = ByteBuffer.allocate(4096);
-        buffer.order(ByteOrder.LITTLE_ENDIAN);
-
-        int bytesRead;
-        try {
-            bytesRead = channel.read(buffer);
-        } catch (IOException exception) {
-            key.cancel();
-            channel.close();
-            this.rconSessions.remove(channel);
-            this.sendQueues.remove(channel);
+    private void send(SocketChannel channel, RCONPacket packet) {
+        if (!channel.keyFor(this.selector).isValid()) {
             return;
         }
 
-        if (bytesRead == -1) {
-            key.cancel();
-            channel.close();
-            this.rconSessions.remove(channel);
-            this.sendQueues.remove(channel);
-            return;
+        synchronized (this.sendQueues) {
+            List<RCONPacket> queue = sendQueues.computeIfAbsent(channel, k -> new ArrayList<>());
+            queue.add(packet);
         }
 
-        //noinspection RedundantCast
-        ((Buffer) buffer).flip(); // do not remove the cast
-        this.handle(channel, new RCONPacket(buffer));
-    }
-
-    private void handle(SocketChannel channel, RCONPacket packet) {
-        switch (packet.getType()) {
-            case SERVERDATA_AUTH:
-                byte[] payload = new byte[1];
-
-                if (new String(packet.getPayload(), StandardCharsets.UTF_8).equals(this.password)) {
-                    this.rconSessions.add(channel);
-                    this.send(channel, new RCONPacket(packet.getId(), SERVERDATA_AUTH_RESPONSE, payload));
-                    try { Server.getInstance().getLogger().info("[RCON] " + channel.getRemoteAddress().toString() + " connected"); } catch (Exception ignored) {}
-                    return;
-                }
-
-                try { Server.getInstance().getLogger().info("[RCON] Authentication failed for " + channel.getRemoteAddress().toString()); } catch (Exception ignored) {}
-                this.send(channel, new RCONPacket(-1, SERVERDATA_AUTH_RESPONSE, payload));
-                break;
-            case SERVERDATA_EXECCOMMAND:
-                if (!this.rconSessions.contains(channel)) {
-                    return;
-                }
-
-                String command = new String(packet.getPayload(), StandardCharsets.UTF_8).trim();
-                synchronized (this.receiveQueue) {
-                    this.receiveQueue.add(new RCONCommand(channel, packet.getId(), command));
-                }
-                break;
-        }
+        this.selector.wakeup();
     }
 
     private void write(SelectionKey key) throws IOException {
@@ -203,18 +222,5 @@ public class RCONServer extends Thread {
 
             key.interestOps(SelectionKey.OP_READ);
         }
-    }
-
-    private void send(SocketChannel channel, RCONPacket packet) {
-        if (!channel.keyFor(this.selector).isValid()) {
-            return;
-        }
-
-        synchronized (this.sendQueues) {
-            List<RCONPacket> queue = sendQueues.computeIfAbsent(channel, k -> new ArrayList<>());
-            queue.add(packet);
-        }
-
-        this.selector.wakeup();
     }
 }

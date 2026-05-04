@@ -34,8 +34,24 @@ public class BlockSmokerLit extends BlockFurnaceBurning {
     }
 
     @Override
-    public Item toItem() {
-        return new ItemBlock(Block.get(SMOKER));
+    public boolean onActivate(Item item, Player player) {
+        if (player != null) {
+            BlockEntity t = this.getLevel().getBlockEntity(this);
+            if (!(t instanceof BlockEntitySmoker)) {
+                return false;
+            }
+
+            BlockEntitySmoker smoker = (BlockEntitySmoker) t;
+            if (smoker.namedTag.contains("Lock") && smoker.namedTag.get("Lock") instanceof StringTag) {
+                if (!smoker.namedTag.getString("Lock").equals(item.getCustomName())) {
+                    return true;
+                }
+            }
+
+            player.addWindow(smoker.getInventory());
+        }
+
+        return true;
     }
 
     @Override
@@ -65,23 +81,7 @@ public class BlockSmokerLit extends BlockFurnaceBurning {
     }
 
     @Override
-    public boolean onActivate(Item item, Player player) {
-        if (player != null) {
-            BlockEntity t = this.getLevel().getBlockEntity(this);
-            if (!(t instanceof BlockEntitySmoker)) {
-                return false;
-            }
-
-            BlockEntitySmoker smoker = (BlockEntitySmoker) t;
-            if (smoker.namedTag.contains("Lock") && smoker.namedTag.get("Lock") instanceof StringTag) {
-                if (!smoker.namedTag.getString("Lock").equals(item.getCustomName())) {
-                    return true;
-                }
-            }
-
-            player.addWindow(smoker.getInventory());
-        }
-
-        return true;
+    public Item toItem() {
+        return new ItemBlock(Block.get(SMOKER));
     }
 }

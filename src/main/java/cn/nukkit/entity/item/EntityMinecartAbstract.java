@@ -61,12 +61,96 @@ public abstract class EntityMinecartAbstract extends EntityVehicle implements En
     private double flyingZ = 0.95;
     private double maxSpeed = 0.4D;
 
-    public abstract MinecartType getType();
-
-    public abstract boolean isRideable();
-
     public EntityMinecartAbstract(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
+    }
+
+    private boolean hasUpdated = false;
+    private final Vector3 tempMoveVec = new Vector3(0, 0, 0);
+
+    /**
+     * Used to multiply the minecart current speed
+     *
+     * @param speed The speed of the minecart that will be calculated
+     */
+    public void setCurrentSpeed(double speed) {
+        this.currentSpeed = speed;
+    }
+
+    public void setDerailedVelocityMod(Vector3 derailed) {
+        Objects.requireNonNull(derailed, "Derailed velocity modifiers cannot be null");
+        derailedX = derailed.getX();
+        derailedY = derailed.getY();
+        derailedZ = derailed.getZ();
+    }
+
+    /**
+     * Set the block offset.
+     *
+     * @param offset The offset
+     */
+    public void setDisplayBlockOffset(int offset) {
+        setDataProperty(new IntEntityData(DATA_DISPLAY_OFFSET, offset));
+    }
+
+    public void setFlyingVelocityMod(Vector3 flying) {
+        Objects.requireNonNull(flying, "Flying velocity modifiers cannot be null");
+        flyingX = flying.getX();
+        flyingY = flying.getY();
+        flyingZ = flying.getZ();
+    }
+
+    public void setMaximumSpeed(double speed) {
+        maxSpeed = speed;
+    }
+
+    public void setName(String name) {
+        entityName = name;
+    }
+
+    /**
+     * Set the minecart slowdown flag
+     *
+     * @param slow The slowdown flag
+     */
+    public void setSlowWhenEmpty(boolean slow) {
+        slowWhenEmpty = slow;
+    }
+
+    @Override
+    public float getBaseOffset() {
+        return 0.35F;
+    }
+
+    public Vector3 getDerailedVelocityMod() {
+        return new Vector3(derailedX, derailedY, derailedZ);
+    }
+
+    /**
+     * Get the minecart display block
+     *
+     * @return Block of minecart display block
+     */
+    public Block getDisplayBlock() {
+        return blockInside;
+    }
+
+    /**
+     * Get the block display offset
+     *
+     * @return integer
+     */
+    public int getDisplayBlockOffset() {
+        return super.getDataPropertyInt(DATA_DISPLAY_OFFSET);
+    }
+
+    @Override
+    protected float getDrag() {
+        return 0.1F;
+    }
+
+    public Vector3 getFlyingVelocityMod() {
+        return new Vector3(flyingX, flyingY, flyingZ);
     }
 
     @Override
@@ -75,17 +159,12 @@ public abstract class EntityMinecartAbstract extends EntityVehicle implements En
     }
 
     @Override
-    public float getWidth() {
-        return 0.98F;
+    public String getInteractButtonText() {
+        return "";
     }
 
-    @Override
-    protected float getDrag() {
-        return 0.1F;
-    }
-
-    public void setName(String name) {
-        entityName = name;
+    public double getMaxSpeed() {
+        return maxSpeed;
     }
 
     @Override
@@ -93,200 +172,37 @@ public abstract class EntityMinecartAbstract extends EntityVehicle implements En
         return entityName;
     }
 
+    public abstract MinecartType getType();
+
     @Override
-    public float getBaseOffset() {
-        return 0.35F;
+    public float getWidth() {
+        return 0.98F;
     }
 
-    @Override
-    public boolean hasCustomName() {
-        return entityName != null;
+    public abstract boolean isRideable();
+
+    /**
+     * Is the minecart can be slowed when empty?
+     *
+     * @return boolean
+     */
+    public boolean isSlowWhenEmpty() {
+        return slowWhenEmpty;
     }
 
-    @Override
-    public boolean canDoInteraction() {
-        return passengers.isEmpty() && this.blockInside == null;
+    protected void activate(int x, int y, int z, boolean flag) {
     }
 
-    @Override
-    public void initEntity() {
-        this.setMaxHealth(40);
-        super.initEntity();
-
-        this.setHealth(40);
-        //this.prepareDataProperty(); // TODO: DATA_DISPLAY_ITEM NBTEntityData
-    }
-
-    @Override
-    public boolean entityBaseTick(int tickDiff) {
-        // The damage token
-        if (getHealth() < 20) {
-            setHealth(getHealth() + 1);
-        }
-
-        // Entity variables
-        lastX = x;
-        lastY = y;
-        lastZ = z;
-        motionY -= 0.04;
-        int dx = MathHelper.floor(x);
-        int dy = MathHelper.floor(y);
-        int dz = MathHelper.floor(z);
-
-        // Some hack to check rails
-        if (Rail.isRailBlock(level.getBlockIdAt(dx, dy - 1, dz))) {
-            --dy;
-        }
-
-        Block block = level.getBlock(chunk, dx, dy, dz, true);
-
-        // Ensure that the block is a rail
-        if (Rail.isRailBlock(block)) {
-            processMovement(dx, dy, dz, (BlockRail) block);
-            // Activate the minecart/TNT
-            if (block instanceof BlockRailActivator) {
-                activate(dx, dy, dz, ((BlockRailActivator) block).isActive());
-            }
+    private void applyDrag() {
+        if (!passengers.isEmpty() || !slowWhenEmpty) {
+            motionX *= 0.996999979019165D;
+            motionY *= 0.0D;
+            motionZ *= 0.996999979019165D;
         } else {
-            setFalling();
+            motionX *= 0.9599999785423279D;
+            motionY *= 0.0D;
+            motionZ *= 0.9599999785423279D;
         }
-
-        // Minecart head
-        pitch = 0;
-        double diffX = this.lastX - this.x;
-        double diffZ = this.lastZ - this.z;
-        double yawToChange = yaw;
-        if (diffX * diffX + diffZ * diffZ > 0.001D) {
-            yawToChange = (Math.atan2(diffZ, diffX) * 180 / Math.PI);
-        }
-
-        // Reverse yaw if yaw is below 0
-        if (yawToChange < 0) {
-            // -90-(-90)-(-90) = 90
-            yawToChange -= yawToChange - yawToChange;
-        }
-
-        setRotation(yawToChange, pitch);
-
-        Location from = new Location(lastX, lastY, lastZ, lastYaw, lastPitch, level);
-        Location to = new Location(this.x, this.y, this.z, this.yaw, this.pitch, level);
-
-        this.getServer().getPluginManager().callEvent(new VehicleUpdateEvent(this));
-
-        if (!from.equals(to)) {
-            this.getServer().getPluginManager().callEvent(new VehicleMoveEvent(this, from, to));
-        }
-
-        // Collisions
-        if (this instanceof InventoryHolder) {
-            for (Entity entity : level.getNearbyEntities(boundingBox.grow(0.2D, 0, 0.2D), this)) {
-                if (entity instanceof EntityMinecartAbstract && !passengers.contains(entity)) {
-                    entity.applyEntityCollision(this);
-                }
-            }
-        }
-
-        if (this instanceof InventoryHolder) {
-            AxisAlignedBB pickupArea = new SimpleAxisAlignedBB(this.x, this.y - 1, this.z, this.x + 1, this.y, this.z + 1);
-            Block[] hopperPickupArray = this.level.getCollisionBlocks(this, pickupArea, false);
-            if (hopperPickupArray.length >= 1) {
-                Block hopper = hopperPickupArray[0];
-                if (hopper instanceof BlockHopper) {
-                    BlockEntity hopperBE = hopper.getLevel().getBlockEntityIfLoaded(hopper);
-                    if (hopperBE instanceof BlockEntityHopper) {
-                        ((BlockEntityHopper) hopperBE).setMinecartPickupInventory((InventoryHolder) this);
-                    }
-                }
-                return true;
-            }
-
-            if (!(this instanceof EntityMinecartHopper)) {
-                AxisAlignedBB pushArea = new SimpleAxisAlignedBB(this.x, this.y, this.z, this.x + 1, this.y + 2, this.z + 1);
-                Block[] hopperPushArray = this.level.getCollisionBlocks(this, pushArea, false);
-                if (hopperPushArray.length >= 1) {
-                    Block hopper = hopperPushArray[0];
-                    if (hopper instanceof BlockHopper) {
-                        BlockEntity hopperBE = hopper.getLevel().getBlockEntityIfLoaded(hopper);
-                        if (hopperBE instanceof BlockEntityHopper) {
-                            ((BlockEntityHopper) hopperBE).setMinecartPushInventory((InventoryHolder) this);
-                        }
-                    }
-                    return true;
-                }
-            }
-        }
-
-        // We call super here after movement code so block collision checks use up to date position
-        return super.entityBaseTick(tickDiff) || this.getRollingAmplitude() > 0 || !(this.motionX == 0 && this.motionY == 0 && this.motionZ == 0);
-    }
-
-    @Override
-    public boolean attack(EntityDamageEvent source) {
-        if (invulnerable) {
-            return false;
-        } else {
-            source.setDamage(source.getDamage() * 15);
-
-            boolean attack = super.attack(source);
-
-            if (isAlive()) {
-                performHurtAnimation();
-            }
-
-            return attack;
-        }
-    }
-
-    public void dropItem() {
-        if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
-            Entity damager = ((EntityDamageByEntityEvent) this.lastDamageCause).getDamager();
-            if (damager instanceof Player && ((Player) damager).isCreative()) {
-                return;
-            }
-        }
-        this.level.dropItem(this, Item.get(Item.MINECART));
-    }
-
-    @Override
-    public void kill() {
-        if (!this.isAlive()) {
-            return;
-        }
-
-        super.kill();
-
-        if (level.getGameRules().getBoolean(GameRule.DO_ENTITY_DROPS)) {
-            this.dropItem();
-        }
-    }
-
-    @Override
-    public void close() {
-        super.close();
-
-        if (!passengers.isEmpty()) {
-            for (Entity passenger : new ArrayList<>(passengers)) {
-                dismountEntity(passenger);
-                passenger.riding = null; // Make sure it's really removed even if a plugin tries to cancel it
-            }
-        }
-    }
-
-    @Override
-    public boolean onInteract(Player p, Item item, Vector3 clickedPos) {
-        if (!isRideable()) {
-            return false;
-        }
-
-        if (!passengers.isEmpty()) {
-            return false;
-        }
-
-        if (blockInside == null) {
-            mountEntity(p);
-        }
-
-        return super.onInteract(p, item, clickedPos);
     }
 
     @Override
@@ -364,49 +280,294 @@ public abstract class EntityMinecartAbstract extends EntityVehicle implements En
     }
 
     @Override
-    public void saveNBT() {
-        super.saveNBT();
+    public boolean attack(EntityDamageEvent source) {
+        if (invulnerable) {
+            return false;
+        } else {
+            source.setDamage(source.getDamage() * 15);
 
-        saveEntityData();
-    }
+            boolean attack = super.attack(source);
 
-    public double getMaxSpeed() {
-        return maxSpeed;
-    }
-
-    protected void activate(int x, int y, int z, boolean flag) {
-    }
-
-    private boolean hasUpdated = false;
-
-    private void setFalling() {
-        motionX = NukkitMath.clamp(motionX, -maxSpeed, maxSpeed);
-        motionZ = NukkitMath.clamp(motionZ, -maxSpeed, maxSpeed);
-
-        if (!hasUpdated) {
-            for (cn.nukkit.entity.Entity linked : passengers) {
-                linked.setSeatPosition(getMountedOffset(linked).add(0, 0.35f));
-                updatePassengerPosition(linked);
+            if (isAlive()) {
+                performHurtAnimation();
             }
 
-            hasUpdated = true;
-        }
-
-        if (onGround) {
-            motionX *= derailedX;
-            motionY *= derailedY;
-            motionZ *= derailedZ;
-        }
-
-        move(motionX, motionY, motionZ);
-        if (!onGround) {
-            motionX *= flyingX;
-            motionY *= flyingY;
-            motionZ *= flyingZ;
+            return attack;
         }
     }
 
-    private final Vector3 tempMoveVec = new Vector3(0, 0, 0);
+    @Override
+    public boolean canDoInteraction() {
+        return passengers.isEmpty() && this.blockInside == null;
+    }
+
+    @Override
+    public void close() {
+        super.close();
+
+        if (!passengers.isEmpty()) {
+            for (Entity passenger : new ArrayList<>(passengers)) {
+                dismountEntity(passenger);
+                passenger.riding = null; // Make sure it's really removed even if a plugin tries to cancel it
+            }
+        }
+    }
+
+    /*private void prepareDataProperty() {
+        setRollingAmplitude(0);
+        setRollingDirection(1);
+        if (namedTag.contains("CustomDisplayTile")) {
+            if (namedTag.getBoolean("CustomDisplayTile")) {
+                int display = namedTag.getInt("DisplayTile");
+                int offSet = namedTag.getInt("DisplayOffset");
+                setDataProperty(new ByteEntityData(DATA_HAS_DISPLAY, 1));
+                setDataProperty(new IntEntityData(DATA_DISPLAY_ITEM, display));
+                setDataProperty(new IntEntityData(DATA_DISPLAY_OFFSET, offSet));
+            }
+        } else {
+            int display = blockInside == null ? 0
+                    : blockInside.getId()
+                    | blockInside.getDamage() << 16;
+            if (display == 0) {
+                setDataProperty(new ByteEntityData(DATA_HAS_DISPLAY, 0));
+                return;
+            }
+            setDataProperty(new ByteEntityData(DATA_HAS_DISPLAY, 1));
+            setDataProperty(new IntEntityData(DATA_DISPLAY_ITEM, display));
+            setDataProperty(new IntEntityData(DATA_DISPLAY_OFFSET, 6));
+        }
+    }*/
+
+    public void dropItem() {
+        if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
+            Entity damager = ((EntityDamageByEntityEvent) this.lastDamageCause).getDamager();
+            if (damager instanceof Player && ((Player) damager).isCreative()) {
+                return;
+            }
+        }
+        this.level.dropItem(this, Item.get(Item.MINECART));
+    }
+
+    @Override
+    public boolean entityBaseTick(int tickDiff) {
+        // The damage token
+        if (getHealth() < 20) {
+            setHealth(getHealth() + 1);
+        }
+
+        // Entity variables
+        lastX = x;
+        lastY = y;
+        lastZ = z;
+        motionY -= 0.04;
+        int dx = MathHelper.floor(x);
+        int dy = MathHelper.floor(y);
+        int dz = MathHelper.floor(z);
+
+        // Some hack to check rails
+        if (Rail.isRailBlock(level.getBlockIdAt(dx, dy - 1, dz))) {
+            --dy;
+        }
+
+        Block block = level.getBlock(chunk, dx, dy, dz, true);
+
+        // Ensure that the block is a rail
+        if (Rail.isRailBlock(block)) {
+            processMovement(dx, dy, dz, (BlockRail) block);
+            // Activate the minecart/TNT
+            if (block instanceof BlockRailActivator) {
+                activate(dx, dy, dz, ((BlockRailActivator) block).isActive());
+            }
+        } else {
+            setFalling();
+        }
+
+        // Minecart head
+        pitch = 0;
+        double diffX = this.lastX - this.x;
+        double diffZ = this.lastZ - this.z;
+        double yawToChange = yaw;
+        if (diffX * diffX + diffZ * diffZ > 0.001D) {
+            yawToChange = (FastMathLite.atan2(diffZ, diffX) * 180 / Math.PI);
+        }
+
+        // Reverse yaw if yaw is below 0
+        if (yawToChange < 0) {
+            // -90-(-90)-(-90) = 90
+            yawToChange -= yawToChange - yawToChange;
+        }
+
+        setRotation(yawToChange, pitch);
+
+        Location from = new Location(lastX, lastY, lastZ, lastYaw, lastPitch, level);
+        Location to = new Location(this.x, this.y, this.z, this.yaw, this.pitch, level);
+
+        if (!this.getServer().suomiCraftPEMode()) {
+            this.getServer().getPluginManager().callEvent(new VehicleUpdateEvent(this));
+        }
+
+        if (!from.equals(to)) {
+            this.getServer().getPluginManager().callEvent(new VehicleMoveEvent(this, from, to));
+        }
+
+        // Collisions
+        if (this instanceof InventoryHolder && (!server.suomiCraftPEMode() || this.age % 2 == 1)) {
+            for (Entity entity : level.getNearbyEntities(boundingBox.grow(0.2D, 0, 0.2D), this)) {
+                if (entity instanceof EntityMinecartAbstract && !passengers.contains(entity)) {
+                    entity.applyEntityCollision(this);
+                }
+            }
+        }
+
+        if (this instanceof InventoryHolder && (!server.suomiCraftPEMode() || this.age % 2 == 0)) {
+            AxisAlignedBB pickupArea = new SimpleAxisAlignedBB(this.x, this.y - 1, this.z, this.x + 1, this.y, this.z + 1);
+            Block[] hopperPickupArray = this.level.getCollisionBlocks(this, pickupArea, false);
+            if (hopperPickupArray.length >= 1) {
+                Block hopper = hopperPickupArray[0];
+                if (hopper instanceof BlockHopper) {
+                    BlockEntity hopperBE = hopper.getLevel().getBlockEntityIfLoaded(hopper);
+                    if (hopperBE instanceof BlockEntityHopper) {
+                        ((BlockEntityHopper) hopperBE).setMinecartPickupInventory((InventoryHolder) this);
+                    }
+                }
+                return true;
+            }
+
+            if (!(this instanceof EntityMinecartHopper)) {
+                AxisAlignedBB pushArea = new SimpleAxisAlignedBB(this.x, this.y, this.z, this.x + 1, this.y + 2, this.z + 1);
+                Block[] hopperPushArray = this.level.getCollisionBlocks(this, pushArea, false);
+                if (hopperPushArray.length >= 1) {
+                    Block hopper = hopperPushArray[0];
+                    if (hopper instanceof BlockHopper) {
+                        BlockEntity hopperBE = hopper.getLevel().getBlockEntityIfLoaded(hopper);
+                        if (hopperBE instanceof BlockEntityHopper) {
+                            ((BlockEntityHopper) hopperBE).setMinecartPushInventory((InventoryHolder) this);
+                        }
+                    }
+                    return true;
+                }
+            }
+        }
+
+        // We call super here after movement code so block collision checks use up to date position
+        return super.entityBaseTick(tickDiff) || this.getRollingAmplitude() > 0 || !(this.motionX == 0 && this.motionY == 0 && this.motionZ == 0);
+    }
+
+    private Vector3 getNextRail(double dx, double dy, double dz) {
+        int checkX = MathHelper.floor(dx);
+        int checkY = MathHelper.floor(dy);
+        int checkZ = MathHelper.floor(dz);
+
+        if (Rail.isRailBlock(level.getBlockIdAt(checkX, checkY - 1, checkZ))) {
+            --checkY;
+        }
+
+        Block block = level.getBlock(chunk, checkX, checkY, checkZ, true);
+
+        if (Rail.isRailBlock(block)) {
+            int[][] facing = matrix[((BlockRail) block).getRealMeta()];
+            double rail;
+            // Genisys mistake (Doesn't check surrounding more exactly)
+            double nextOne = (double) checkX + 0.5D + (double) facing[0][0] * 0.5D;
+            double nextTwo = (double) checkY + 0.5D + (double) facing[0][1] * 0.5D;
+            double nextThree = (double) checkZ + 0.5D + (double) facing[0][2] * 0.5D;
+            double nextFour = (double) checkX + 0.5D + (double) facing[1][0] * 0.5D;
+            double nextFive = (double) checkY + 0.5D + (double) facing[1][1] * 0.5D;
+            double nextSix = (double) checkZ + 0.5D + (double) facing[1][2] * 0.5D;
+            double nextSeven = nextFour - nextOne;
+            double nextEight = (nextFive - nextTwo) * 2;
+            double nextMax = nextSix - nextThree;
+
+            if (nextSeven == 0) {
+                rail = dz - (double) checkZ;
+            } else if (nextMax == 0) {
+                rail = dx - (double) checkX;
+            } else {
+                double whatOne = dx - nextOne;
+                double whatTwo = dz - nextThree;
+
+                rail = (whatOne * nextSeven + whatTwo * nextMax) * 2;
+            }
+
+            dx = nextOne + nextSeven * rail;
+            dy = nextTwo + nextEight * rail;
+            dz = nextThree + nextMax * rail;
+            if (nextEight < 0) {
+                ++dy;
+            }
+
+            if (nextEight > 0) {
+                dy += 0.5D;
+            }
+
+            return new Vector3(dx, dy, dz);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public boolean goToNewChunk(FullChunk chunk) {
+        if (chunk.getEntities().size() > 200) {
+            if (!this.isClosed() && this.isAlive()) {
+                if (level.getGameRules().getBoolean(GameRule.DO_ENTITY_DROPS)) {
+                    this.dropItem();
+                }
+            }
+            this.close();
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public boolean hasCustomName() {
+        return entityName != null;
+    }
+
+    @Override
+    public void initEntity() {
+        this.setMaxHealth(40);
+        super.initEntity();
+
+        this.setHealth(40);
+        //this.prepareDataProperty(); // TODO: DATA_DISPLAY_ITEM NBTEntityData
+    }
+
+    @Override
+    public void kill() {
+        if (!this.isAlive()) {
+            return;
+        }
+
+        super.kill();
+
+        if (level.getGameRules().getBoolean(GameRule.DO_ENTITY_DROPS)) {
+            this.dropItem();
+        }
+    }
+
+    @Override
+    public boolean onInteract(Player p, Item item, Vector3 clickedPos) {
+        if (!isRideable()) {
+            return false;
+        }
+
+        if (!passengers.isEmpty()) {
+            return false;
+        }
+
+        if (blockInside == null) {
+            mountEntity(p);
+        }
+
+        return super.onInteract(p, item, clickedPos);
+    }
+
+    @Override
+    public void onPlayerInput(Player player, double strafe, double forward) {
+        this.setCurrentSpeed(forward);
+    }
 
     private void processMovement(int dx, int dy, int dz, BlockRail block) {
         fallDistance = 0.0F;
@@ -587,110 +748,6 @@ public abstract class EntityMinecartAbstract extends EntityVehicle implements En
         }
     }
 
-    private void applyDrag() {
-        if (!passengers.isEmpty() || !slowWhenEmpty) {
-            motionX *= 0.996999979019165D;
-            motionY *= 0.0D;
-            motionZ *= 0.996999979019165D;
-        } else {
-            motionX *= 0.9599999785423279D;
-            motionY *= 0.0D;
-            motionZ *= 0.9599999785423279D;
-        }
-    }
-
-    private Vector3 getNextRail(double dx, double dy, double dz) {
-        int checkX = MathHelper.floor(dx);
-        int checkY = MathHelper.floor(dy);
-        int checkZ = MathHelper.floor(dz);
-
-        if (Rail.isRailBlock(level.getBlockIdAt(checkX, checkY - 1, checkZ))) {
-            --checkY;
-        }
-
-        Block block = level.getBlock(chunk, checkX, checkY, checkZ, true);
-
-        if (Rail.isRailBlock(block)) {
-            int[][] facing = matrix[((BlockRail) block).getRealMeta()];
-            double rail;
-            // Genisys mistake (Doesn't check surrounding more exactly)
-            double nextOne = (double) checkX + 0.5D + (double) facing[0][0] * 0.5D;
-            double nextTwo = (double) checkY + 0.5D + (double) facing[0][1] * 0.5D;
-            double nextThree = (double) checkZ + 0.5D + (double) facing[0][2] * 0.5D;
-            double nextFour = (double) checkX + 0.5D + (double) facing[1][0] * 0.5D;
-            double nextFive = (double) checkY + 0.5D + (double) facing[1][1] * 0.5D;
-            double nextSix = (double) checkZ + 0.5D + (double) facing[1][2] * 0.5D;
-            double nextSeven = nextFour - nextOne;
-            double nextEight = (nextFive - nextTwo) * 2;
-            double nextMax = nextSix - nextThree;
-
-            if (nextSeven == 0) {
-                rail = dz - (double) checkZ;
-            } else if (nextMax == 0) {
-                rail = dx - (double) checkX;
-            } else {
-                double whatOne = dx - nextOne;
-                double whatTwo = dz - nextThree;
-
-                rail = (whatOne * nextSeven + whatTwo * nextMax) * 2;
-            }
-
-            dx = nextOne + nextSeven * rail;
-            dy = nextTwo + nextEight * rail;
-            dz = nextThree + nextMax * rail;
-            if (nextEight < 0) {
-                ++dy;
-            }
-
-            if (nextEight > 0) {
-                dy += 0.5D;
-            }
-
-            return new Vector3(dx, dy, dz);
-        } else {
-            return null;
-        }
-    }
-
-    @Override
-    public void onPlayerInput(Player player, double strafe, double forward) {
-        this.setCurrentSpeed(forward);
-    }
-
-    /**
-     * Used to multiply the minecart current speed
-     *
-     * @param speed The speed of the minecart that will be calculated
-     */
-    public void setCurrentSpeed(double speed) {
-        this.currentSpeed = speed;
-    }
-
-    /*private void prepareDataProperty() {
-        setRollingAmplitude(0);
-        setRollingDirection(1);
-        if (namedTag.contains("CustomDisplayTile")) {
-            if (namedTag.getBoolean("CustomDisplayTile")) {
-                int display = namedTag.getInt("DisplayTile");
-                int offSet = namedTag.getInt("DisplayOffset");
-                setDataProperty(new ByteEntityData(DATA_HAS_DISPLAY, 1));
-                setDataProperty(new IntEntityData(DATA_DISPLAY_ITEM, display));
-                setDataProperty(new IntEntityData(DATA_DISPLAY_OFFSET, offSet));
-            }
-        } else {
-            int display = blockInside == null ? 0
-                    : blockInside.getId()
-                    | blockInside.getDamage() << 16;
-            if (display == 0) {
-                setDataProperty(new ByteEntityData(DATA_HAS_DISPLAY, 0));
-                return;
-            }
-            setDataProperty(new ByteEntityData(DATA_HAS_DISPLAY, 1));
-            setDataProperty(new IntEntityData(DATA_DISPLAY_ITEM, display));
-            setDataProperty(new IntEntityData(DATA_DISPLAY_OFFSET, 6));
-        }
-    }*/
-
     private void saveEntityData() {
         boolean hasDisplay = super.getDataPropertyByte(DATA_HAS_DISPLAY) == 1 || blockInside != null;
         int display;
@@ -702,6 +759,13 @@ public abstract class EntityMinecartAbstract extends EntityVehicle implements En
             namedTag.putInt("DisplayTile", display);
             namedTag.putInt("DisplayOffset", offSet);
         }
+    }
+
+    @Override
+    public void saveNBT() {
+        super.saveNBT();
+
+        saveEntityData();
     }
 
     /**
@@ -717,7 +781,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle implements En
     /**
      * Set the minecart display block
      *
-     * @param block The block that will changed. Set {@code null} for BlockAir
+     * @param block  The block that will changed. Set {@code null} for BlockAir
      * @param update Do update for the block. (This state changes if you want to show the block)
      * @return {@code true} if the block is normal block
      */
@@ -750,79 +814,30 @@ public abstract class EntityMinecartAbstract extends EntityVehicle implements En
         return true;
     }
 
-    /**
-     * Get the minecart display block
-     *
-     * @return Block of minecart display block
-     */
-    public Block getDisplayBlock() {
-        return blockInside;
-    }
+    private void setFalling() {
+        motionX = NukkitMath.clamp(motionX, -maxSpeed, maxSpeed);
+        motionZ = NukkitMath.clamp(motionZ, -maxSpeed, maxSpeed);
 
-    /**
-     * Set the block offset.
-     *
-     * @param offset The offset
-     */
-    public void setDisplayBlockOffset(int offset) {
-        setDataProperty(new IntEntityData(DATA_DISPLAY_OFFSET, offset));
-    }
+        if (!hasUpdated) {
+            for (cn.nukkit.entity.Entity linked : passengers) {
+                linked.setSeatPosition(getMountedOffset(linked).add(0, 0.35f));
+                updatePassengerPosition(linked);
+            }
 
-    /**
-     * Get the block display offset
-     *
-     * @return integer
-     */
-    public int getDisplayBlockOffset() {
-        return super.getDataPropertyInt(DATA_DISPLAY_OFFSET);
-    }
+            hasUpdated = true;
+        }
 
-    /**
-     * Is the minecart can be slowed when empty?
-     *
-     * @return boolean
-     */
-    public boolean isSlowWhenEmpty() {
-        return slowWhenEmpty;
-    }
+        if (onGround) {
+            motionX *= derailedX;
+            motionY *= derailedY;
+            motionZ *= derailedZ;
+        }
 
-    /**
-     * Set the minecart slowdown flag
-     *
-     * @param slow The slowdown flag
-     */
-    public void setSlowWhenEmpty(boolean slow) {
-        slowWhenEmpty = slow;
-    }
-
-    public Vector3 getFlyingVelocityMod() {
-        return new Vector3(flyingX, flyingY, flyingZ);
-    }
-
-    public void setFlyingVelocityMod(Vector3 flying) {
-        Objects.requireNonNull(flying, "Flying velocity modifiers cannot be null");
-        flyingX = flying.getX();
-        flyingY = flying.getY();
-        flyingZ = flying.getZ();
-    }
-
-    public Vector3 getDerailedVelocityMod() {
-        return new Vector3(derailedX, derailedY, derailedZ);
-    }
-
-    public void setDerailedVelocityMod(Vector3 derailed) {
-        Objects.requireNonNull(derailed, "Derailed velocity modifiers cannot be null");
-        derailedX = derailed.getX();
-        derailedY = derailed.getY();
-        derailedZ = derailed.getZ();
-    }
-
-    public void setMaximumSpeed(double speed) {
-        maxSpeed = speed;
-    }
-
-    @Override
-    public String getInteractButtonText() {
-        return "";
+        move(motionX, motionY, motionZ);
+        if (!onGround) {
+            motionX *= flyingX;
+            motionY *= flyingY;
+            motionZ *= flyingZ;
+        }
     }
 }

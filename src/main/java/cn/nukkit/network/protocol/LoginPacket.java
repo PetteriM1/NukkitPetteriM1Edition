@@ -9,9 +9,8 @@ public class LoginPacket extends DataPacket {
 
     private int protocol_;
 
-    @Override
-    public byte pid() {
-        return NETWORK_ID;
+    public int getProtocol() {
+        return protocol_;
     }
 
     @Override
@@ -29,7 +28,8 @@ public class LoginPacket extends DataPacket {
         this.encodeUnsupported();
     }
 
-    public int getProtocol() {
-        return protocol_;
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

@@ -4,18 +4,18 @@ import cn.nukkit.block.properties.OxidizationLevel;
 import cn.nukkit.utils.BlockColor;
 
 public class BlockDoubleSlabCopperCutExposed extends BlockDoubleSlabCopperCut {
-    
+
     public BlockDoubleSlabCopperCutExposed() {
         this(0);
     }
-    
+
     public BlockDoubleSlabCopperCutExposed(int meta) {
         super(meta);
     }
 
     @Override
-    public int getSingleSlabId() {
-        return EXPOSED_CUT_COPPER_SLAB;
+    public BlockColor getColor() {
+        return BlockColor.LIGHT_GRAY_TERRACOTA_BLOCK_COLOR;
     }
 
     @Override
@@ -29,7 +29,7 @@ public class BlockDoubleSlabCopperCutExposed extends BlockDoubleSlabCopperCut {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.LIGHT_GRAY_TERRACOTA_BLOCK_COLOR;
+    public int getSingleSlabId() {
+        return EXPOSED_CUT_COPPER_SLAB;
     }
 }

@@ -1,5 +1,6 @@
 package cn.nukkit.level.format.leveldb;
 
+import cn.nukkit.Server;
 import cn.nukkit.block.BlockID;
 import cn.nukkit.level.format.leveldb.structure.BlockStateSnapshot;
 import cn.nukkit.level.format.leveldb.updater.BlockStateUpdaterChunker;
@@ -88,26 +89,20 @@ public class BlockStateMapping {
         log.info("Latest block state updater version {}", context.getLatestVersion());
     }
 
-    public static BlockStateMapping get() {
-        return INSTANCE;
-    }
-
     private final Int2ObjectMap<BlockStateSnapshot> runtime2State = new Int2ObjectOpenHashMap<>();
     private final Object2ObjectMap<NbtMap, BlockStateSnapshot> paletteMap = new Object2ObjectOpenCustomHashMap<>(new Hash.Strategy<NbtMap>() {
-        @Override
-        public int hashCode(NbtMap nbtMap) {
-            return nbtMap.hashCode();
-        }
-
         @Override
         public boolean equals(NbtMap nbtMap1, NbtMap nbtMap2) {
             return Objects.equals(nbtMap1, nbtMap2);
         }
+
+        @Override
+        public int hashCode(NbtMap nbtMap) {
+            return nbtMap.hashCode();
+        }
     });
     private final int version;
-
     private LegacyStateMapper legacyMapper;
-
     private int defaultRuntimeId = -1;
     private BlockStateSnapshot defaultState;
 
@@ -120,24 +115,82 @@ public class BlockStateMapping {
         this.legacyMapper = legacyMapper;
     }
 
-    public void registerState(int runtimeId, NbtMap state) {
-        Preconditions.checkArgument(!this.runtime2State.containsKey(runtimeId),
-                "Mapping for runtimeId " + runtimeId + " is already created!");
-        Preconditions.checkArgument(!this.paletteMap.containsKey(state),
-                "Mapping for state is already created: " + state);
+    public void setLegacyMapper(LegacyStateMapper legacyMapper) {
+        this.legacyMapper = legacyMapper;
+    }
 
-        BlockStateSnapshot blockState = BlockStateSnapshot.builder()
-                .version(this.version)
-                .vanillaState(state)
-                .runtimeId(runtimeId)
-                .build();
-        this.runtime2State.put(runtimeId, blockState);
-        this.paletteMap.put(state, blockState);
+    public int getDefaultRuntimeId() {
+        if (this.defaultRuntimeId == -1) {
+            this.setDefaultBlock(BlockID.INFO_UPDATE, 0);
+        }
+        return this.defaultRuntimeId;
+    }
+
+    public BlockStateSnapshot getDefaultState() {
+        if (this.defaultState == null) {
+            if (Server.getInstance().suomiCraftPEMode()) {
+                this.setDefaultBlock(BlockID.AIR, 0); // Until those doors are fixed
+            } else {
+                this.setDefaultBlock(BlockID.INFO_UPDATE, 0);
+            }
+        }
+        return this.defaultState;
+    }
+
+    public LegacyStateMapper getLegacyMapper() {
+        return this.legacyMapper;
+    }
+
+    public int getVersion() {
+        return this.version;
     }
 
     public void clearMapping() {
         this.runtime2State.clear();
         this.paletteMap.clear();
+    }
+
+    public static BlockStateMapping get() {
+        return INSTANCE;
+    }
+
+    public int getFullId(int runtimeId) {
+        int fullId = this.legacyMapper.runtimeToFullId(runtimeId);
+        if (fullId == -1) {
+            log.warn("Can not find legacyId! No runtime2FullId mapping for " + runtimeId);
+            fullId = this.legacyMapper.runtimeToFullId(this.getDefaultRuntimeId());
+            Preconditions.checkArgument(fullId != -1, "Can not find fullId for default runtimeId: " + this.getDefaultRuntimeId());
+        }
+        return fullId;
+    }
+
+    public int getLegacyData(int runtimeId) {
+        int data = this.legacyMapper.runtimeToLegacyData(runtimeId);
+        if (data == -1) {
+            log.warn("Can not find legacyId! No runtime2legacy mapping for " + runtimeId);
+            data = this.legacyMapper.runtimeToLegacyData(this.getDefaultRuntimeId());
+            Preconditions.checkArgument(data != -1, "Can not find legacyData for default runtimeId: " + this.getDefaultRuntimeId());
+        }
+        return data;
+    }
+
+    public int getLegacyId(int runtimeId) {
+        int legacyId = this.legacyMapper.runtimeToLegacyId(runtimeId);
+        if (legacyId == -1) {
+            log.warn("Can not find legacyId! No runtime2legacy mapping for " + runtimeId);
+            legacyId = this.legacyMapper.runtimeToLegacyId(this.getDefaultRuntimeId());
+            Preconditions.checkArgument(legacyId != -1, "Can not find legacyId for default runtimeId: " + this.getDefaultRuntimeId());
+        }
+        return legacyId;
+    }
+
+    public int getRuntimeId(int legacyId, int data) {
+        int runtimeId = this.legacyMapper.legacyToRuntime(legacyId, data);
+        if (runtimeId == -1) {
+            log.warn("Can not find runtimeId! No legacy2runtime mapping for " + legacyId + ":" + data);
+            return this.getDefaultRuntimeId();
+        }
+        return runtimeId;
     }
 
     public BlockStateSnapshot getState(int legacyId, int data) {
@@ -171,98 +224,6 @@ public class BlockStateMapping {
         return this.paletteMap.get(vanillaState);
     }
 
-    public int getRuntimeId(int legacyId, int data) {
-        int runtimeId = this.legacyMapper.legacyToRuntime(legacyId, data);
-        if (runtimeId == -1) {
-            log.warn("Can not find runtimeId! No legacy2runtime mapping for " + legacyId + ":" + data);
-            return this.getDefaultRuntimeId();
-        }
-        return runtimeId;
-    }
-
-    public int getFullId(int runtimeId) {
-        int fullId = this.legacyMapper.runtimeToFullId(runtimeId);
-        if (fullId == -1) {
-            log.warn("Can not find legacyId! No runtime2FullId mapping for " + runtimeId);
-            fullId = this.legacyMapper.runtimeToFullId(this.getDefaultRuntimeId());
-            Preconditions.checkArgument(fullId != -1, "Can not find fullId for default runtimeId: " + this.getDefaultRuntimeId());
-        }
-        return fullId;
-    }
-
-    public int getLegacyId(int runtimeId) {
-        int legacyId = this.legacyMapper.runtimeToLegacyId(runtimeId);
-        if (legacyId == -1) {
-            log.warn("Can not find legacyId! No runtime2legacy mapping for " + runtimeId);
-            legacyId = this.legacyMapper.runtimeToLegacyId(this.getDefaultRuntimeId());
-            Preconditions.checkArgument(legacyId != -1, "Can not find legacyId for default runtimeId: " + this.getDefaultRuntimeId());
-        }
-        return legacyId;
-    }
-
-    public int getLegacyData(int runtimeId) {
-        int data = this.legacyMapper.runtimeToLegacyData(runtimeId);
-        if (data == -1) {
-            log.warn("Can not find legacyId! No runtime2legacy mapping for " + runtimeId);
-            data = this.legacyMapper.runtimeToLegacyData(this.getDefaultRuntimeId());
-            Preconditions.checkArgument(data != -1, "Can not find legacyData for default runtimeId: " + this.getDefaultRuntimeId());
-        }
-        return data;
-    }
-
-    public void setDefaultBlock(int legacyId, int legacyData) {
-        int runtimeId = this.legacyMapper.legacyToRuntime(legacyId, legacyData);
-        Preconditions.checkArgument(runtimeId != -1, "Can not find runtimeId mapping for default block: " + legacyId + ":" + legacyData);
-        this.defaultRuntimeId = runtimeId;
-
-        BlockStateSnapshot state = this.runtime2State.get(runtimeId);
-        Preconditions.checkNotNull(state, "Can not find state for default block: " + legacyId + ":" + legacyData);
-        this.defaultState = state;
-    }
-
-    public int getDefaultRuntimeId() {
-        if (this.defaultRuntimeId == -1) {
-            this.setDefaultBlock(BlockID.INFO_UPDATE, 0);
-        }
-        return this.defaultRuntimeId;
-    }
-
-    public BlockStateSnapshot getDefaultState() {
-        if (this.defaultState == null) {
-            this.setDefaultBlock(BlockID.INFO_UPDATE, 0);
-        }
-        return this.defaultState;
-    }
-
-    public BlockStateSnapshot updateState(NbtMap state) {
-        BlockStateSnapshot blockState = this.paletteMap.get(state);
-        if (blockState == null) {
-            blockState = this.updateStateUnsafe(state);
-        }
-        return blockState;
-    }
-
-    public BlockStateSnapshot updateStateUnsafe(NbtMap state) {
-        return this.getState(this.updateVanillaState(state));
-    }
-
-    public BlockStateSnapshot getUpdatedState(NbtMap state) {
-        if (this.paletteMap.get(state) == null) {
-            return this.getState(this.updateVanillaState(state));
-        }
-        return null;
-    }
-
-    public NbtMap updateVanillaState(NbtMap state) {
-        NbtMap cached = BLOCK_UPDATE_CACHE.getIfPresent(state);
-        if (cached == null) {
-            int version = state.getInt("version"); // TODO: validate this when updating next time
-            cached = CONTEXT.update(state, LATEST_UPDATER_VERSION == version ? version - 1 : version);
-            BLOCK_UPDATE_CACHE.put(state, cached);
-        }
-        return cached;
-    }
-
     public BlockStateSnapshot getUpdatedOrCustom(NbtMap state) {
         return this.getUpdatedOrCustom(state, this.updateVanillaState(state));
     }
@@ -281,15 +242,57 @@ public class BlockStateMapping {
                 .build();
     }
 
-    public void setLegacyMapper(LegacyStateMapper legacyMapper) {
-        this.legacyMapper = legacyMapper;
+    public BlockStateSnapshot getUpdatedState(NbtMap state) {
+        if (this.paletteMap.get(state) == null) {
+            return this.getState(this.updateVanillaState(state));
+        }
+        return null;
     }
 
-    public LegacyStateMapper getLegacyMapper() {
-        return this.legacyMapper;
+    public void registerState(int runtimeId, NbtMap state) {
+        Preconditions.checkArgument(!this.runtime2State.containsKey(runtimeId),
+                version + ": Mapping for runtimeId " + runtimeId + " is already created!");
+        Preconditions.checkArgument(!this.paletteMap.containsKey(state),
+                version + ": Mapping for state is already created: " + state);
+
+        BlockStateSnapshot blockState = BlockStateSnapshot.builder()
+                .version(this.version)
+                .vanillaState(state)
+                .runtimeId(runtimeId)
+                .build();
+        this.runtime2State.put(runtimeId, blockState);
+        this.paletteMap.put(state, blockState);
     }
 
-    public int getVersion() {
-        return this.version;
+    public void setDefaultBlock(int legacyId, int legacyData) {
+        int runtimeId = this.legacyMapper.legacyToRuntime(legacyId, legacyData);
+        Preconditions.checkArgument(runtimeId != -1, "Can not find runtimeId mapping for default block: " + legacyId + ":" + legacyData);
+        this.defaultRuntimeId = runtimeId;
+
+        BlockStateSnapshot state = this.runtime2State.get(runtimeId);
+        Preconditions.checkNotNull(state, "Can not find state for default block: " + legacyId + ":" + legacyData);
+        this.defaultState = state;
+    }
+
+    public BlockStateSnapshot updateState(NbtMap state) {
+        BlockStateSnapshot blockState = this.paletteMap.get(state);
+        if (blockState == null) {
+            blockState = this.updateStateUnsafe(state);
+        }
+        return blockState;
+    }
+
+    public BlockStateSnapshot updateStateUnsafe(NbtMap state) {
+        return this.getState(this.updateVanillaState(state));
+    }
+
+    public NbtMap updateVanillaState(NbtMap state) {
+        NbtMap cached = BLOCK_UPDATE_CACHE.getIfPresent(state);
+        if (cached == null) {
+            int version = state.getInt("version"); // TODO: validate this when updating next time
+            cached = CONTEXT.update(state, LATEST_UPDATER_VERSION == version ? version - 1 : version);
+            BLOCK_UPDATE_CACHE.put(state, cached);
+        }
+        return cached;
     }
 }

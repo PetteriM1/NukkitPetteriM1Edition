@@ -15,13 +15,28 @@ import java.util.concurrent.ThreadLocalRandom;
 public class BlockOreEmerald extends BlockOre {
 
     @Override
-    public String getName() {
-        return "Emerald Ore";
+    public int getDropExp() {
+        return Utils.rand(3, 7);
     }
 
     @Override
     public int getId() {
         return EMERALD_ORE;
+    }
+
+    @Override
+    public String getName() {
+        return "Emerald Ore";
+    }
+
+    @Override
+    protected int getRawMaterial() {
+        return ItemID.EMERALD;
+    }
+
+    @Override
+    public int getToolTier() {
+        return ItemTool.TIER_IRON;
     }
 
     @Override
@@ -49,20 +64,5 @@ public class BlockOreEmerald extends BlockOre {
         } else {
             return new Item[0];
         }
-    }
-
-    @Override
-    protected int getRawMaterial() {
-        return ItemID.EMERALD;
-    }
-
-    @Override
-    public int getDropExp() {
-        return Utils.rand(3, 7);
-    }
-
-    @Override
-    public int getToolTier() {
-        return ItemTool.TIER_IRON;
     }
 }

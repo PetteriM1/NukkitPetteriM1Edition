@@ -7,11 +7,6 @@ import cn.nukkit.event.HandlerList;
 public class EntityExplosionPrimeEvent extends EntityEvent implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
-
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private double force;
     private boolean blockBreaking;
 
@@ -21,19 +16,23 @@ public class EntityExplosionPrimeEvent extends EntityEvent implements Cancellabl
         this.blockBreaking = true;
     }
 
-    public double getForce() {
-        return force;
+    public void setBlockBreaking(boolean blockBreaking) {
+        this.blockBreaking = blockBreaking;
     }
 
     public void setForce(double force) {
         this.force = force;
     }
 
-    public boolean isBlockBreaking() {
-        return blockBreaking;
+    public double getForce() {
+        return force;
     }
 
-    public void setBlockBreaking(boolean blockBreaking) {
-        this.blockBreaking = blockBreaking;
+    public static HandlerList getHandlers() {
+        return handlers;
+    }
+
+    public boolean isBlockBreaking() {
+        return blockBreaking;
     }
 }

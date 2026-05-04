@@ -1,5 +1,7 @@
 package cn.nukkit.item;
 
+import cn.nukkit.network.protocol.ProtocolInfo;
+
 public class ItemWarpedFungusOnAStick extends ItemTool {
 
     public ItemWarpedFungusOnAStick() {
@@ -17,6 +19,11 @@ public class ItemWarpedFungusOnAStick extends ItemTool {
     @Override
     public int getMaxDurability() {
         return ItemTool.DURABILITY_WARPED_FUNGUS_ON_A_STICK;
+    }
+
+    @Override
+    public boolean isSupportedOn(int protocol) {
+        return protocol >= ProtocolInfo.v1_16_0;
     }
 
     @Override

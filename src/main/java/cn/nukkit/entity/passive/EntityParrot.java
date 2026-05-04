@@ -1,5 +1,7 @@
 package cn.nukkit.entity.passive;
 
+import cn.nukkit.Player;
+import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.data.IntEntityData;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
@@ -19,18 +21,32 @@ public class EntityParrot extends EntityFlyingAnimal {
     }
 
     @Override
-    public int getNetworkId() {
-        return NETWORK_ID;
-    }
-
-    @Override
-    public float getWidth() {
-        return 0.5f;
+    public Item[] getDrops() {
+        return new Item[]{Item.get(Item.FEATHER, 0, Utils.rand(1, 2))};
     }
 
     @Override
     public float getHeight() {
         return 0.9f;
+    }
+
+    @Override
+    public int getKillExperience() {
+        return this.isBaby() ? 0 : Utils.rand(1, 3);
+    }
+
+    @Override
+    public int getNetworkId() {
+        return NETWORK_ID;
+    }
+
+    private static int getRandomVariant() {
+        return VARIANTS[Utils.rand(0, VARIANTS.length - 1)];
+    }
+
+    @Override
+    public float getWidth() {
+        return 0.5f;
     }
 
     @Override
@@ -54,16 +70,20 @@ public class EntityParrot extends EntityFlyingAnimal {
     }
 
     @Override
-    public Item[] getDrops() {
-        return new Item[]{Item.get(Item.FEATHER, 0, Utils.rand(1, 2))};
-    }
-
-    @Override
-    public int getKillExperience() {
-        return this.isBaby() ? 0 : Utils.rand(1, 3);
-    }
-
-    private static int getRandomVariant() {
-        return VARIANTS[Utils.rand(0, VARIANTS.length - 1)];
+    public boolean targetOption(EntityCreature creature, double distance) {
+        if (creature instanceof Player) {
+            Player player = (Player) creature;
+            if (player.closed) {
+                return false;
+            }
+            int id = player.getInventory().getItemInHandFast().getId();
+            return player.spawned && player.isAlive()
+                    && (id == Item.SEEDS
+                    || id == Item.BEETROOT_SEEDS
+                    || id == Item.PUMPKIN_SEEDS
+                    || id == Item.MELON_SEEDS)
+                    && distance <= 49;
+        }
+        return super.targetOption(creature, distance);
     }
 }

@@ -25,17 +25,35 @@ public class BlockSeaPickle extends BlockTransparentMeta {
         super(meta);
     }
 
+    public void setDead(boolean dead) {
+        if (dead) {
+            this.setDamage(getDamage() | 0x4);
+        } else {
+            this.setDamage(getDamage() ^ 0x4);
+        }
+    }
+
     @Override
-    public int getId() {
-        return SEA_PICKLE;
+    public BlockColor getColor() {
+        return BlockColor.GREEN_BLOCK_COLOR;
     }
 
     public double getHardness() {
         return 0;
     }
 
-    public double getResistance() {
-        return 0;
+    @Override
+    public int getId() {
+        return SEA_PICKLE;
+    }
+
+    @Override
+    public int getLightLevel() {
+        if (this.isDead()) {
+            return 0;
+        }
+
+        return getPickleCount() * 3;
     }
 
     @Override
@@ -43,16 +61,83 @@ public class BlockSeaPickle extends BlockTransparentMeta {
         return "Sea Pickle";
     }
 
+    public int getPickleCount() {
+        return (getDamage() & 0b11) + 1;
+    }
+
+    public double getResistance() {
+        return 0;
+    }
+
+    @Override
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.WHEN_PLACED_IN_WATER;
+    }
+
     public boolean isDead() {
         return (getDamage() & 0x4) == 0x4;
     }
 
-    public void setDead(boolean dead) {
-        if (dead) {
-            this.setDamage(getDamage() | 0x4);
-        } else {
-            this.setDamage(getDamage() ^ 0x4);
+    @Override
+    public boolean breakWhenPushed() {
+        return true;
+    }
+
+    @Override
+    public boolean canBeActivated() {
+        return true;
+    }
+
+    @Override
+    public boolean canPassThrough() {
+        return true;
+    }
+
+    @Override
+    public Item[] getDrops(Item item) {
+        return new Item[]{new ItemBlock(Block.get(this.getId()), 0, getPickleCount())};
+    }
+
+    @Override
+    public boolean onActivate(Item item, Player player) {
+        if (item.getId() != Item.DYE || item.getDamage() != ItemDye.BONE_MEAL) {
+            return super.onActivate(item, player);
         }
+
+        BlockSeaPickle block = (BlockSeaPickle) this.clone();
+        if (!block.isDead()) {
+            block.setDamage(3);
+        }
+
+        BlockGrowEvent blockGrowEvent = new BlockGrowEvent(this, block);
+        this.level.getServer().getPluginManager().callEvent(blockGrowEvent);
+
+        if (blockGrowEvent.isCancelled()) {
+            return false;
+        }
+
+        this.getLevel().setBlock(this, blockGrowEvent.getNewState(), false, true);
+        this.level.addParticle(new BoneMealParticle(this));
+
+        if (player != null && !player.isCreative()) {
+            item.count--;
+        }
+
+        ThreadLocalRandom random = ThreadLocalRandom.current();
+        Block[] blocksAround = this.getLevel().getCollisionBlocks(new SimpleAxisAlignedBB(x - 2, y - 2, z - 2, x + 3, y, z + 3));
+        for (Block blockNearby : blocksAround) {
+            if (blockNearby.getId() == CORAL_BLOCK) {
+                Block up = blockNearby.up();
+                if (up instanceof BlockWater && (up.getDamage() == 0 || up.getDamage() == 8) && random.nextInt(6) == 0) {
+                    BlockSpreadEvent blockSpreadEvent = new BlockSpreadEvent(up, this, Block.get(SEA_PICKLE, random.nextInt(3)));
+                    if (!blockSpreadEvent.isCancelled()) {
+                        this.getLevel().setBlock(up, BlockLayer.WATERLOGGED, Block.get(WATER), true, false);
+                        this.getLevel().setBlock(up, blockSpreadEvent.getNewState(), true, true);
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     @Override
@@ -110,92 +195,7 @@ public class BlockSeaPickle extends BlockTransparentMeta {
     }
 
     @Override
-    public boolean canBeActivated() {
-        return true;
-    }
-
-    @Override
-    public boolean onActivate(Item item, Player player) {
-        if (item.getId() != Item.DYE || item.getDamage() != ItemDye.BONE_MEAL) {
-            return super.onActivate(item, player);
-        }
-
-        BlockSeaPickle block = (BlockSeaPickle) this.clone();
-        if (!block.isDead()) {
-            block.setDamage(3);
-        }
-
-        BlockGrowEvent blockGrowEvent = new BlockGrowEvent(this, block);
-        this.level.getServer().getPluginManager().callEvent(blockGrowEvent);
-
-        if (blockGrowEvent.isCancelled()) {
-            return false;
-        }
-
-        this.getLevel().setBlock(this, blockGrowEvent.getNewState(), false, true);
-        this.level.addParticle(new BoneMealParticle(this));
-
-        if (player != null && !player.isCreative()) {
-            item.count--;
-        }
-
-        ThreadLocalRandom random = ThreadLocalRandom.current();
-        Block[] blocksAround = this.getLevel().getCollisionBlocks(new SimpleAxisAlignedBB(x - 2, y - 2, z - 2, x + 3, y, z + 3));
-        for (Block blockNearby : blocksAround) {
-            if (blockNearby.getId() == CORAL_BLOCK) {
-                Block up = blockNearby.up();
-                if (up instanceof BlockWater && (up.getDamage() == 0 || up.getDamage() == 8) && random.nextInt(6) == 0) {
-                    BlockSpreadEvent blockSpreadEvent = new BlockSpreadEvent(up, this, Block.get(SEA_PICKLE, random.nextInt(3)));
-                    if (!blockSpreadEvent.isCancelled()) {
-                        this.getLevel().setBlock(up, BlockLayer.WATERLOGGED, Block.get(WATER), true, false);
-                        this.getLevel().setBlock(up, blockSpreadEvent.getNewState(), true, true);
-                    }
-                }
-            }
-        }
-        return true;
-    }
-
-    @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.WHEN_PLACED_IN_WATER;
-    }
-
-    @Override
     public Item toItem() {
         return new ItemBlock(Block.get(this.getId(), 0), 0);
-    }
-
-    @Override
-    public Item[] getDrops(Item item) {
-        return new Item[]{new ItemBlock(Block.get(this.getId()), 0, getPickleCount())};
-    }
-
-    @Override
-    public int getLightLevel() {
-        if (this.isDead()) {
-            return 0;
-        }
-
-        return getPickleCount() * 3;
-    }
-
-    public int getPickleCount() {
-        return (getDamage() & 0b11) + 1;
-    }
-
-    @Override
-    public boolean breakWhenPushed() {
-        return true;
-    }
-
-    @Override
-    public boolean canPassThrough() {
-        return true;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.GREEN_BLOCK_COLOR;
     }
 }

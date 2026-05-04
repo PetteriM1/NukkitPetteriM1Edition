@@ -20,8 +20,13 @@ public class BlockLantern extends BlockFlowable {
     }
 
     @Override
-    public String getName() {
-        return "Lantern";
+    public BlockColor getColor() {
+        return BlockColor.IRON_BLOCK_COLOR;
+    }
+
+    @Override
+    public double getHardness() {
+        return 3.5;
     }
 
     @Override
@@ -32,51 +37,6 @@ public class BlockLantern extends BlockFlowable {
     @Override
     public int getLightLevel() {
         return 15;
-    }
-
-    @Override
-    public double getResistance() {
-        return 3.5;
-    }
-
-    @Override
-    public double getHardness() {
-        return 3.5;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
-    }
-
-    @Override
-    public boolean canPassThrough() {
-        return false;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.IRON_BLOCK_COLOR;
-    }
-
-    @Override
-    public Item toItem() {
-        return new ItemBlock(Block.get(LANTERN));
-    }
-
-    @Override
-    protected AxisAlignedBB recalculateBoundingBox() {
-        return this;
-    }
-
-    @Override
-    public double getMinX() {
-        return this.x + 0.3125;
-    }
-
-    @Override
-    public double getMinZ() {
-        return this.z + 0.3125;
     }
 
     @Override
@@ -92,6 +52,31 @@ public class BlockLantern extends BlockFlowable {
     @Override
     public double getMaxZ() {
         return this.z + 0.6875;
+    }
+
+    @Override
+    public double getMinX() {
+        return this.x + 0.3125;
+    }
+
+    @Override
+    public double getMinZ() {
+        return this.z + 0.3125;
+    }
+
+    @Override
+    public String getName() {
+        return "Lantern";
+    }
+
+    @Override
+    public double getResistance() {
+        return 3.5;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
     }
 
     private boolean isBlockAboveValid() {
@@ -124,21 +109,13 @@ public class BlockLantern extends BlockFlowable {
     }
 
     @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        boolean isUnderValid = this.isBlockUnderValid();
-        boolean hanging = face != BlockFace.UP && this.isBlockAboveValid() && (!isUnderValid || face == BlockFace.DOWN);
-        if (!isUnderValid && !hanging) {
-            return false;
-        }
+    public boolean canHarvestWithHand() {
+        return false;
+    }
 
-        if (hanging) {
-            this.setDamage(1);
-        } else {
-            this.setDamage(0);
-        }
-
-        this.getLevel().setBlock(this, this, true, true);
-        return true;
+    @Override
+    public boolean canPassThrough() {
+        return false;
     }
 
     @Override
@@ -157,7 +134,30 @@ public class BlockLantern extends BlockFlowable {
     }
 
     @Override
-    public boolean canHarvestWithHand() {
-        return false;
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        boolean isUnderValid = this.isBlockUnderValid();
+        boolean hanging = face != BlockFace.UP && this.isBlockAboveValid() && (!isUnderValid || face == BlockFace.DOWN);
+        if (!isUnderValid && !hanging) {
+            return false;
+        }
+
+        if (hanging) {
+            this.setDamage(1);
+        } else {
+            this.setDamage(0);
+        }
+
+        this.getLevel().setBlock(this, this, true, true);
+        return true;
+    }
+
+    @Override
+    protected AxisAlignedBB recalculateBoundingBox() {
+        return this;
+    }
+
+    @Override
+    public Item toItem() {
+        return new ItemBlock(Block.get(LANTERN));
     }
 }

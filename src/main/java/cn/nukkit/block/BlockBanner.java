@@ -28,13 +28,45 @@ public class BlockBanner extends BlockTransparentMeta implements Faceable {
     }
 
     @Override
-    public int getId() {
-        return STANDING_BANNER;
+    public BlockFace getBlockFace() {
+        return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
+    }
+
+    @Override
+    public AxisAlignedBB getBoundingBox() {
+        return null;
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return this.getDyeColor().getColor();
+    }
+
+    public DyeColor getDyeColor() {
+        if (this.level != null) {
+            BlockEntity blockEntity = this.level.getBlockEntity(this);
+
+            if (blockEntity instanceof BlockEntityBanner) {
+                return ((BlockEntityBanner) blockEntity).getDyeColor();
+            }
+        }
+
+        return DyeColor.WHITE;
     }
 
     @Override
     public double getHardness() {
         return 1;
+    }
+
+    @Override
+    public int getId() {
+        return STANDING_BANNER;
+    }
+
+    @Override
+    public String getName() {
+        return "Banner";
     }
 
     @Override
@@ -48,18 +80,36 @@ public class BlockBanner extends BlockTransparentMeta implements Faceable {
     }
 
     @Override
-    public String getName() {
-        return "Banner";
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.WHEN_PLACED_IN_WATER;
     }
 
     @Override
-    public AxisAlignedBB getBoundingBox() {
-        return null;
+    public boolean isSolid() {
+        return false;
+    }
+
+    @Override
+    public boolean breakWhenPushed() {
+        return true;
     }
 
     @Override
     public boolean canPassThrough() {
         return true;
+    }
+
+    @Override
+    public int onUpdate(int type) {
+        if (type == Level.BLOCK_UPDATE_NORMAL) {
+            if (this.down().getId() == Block.AIR) {
+                this.getLevel().useBreakOn(this);
+
+                return Level.BLOCK_UPDATE_NORMAL;
+            }
+        }
+
+        return 0;
     }
 
     @Override
@@ -95,19 +145,6 @@ public class BlockBanner extends BlockTransparentMeta implements Faceable {
         }
         return false;
     }
-    
-    @Override
-    public int onUpdate(int type) {
-        if (type == Level.BLOCK_UPDATE_NORMAL) {
-            if (this.down().getId() == Block.AIR) {
-                this.getLevel().useBreakOn(this);
-
-                return Level.BLOCK_UPDATE_NORMAL;
-            }
-        }
-
-        return 0;
-    }
 
     @Override
     public Item toItem() {
@@ -128,42 +165,5 @@ public class BlockBanner extends BlockTransparentMeta implements Faceable {
             }
         }
         return item;
-    }
-
-    @Override
-    public BlockFace getBlockFace() {
-        return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return this.getDyeColor().getColor();
-    }
-
-    public DyeColor getDyeColor() {
-        if (this.level != null) {
-            BlockEntity blockEntity = this.level.getBlockEntity(this);
-
-            if (blockEntity instanceof BlockEntityBanner) {
-                return ((BlockEntityBanner) blockEntity).getDyeColor();
-            }
-        }
-
-        return DyeColor.WHITE;
-    }
-
-    @Override
-    public boolean isSolid() {
-        return false;
-    }
-
-    @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.WHEN_PLACED_IN_WATER;
-    }
-
-    @Override
-    public boolean breakWhenPushed() {
-        return true;
     }
 }

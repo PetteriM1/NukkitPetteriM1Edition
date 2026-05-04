@@ -12,6 +12,46 @@ public abstract class BlockOre extends BlockSolid {
     public BlockOre() {
     }
 
+    protected float getDropMultiplier() {
+        return 1;
+    }
+
+    @Override
+    public double getHardness() {
+        return 3;
+    }
+
+    protected abstract int getRawMaterial();
+
+    protected int getRawMaterialMeta() {
+        return 0;
+    }
+
+    @Override
+    public double getResistance() {
+        return 3;
+    }
+
+    @Override
+    public int getToolTier() {
+        return ItemTool.TIER_STONE;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
+    }
+
+    @Override
+    public boolean canHarvestWithHand() {
+        return false;
+    }
+
+    @Override
+    public boolean canSilkTouch() {
+        return true;
+    }
+
     @Override
     public Item[] getDrops(Item item) {
         if (item.isPickaxe() && item.getTier() >= this.getToolTier()) {
@@ -34,45 +74,5 @@ public abstract class BlockOre extends BlockSolid {
         } else {
             return new Item[0];
         }
-    }
-
-    protected abstract int getRawMaterial();
-
-    protected int getRawMaterialMeta() {
-        return 0;
-    }
-
-    protected float getDropMultiplier() {
-        return 1;
-    }
-
-    @Override
-    public boolean canSilkTouch() {
-        return true;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
-    }
-
-    @Override
-    public int getToolTier() {
-        return ItemTool.TIER_STONE;
-    }
-
-    @Override
-    public boolean canHarvestWithHand() {
-        return false;
-    }
-
-    @Override
-    public double getHardness() {
-        return 3;
-    }
-
-    @Override
-    public double getResistance() {
-        return 3;
     }
 }

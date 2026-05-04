@@ -13,8 +13,8 @@ public class BlockStairsEndBrick extends BlockStairs {
     }
 
     @Override
-    public String getName() {
-        return "End Brick Stairs";
+    public double getHardness() {
+        return 2; //3
     }
 
     @Override
@@ -23,8 +23,8 @@ public class BlockStairsEndBrick extends BlockStairs {
     }
 
     @Override
-    public double getHardness() {
-        return 2; //3
+    public String getName() {
+        return "End Brick Stairs";
     }
 
     @Override

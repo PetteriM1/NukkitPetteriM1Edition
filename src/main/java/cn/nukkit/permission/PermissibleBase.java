@@ -31,11 +31,6 @@ public class PermissibleBase implements Permissible {
     }
 
     @Override
-    public boolean isOp() {
-        return this.opable != null && this.opable.isOp();
-    }
-
-    @Override
     public void setOp(boolean value) {
         if (this.opable == null) {
             throw new ServerException("Cannot change op value as no ServerOperator is set");
@@ -45,38 +40,13 @@ public class PermissibleBase implements Permissible {
     }
 
     @Override
-    public boolean isPermissionSet(String name) {
-        return this.permissions.containsKey(name);
+    public Map<String, PermissionAttachmentInfo> getEffectivePermissions() {
+        return this.permissions;
     }
 
     @Override
-    public boolean isPermissionSet(Permission permission) {
-        return this.isPermissionSet(permission.getName());
-    }
-
-    @Override
-    public boolean hasPermission(String name) {
-        PermissionAttachmentInfo isPermissionSet = this.permissions.get(name);
-        if (isPermissionSet != null) {
-            return isPermissionSet.getValue();
-        }
-
-        Permission perm = Server.getInstance().getPluginManager().getPermission(name);
-
-        if (perm != null) {
-            String permission = perm.getDefault();
-
-            boolean op;
-            return Permission.DEFAULT_TRUE.equals(permission) || ((op = this.isOp()) && Permission.DEFAULT_OP.equals(permission)) || (!op && Permission.DEFAULT_NOT_OP.equals(permission));
-        } else {
-            return this.isOp();
-            //return Permission.DEFAULT_TRUE.equals(Permission.DEFAULT_PERMISSION) || ((op = this.isOp()) && Permission.DEFAULT_OP.equals(Permission.DEFAULT_PERMISSION)) || (!op && Permission.DEFAULT_NOT_OP.equals(Permission.DEFAULT_PERMISSION));
-        }
-    }
-
-    @Override
-    public boolean hasPermission(Permission permission) {
-        return this.hasPermission(permission.getName());
+    public boolean isOp() {
+        return this.opable != null && this.opable.isOp();
     }
 
     @Override
@@ -105,16 +75,65 @@ public class PermissibleBase implements Permissible {
         return result;
     }
 
-    @Override
-    public void removeAttachment(PermissionAttachment attachment) {
-        if (this.attachments.contains(attachment)) {
-            this.attachments.remove(attachment);
-            PermissionRemovedExecutor ex = attachment.getRemovalCallback();
-            if (ex != null) {
-                ex.attachmentRemoved(attachment);
+    private void calculateChildPermissions(Map<String, Boolean> children, boolean invert, PermissionAttachment attachment) {
+        for (Map.Entry<String, Boolean> entry : children.entrySet()) {
+            String name = entry.getKey();
+            Permission perm = Server.getInstance().getPluginManager().getPermission(name);
+            boolean v = entry.getValue();
+            boolean value = (v ^ invert);
+            this.permissions.put(name, new PermissionAttachmentInfo(this.parent != null ? this.parent : this, name, attachment, value));
+            Server.getInstance().getPluginManager().subscribeToPermission(name, this.parent != null ? this.parent : this);
+
+            if (perm != null) {
+                this.calculateChildPermissions(perm.getChildren(), !value, attachment);
             }
-            this.recalculatePermissions();
         }
+    }
+
+    public void clearPermissions() {
+        for (String name : this.permissions.keySet()) {
+            Server.getInstance().getPluginManager().unsubscribeFromPermission(name, this.parent != null ? this.parent : this);
+        }
+
+        Server.getInstance().getPluginManager().unsubscribeFromDefaultPerms(false, this.parent != null ? this.parent : this);
+        Server.getInstance().getPluginManager().unsubscribeFromDefaultPerms(true, this.parent != null ? this.parent : this);
+
+        this.permissions.clear();
+    }
+
+    @Override
+    public boolean hasPermission(String name) {
+        PermissionAttachmentInfo isPermissionSet = this.permissions.get(name);
+        if (isPermissionSet != null) {
+            return isPermissionSet.getValue();
+        }
+
+        Permission perm = Server.getInstance().getPluginManager().getPermission(name);
+
+        if (perm != null) {
+            String permission = perm.getDefault();
+
+            boolean op;
+            return Permission.DEFAULT_TRUE.equals(permission) || ((op = this.isOp()) && Permission.DEFAULT_OP.equals(permission)) || (!op && Permission.DEFAULT_NOT_OP.equals(permission));
+        } else {
+            return this.isOp();
+            //return Permission.DEFAULT_TRUE.equals(Permission.DEFAULT_PERMISSION) || ((op = this.isOp()) && Permission.DEFAULT_OP.equals(Permission.DEFAULT_PERMISSION)) || (!op && Permission.DEFAULT_NOT_OP.equals(Permission.DEFAULT_PERMISSION));
+        }
+    }
+
+    @Override
+    public boolean hasPermission(Permission permission) {
+        return this.hasPermission(permission.getName());
+    }
+
+    @Override
+    public boolean isPermissionSet(String name) {
+        return this.permissions.containsKey(name);
+    }
+
+    @Override
+    public boolean isPermissionSet(Permission permission) {
+        return this.isPermissionSet(permission.getName());
     }
 
     @Override
@@ -135,34 +154,15 @@ public class PermissibleBase implements Permissible {
         }
     }
 
-    public void clearPermissions() {
-        for (String name : this.permissions.keySet()) {
-            Server.getInstance().getPluginManager().unsubscribeFromPermission(name, this.parent != null ? this.parent : this);
-        }
-
-        Server.getInstance().getPluginManager().unsubscribeFromDefaultPerms(false, this.parent != null ? this.parent : this);
-        Server.getInstance().getPluginManager().unsubscribeFromDefaultPerms(true, this.parent != null ? this.parent : this);
-
-        this.permissions.clear();
-    }
-
-    private void calculateChildPermissions(Map<String, Boolean> children, boolean invert, PermissionAttachment attachment) {
-        for (Map.Entry<String, Boolean> entry : children.entrySet()) {
-            String name = entry.getKey();
-            Permission perm = Server.getInstance().getPluginManager().getPermission(name);
-            boolean v = entry.getValue();
-            boolean value = (v ^ invert);
-            this.permissions.put(name, new PermissionAttachmentInfo(this.parent != null ? this.parent : this, name, attachment, value));
-            Server.getInstance().getPluginManager().subscribeToPermission(name, this.parent != null ? this.parent : this);
-
-            if (perm != null) {
-                this.calculateChildPermissions(perm.getChildren(), !value, attachment);
-            }
-        }
-    }
-
     @Override
-    public Map<String, PermissionAttachmentInfo> getEffectivePermissions() {
-        return this.permissions;
+    public void removeAttachment(PermissionAttachment attachment) {
+        if (this.attachments.contains(attachment)) {
+            this.attachments.remove(attachment);
+            PermissionRemovedExecutor ex = attachment.getRemovalCallback();
+            if (ex != null) {
+                ex.attachmentRemoved(attachment);
+            }
+            this.recalculatePermissions();
+        }
     }
 }

@@ -1,9 +1,16 @@
 package cn.nukkit.entity.mob;
 
+import cn.nukkit.Player;
+import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.EntityLiving;
+import cn.nukkit.event.entity.EntityDamageByEntityEvent;
+import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.utils.Utils;
+
+import java.util.HashMap;
 
 public class EntityEvoker extends EntityWalkingMob {
 
@@ -14,13 +21,8 @@ public class EntityEvoker extends EntityWalkingMob {
     }
 
     @Override
-    public int getNetworkId() {
-        return NETWORK_ID;
-    }
-
-    @Override
-    public float getWidth() {
-        return 0.6f;
+    public Item[] getDrops() {
+        return new Item[]{Item.get(Item.EMERALD, 0, Utils.rand(0, 1)), Item.get(Item.TOTEM, 0, 1)};
     }
 
     @Override
@@ -29,18 +31,59 @@ public class EntityEvoker extends EntityWalkingMob {
     }
 
     @Override
+    public int getKillExperience() {
+        return 10;
+    }
+
+    @Override
+    public int getNetworkId() {
+        return NETWORK_ID;
+    }
+
+    @Override
+    public double getSpeed() {
+        return 1.1;
+    }
+
+    @Override
+    public float getWidth() {
+        return 0.6f;
+    }
+
+    @Override
+    public void attackEntity(Entity player) {
+        if (this.attackDelay > 23 && player.distanceSquared(this) < 2 + this.getWidth() * this.getWidth()) {
+            this.attackDelay = 0;
+            HashMap<EntityDamageEvent.DamageModifier, Float> damage = new HashMap<>();
+            damage.put(EntityDamageEvent.DamageModifier.BASE, (float) this.getDamage());
+
+            if (player instanceof Player) {
+                float points = 0;
+                for (Item i : ((Player) player).getInventory().getArmorContents()) {
+                    points += this.getArmorPoints(i.getId());
+                }
+
+                damage.put(EntityDamageEvent.DamageModifier.ARMOR,
+                        (float) (damage.getOrDefault(EntityDamageEvent.DamageModifier.ARMOR, 0f) - Math.floor(damage.getOrDefault(EntityDamageEvent.DamageModifier.BASE, 1f) * points * 0.04)));
+            }
+            player.attack(new EntityDamageByEntityEvent(this, player, EntityDamageEvent.DamageCause.ENTITY_ATTACK, damage));
+        }
+    }
+
+    @Override
+    public boolean canDespawn() {
+        return false;
+    }
+
+    @Override
     protected void initEntity() {
         this.setMaxHealth(24);
         super.initEntity();
+        this.setDamage(new int[]{0, 2, 3, 4});
     }
 
     @Override
-    public Item[] getDrops() {
-        return new Item[]{Item.get(Item.EMERALD, 0, Utils.rand(0, 1)), Item.get(Item.TOTEM, 0, 1)};
-    }
-
-    @Override
-    public int getKillExperience() {
-        return 10;
+    protected int nearbyDistanceMultiplier() {
+        return target instanceof EntityLiving || followTarget instanceof EntityLiving ? 10 : 1;
     }
 }

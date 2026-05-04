@@ -4,7 +4,9 @@ import cn.nukkit.Player;
 import cn.nukkit.block.properties.OxidizationLevel;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockCopperTrapdoor extends BlockTrapdoor implements Oxidizable, Waxable {
 
@@ -17,8 +19,18 @@ public class BlockCopperTrapdoor extends BlockTrapdoor implements Oxidizable, Wa
     }
 
     @Override
+    public BlockColor getColor() {
+        return BlockColor.ORANGE_BLOCK_COLOR;
+    }
+
+    @Override
     public int getId() {
         return COPPER_TRAPDOOR;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_21_0;
     }
 
     @Override
@@ -27,23 +39,13 @@ public class BlockCopperTrapdoor extends BlockTrapdoor implements Oxidizable, Wa
     }
 
     @Override
+    public OxidizationLevel getOxidizationLevel() {
+        return OxidizationLevel.UNAFFECTED;
+    }
+
+    @Override
     public double getResistance() {
         return 30;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.ORANGE_BLOCK_COLOR;
-    }
-
-    @Override
-    public boolean canHarvestWithHand() {
-        return false;
     }
 
     @Override
@@ -52,40 +54,23 @@ public class BlockCopperTrapdoor extends BlockTrapdoor implements Oxidizable, Wa
     }
 
     @Override
-    public boolean onActivate(Item item, Player player) {
-        return Waxable.super.onActivate(item, player)
-                || Oxidizable.super.onActivate(item, player) || super.onActivate(item, player);
-    }
-
-    @Override
-    public int onUpdate(int type) {
-        return Oxidizable.super.onUpdate(type) == 0 ? super.onUpdate(type) : 0;
-    }
-
-    @Override
-    public Block getStateWithOxidizationLevel(OxidizationLevel oxidizationLevel) {
-        return Block.get(this.getCopperId(this.isWaxed(), oxidizationLevel), this.getDamage());
-    }
-
-    @Override
-    public boolean setOxidizationLevel(OxidizationLevel oxidizationLevel) {
-        if (this.getOxidizationLevel().equals(oxidizationLevel)) {
-            return true;
-        }
-        return this.level.setBlock(this, Block.get(this.getCopperId(this.isWaxed(), oxidizationLevel)));
-    }
-
-    @Override
-    public boolean setWaxed(boolean waxed) {
-        if (this.isWaxed() == waxed) {
-            return true;
-        }
-        return this.level.setBlock(this, Block.get(getCopperId(waxed, getOxidizationLevel())));
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
     }
 
     @Override
     public boolean isWaxed() {
         return false;
+    }
+
+    @Override
+    public boolean canHarvestWithHand() {
+        return false;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.IRON_TRAPDOOR;
     }
 
     protected int getCopperId(boolean waxed, OxidizationLevel oxidizationLevel) {
@@ -107,7 +92,34 @@ public class BlockCopperTrapdoor extends BlockTrapdoor implements Oxidizable, Wa
     }
 
     @Override
-    public OxidizationLevel getOxidizationLevel() {
-        return OxidizationLevel.UNAFFECTED;
+    public Block getStateWithOxidizationLevel(OxidizationLevel oxidizationLevel) {
+        return Block.get(this.getCopperId(this.isWaxed(), oxidizationLevel), this.getDamage());
+    }
+
+    @Override
+    public boolean onActivate(Item item, Player player) {
+        return Waxable.super.onActivate(item, player)
+                || Oxidizable.super.onActivate(item, player) || super.onActivate(item, player);
+    }
+
+    @Override
+    public int onUpdate(int type) {
+        return Oxidizable.super.onUpdate(type) == 0 ? super.onUpdate(type) : 0;
+    }
+
+    @Override
+    public boolean setOxidizationLevel(OxidizationLevel oxidizationLevel) {
+        if (this.getOxidizationLevel().equals(oxidizationLevel)) {
+            return true;
+        }
+        return this.level.setBlock(this, Block.get(this.getCopperId(this.isWaxed(), oxidizationLevel)));
+    }
+
+    @Override
+    public boolean setWaxed(boolean waxed) {
+        if (this.isWaxed() == waxed) {
+            return true;
+        }
+        return this.level.setBlock(this, Block.get(getCopperId(waxed, getOxidizationLevel())));
     }
 }

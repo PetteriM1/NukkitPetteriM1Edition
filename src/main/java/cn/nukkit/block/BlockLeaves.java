@@ -34,36 +34,27 @@ public class BlockLeaves extends BlockTransparentMeta {
         super(meta);
     }
 
-    @Override
-    public int getId() {
-        return LEAVES;
-    }
-
-    @Override
-    public double getHardness() {
-        return 0.2;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_HOE;
-    }
-
-    private static final String[] NAMES = {
+    private static final String[] names = {
             "Oak Leaves",
             "Spruce Leaves",
             "Birch Leaves",
             "Jungle Leaves"
     };
 
-    @Override
-    public String getName() {
-        return NAMES[this.getDamage() & 0x03];
+    public void setCheckDecay(boolean checkDecay) {
+        if (checkDecay) {
+            this.setDamage(this.getDamage() | 0x08);
+        } else {
+            this.setDamage(this.getDamage() & -9);
+        }
     }
 
-    @Override
-    public int getBurnChance() {
-        return 30;
+    public void setPersistent(boolean persistent) {
+        if (persistent) {
+            this.setDamage(this.getDamage() | 0x04);
+        } else {
+            this.setDamage(this.getDamage() & -5);
+        }
     }
 
     @Override
@@ -72,15 +63,98 @@ public class BlockLeaves extends BlockTransparentMeta {
     }
 
     @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        setPersistent(true);
-        this.getLevel().setBlock(this, this, true, true);
-        return true;
+    public int getBurnChance() {
+        return 30;
     }
 
     @Override
-    public Item toItem() {
-        return new ItemBlock(this, this.getDamage() & 0x3, 1);
+    public BlockColor getColor() {
+        return BlockColor.FOLIAGE_BLOCK_COLOR;
+    }
+
+    @Override
+    public double getHardness() {
+        return 0.1; //0.2
+    }
+
+    @Override
+    public int getId() {
+        return LEAVES;
+    }
+
+    @Override
+    public String getName() {
+        return names[this.getDamage() & 0x03];
+    }
+
+    protected Item getSapling() {
+        return Item.get(BlockID.SAPLING, this.getDamage() & 0x03);
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_HOE;
+    }
+
+    @Override
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.WHEN_PLACED_IN_WATER;
+    }
+
+    public boolean isCheckDecay() {
+        return (this.getDamage() & 0x08) != 0;
+    }
+
+    public boolean isPersistent() {
+        return (this.getDamage() & 0x04) != 0;
+    }
+
+    @Override
+    public boolean breakWhenPushed() {
+        return true;
+    }
+
+    protected boolean canDropApple() {
+        return (this.getDamage() & 0x03) == OAK;
+    }
+
+    @Override
+    public boolean canSilkTouch() {
+        return true;
+    }
+
+    private boolean findLog() {
+        Set<Block> visited = new HashSet<>();
+        Queue<Block> queue = new LinkedList<>();
+        Map<Block, Integer> distance = new HashMap<>();
+
+        queue.offer(this);
+        visited.add(this);
+        distance.put(this, 0);
+
+        while (!queue.isEmpty()) {
+            Block currentBlock = queue.poll();
+            int currentDistance = distance.get(currentBlock);
+
+            if (currentDistance > 4) {
+                return false;
+            }
+
+            for (BlockFace face : BlockFace.values()) {
+                Block nextBlock = currentBlock.getSideIfLoadedOrNull(face); // If side chunk not loaded, do not load or decay
+                if (nextBlock == null || nextBlock instanceof BlockWood) {
+                    return true;
+                }
+
+                if (nextBlock instanceof BlockLeaves && !visited.contains(nextBlock)) {
+                    queue.offer(nextBlock);
+                    visited.add(nextBlock);
+                    distance.put(nextBlock, currentDistance + 1);
+                }
+            }
+        }
+
+        return false;
     }
 
     @Override
@@ -140,89 +214,15 @@ public class BlockLeaves extends BlockTransparentMeta {
         return 0;
     }
 
-    public boolean isCheckDecay() {
-        return (this.getDamage() & 0x08) != 0;
-    }
-
-    public void setCheckDecay(boolean checkDecay) {
-        if (checkDecay) {
-            this.setDamage(this.getDamage() | 0x08);
-        } else {
-            this.setDamage(this.getDamage() & -9);
-        }
-    }
-
-    public boolean isPersistent() {
-        return (this.getDamage() & 0x04) != 0;
-    }
-
-    public void setPersistent(boolean persistent) {
-        if (persistent) {
-            this.setDamage(this.getDamage() | 0x04);
-        } else {
-            this.setDamage(this.getDamage() & -5);
-        }
-    }
-
     @Override
-    public BlockColor getColor() {
-        return BlockColor.FOLIAGE_BLOCK_COLOR;
-    }
-
-    @Override
-    public boolean canSilkTouch() {
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        setPersistent(true);
+        this.getLevel().setBlock(this, this, true, true);
         return true;
     }
 
-    protected boolean canDropApple() {
-        return (this.getDamage() & 0x03) == OAK;
-    }
-
-    protected Item getSapling() {
-        return Item.get(BlockID.SAPLING, this.getDamage() & 0x03);
-    }
-
     @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.WHEN_PLACED_IN_WATER;
-    }
-
-    @Override
-    public boolean breakWhenPushed() {
-        return true;
-    }
-
-    private boolean findLog() {
-        Set<Block> visited = new HashSet<>();
-        Queue<Block> queue = new LinkedList<>();
-        Map<Block, Integer> distance = new HashMap<>();
-
-        queue.offer(this);
-        visited.add(this);
-        distance.put(this, 0);
-
-        while (!queue.isEmpty()) {
-            Block currentBlock = queue.poll();
-            int currentDistance = distance.get(currentBlock);
-
-            if (currentDistance > 4) {
-                return false;
-            }
-
-            for (BlockFace face : BlockFace.values()) {
-                Block nextBlock = currentBlock.getSideIfLoadedOrNull(face); // If side chunk not loaded, do not load or decay
-                if (nextBlock == null || nextBlock instanceof BlockWood) {
-                    return true;
-                }
-
-                if (nextBlock instanceof BlockLeaves && !visited.contains(nextBlock)) {
-                    queue.offer(nextBlock);
-                    visited.add(nextBlock);
-                    distance.put(nextBlock, currentDistance + 1);
-                }
-            }
-        }
-
-        return false;
+    public Item toItem() {
+        return new ItemBlock(this, this.getDamage() & 0x3, 1);
     }
 }

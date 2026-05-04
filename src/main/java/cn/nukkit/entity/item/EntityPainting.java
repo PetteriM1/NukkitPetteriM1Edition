@@ -8,12 +8,14 @@ import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.GameRule;
+import cn.nukkit.level.Level;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.DestroyBlockParticle;
 import cn.nukkit.math.SimpleAxisAlignedBB;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddPaintingPacket;
 import cn.nukkit.network.protocol.DataPacket;
+import cn.nukkit.network.protocol.ProtocolInfo;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,64 +37,28 @@ public class EntityPainting extends EntityHanging {
         super(chunk, nbt);
     }
 
-    public static Motive getMotive(String name) {
-        return Motive.BY_NAME.getOrDefault(name, Motive.KEBAB);
-    }
-
-    @Override
-    public int getNetworkId() {
-        return NETWORK_ID;
-    }
-
-    @Override
-    protected void initEntity() {
-        super.initEntity();
-        this.motive = getMotive(this.namedTag.getString("Motive"));
-    }
-
-    @Override
-    public DataPacket createAddEntityPacket() {
-        AddPaintingPacket addPainting = new AddPaintingPacket();
-        addPainting.entityUniqueId = this.getId();
-        addPainting.entityRuntimeId = this.getId();
-        addPainting.x = (float) this.x;
-        addPainting.y = (float) this.y;
-        addPainting.z = (float) this.z;
-        addPainting.direction = this.getDirection().getHorizontalIndex();
-        addPainting.title = this.motive.title;
-        return addPainting;
-    }
-
-    @Override
-    public boolean attack(EntityDamageEvent source) {
-        if (super.attack(source)) {
-            if (source instanceof EntityDamageByEntityEvent) {
-                Entity damager = ((EntityDamageByEntityEvent) source).getDamager();
-                if (damager instanceof Player && ((Player) damager).isSurvival()) {
-                    this.dropItem();
-                }
-            }
-            this.level.addParticle(new DestroyBlockParticle(this, Block.get(Block.WOODEN_PLANKS)));
-            this.close();
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    @Override
-    public void saveNBT() {
-        super.saveNBT();
-        this.namedTag.putString("Motive", this.motive.title);
-    }
-
-    public Motive getArt() {
-        return getMotive();
-    }
-
-    public Motive getMotive() {
-        return this.motive;
-    }
+    private static final Map<String, String> MULTIVERSION_MOTIVES = new HashMap<String, String>() {{
+        put("meditative", "Kebab");
+        put("prairie_ride", "Wanderer");
+        put("baroque", "Match");
+        put("humble", "Bust");
+        put("unpacked", "Pointer");
+        put("bouquet", "Stage");
+        put("cavebird", "Void");
+        put("cotan", "SkullAndRoses");
+        put("endboss", "Wither");
+        put("fern", "Match");
+        put("owlemons", "Bust");
+        put("sunflowers", "Stage");
+        put("tides", "Void");
+        put("backyard", "SkullAndRoses");
+        put("pond", "Wither");
+        put("changing", "Fighters");
+        put("finding", "Fighters");
+        put("lowmist", "Fighters");
+        put("passage", "Fighters");
+        put("orb", "Pigscene");
+    }};
 
     public enum Motive {
         KEBAB("Kebab", 1, 1),
@@ -161,6 +127,19 @@ public class EntityPainting extends EntityHanging {
         }
     }
 
+    public Motive getArt() {
+        return getMotive();
+    }
+
+    public Motive getMotive() {
+        return this.motive;
+    }
+
+    @Override
+    public int getNetworkId() {
+        return NETWORK_ID;
+    }
+
     @Override
     protected boolean isSurfaceValid() {
         if (this.cachedBoundingBox == null) {
@@ -170,14 +149,95 @@ public class EntityPainting extends EntityHanging {
     }
 
     @Override
+    public boolean attack(EntityDamageEvent source) {
+        if (super.attack(source)) {
+            if (source instanceof EntityDamageByEntityEvent) {
+                Entity damager = ((EntityDamageByEntityEvent) source).getDamager();
+                if (damager instanceof Player && ((Player) damager).isSurvival()) {
+                    this.dropItem();
+                }
+            }
+            this.level.addParticle(new DestroyBlockParticle(this, Block.get(Block.WOODEN_PLANKS)));
+            this.close();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public DataPacket createAddEntityPacket() {
+        AddPaintingPacket addPainting = new AddPaintingPacket();
+        addPainting.entityUniqueId = this.getId();
+        addPainting.entityRuntimeId = this.getId();
+        addPainting.x = (float) this.x;
+        addPainting.y = (float) this.y;
+        addPainting.z = (float) this.z;
+        addPainting.direction = this.getDirection().getHorizontalIndex();
+        addPainting.title = this.motive.title;
+        return addPainting;
+    }
+
+    @Override
     protected void dropItem() {
         if (this.level.getGameRules().getBoolean(GameRule.DO_ENTITY_DROPS)) {
             this.level.dropItem(this, Item.get(Item.PAINTING));
         }
     }
 
+    public static Motive getMotive(String name) {
+        return Motive.BY_NAME.getOrDefault(name, Motive.KEBAB);
+    }
+
+    @Override
+    public boolean goToNewChunk(FullChunk chunk) {
+        if (chunk.getEntities().size() > 200) {
+            if (!this.isClosed() && this.isAlive()) {
+                this.dropItem();
+            }
+            this.close();
+            return false;
+        }
+        return true;
+    }
+
     @Override
     public boolean ignoredAsSaveReason() {
         return true;
+    }
+
+    @Override
+    protected void initEntity() {
+        super.initEntity();
+        this.motive = getMotive(this.namedTag.getString("Motive"));
+    }
+
+    @Override
+    public void saveNBT() {
+        super.saveNBT();
+        this.namedTag.putString("Motive", this.motive.title);
+    }
+
+    @Override // Multiversion: alternative motives for old versions
+    public void spawnTo(Player player) {
+        if (!this.hasSpawned.containsKey(player.getLoaderId())) {
+            Boolean hasChunk = player.usedChunks.get(Level.chunkHash(this.chunk.getX(), this.chunk.getZ()));
+            if (hasChunk != null && hasChunk) {
+                AddPaintingPacket addPainting = new AddPaintingPacket();
+                addPainting.entityUniqueId = this.getId();
+                addPainting.entityRuntimeId = this.getId();
+                addPainting.x = (float) this.x;
+                addPainting.y = (float) this.y;
+                addPainting.z = (float) this.z;
+                addPainting.direction = this.getDirection().getHorizontalIndex();
+                if (player.protocol < ProtocolInfo.v1_21_0) {
+                    addPainting.title = MULTIVERSION_MOTIVES.getOrDefault(this.motive.title, this.motive.title);
+                } else {
+                    addPainting.title = this.motive.title;
+                }
+                player.dataPacket(addPainting);
+                this.hasSpawned.put(player.getLoaderId(), player);
+            }
+        }
     }
 }

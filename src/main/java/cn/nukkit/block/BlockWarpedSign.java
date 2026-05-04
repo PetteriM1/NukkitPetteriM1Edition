@@ -14,18 +14,13 @@ public class BlockWarpedSign extends BlockSignPost {
     }
 
     @Override
-    public String getName() {
-        return "Warped Sign";
-    }
-
-    @Override
     public int getId() {
         return WARPED_STANDING_SIGN;
     }
 
     @Override
-    public Item toItem() {
-        return Item.get(ItemID.WARPED_SIGN);
+    public String getName() {
+        return "Warped Sign";
     }
 
     @Override
@@ -36,5 +31,10 @@ public class BlockWarpedSign extends BlockSignPost {
     @Override
     protected int getWallId() {
         return WARPED_WALL_SIGN;
+    }
+
+    @Override
+    public Item toItem() {
+        return Item.get(ItemID.WARPED_SIGN);
     }
 }

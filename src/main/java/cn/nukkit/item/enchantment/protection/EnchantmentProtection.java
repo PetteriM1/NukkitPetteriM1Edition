@@ -28,17 +28,6 @@ public abstract class EnchantmentProtection extends Enchantment {
     }
 
     @Override
-    public boolean checkCompatibility(Enchantment enchantment) {
-        if (enchantment instanceof EnchantmentProtection) {
-            if (((EnchantmentProtection) enchantment).protectionType == this.protectionType) {
-                return false;
-            }
-            return ((EnchantmentProtection) enchantment).protectionType == TYPE.FALL || this.protectionType == TYPE.FALL;
-        }
-        return super.checkCompatibility(enchantment);
-    }
-
-    @Override
     public int getMaxLevel() {
         return 4;
     }
@@ -55,5 +44,16 @@ public abstract class EnchantmentProtection extends Enchantment {
     @Override
     public boolean isMajor() {
         return true;
+    }
+
+    @Override
+    public boolean checkCompatibility(Enchantment enchantment) {
+        if (enchantment instanceof EnchantmentProtection) {
+            if (((EnchantmentProtection) enchantment).protectionType == this.protectionType) {
+                return false;
+            }
+            return ((EnchantmentProtection) enchantment).protectionType == TYPE.FALL || this.protectionType == TYPE.FALL;
+        }
+        return super.checkCompatibility(enchantment);
     }
 }

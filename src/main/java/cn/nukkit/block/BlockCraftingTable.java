@@ -14,8 +14,13 @@ import cn.nukkit.utils.BlockColor;
 public class BlockCraftingTable extends BlockSolid {
 
     @Override
-    public String getName() {
-        return "Crafting Table";
+    public BlockColor getColor() {
+        return BlockColor.WOOD_BLOCK_COLOR;
+    }
+
+    @Override
+    public double getHardness() {
+        return 2.5;
     }
 
     @Override
@@ -24,13 +29,8 @@ public class BlockCraftingTable extends BlockSolid {
     }
 
     @Override
-    public boolean canBeActivated() {
-        return true;
-    }
-
-    @Override
-    public double getHardness() {
-        return 2.5;
+    public String getName() {
+        return "Crafting Table";
     }
 
     @Override
@@ -41,6 +41,16 @@ public class BlockCraftingTable extends BlockSolid {
     @Override
     public int getToolType() {
         return ItemTool.TYPE_AXE;
+    }
+
+    @Override
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.WHEN_PLACED_IN_WATER;
+    }
+
+    @Override
+    public boolean canBeActivated() {
+        return true;
     }
 
     @Override
@@ -55,27 +65,18 @@ public class BlockCraftingTable extends BlockSolid {
                 }
                 player.craftingType = Player.CRAFTING_BIG;
                 player.setCraftingGrid(player.getUIInventory().getBigCraftingGrid());
-
-                ContainerOpenPacket pk = new ContainerOpenPacket();
-                pk.windowId = -1;
-                pk.type = 1;
-                pk.x = (int) x;
-                pk.y = (int) y;
-                pk.z = (int) z;
-                pk.entityId = player.getId();
-                player.dataPacket(pk);
+                if (player.protocol >= 407) {
+                    ContainerOpenPacket pk = new ContainerOpenPacket();
+                    pk.windowId = -1;
+                    pk.type = 1;
+                    pk.x = (int) x;
+                    pk.y = (int) y;
+                    pk.z = (int) z;
+                    pk.entityId = player.getId();
+                    player.dataPacket(pk);
+                }
             }
         }
         return true;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.WOOD_BLOCK_COLOR;
-    }
-
-    @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.WHEN_PLACED_IN_WATER;
     }
 }

@@ -2,7 +2,6 @@ package cn.nukkit.network.protocol;
 
 import lombok.ToString;
 
-@Deprecated
 @ToString
 public class FilterTextPacket extends DataPacket {
 
@@ -10,11 +9,6 @@ public class FilterTextPacket extends DataPacket {
 
     public String text;
     public boolean fromServer;
-
-    @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
 
     @Override
     public void decode() {
@@ -27,5 +21,10 @@ public class FilterTextPacket extends DataPacket {
         this.reset();
         this.putString(this.text);
         this.putBoolean(this.fromServer);
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

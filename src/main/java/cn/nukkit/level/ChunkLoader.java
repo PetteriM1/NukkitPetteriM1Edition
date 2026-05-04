@@ -9,9 +9,9 @@ import cn.nukkit.math.Vector3;
  */
 public interface ChunkLoader {
 
-    int getLoaderId();
+    Level getLevel();
 
-    boolean isLoaderActive();
+    int getLoaderId();
 
     Position getPosition();
 
@@ -19,15 +19,15 @@ public interface ChunkLoader {
 
     double getZ();
 
-    Level getLevel();
+    boolean isLoaderActive();
+
+    void onBlockChanged(Vector3 block);
 
     void onChunkChanged(FullChunk chunk);
 
     void onChunkLoaded(FullChunk chunk);
 
-    void onChunkUnloaded(FullChunk chunk);
-
     void onChunkPopulated(FullChunk chunk);
 
-    void onBlockChanged(Vector3 block);
+    void onChunkUnloaded(FullChunk chunk);
 }

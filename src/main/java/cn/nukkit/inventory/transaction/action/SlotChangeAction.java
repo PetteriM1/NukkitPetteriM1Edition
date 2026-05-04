@@ -48,6 +48,16 @@ public class SlotChangeAction extends InventoryAction {
     }
 
     /**
+     * Sets the item into the target inventory.
+     *
+     * @param source player
+     * @return successfully executed
+     */
+    public boolean execute(Player source) {
+        return this.inventory.setItem(this.inventorySlot, this.targetItem, false);
+    }
+
+    /**
      * Checks if the item in the inventory at the specified inventorySlot is the same as this action's source item.
      *
      * @param source player
@@ -97,14 +107,18 @@ public class SlotChangeAction extends InventoryAction {
         return valid;
     }
 
+    @Override
+    public void onAddToTransaction(InventoryTransaction transaction) {
+        transaction.addInventory(this.inventory);
+    }
+
     /**
-     * Sets the item into the target inventory.
+     * Sends the original inventorySlot contents to the source player to revert the action.
      *
      * @param source player
-     * @return successfully executed
      */
-    public boolean execute(Player source) {
-        return this.inventory.setItem(this.inventorySlot, this.targetItem, false);
+    public void onExecuteFail(Player source) {
+        this.inventory.sendSlot(this.inventorySlot, source);
     }
 
     /**
@@ -139,19 +153,5 @@ public class SlotChangeAction extends InventoryAction {
                 }
             }
         }
-    }
-
-    /**
-     * Sends the original inventorySlot contents to the source player to revert the action.
-     *
-     * @param source player
-     */
-    public void onExecuteFail(Player source) {
-        this.inventory.sendSlot(this.inventorySlot, source);
-    }
-
-    @Override
-    public void onAddToTransaction(InventoryTransaction transaction) {
-        transaction.addInventory(this.inventory);
     }
 }

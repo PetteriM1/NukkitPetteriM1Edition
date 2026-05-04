@@ -25,12 +25,7 @@ public class BlockTallGrass extends BlockFlowable {
         super(meta);
     }
 
-    @Override
-    public int getId() {
-        return TALL_GRASS;
-    }
-
-    private static final String[] NAMES = {
+    private static final String[] names = {
             "Grass",
             "Grass",
             "Fern",
@@ -38,8 +33,38 @@ public class BlockTallGrass extends BlockFlowable {
     };
 
     @Override
+    public int getBurnAbility() {
+        return 100;
+    }
+
+    @Override
+    public int getBurnChance() {
+        return 60;
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.FOLIAGE_BLOCK_COLOR;
+    }
+
+    @Override
+    public int getId() {
+        return TALL_GRASS;
+    }
+
+    @Override
     public String getName() {
-        return NAMES[this.getDamage() & 0x03];
+        return names[this.getDamage() & 0x03];
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_SHEARS;
+    }
+
+    @Override
+    public boolean breakWhenPushed() {
+        return true;
     }
 
     @Override
@@ -53,35 +78,20 @@ public class BlockTallGrass extends BlockFlowable {
     }
 
     @Override
-    public int getBurnChance() {
-        return 60;
-    }
-
-    @Override
-    public int getBurnAbility() {
-        return 100;
-    }
-
-    @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        Block down = this.down();
-        int id = down.getId();
-        if (id == Block.GRASS || id == Block.DIRT || id == Block.PODZOL || id == FARMLAND || id == MYCELIUM || id == MOSS_BLOCK) {
-            this.getLevel().setBlock(block, this, true);
-            return true;
+    public Item[] getDrops(Item item) {
+        if (item.isShears()) {
+            return new Item[]{
+                    Item.get(Item.TALL_GRASS, this.getDamage() & 2, 1)
+            };
         }
-        return false;
-    }
 
-    @Override
-    public int onUpdate(int type) {
-        if (type == Level.BLOCK_UPDATE_NORMAL) {
-            if (this.down().isTransparent()) {
-                this.getLevel().useBreakOn(this);
-                return Level.BLOCK_UPDATE_NORMAL;
-            }
+        if (ThreadLocalRandom.current().nextInt(10) == 0) {
+            return new Item[]{
+                    Item.get(Item.WHEAT_SEEDS)
+            };
+        } else {
+            return new Item[0];
         }
-        return 0;
     }
 
     @Override
@@ -122,36 +132,25 @@ public class BlockTallGrass extends BlockFlowable {
         return false;
     }
 
-
     @Override
-    public Item[] getDrops(Item item) {
-        if (item.isShears()) {
-            return new Item[]{
-                    Item.get(Item.TALL_GRASS, this.getDamage() & 2, 1)
-            };
+    public int onUpdate(int type) {
+        if (type == Level.BLOCK_UPDATE_NORMAL) {
+            if (this.down().isTransparent()) {
+                this.getLevel().useBreakOn(this);
+                return Level.BLOCK_UPDATE_NORMAL;
+            }
         }
+        return 0;
+    }
 
-        if (ThreadLocalRandom.current().nextInt(10) == 0) {
-            return new Item[]{
-                    Item.get(Item.WHEAT_SEEDS)
-            };
-        } else {
-            return new Item[0];
+    @Override
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        Block down = this.down();
+        int id = down.getId();
+        if (id == Block.GRASS || id == Block.DIRT || id == Block.PODZOL || id == FARMLAND || id == MYCELIUM || id == MOSS_BLOCK) {
+            this.getLevel().setBlock(block, this, true);
+            return true;
         }
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_SHEARS;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.FOLIAGE_BLOCK_COLOR;
-    }
-
-    @Override
-    public boolean breakWhenPushed() {
-        return true;
+        return false;
     }
 }

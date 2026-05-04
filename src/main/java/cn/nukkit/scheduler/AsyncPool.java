@@ -22,14 +22,14 @@ public class AsyncPool extends ThreadPoolExecutor {
         this.server = server;
     }
 
+    public Server getServer() {
+        return server;
+    }
+
     @Override
     protected void afterExecute(Runnable runnable, Throwable throwable) {
         if (throwable != null) {
             server.getLogger().critical("Exception in asynchronous task", throwable);
         }
-    }
-
-    public Server getServer() {
-        return server;
     }
 }

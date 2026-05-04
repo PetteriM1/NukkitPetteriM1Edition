@@ -10,8 +10,8 @@ public class BlockCopperCut extends BlockCopperBase {
     }
 
     @Override
-    public String getName() {
-        return "Cut Copper";
+    public BlockColor getColor() {
+        return BlockColor.ORANGE_BLOCK_COLOR;
     }
 
     @Override
@@ -20,8 +20,8 @@ public class BlockCopperCut extends BlockCopperBase {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.ORANGE_BLOCK_COLOR;
+    public String getName() {
+        return "Cut Copper";
     }
 
     @Override

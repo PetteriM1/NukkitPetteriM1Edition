@@ -14,11 +14,6 @@ public class BlockMushroomBrown extends BlockMushroom {
     }
 
     @Override
-    public String getName() {
-        return "Brown Mushroom";
-    }
-
-    @Override
     public int getId() {
         return BROWN_MUSHROOM;
     }
@@ -26,6 +21,11 @@ public class BlockMushroomBrown extends BlockMushroom {
     @Override
     public int getLightLevel() {
         return 1;
+    }
+
+    @Override
+    public String getName() {
+        return "Brown Mushroom";
     }
 
     @Override

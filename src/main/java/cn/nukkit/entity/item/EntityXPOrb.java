@@ -33,6 +33,74 @@ public class EntityXPOrb extends Entity {
         super(chunk, nbt);
     }
 
+    public void setExp(int exp) {
+        if (exp <= 0) {
+            throw new IllegalArgumentException("XP amount must be greater than 0, got " + exp);
+        }
+        this.exp = exp;
+    }
+
+    public void setPickupDelay(int pickupDelay) {
+        this.pickupDelay = pickupDelay;
+    }
+
+    @Override
+    protected float getDrag() {
+        return 0.02f;
+    }
+
+    public int getExp() {
+        return exp;
+    }
+
+    @Override
+    protected float getGravity() {
+        return 0.04f;
+    }
+
+    @Override
+    public float getHeight() {
+        return 0.1f;
+    }
+
+    @Override
+    public float getLength() {
+        return 0.1f;
+    }
+
+    @Override
+    public int getNetworkId() {
+        return NETWORK_ID;
+    }
+
+    public int getPickupDelay() {
+        return pickupDelay;
+    }
+
+    @Override
+    public float getWidth() {
+        return 0.1f;
+    }
+
+    @Override
+    public boolean attack(EntityDamageEvent source) {
+        return (source.getCause() == DamageCause.VOID ||
+                source.getCause() == DamageCause.FIRE_TICK ||
+                source.getCause() == DamageCause.ENTITY_EXPLOSION ||
+                source.getCause() == DamageCause.BLOCK_EXPLOSION) &&
+                super.attack(source);
+    }
+
+    @Override
+    public boolean canCollide() {
+        return false;
+    }
+
+    @Override
+    public boolean canCollideWith(Entity entity) {
+        return false;
+    }
+
     /**
      * Returns the largest size of normal XP orb that will be spawned for the specified amount of XP. Used to split XP
      * up into multiple orbs when an amount of XP is dropped.
@@ -47,54 +115,13 @@ public class EntityXPOrb extends Entity {
         return 1;
     }
 
-    /**
-     * Splits the specified amount of XP into an array of acceptable XP orb sizes.
-     */
-    public static List<Integer> splitIntoOrbSizes(int amount) {
-        List<Integer> result = new IntArrayList();
-
-        while (amount > 0) {
-            int size = getMaxOrbSize(amount);
-            result.add(size);
-            amount -= size;
+    @Override
+    public boolean goToNewChunk(FullChunk chunk) {
+        if (chunk.getEntities().size() > 400) { // no drops so slightly higher limit
+            this.close();
+            return false;
         }
-
-        return result;
-    }
-
-    @Override
-    public int getNetworkId() {
-        return NETWORK_ID;
-    }
-
-    @Override
-    public float getWidth() {
-        return 0.1f;
-    }
-
-    @Override
-    public float getLength() {
-        return 0.1f;
-    }
-
-    @Override
-    public float getHeight() {
-        return 0.1f;
-    }
-
-    @Override
-    protected float getGravity() {
-        return 0.04f;
-    }
-
-    @Override
-    protected float getDrag() {
-        return 0.02f;
-    }
-
-    @Override
-    public boolean canCollide() {
-        return false;
+        return true;
     }
 
     @Override
@@ -125,15 +152,6 @@ public class EntityXPOrb extends Entity {
         }
 
         this.dataProperties.putInt(DATA_EXPERIENCE_VALUE, this.exp);
-    }
-
-    @Override
-    public boolean attack(EntityDamageEvent source) {
-        return (source.getCause() == DamageCause.VOID ||
-                source.getCause() == DamageCause.FIRE_TICK ||
-                source.getCause() == DamageCause.ENTITY_EXPLOSION ||
-                source.getCause() == DamageCause.BLOCK_EXPLOSION) &&
-                super.attack(source);
     }
 
     @Override
@@ -184,11 +202,11 @@ public class EntityXPOrb extends Entity {
             if (this.age % 2 == 0) {
                 if (this.closestPlayer != null &&
                         (this.closestPlayer.level != this.level ||
-                        this.closestPlayer.closed ||
-                        !this.closestPlayer.isAlive() ||
-                        this.closestPlayer.isSpectator() ||
-                        !this.closestPlayer.canPickupXP() ||
-                        this.closestPlayer.distanceSquared(this) > 64.0D)) {
+                                this.closestPlayer.closed ||
+                                !this.closestPlayer.isAlive() ||
+                                this.closestPlayer.isSpectator() ||
+                                !this.closestPlayer.canPickupXP() ||
+                                this.closestPlayer.distanceSquared(this) > 64.0D)) {
                     this.closestPlayer = null;
                 }
 
@@ -274,27 +292,18 @@ public class EntityXPOrb extends Entity {
         this.namedTag.putShort("Value", exp);
     }
 
-    public int getExp() {
-        return exp;
-    }
+    /**
+     * Splits the specified amount of XP into an array of acceptable XP orb sizes.
+     */
+    public static List<Integer> splitIntoOrbSizes(int amount) {
+        List<Integer> result = new IntArrayList();
 
-    public void setExp(int exp) {
-        if (exp <= 0) {
-            throw new IllegalArgumentException("XP amount must be greater than 0, got " + exp);
+        while (amount > 0) {
+            int size = getMaxOrbSize(amount);
+            result.add(size);
+            amount -= size;
         }
-        this.exp = exp;
-    }
 
-    @Override
-    public boolean canCollideWith(Entity entity) {
-        return false;
-    }
-
-    public int getPickupDelay() {
-        return pickupDelay;
-    }
-
-    public void setPickupDelay(int pickupDelay) {
-        this.pickupDelay = pickupDelay;
+        return result;
     }
 }

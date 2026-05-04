@@ -3,29 +3,31 @@ package cn.nukkit.entity;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.block.Block;
-import cn.nukkit.block.BlockCactus;
-import cn.nukkit.block.BlockMagma;
+import cn.nukkit.block.BlockLayer;
 import cn.nukkit.entity.mob.*;
 import cn.nukkit.entity.passive.EntityIronGolem;
 import cn.nukkit.entity.passive.EntitySkeletonHorse;
+import cn.nukkit.entity.passive.EntityWolf;
 import cn.nukkit.entity.projectile.EntityProjectile;
 import cn.nukkit.entity.weather.EntityWeather;
 import cn.nukkit.event.entity.*;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
 import cn.nukkit.inventory.PlayerInventory;
-import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemArmor;
-import cn.nukkit.item.ItemTurtleShell;
+import cn.nukkit.item.*;
+import cn.nukkit.lang.TranslationContainer;
 import cn.nukkit.level.GameRule;
 import cn.nukkit.level.format.FullChunk;
+import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.NukkitMath;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.FloatTag;
 import cn.nukkit.network.protocol.EntityEventPacket;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
+import cn.nukkit.network.protocol.TextPacket;
 import cn.nukkit.potion.Effect;
 import cn.nukkit.utils.BlockIterator;
+import cn.nukkit.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,16 +44,6 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
         super(chunk, nbt);
     }
 
-    @Override
-    protected float getGravity() {
-        return 0.08f;
-    }
-
-    @Override
-    protected float getDrag() {
-        return 0.02f;
-    }
-
     protected int attackTime;
     protected int knockBackTime;
     private float currentDamage;
@@ -60,20 +52,15 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
     private boolean blocking;
     private boolean spinAttack;
 
-    @Override
-    protected void initEntity() {
-        super.initEntity();
+    public void setAirTicks(int ticks) {
+        this.airTicks = ticks;
+    }
 
-        if (this.namedTag.contains("HealF")) {
-            this.namedTag.putFloat("Health", this.namedTag.getShort("HealF"));
-            this.namedTag.remove("HealF");
+    public void setBlocking(boolean value) {
+        if (this.blocking != value) {
+            this.blocking = value;
+            this.setDataFlag(DATA_FLAGS_EXTENDED, DATA_FLAG_BLOCKING, value);
         }
-
-        if (!this.namedTag.contains("Health") || !(this.namedTag.get("Health") instanceof FloatTag)) {
-            this.namedTag.putFloat("Health", this.getMaxHealth());
-        }
-
-        this.health = this.namedTag.getFloat("Health");
     }
 
     @Override
@@ -88,19 +75,112 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
         }
     }
 
+    public void setMovementSpeed(float speed) {
+        this.movementSpeed = speed;
+    }
+
+    public void setSpinAttack(boolean value) {
+        if (this.spinAttack != value) {
+            this.spinAttack = value;
+            this.setDataFlag(DATA_FLAGS, DATA_FLAG_SPIN_ATTACK, value);
+        }
+    }
+
+    public int getAirTicks() {
+        return this.airTicks;
+    }
+
     @Override
-    public void saveNBT() {
-        super.saveNBT();
+    public List<Block> getBlocksAround() {
+        if (this.blocksAround == null) {
+            AxisAlignedBB bb = this.boundingBox.clone();
+            bb.setMinY(this.boundingBox.getMinY() - 0.1);
 
-        this.namedTag.putFloat("Health", this.getHealth());
+            int minX = NukkitMath.floorDouble(bb.getMinX());
+            int minY = NukkitMath.floorDouble(bb.getMinY());
+            int minZ = NukkitMath.floorDouble(bb.getMinZ());
+            int maxX = NukkitMath.ceilDouble(bb.getMaxX());
+            int maxY = NukkitMath.ceilDouble(bb.getMaxY());
+            int maxZ = NukkitMath.ceilDouble(bb.getMaxZ());
+
+            this.blocksAround = new ArrayList<>();
+
+            for (int z = minZ; z <= maxZ; ++z) {
+                for (int x = minX; x <= maxX; ++x) {
+                    for (int y = minY; y <= maxY; ++y) {
+                        if (server.suomiCraftPEMode()) {
+                            if (y < level.getMinBlockY() || y > level.getMaxBlockY()) {
+                                continue;
+                            }
+
+                            int cx = x >> 4;
+                            int cz = z >> 4;
+
+                            FullChunk chunk = this.chunk;
+                            if (chunk == null || cx != chunk.getX() || cz != chunk.getZ()) {
+                                chunk = level.getChunkIfLoaded(cx, cz);
+                            }
+
+                            if (chunk != null) {
+                                int fullState = chunk.getFullBlock(x & 0xF, y, z & 0xF, BlockLayer.NORMAL);
+                                if (fullState != 0) {
+                                    this.blocksAround.add(Block.get(fullState, this.level, x, y, z, BlockLayer.NORMAL));
+                                }
+                            }
+                        } else {
+                            this.blocksAround.add(this.level.getBlock(this.chunk, x, y, z, false));
+                        }
+                    }
+                }
+            }
+        }
+
+        return this.blocksAround;
     }
 
-    public boolean hasLineOfSight(Entity entity) {
-        return true;
+    @Override
+    public List<Block> getCollisionBlocks() {
+        if (this.collisionBlocks == null) {
+            this.collisionBlocks = new ArrayList<>();
+
+            AxisAlignedBB bb = this.boundingBox.clone();
+            bb.setMinY(this.boundingBox.getMinY() - 0.1);
+
+            List<Block> bl = this.getBlocksAround();
+            for (Block b : bl) {
+                if (b.collidesWithBB(bb, true)) {
+                    this.collisionBlocks.add(b);
+                }
+            }
+        }
+
+        return this.collisionBlocks;
     }
 
-    public void collidingWith(Entity ent) {
-        ent.applyEntityCollision(this);
+    @Override
+    protected float getDrag() {
+        return 0.02f;
+    }
+
+    public Item[] getDrops() {
+        return new Item[0];
+    }
+
+    @Override
+    protected float getGravity() {
+        return 0.08f;
+    }
+
+    public float getMovementSpeed() {
+        return this.movementSpeed;
+    }
+
+    public boolean isBlocking() {
+        return this.blocking;
+    }
+
+    public boolean isSpinAttack() {
+        return this.spinAttack;
     }
 
     @Override
@@ -196,105 +276,58 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
         return true;
     }
 
-    private void updateAttackTime(EntityDamageEvent source) {
-        if (this.attackTime < 1) { // Does not reset the immunity period
-            this.attackTime = source.getAttackCooldown();
-        }
-    }
-
-    protected void onBlock(Entity damager, EntityDamageBlockedEvent event, EntityDamageEvent source) {
-        if (event.getAnimation()) {
-            this.level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_ITEM_SHIELD_BLOCK);
-        }
-    }
-
-    public void knockBack(Entity attacker, double damage, double x, double z) {
-        this.knockBack(attacker, damage, x, z, 0.3);
-    }
-
-    public void knockBack(Entity attacker, double damage, double x, double z, double base) {
-        double f = Math.sqrt(x * x + z * z);
-        if (f <= 0) {
-            return;
-        }
-
-        if (this instanceof Player) {
-            int netheritePieces = 0;
-            for (Item armor : ((Player) this).getInventory().getArmorContents()) {
-                if (armor.getTier() == ItemArmor.TIER_NETHERITE) {
-                    netheritePieces++;
-                }
+    private void checkTameableEntityDeath() {
+        if (this instanceof EntityTameable) {
+            if (!((EntityTameable) this).hasOwner()) {
+                return;
             }
-            if (netheritePieces > 0) {
-                base *= 1 - 0.1 * netheritePieces;
+
+            if (!((EntityTameable) this).hasOwner()) {
+                return;
             }
-        }
 
-        f = 1 / f;
-
-        Vector3 motion = new Vector3(this.motionX, this.motionY, this.motionZ);
-
-        motion.x /= 2d;
-        motion.y /= 2d;
-        motion.z /= 2d;
-        motion.x += x * f * base;
-        motion.y += base;
-        motion.z += z * f * base;
-
-        if (motion.y > base) {
-            motion.y = base;
-        }
-
-        this.resetFallDistance();
-
-        this.setMotion(motion);
-
-        this.knockBackTime = 10;
-    }
-
-    @Override
-    public void kill() {
-        if (!this.isAlive()) {
-            return;
-        }
-        super.kill();
-        EntityDeathEvent ev = new EntityDeathEvent(this, this.getDrops());
-        this.server.getPluginManager().callEvent(ev);
-
-        // Monster Hunter Achievement
-        int id = ev.getEntity().getNetworkId();
-        if (id == EntityEnderman.NETWORK_ID || id == EntityZombiePigman.NETWORK_ID || id == EntitySpider.NETWORK_ID || id == EntityCaveSpider.NETWORK_ID) {
-            if (ev.getEntity().getLastDamageCause() instanceof EntityDamageByEntityEvent) {
-                Entity damager = ((EntityDamageByEntityEvent) ev.getEntity().getLastDamageCause()).getDamager();
-                if (damager instanceof Player) {
-                    ((Player) damager).awardAchievement("killEnemy");
-                }
+            // TODO: More detailed death messages
+            String killedEntity;
+            if (this instanceof EntityWolf) {
+                killedEntity = "%entity.wolf.name";
+            } else {
+                killedEntity = this.getName();
             }
-        }
 
-        if (this.level.getGameRules().getBoolean(GameRule.DO_MOB_LOOT) && this.lastDamageCause != null && DamageCause.VOID != this.lastDamageCause.getCause()) {
-            if (ev.getEntity() instanceof BaseEntity) {
-                BaseEntity baseEntity = (BaseEntity) ev.getEntity();
-                if (baseEntity.getLastDamageCause() instanceof EntityDamageByEntityEvent) {
-                    Entity damager = ((EntityDamageByEntityEvent) baseEntity.getLastDamageCause()).getDamager();
-                    if (damager instanceof Player) {
-                        this.getLevel().dropExpOrb(this, baseEntity.getKillExperience());
+            Player owner = ((EntityTameable) this).getOwner();
 
-                        if (!this.dropsOnNaturalDeath()) {
-                            for (cn.nukkit.item.Item item : ev.getDrops()) {
-                                this.getLevel().dropItem(this, item);
-                            }
-                        }
+            if (owner == null) {
+                return;
+            }
+
+            TranslationContainer deathMessage = new TranslationContainer("death.attack.generic", killedEntity);
+            if (this.getLastDamageCause() instanceof EntityDamageByEntityEvent) {
+                Entity damageEntity = ((EntityDamageByEntityEvent) this.getLastDamageCause()).getDamager();
+                if (damageEntity instanceof Player) {
+                    deathMessage = new TranslationContainer("death.attack.player", killedEntity, damageEntity.getName());
+                } else {
+                    if (damageEntity instanceof EntityWolf) {
+                        ((EntityWolf) damageEntity).setAngry(false);
                     }
+                    deathMessage = new TranslationContainer("death.attack.mob", killedEntity, damageEntity.getName());
                 }
             }
 
-            if (this.dropsOnNaturalDeath()) {
-                for (cn.nukkit.item.Item item : ev.getDrops()) {
-                    this.getLevel().dropItem(this, item);
-                }
-            }
+            TextPacket tameDeathMessage = new TextPacket();
+            tameDeathMessage.type = TextPacket.TYPE_TRANSLATION;
+            tameDeathMessage.message = deathMessage.getText();
+            tameDeathMessage.parameters = deathMessage.getParameters();
+            tameDeathMessage.isLocalized = true;
+            owner.dataPacket(tameDeathMessage);
         }
+    }
+
+    public void collidingWith(Entity ent) {
+        ent.applyEntityCollision(this);
+    }
+
+    public boolean dropsOnNaturalDeath() {
+        return true;
     }
 
     @Override
@@ -370,19 +403,6 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
                 }
             }
 
-            // Check collisions with blocks
-            if ((this instanceof Player || this instanceof BaseEntity) && this.riding == null && this.age % (this instanceof Player ? 2 : 10) == 0) {
-                int floorY = NukkitMath.floorDouble(this.y - 0.25);
-                if (floorY != getFloorY()) {
-                    Block block = this.level.getBlock(this.chunk, getFloorX(), floorY, getFloorZ(), false);
-                    if (block instanceof BlockCactus) {
-                        block.onEntityCollide(this);
-                    } else if (block instanceof BlockMagma) {
-                        block.onEntityCollide(this);
-                    }
-                }
-            }
-
             if (this.attackTime > 0) {
                 this.attackTime -= tickDiff;
                 if (this.attackTime < 1) {
@@ -408,10 +428,6 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
         return hasUpdate;
     }
 
-    public Item[] getDrops() {
-        return new Item[0];
-    }
-
     public Block[] getLineOfSight(int maxDistance) {
         return this.getLineOfSight(maxDistance, 0);
     }
@@ -420,7 +436,6 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
         return this.getLineOfSight(maxDistance, maxLength, new Integer[0]);
     }
 
-    @Deprecated
     public Block[] getLineOfSight(int maxDistance, int maxLength, Map<Integer, Object> transparent) {
         return this.getLineOfSight(maxDistance, maxLength, transparent.keySet().toArray(new Integer[0]));
     }
@@ -466,7 +481,6 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
         return getTargetBlock(maxDistance, new Integer[0]);
     }
 
-    @Deprecated
     public Block getTargetBlock(int maxDistance, Map<Integer, Object> transparent) {
         return getTargetBlock(maxDistance, transparent.keySet().toArray(new Integer[0]));
     }
@@ -484,50 +498,157 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
                     return block;
                 }
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
 
         return null;
     }
 
-    public void setMovementSpeed(float speed) {
-        this.movementSpeed = speed;
-    }
-
-    public float getMovementSpeed() {
-        return this.movementSpeed;
-    }
-    
-    public int getAirTicks() {
-        return this.airTicks;
-    }
-
-    public void setAirTicks(int ticks) {
-        this.airTicks = ticks;
-    }
-
-    public boolean isBlocking() {
-        return this.blocking;
-    }
-
-    public void setBlocking(boolean value) {
-        if (this.blocking != value) {
-            this.blocking = value;
-            this.setDataFlag(DATA_FLAGS_EXTENDED, DATA_FLAG_BLOCKING, value);
-        }
-    }
-
-    public boolean dropsOnNaturalDeath() {
+    public boolean hasLineOfSight(Entity entity) {
         return true;
     }
 
-    public boolean isSpinAttack() {
-        return this.spinAttack;
+    @Override
+    protected void initEntity() {
+        super.initEntity();
+
+        if (this.namedTag.contains("HealF")) {
+            this.namedTag.putFloat("Health", this.namedTag.getShort("HealF"));
+            this.namedTag.remove("HealF");
+        }
+
+        if (!this.namedTag.contains("Health") || !(this.namedTag.get("Health") instanceof FloatTag)) {
+            this.namedTag.putFloat("Health", this.getMaxHealth());
+        }
+
+        this.health = this.namedTag.getFloat("Health");
     }
 
-    public void setSpinAttack(boolean value) {
-        if (this.spinAttack != value) {
-            this.spinAttack = value;
-            this.setDataFlag(DATA_FLAGS, DATA_FLAG_SPIN_ATTACK, value);
+    @Override
+    public void kill() {
+        if (!this.isAlive()) {
+            return;
+        }
+        super.kill();
+        EntityDeathEvent ev = new EntityDeathEvent(this, this.getDrops());
+        this.server.getPluginManager().callEvent(ev);
+
+        this.checkTameableEntityDeath();
+
+        // Monster Hunter Achievement
+        int id = ev.getEntity().getNetworkId();
+        if (id == EntityEnderman.NETWORK_ID || id == EntityZombiePigman.NETWORK_ID || id == EntitySpider.NETWORK_ID || id == EntityCaveSpider.NETWORK_ID) {
+            if (ev.getEntity().getLastDamageCause() instanceof EntityDamageByEntityEvent) {
+                Entity damager = ((EntityDamageByEntityEvent) ev.getEntity().getLastDamageCause()).getDamager();
+                if (damager instanceof Player) {
+                    ((Player) damager).awardAchievement("killEnemy");
+                }
+            }
+        }
+
+        if (this.level.getGameRules().getBoolean(GameRule.DO_MOB_LOOT) && this.lastDamageCause != null && DamageCause.VOID != this.lastDamageCause.getCause()) {
+            if (ev.getEntity() instanceof BaseEntity) {
+                BaseEntity baseEntity = (BaseEntity) ev.getEntity();
+
+                // TODO: all this to event drops
+
+                if (baseEntity.getLastDamageCause() instanceof EntityDamageByEntityEvent) {
+                    Entity damager = ((EntityDamageByEntityEvent) baseEntity.getLastDamageCause()).getDamager();
+                    if (damager instanceof Player) {
+                        this.getLevel().dropExpOrb(this, baseEntity.getKillExperience());
+
+                        if (!this.dropsOnNaturalDeath()) {
+                            for (cn.nukkit.item.Item item : ev.getDrops()) {
+                                this.getLevel().dropItem(this, item);
+                            }
+                        }
+                    } else if (damager instanceof EntityCreeper && damager != this && this.lastDamageCause.getCause() == DamageCause.ENTITY_EXPLOSION) {
+                        if (((EntityCreeper) damager).isPowered()) {
+                            Item skull = ItemSkull.getMobHead(this.getNetworkId());
+                            if (skull != null) {
+                                this.getLevel().dropItem(this, skull); // Drop a mob head
+                            }
+                        }
+                    } else if (baseEntity instanceof EntityCreeper && damager instanceof EntitySkeleton && this.lastDamageCause.getCause() == DamageCause.PROJECTILE) {
+                        this.getLevel().dropItem(this, Item.get(Utils.rand(500, 511), 0, 1)); // Drop a random music disk (excluding otherside and pigstep)
+                    }
+                }
+
+                if (baseEntity.isLeashed()) {
+                    this.getLevel().dropItem(this, Item.get(ItemID.LEAD));
+                }
+            }
+
+            if (this.dropsOnNaturalDeath()) {
+                for (cn.nukkit.item.Item item : ev.getDrops()) {
+                    this.getLevel().dropItem(this, item);
+                }
+            }
+        }
+    }
+
+    public void knockBack(Entity attacker, double damage, double x, double z) {
+        this.knockBack(attacker, damage, x, z, 0.3);
+    }
+
+    public void knockBack(Entity attacker, double damage, double x, double z, double base) {
+        double f = Math.sqrt(x * x + z * z);
+        if (f <= 0) {
+            return;
+        }
+
+        if (this instanceof Player) {
+            int netheritePieces = 0;
+            for (Item armor : ((Player) this).getInventory().getArmorContents()) {
+                if (armor.getTier() == ItemArmor.TIER_NETHERITE) {
+                    netheritePieces++;
+                }
+            }
+            if (netheritePieces > 0) {
+                base *= 1 - 0.1 * netheritePieces;
+            }
+        }
+
+        f = 1 / f;
+
+        Vector3 motion = new Vector3(this.motionX, this.motionY, this.motionZ);
+
+        motion.x /= 2d;
+        motion.y /= 2d;
+        motion.z /= 2d;
+        motion.x += x * f * base;
+        motion.y += base;
+        motion.z += z * f * base;
+
+        if (motion.y > base) {
+            motion.y = base;
+        }
+
+        this.resetFallDistance();
+
+        this.setMotion(motion);
+
+        this.knockBackTime = 10;
+    }
+
+    protected void onBlock(Entity damager, EntityDamageBlockedEvent event, EntityDamageEvent source) {
+        if (event.getAnimation()) {
+            this.level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_ITEM_SHIELD_BLOCK);
+        }
+    }
+
+    // Hack: add collisions for block below so magma, slime, flowing water, etc. work
+
+    @Override
+    public void saveNBT() {
+        super.saveNBT();
+
+        this.namedTag.putFloat("Health", this.getHealth());
+    }
+
+    private void updateAttackTime(EntityDamageEvent source) {
+        if (this.attackTime < 1) { // Does not reset the immunity period
+            this.attackTime = source.getAttackCooldown();
         }
     }
 }

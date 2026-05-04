@@ -1,5 +1,7 @@
 package cn.nukkit.item;
 
+import cn.nukkit.network.protocol.ProtocolInfo;
+
 public class ItemRecordCreator extends ItemRecord {
 
     public ItemRecordCreator() {
@@ -15,12 +17,17 @@ public class ItemRecordCreator extends ItemRecord {
     }
 
     @Override
+    public String getDiscName() {
+        return "Lena Raine - Creator";
+    }
+
+    @Override
     public String getSoundId() {
         return "record.creator";
     }
 
     @Override
-    public String getDiscName() {
-        return "Lena Raine - Creator";
+    public boolean isSupportedOn(int protocol) {
+        return protocol >= ProtocolInfo.v1_21_0;
     }
 }

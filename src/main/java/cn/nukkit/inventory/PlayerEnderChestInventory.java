@@ -21,6 +21,38 @@ public class PlayerEnderChestInventory extends BaseInventory {
     }
 
     @Override
+    public void onClose(Player who) {
+        if (who.getClosingWindowId() != Integer.MAX_VALUE) {
+            ContainerClosePacket pk = new ContainerClosePacket();
+            int id = who.getWindowId(this);
+            pk.wasServerInitiated = id != who.getClosingWindowId();
+            pk.windowId = pk.wasServerInitiated ? id : who.getClosingWindowId();
+            who.dataPacket(pk);
+        }
+
+        super.onClose(who);
+
+        BlockEnderChest chest = who.getViewingEnderChest();
+        if (chest != null && chest.getViewers().size() == 1) {
+            BlockEventPacket blockEventPacket = new BlockEventPacket();
+            blockEventPacket.x = (int) chest.getX();
+            blockEventPacket.y = (int) chest.getY();
+            blockEventPacket.z = (int) chest.getZ();
+            blockEventPacket.case1 = 1;
+            blockEventPacket.case2 = 0;
+
+            if (chest.level != null && chest.level == who.level) {
+                chest.level.addLevelSoundEvent(chest.add(0.5, 0.5, 0.5), LevelSoundEventPacket.SOUND_ENDERCHEST_CLOSED);
+                chest.level.addChunkPacket((int) chest.getX() >> 4, (int) chest.getZ() >> 4, blockEventPacket);
+            }
+        }
+
+        who.setViewingEnderChest(null);
+
+        super.onClose(who);
+    }
+
+    @Override
     public void onOpen(Player who) {
         if (who != this.getHolder()) {
             return;
@@ -55,37 +87,5 @@ public class PlayerEnderChestInventory extends BaseInventory {
                 chest.level.addChunkPacket((int) chest.getX() >> 4, (int) chest.getZ() >> 4, blockEventPacket);
             }
         }
-    }
-
-    @Override
-    public void onClose(Player who) {
-        if (who.getClosingWindowId() != Integer.MAX_VALUE) {
-            ContainerClosePacket pk = new ContainerClosePacket();
-            int id = who.getWindowId(this);
-            pk.wasServerInitiated = id != who.getClosingWindowId();
-            pk.windowId = pk.wasServerInitiated ? id : who.getClosingWindowId();
-            who.dataPacket(pk);
-        }
-
-        super.onClose(who);
-
-        BlockEnderChest chest = who.getViewingEnderChest();
-        if (chest != null && chest.getViewers().size() == 1) {
-            BlockEventPacket blockEventPacket = new BlockEventPacket();
-            blockEventPacket.x = (int) chest.getX();
-            blockEventPacket.y = (int) chest.getY();
-            blockEventPacket.z = (int) chest.getZ();
-            blockEventPacket.case1 = 1;
-            blockEventPacket.case2 = 0;
-
-            if (chest.level != null && chest.level == who.level) {
-                chest.level.addLevelSoundEvent(chest.add(0.5, 0.5, 0.5), LevelSoundEventPacket.SOUND_ENDERCHEST_CLOSED);
-                chest.level.addChunkPacket((int) chest.getX() >> 4, (int) chest.getZ() >> 4, blockEventPacket);
-            }
-        }
-
-        who.setViewingEnderChest(null);
-
-        super.onClose(who);
     }
 }

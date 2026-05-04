@@ -22,12 +22,12 @@ public abstract class GrassyBiome extends CoveredBiome {
     }
 
     @Override
-    public int getSurfaceId(int x, int y, int z) {
-        return Block.GRASS << Block.DATA_BITS;
+    public int getGroundId(int x, int y, int z) {
+        return Block.DIRT << Block.DATA_BITS;
     }
 
     @Override
-    public int getGroundId(int x, int y, int z) {
-        return Block.DIRT << Block.DATA_BITS;
+    public int getSurfaceId(int x, int y, int z) {
+        return Block.GRASS << Block.DATA_BITS;
     }
 }

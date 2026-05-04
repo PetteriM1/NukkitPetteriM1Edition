@@ -11,11 +11,6 @@ import cn.nukkit.event.HandlerList;
 public class EntityInteractEvent extends EntityEvent implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
-
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private final Block block;
 
     public EntityInteractEvent(Entity entity, Block block) {
@@ -25,5 +20,9 @@ public class EntityInteractEvent extends EntityEvent implements Cancellable {
 
     public Block getBlock() {
         return block;
+    }
+
+    public static HandlerList getHandlers() {
+        return handlers;
     }
 }

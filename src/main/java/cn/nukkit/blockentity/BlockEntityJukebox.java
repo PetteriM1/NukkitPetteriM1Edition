@@ -22,76 +22,10 @@ public class BlockEntityJukebox extends BlockEntitySpawnable {
         super(chunk, nbt);
     }
 
-    @Override
-    protected void initBlockEntity() {
-        if (namedTag.contains("RecordItem")) {
-            this.recordItem = NBTIO.getItemHelper(namedTag.getCompound("RecordItem"));
-        } else {
-            this.recordItem = Item.get(0);
-        }
-
-        super.initBlockEntity();
-    }
-
-    @Override
-    public boolean isBlockEntityValid() {
-        return level.getBlockIdAt(chunk, (int) x, (int) y, (int) z) == Block.JUKEBOX;
-    }
-
     public void setRecordItem(Item recordItem) {
         Objects.requireNonNull(recordItem, "Record item cannot be null");
         this.recordItem = recordItem.clone();
         setDirty();
-    }
-
-    public Item getRecordItem() {
-        return recordItem;
-    }
-
-    public void play() {
-        if (this.recordItem instanceof ItemRecord) {
-            PlaySoundPacket pk = new PlaySoundPacket();
-            pk.name = ((ItemRecord) this.recordItem).getSoundId();
-            pk.volume = 1;
-            pk.pitch = 1;
-            pk.x = (int) this.x;
-            pk.y = (int) this.y;
-            pk.z = (int) this.z;
-            this.level.addChunkPacket(this.getChunkX(), this.getChunkZ(), pk);
-        }
-    }
-
-    public void stop() {
-        if (this.recordItem instanceof ItemRecord) {
-            StopSoundPacket pk = new StopSoundPacket();
-            pk.name = ((ItemRecord) this.recordItem).getSoundId();
-            this.level.addChunkPacket(this.getChunkX(), this.getChunkZ(), pk);
-        }
-    }
-
-    public void dropItem() {
-        if (this.recordItem.getId() != 0) {
-            stop();
-            this.level.dropItem(this.up(), this.recordItem);
-            this.recordItem = Item.get(0);
-            setDirty();
-        }
-    }
-
-    @Override
-    public void saveNBT() {
-        super.saveNBT();
-        this.namedTag.putCompound("RecordItem", NBTIO.putItemHelper(this.recordItem));
-    }
-
-    @Override
-    public CompoundTag getSpawnCompound() {
-        return getDefaultCompound(this, JUKEBOX);
-    }
-
-    @Override
-    public void onBreak() {
-        this.dropItem();
     }
 
     public int getComparatorSignal() {
@@ -131,5 +65,71 @@ public class BlockEntityJukebox extends BlockEntitySpawnable {
             }
         }
         return 0;
+    }
+
+    public Item getRecordItem() {
+        return recordItem;
+    }
+
+    @Override
+    public CompoundTag getSpawnCompound() {
+        return getDefaultCompound(this, JUKEBOX);
+    }
+
+    @Override
+    public boolean isBlockEntityValid() {
+        return level.getBlockIdAt(chunk, (int) x, (int) y, (int) z) == Block.JUKEBOX;
+    }
+
+    public void dropItem() {
+        if (this.recordItem.getId() != 0) {
+            stop();
+            this.level.dropItem(this.up(), this.recordItem);
+            this.recordItem = Item.get(0);
+            setDirty();
+        }
+    }
+
+    @Override
+    protected void initBlockEntity() {
+        if (namedTag.contains("RecordItem")) {
+            this.recordItem = NBTIO.getItemHelper(namedTag.getCompound("RecordItem"));
+        } else {
+            this.recordItem = Item.get(0);
+        }
+
+        super.initBlockEntity();
+    }
+
+    @Override
+    public void onBreak() {
+        this.dropItem();
+    }
+
+    public void play() {
+        if (this.recordItem instanceof ItemRecord) {
+            PlaySoundPacket pk = new PlaySoundPacket();
+            pk.name = ((ItemRecord) this.recordItem).getSoundId();
+            pk.volume = 1;
+            pk.pitch = 1;
+            pk.x = (int) this.x;
+            pk.y = (int) this.y;
+            pk.z = (int) this.z;
+            this.level.addChunkPacket(this.getChunkX(), this.getChunkZ(), pk);
+        }
+    }
+
+    @Override
+    public void saveNBT() {
+        super.saveNBT();
+        this.namedTag.putCompound("RecordItem", NBTIO.putItemHelper(this.recordItem));
+    }
+
+    public void stop() {
+        if (this.recordItem instanceof ItemRecord) {
+            StopSoundPacket pk = new StopSoundPacket();
+            pk.name = ((ItemRecord) this.recordItem).getSoundId();
+            this.level.addChunkPacket(this.getChunkX(), this.getChunkZ(), pk);
+        }
     }
 }

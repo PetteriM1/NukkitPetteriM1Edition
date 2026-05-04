@@ -9,11 +9,6 @@ import cn.nukkit.network.protocol.BookEditPacket;
 public class PlayerEditBookEvent extends PlayerEvent implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
-
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private final Item oldBook;
     private final BookEditPacket.Action action;
     private Item newBook;
@@ -25,19 +20,23 @@ public class PlayerEditBookEvent extends PlayerEvent implements Cancellable {
         this.action = action;
     }
 
+    public void setNewBook(Item book) {
+        this.newBook = book;
+    }
+
     public BookEditPacket.Action getAction() {
         return this.action;
     }
 
-    public Item getOldBook() {
-        return this.oldBook;
+    public static HandlerList getHandlers() {
+        return handlers;
     }
 
     public Item getNewBook() {
         return this.newBook;
     }
 
-    public void setNewBook(Item book) {
-        this.newBook = book;
+    public Item getOldBook() {
+        return this.oldBook;
     }
 }

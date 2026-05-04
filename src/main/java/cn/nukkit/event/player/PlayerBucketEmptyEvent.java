@@ -12,10 +12,6 @@ public class PlayerBucketEmptyEvent extends PlayerBucketEvent {
 
     private boolean mobSpawningAllowed;
 
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     public PlayerBucketEmptyEvent(Player who, Block blockClicked, BlockFace blockFace, Item bucket, Item itemInHand) {
         this(who, blockClicked, blockFace, bucket, itemInHand, true);
     }
@@ -29,19 +25,23 @@ public class PlayerBucketEmptyEvent extends PlayerBucketEvent {
      * Whether a fish can be spawned if a fish bucket is emptied.
      * Notice: Disabling 'block-listener' in server.properties disables fish spawning from buckets.
      *
-     * @return can spawn a fish
+     * @param mobSpawningAllowed can spawn a fish
      */
-    public boolean isMobSpawningAllowed() {
-        return this.mobSpawningAllowed;
+    public void setMobSpawningAllowed(boolean mobSpawningAllowed) {
+        this.mobSpawningAllowed = mobSpawningAllowed;
+    }
+
+    public static HandlerList getHandlers() {
+        return handlers;
     }
 
     /**
      * Whether a fish can be spawned if a fish bucket is emptied.
      * Notice: Disabling 'block-listener' in server.properties disables fish spawning from buckets.
      *
-     * @param mobSpawningAllowed can spawn a fish
+     * @return can spawn a fish
      */
-    public void setMobSpawningAllowed(boolean mobSpawningAllowed) {
-        this.mobSpawningAllowed = mobSpawningAllowed;
+    public boolean isMobSpawningAllowed() {
+        return this.mobSpawningAllowed;
     }
 }

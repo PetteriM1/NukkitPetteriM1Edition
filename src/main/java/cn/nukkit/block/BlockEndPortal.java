@@ -16,18 +16,8 @@ public class BlockEndPortal extends BlockFlowable {
     }
 
     @Override
-    public String getName() {
-        return "End Portal Block";
-    }
-
-    @Override
-    public int getId() {
-        return END_PORTAL;
-    }
-
-    @Override
-    public boolean isBreakable(Item item) {
-        return false;
+    public BlockColor getColor() {
+        return BlockColor.BLACK_BLOCK_COLOR;
     }
 
     @Override
@@ -36,8 +26,8 @@ public class BlockEndPortal extends BlockFlowable {
     }
 
     @Override
-    public double getResistance() {
-        return 18000000;
+    public int getId() {
+        return END_PORTAL;
     }
 
     @Override
@@ -46,13 +36,18 @@ public class BlockEndPortal extends BlockFlowable {
     }
 
     @Override
-    public boolean hasEntityCollision() {
-        return true;
+    public String getName() {
+        return "End Portal Block";
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.BLACK_BLOCK_COLOR;
+    public double getResistance() {
+        return 18000000;
+    }
+
+    @Override
+    public boolean canBeFlowedInto() {
+        return false;
     }
 
     @Override
@@ -66,7 +61,12 @@ public class BlockEndPortal extends BlockFlowable {
     }
 
     @Override
-    public boolean canBeFlowedInto() {
+    public boolean hasEntityCollision() {
+        return true;
+    }
+
+    @Override
+    public boolean isBreakable(Item item) {
         return false;
     }
 

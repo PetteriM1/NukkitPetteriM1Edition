@@ -10,11 +10,6 @@ public class SetCommandsEnabledPacket extends DataPacket {
     public boolean enabled;
 
     @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
-    @Override
     public void decode() {
         this.decodeUnsupported();
     }
@@ -23,5 +18,10 @@ public class SetCommandsEnabledPacket extends DataPacket {
     public void encode() {
         this.reset();
         this.putBoolean(this.enabled);
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

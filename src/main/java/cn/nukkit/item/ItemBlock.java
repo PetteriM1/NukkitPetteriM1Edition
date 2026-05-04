@@ -25,15 +25,16 @@ public class ItemBlock extends Item {
     }
 
     public ItemBlock(Block block, Integer meta, int count) {
-        super(block.getItemId(), meta, count, block.getName());
+        super(block.getItemId(), meta, count, null);
         this.block = block;
     }
 
     public ItemBlock(Block block, int meta, int count) {
-        super(block.getItemId(), meta, count, block.getName());
+        super(block.getItemId(), meta, count, null);
         this.block = block;
     }
 
+    @Override
     public void setDamage(Integer meta) {
         if (meta != null) {
             this.meta = meta & 0xffff;
@@ -49,12 +50,6 @@ public class ItemBlock extends Item {
     }
 
     @Override
-    public ItemBlock clone() {
-        ItemBlock block = (ItemBlock) super.clone();
-        block.block = this.block.clone();
-        return block;
-    }
-
     public Block getBlock() {
         return this.block.clone();
     }
@@ -76,6 +71,18 @@ public class ItemBlock extends Item {
     @Override
     final public String getName() {
         return this.hasCustomName() ? this.getCustomName() : this.block.getName();
+    }
+
+    @Override
+    public ItemBlock clone() {
+        ItemBlock block = (ItemBlock) super.clone();
+        block.block = this.block.clone();
+        return block;
+    }
+
+    @Override
+    public boolean isSupportedOn(int protocol) {
+        return this.id >= 0 || (protocol >= this.block.getMinimumVersion() && super.isSupportedOn(protocol));
     }
 
     @Override

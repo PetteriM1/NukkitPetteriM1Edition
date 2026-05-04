@@ -1,5 +1,7 @@
 package cn.nukkit.item;
 
+import cn.nukkit.network.protocol.ProtocolInfo;
+
 public class ItemMace extends ItemTool {
 
     public ItemMace() {
@@ -15,12 +17,17 @@ public class ItemMace extends ItemTool {
     }
 
     @Override
+    public int getAttackDamage() {
+        return 6;
+    }
+
+    @Override
     public int getMaxDurability() {
         return ItemTool.DURABILITY_MACE;
     }
 
     @Override
-    public int getAttackDamage() {
-        return 6;
+    public boolean isSupportedOn(int protocol) {
+        return protocol >= ProtocolInfo.v1_21_0;
     }
 }

@@ -1,7 +1,7 @@
 package cn.nukkit.block;
 
 public class BlockDoubleSlabCopperCutExposedWaxed extends BlockDoubleSlabCopperCutExposed {
-    
+
     public BlockDoubleSlabCopperCutExposedWaxed() {
         this(0);
     }
@@ -11,13 +11,13 @@ public class BlockDoubleSlabCopperCutExposedWaxed extends BlockDoubleSlabCopperC
     }
 
     @Override
-    public int getSingleSlabId() {
-        return WAXED_EXPOSED_CUT_COPPER_SLAB;
+    public int getId() {
+        return WAXED_EXPOSED_DOUBLE_CUT_COPPER_SLAB;
     }
 
     @Override
-    public int getId() {
-        return WAXED_EXPOSED_DOUBLE_CUT_COPPER_SLAB;
+    public int getSingleSlabId() {
+        return WAXED_EXPOSED_CUT_COPPER_SLAB;
     }
 
     @Override

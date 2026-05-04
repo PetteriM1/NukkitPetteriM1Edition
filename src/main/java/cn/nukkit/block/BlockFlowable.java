@@ -13,16 +13,6 @@ public abstract class BlockFlowable extends BlockTransparentMeta {
     }
 
     @Override
-    public boolean canBeFlowedInto() {
-        return true;
-    }
-
-    @Override
-    public boolean canPassThrough() {
-        return true;
-    }
-
-    @Override
     public double getHardness() {
         return 0;
     }
@@ -38,12 +28,22 @@ public abstract class BlockFlowable extends BlockTransparentMeta {
     }
 
     @Override
-    protected AxisAlignedBB recalculateBoundingBox() {
-        return null;
+    public boolean breakWhenPushed() {
+        return true;
     }
 
     @Override
-    public boolean breakWhenPushed() {
+    public boolean canBeFlowedInto() {
         return true;
+    }
+
+    @Override
+    public boolean canPassThrough() {
+        return true;
+    }
+
+    @Override
+    protected AxisAlignedBB recalculateBoundingBox() {
+        return null;
     }
 }

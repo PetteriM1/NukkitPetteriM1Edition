@@ -31,7 +31,6 @@ abstract public class ItemColorArmor extends ItemArmor {
      * @param dyeColor - Dye color data value
      * @return - Return colored item
      */
-    @Deprecated
     public ItemColorArmor setColor(int dyeColor) {
         BlockColor blockColor = DyeColor.getByDyeData(dyeColor).getColor();
         return setColor(blockColor.getRed(), blockColor.getGreen(), blockColor.getBlue());
@@ -59,6 +58,19 @@ abstract public class ItemColorArmor extends ItemArmor {
     }
 
     /**
+     * Get color of Leather Item
+     *
+     * @return - BlockColor, or null if item has no color
+     */
+    public BlockColor getColor() {
+        if (!this.hasCompoundTag()) return null;
+        CompoundTag tag = this.getNamedTag();
+        if (!tag.exist("customColor")) return null;
+        int rgb = tag.getInt("customColor");
+        return new BlockColor(rgb);
+    }
+
+    /**
      * Set leather armor color
      *
      * @param r - red
@@ -72,18 +84,5 @@ abstract public class ItemColorArmor extends ItemArmor {
         tag.putInt("customColor", rgb);
         this.setNamedTag(tag);
         return this;
-    }
-
-    /**
-     * Get color of Leather Item
-     *
-     * @return - BlockColor, or null if item has no color
-     */
-    public BlockColor getColor() {
-        if (!this.hasCompoundTag()) return null;
-        CompoundTag tag = this.getNamedTag();
-        if (!tag.exist("customColor")) return null;
-        int rgb = tag.getInt("customColor");
-        return new BlockColor(rgb);
     }
 }

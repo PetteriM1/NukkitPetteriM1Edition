@@ -12,7 +12,7 @@ import cn.nukkit.math.Vector3;
 
 /**
  * @author DaPorkchop_
- *
+ * <p>
  * Used for the dense foliage on the floor in the jungle M biome
  */
 public class JungleFloorPopulator extends Populator {
@@ -24,14 +24,29 @@ public class JungleFloorPopulator extends Populator {
         this(BlockSapling.JUNGLE);
     }
 
-    public JungleFloorPopulator(int type) {}
+    public JungleFloorPopulator(int type) {
+    }
+
+    public void setBaseAmount(int baseAmount) {
+        this.baseAmount = baseAmount;
+    }
 
     public void setRandomAmount(int randomAmount) {
         this.randomAmount = randomAmount;
     }
 
-    public void setBaseAmount(int baseAmount) {
-        this.baseAmount = baseAmount;
+    private int getHighestWorkableBlock(int x, int z) {
+        int y;
+        for (y = 255; y > 0; --y) {
+            int b = this.level.getBlockIdAt(x, y, z);
+            if (b == Block.DIRT || b == Block.GRASS) {
+                break;
+            } else if (b != Block.AIR && b != Block.SNOW_LAYER) {
+                return -1;
+            }
+        }
+
+        return ++y;
     }
 
     @Override
@@ -49,19 +64,5 @@ public class JungleFloorPopulator extends Populator {
             }
             new NewJungleTree(1, 0).generate(level, random, v.setComponents(x, y, z));
         }
-    }
-
-    private int getHighestWorkableBlock(int x, int z) {
-        int y;
-        for (y = 255; y > 0; --y) {
-            int b = this.level.getBlockIdAt(x, y, z);
-            if (b == Block.DIRT || b == Block.GRASS) {
-                break;
-            } else if (b != Block.AIR && b != Block.SNOW_LAYER) {
-                return -1;
-            }
-        }
-
-        return ++y;
     }
 }

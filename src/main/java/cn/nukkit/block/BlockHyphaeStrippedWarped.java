@@ -13,13 +13,8 @@ public class BlockHyphaeStrippedWarped extends BlockStemStripped {
     }
 
     @Override
-    public int getId() {
-        return STRIPPED_WARPED_HYPHAE;
-    }
-
-    @Override
-    public String getName() {
-        return "Warped Stripped Hyphae";
+    public BlockColor getColor() {
+        return BlockColor.WARPED_HYPHAE_BLOCK_COLOR;
     }
 
     @Override
@@ -28,7 +23,12 @@ public class BlockHyphaeStrippedWarped extends BlockStemStripped {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.WARPED_HYPHAE_BLOCK_COLOR;
+    public int getId() {
+        return STRIPPED_WARPED_HYPHAE;
+    }
+
+    @Override
+    public String getName() {
+        return "Warped Stripped Hyphae";
     }
 }

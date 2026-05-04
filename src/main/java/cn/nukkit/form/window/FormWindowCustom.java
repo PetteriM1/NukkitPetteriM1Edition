@@ -3,6 +3,7 @@ package cn.nukkit.form.window;
 import cn.nukkit.form.element.*;
 import cn.nukkit.form.response.FormResponseCustom;
 import cn.nukkit.form.response.FormResponseData;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import com.google.gson.reflect.TypeToken;
 
 import javax.annotation.Nullable;
@@ -13,7 +14,7 @@ import java.util.List;
 public class FormWindowCustom extends FormWindow {
 
     @SuppressWarnings("unused")
-    private final String type = "custom_form"; // This variable is used for JSON import operations. Do NOT delete :) -- @Snake1999
+    private final String type = "custom_form";
     private String title = "";
     private String submit = null;
     private ElementButtonImageData icon;
@@ -21,6 +22,8 @@ public class FormWindowCustom extends FormWindow {
     private List<Element> content;
 
     private FormResponseCustom response;
+
+    public transient int protocol = ProtocolInfo.CURRENT_PROTOCOL;
 
     public FormWindowCustom(String title) {
         this(title, new ArrayList<>());
@@ -40,33 +43,7 @@ public class FormWindowCustom extends FormWindow {
         this.icon = icon;
     }
 
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    @Nullable
-    public String getSubmitButtonText() {
-        return submit;
-    }
-
-    public void setSubmitButtonText(String submit) {
-        this.submit = submit;
-    }
-
-    public List<Element> getElements() {
-        return content;
-    }
-
-    public void addElement(Element element) {
-        content.add(element);
-    }
-
-    public ElementButtonImageData getIcon() {
-        return icon;
+    private static class ListTypeToken extends TypeToken<List<String>> {
     }
 
     public void setIcon(String icon) {
@@ -75,10 +52,6 @@ public class FormWindowCustom extends FormWindow {
 
     public void setIcon(ElementButtonImageData icon) {
         this.icon = icon;
-    }
-
-    public FormResponseCustom getResponse() {
-        return response;
     }
 
     public void setResponse(String data) {
@@ -99,9 +72,10 @@ public class FormWindowCustom extends FormWindow {
         HashMap<Integer, String> headerResponses = new HashMap<>();
         HashMap<Integer, String> dividerResponses = new HashMap<>();
 
+        int responseIndex = 0;
         for (int i = 0; i < content.size(); i++) {
             Element e = content.get(i);
-            String elementData = elementResponses.get(i);
+            String elementData = responseIndex >= elementResponses.size() ? "" : elementResponses.get(protocol >= ProtocolInfo.v1_21_70_24 && protocol < ProtocolInfo.v1_21_80 ? responseIndex : i);
             if (e instanceof ElementLabel) {
                 labelResponses.put(i, ((ElementLabel) e).getText());
                 responses.put(i, ((ElementLabel) e).getText());
@@ -110,22 +84,27 @@ public class FormWindowCustom extends FormWindow {
                 String answer = ((ElementDropdown) e).getOptions().get(index);
                 dropdownResponses.put(i, new FormResponseData(index, answer));
                 responses.put(i, answer);
+                responseIndex++;
             } else if (e instanceof ElementInput) {
                 inputResponses.put(i, elementData);
                 responses.put(i, elementData);
+                responseIndex++;
             } else if (e instanceof ElementSlider) {
                 Float answer = Float.parseFloat(elementData);
                 sliderResponses.put(i, answer);
                 responses.put(i, answer);
+                responseIndex++;
             } else if (e instanceof ElementStepSlider) {
                 int index = Integer.parseInt(elementData);
                 String answer = ((ElementStepSlider) e).getSteps().get(index);
                 stepSliderResponses.put(i, new FormResponseData(index, answer));
                 responses.put(i, answer);
+                responseIndex++;
             } else if (e instanceof ElementToggle) {
                 Boolean answer = Boolean.parseBoolean(elementData);
                 toggleResponses.put(i, answer);
                 responses.put(i, answer);
+                responseIndex++;
             } else if (e instanceof ElementHeader) {
                 headerResponses.put(i, ((ElementHeader) e).getText());
                 responses.put(i, ((ElementHeader) e).getText());
@@ -137,6 +116,39 @@ public class FormWindowCustom extends FormWindow {
 
         this.response = new FormResponseCustom(responses, dropdownResponses, inputResponses,
                 sliderResponses, stepSliderResponses, toggleResponses, labelResponses, headerResponses, dividerResponses);
+    }
+
+    public void setSubmitButtonText(String submit) {
+        this.submit = submit;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public List<Element> getElements() {
+        return content;
+    }
+
+    public ElementButtonImageData getIcon() {
+        return icon;
+    }
+
+    public FormResponseCustom getResponse() {
+        return response;
+    }
+
+    @Nullable
+    public String getSubmitButtonText() {
+        return submit;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void addElement(Element element) {
+        content.add(element);
     }
 
     /**
@@ -151,19 +163,16 @@ public class FormWindowCustom extends FormWindow {
                     if (e instanceof ElementDropdown) {
                         ((ElementDropdown) e).setDefaultOptionIndex(((ElementDropdown) e).getOptions().indexOf(response));
                     } else if (e instanceof ElementInput) {
-                        ((ElementInput) e).setDefaultText((String)response);
+                        ((ElementInput) e).setDefaultText((String) response);
                     } else if (e instanceof ElementSlider) {
-                        ((ElementSlider) e).setDefaultValue((Float)response);
+                        ((ElementSlider) e).setDefaultValue((Float) response);
                     } else if (e instanceof ElementStepSlider) {
                         ((ElementStepSlider) e).setDefaultOptionIndex(((ElementStepSlider) e).getSteps().indexOf(response));
                     } else if (e instanceof ElementToggle) {
-                        ((ElementToggle) e).setDefaultValue((Boolean)response);
+                        ((ElementToggle) e).setDefaultValue((Boolean) response);
                     }
                 }
             });
         }
-    }
-
-    private static class ListTypeToken extends TypeToken<List<String>> {
     }
 }

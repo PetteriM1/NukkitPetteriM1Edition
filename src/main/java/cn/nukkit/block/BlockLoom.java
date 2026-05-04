@@ -18,24 +18,11 @@ public class BlockLoom extends BlockSolidMeta {
         super(meta);
     }
 
-    @Override
-    public String getName() {
-        return "Loom";
-    }
+    private static final short[] faces = {2, 3, 0, 1};
 
     @Override
-    public int getId() {
-        return LOOM;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_AXE;
-    }
-
-    @Override
-    public double getResistance() {
-        return 12.5;
+    public BlockColor getColor() {
+        return BlockColor.WOOD_BLOCK_COLOR;
     }
 
     @Override
@@ -44,8 +31,23 @@ public class BlockLoom extends BlockSolidMeta {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.WOOD_BLOCK_COLOR;
+    public int getId() {
+        return LOOM;
+    }
+
+    @Override
+    public String getName() {
+        return "Loom";
+    }
+
+    @Override
+    public double getResistance() {
+        return 12.5;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_AXE;
     }
 
     @Override
@@ -62,15 +64,13 @@ public class BlockLoom extends BlockSolidMeta {
     }
 
     @Override
-    public Item toItem() {
-        return new ItemBlock(Block.get(this.getId(), 0), 0);
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        this.setDamage(faces[player != null ? player.getDirection().getHorizontalIndex() : 0]);
+        return this.getLevel().setBlock(this, this, true, true);
     }
 
-    private static final short[] FACES = {2, 3, 0, 1};
-
     @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        this.setDamage(FACES[player != null ? player.getDirection().getHorizontalIndex() : 0]);
-        return this.getLevel().setBlock(this, this, true, true);
+    public Item toItem() {
+        return new ItemBlock(Block.get(this.getId(), 0), 0);
     }
 }

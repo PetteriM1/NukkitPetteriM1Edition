@@ -1,7 +1,9 @@
 package cn.nukkit.block;
 
 import cn.nukkit.block.properties.OxidizationLevel;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.material.BlockType;
 
 
 public class BlockCopperGrate extends BlockCopperBase {
@@ -11,18 +13,8 @@ public class BlockCopperGrate extends BlockCopperBase {
     }
 
     @Override
-    public boolean isTransparent() {
-        return true;
-    }
-
-    @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.WHEN_PLACED_IN_WATER;
-    }
-
-    @Override
-    public String getName() {
-        return "Copper Grate";
+    public BlockColor getColor() {
+        return BlockColor.ORANGE_BLOCK_COLOR;
     }
 
     @Override
@@ -31,13 +23,36 @@ public class BlockCopperGrate extends BlockCopperBase {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.ORANGE_BLOCK_COLOR;
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_21_0;
+    }
+
+    @Override
+    public String getName() {
+        return "Copper Grate";
     }
 
     @Override
     public OxidizationLevel getOxidizationLevel() {
         return OxidizationLevel.UNAFFECTED;
+    }
+
+    @Override
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.WHEN_PLACED_IN_WATER;
+    }
+
+    @Override
+    public boolean isTransparent() {
+        return true;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        if (protocol >= ProtocolInfo.v1_17_0) {
+            return BlockTypes.COPPER_BLOCK;
+        }
+        return BlockTypes.IRON_BLOCK;
     }
 
     @Override

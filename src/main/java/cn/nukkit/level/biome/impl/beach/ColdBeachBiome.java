@@ -11,11 +11,6 @@ public class ColdBeachBiome extends SandyBiome {
     }
 
     @Override
-    public int getCoverId(int x, int z) {
-        return Block.SNOW_LAYER << Block.DATA_BITS;
-    }
-
-    @Override
     public String getName() {
         return "Cold Beach";
     }
@@ -28,5 +23,10 @@ public class ColdBeachBiome extends SandyBiome {
     @Override
     public boolean canRain() {
         return false;
+    }
+
+    @Override
+    public int getCoverId(int x, int z) {
+        return Block.SNOW_LAYER << Block.DATA_BITS;
     }
 }
