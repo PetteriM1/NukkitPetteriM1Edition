@@ -28,6 +28,47 @@ public class BlockDropper extends BlockSolidMeta implements Faceable {
         super(meta);
     }
 
+    public void setTriggered(boolean value) {
+        int i = 0;
+        i |= getBlockFace().getIndex();
+
+        if (value) {
+            i |= 8;
+        }
+
+        this.setDamage(i);
+    }
+
+    @Override
+    public BlockFace getBlockFace() {
+        return BlockFace.fromIndex(this.getDamage() & 0x7);
+    }
+
+    @Override
+    public int getComparatorInputOverride() {
+        BlockEntity blockEntity = this.level.getBlockEntity(this);
+
+        if (blockEntity instanceof BlockEntityDropper) {
+            return ContainerInventory.calculateRedstone(((BlockEntityDropper) blockEntity).getInventory());
+        }
+
+        return 0;
+    }
+
+    public Vector3 getDispensePosition() {
+        BlockFace facing = getBlockFace();
+        return this.add(
+                0.5 + 0.7 * facing.getXOffset(),
+                0.5 + 0.7 * facing.getYOffset(),
+                0.5 + 0.7 * facing.getZOffset()
+        );
+    }
+
+    @Override
+    public double getHardness() {
+        return 3.5;
+    }
+
     @Override
     public int getId() {
         return DROPPER;
@@ -39,11 +80,6 @@ public class BlockDropper extends BlockSolidMeta implements Faceable {
     }
 
     @Override
-    public double getHardness() {
-        return 3.5;
-    }
-
-    @Override
     public double getResistance() {
         return 17.5;
     }
@@ -52,75 +88,19 @@ public class BlockDropper extends BlockSolidMeta implements Faceable {
     public int getToolType() {
         return ItemTool.TYPE_PICKAXE;
     }
-    
+
+    public boolean isTriggered() {
+        return (this.getDamage() & 8) > 0;
+    }
+
     @Override
     public boolean canBeActivated() {
         return true;
     }
 
     @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        if (player != null) {
-            if (Math.abs(player.x - this.x) < 2 && Math.abs(player.z - this.z) < 2) {
-                double y = player.y + player.getEyeHeight();
-
-                if (y - this.y > 2) {
-                    this.setDamage(BlockFace.UP.getIndex());
-                } else if (this.y - y > 0) {
-                    this.setDamage(BlockFace.DOWN.getIndex());
-                } else {
-                    this.setDamage(player.getHorizontalFacing().getOpposite().getIndex());
-                }
-            } else {
-                this.setDamage(player.getHorizontalFacing().getOpposite().getIndex());
-            }
-        }
-
-        this.getLevel().setBlock(block, this, true);
-
-        BlockEntity.createBlockEntity(BlockEntity.DROPPER, this.getChunk(), BlockEntity.getDefaultCompound(this, BlockEntity.DROPPER));
-        return true;
-    }
-
-    @Override
-    public boolean onActivate(Item item, Player player) {
-        if (player == null) {
-            return false;
-        }
-
-        BlockEntity blockEntity = this.level.getBlockEntity(this);
-
-        if (!(blockEntity instanceof BlockEntityDropper)) {
-            return false;
-        }
-
-        if (blockEntity.namedTag.contains("Lock") && blockEntity.namedTag.get("Lock") instanceof StringTag) {
-            if (!blockEntity.namedTag.getString("Lock").equals(item.getCustomName())) {
-                return true;
-            }
-        }
-
-        player.addWindow(((BlockEntityDropper) blockEntity).getInventory());
-        return true;
-    }
-
-    @Override
-    public BlockFace getBlockFace() {
-        return BlockFace.fromIndex(this.getDamage() & 0x7);
-    }
-
-    @Override
-    public Item toItem() {
-        return new ItemBlock(Block.get(Block.DROPPER));
-    }
-
-    public Vector3 getDispensePosition() {
-        BlockFace facing = getBlockFace();
-        return this.add(
-                0.5 + 0.7 * facing.getXOffset(),
-                0.5 + 0.7 * facing.getYOffset(),
-                0.5 + 0.7 * facing.getZOffset()
-        );
+    public boolean canBePushed() {
+        return false; // prevent item loss issue with pistons until a working implementation
     }
 
     public void dispense() {
@@ -190,29 +170,25 @@ public class BlockDropper extends BlockSolidMeta implements Faceable {
     }
 
     @Override
-    public int getComparatorInputOverride() {
+    public boolean onActivate(Item item, Player player) {
+        if (player == null) {
+            return false;
+        }
+
         BlockEntity blockEntity = this.level.getBlockEntity(this);
 
-        if (blockEntity instanceof BlockEntityDropper) {
-            return ContainerInventory.calculateRedstone(((BlockEntityDropper) blockEntity).getInventory());
+        if (!(blockEntity instanceof BlockEntityDropper)) {
+            return false;
         }
 
-        return 0;
-    }
-
-    public boolean isTriggered() {
-        return (this.getDamage() & 8) > 0;
-    }
-
-    public void setTriggered(boolean value) {
-        int i = 0;
-        i |= getBlockFace().getIndex();
-
-        if (value) {
-            i |= 8;
+        if (blockEntity.namedTag.contains("Lock") && blockEntity.namedTag.get("Lock") instanceof StringTag) {
+            if (!blockEntity.namedTag.getString("Lock").equals(item.getCustomName())) {
+                return true;
+            }
         }
 
-        this.setDamage(i);
+        player.addWindow(((BlockEntityDropper) blockEntity).getInventory());
+        return true;
     }
 
     @Override
@@ -236,7 +212,31 @@ public class BlockDropper extends BlockSolidMeta implements Faceable {
     }
 
     @Override
-    public boolean canBePushed() {
-        return false; // prevent item loss issue with pistons until a working implementation
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        if (player != null) {
+            if (Math.abs(player.x - this.x) < 2 && Math.abs(player.z - this.z) < 2) {
+                double y = player.y + player.getEyeHeight();
+
+                if (y - this.y > 2) {
+                    this.setDamage(BlockFace.UP.getIndex());
+                } else if (this.y - y > 0) {
+                    this.setDamage(BlockFace.DOWN.getIndex());
+                } else {
+                    this.setDamage(player.getHorizontalFacing().getOpposite().getIndex());
+                }
+            } else {
+                this.setDamage(player.getHorizontalFacing().getOpposite().getIndex());
+            }
+        }
+
+        this.getLevel().setBlock(block, this, true);
+
+        BlockEntity.createBlockEntity(BlockEntity.DROPPER, this.getChunk(), BlockEntity.getDefaultCompound(this, BlockEntity.DROPPER));
+        return true;
+    }
+
+    @Override
+    public Item toItem() {
+        return new ItemBlock(Block.get(Block.DROPPER));
     }
 }

@@ -31,32 +31,31 @@ public class Nether extends Generator {
 
     private ChunkManager level;
     private NukkitRandom nukkitRandom;
+    private ScaleOctavesOffsetFilter selector;
+    private ScaleOctavesOffsetFilter low;
+    private ScaleOctavesOffsetFilter high;
     private static final int lavaHeight = 32; // should be 31
+    private long localSeed1;
+    private long localSeed2;
+    private SimplexF biomeNoise;
     private final SimplexF[] noiseGen = new SimplexF[3];
     private final List<Populator> populators = new ArrayList<>();
     private final List<Populator> generationPopulators = new ArrayList<>();
 
-    private long localSeed1;
-    private long localSeed2;
-    private SimplexF biomeNoise;
-
     private static final int STEP_X = 4;
     private static final int STEP_Y = 8;
     private static final int STEP_Z = STEP_X;
-    private static final int SAMPLES_X = 16 / STEP_X;
-    private static final int SAMPLES_Y = 256 / STEP_Y;
     private static final int SAMPLES_Z = 16 / STEP_Z;
-    private static final int CACHE_X = SAMPLES_X + 1;
-    private static final int CACHE_Y = SAMPLES_Y + 1;
     private static final int CACHE_Z = SAMPLES_Z + 1;
+    private static final double SCALE_Z = 1.0d / STEP_Z;
+    private static final int SAMPLES_X = 16 / STEP_X;
+    private static final int CACHE_X = SAMPLES_X + 1;
+    private static final int SAMPLES_Y = 256 / STEP_Y;
+    private static final int CACHE_Y = SAMPLES_Y + 1;
     private static final double SCALE_X = 1.0d / STEP_X;
     private static final double SCALE_Y = 1.0d / STEP_Y;
-    private static final double SCALE_Z = 1.0d / STEP_Z;
     private static final double NOISE_SCALE_FACTOR = ((1 << 16) - 1.0d) / 512.0d;
     private static final Ref<ThreadData> THREAD_DATA_CACHE = ThreadRef.soft(ThreadData::new);
-    private ScaleOctavesOffsetFilter selector;
-    private ScaleOctavesOffsetFilter low;
-    private ScaleOctavesOffsetFilter high;
 
     public Nether() {
         this(Collections.emptyMap());
@@ -67,14 +66,23 @@ public class Nether extends Generator {
         this.version = (int) options.getOrDefault("__Version", 0);
     }
 
+    private static final class ThreadData {
+        private double[] densityCache;
+    }
+
     @Override
-    public int getId() {
-        return Generator.TYPE_NETHER;
+    public ChunkManager getChunkManager() {
+        return level;
     }
 
     @Override
     public int getDimension() {
         return Level.DIMENSION_NETHER;
+    }
+
+    @Override
+    public int getId() {
+        return Generator.TYPE_NETHER;
     }
 
     @Override
@@ -87,68 +95,49 @@ public class Nether extends Generator {
         return Collections.emptyMap();
     }
 
-    @Override
-    public ChunkManager getChunkManager() {
-        return level;
+    public Vector3 getSpawn() {
+        return new Vector3(0.5, 64, 0.5);
     }
 
-    @Override
-    public void init(ChunkManager level, NukkitRandom random) {
-        this.level = level;
-        this.nukkitRandom = random;
-        this.nukkitRandom.setSeed(this.level.getSeed());
+    private double densityGet(int x, int y, int z) {
+        if (y >= 128) {
+            return 0.0d;
+        }
 
-        SplittableRandom random1 = new SplittableRandom(this.level.getSeed());
-        this.localSeed1 = random1.nextLong();
-        this.localSeed2 = random1.nextLong();
+        double selector = NukkitMath.clamp(this.selector.get(x, y, (double) z), 0.0d, 1.0d);
+        double low = this.low.get(x, y, (double) z) * NOISE_SCALE_FACTOR;
+        double high = this.high.get(x, y, (double) z) * NOISE_SCALE_FACTOR;
 
-        if (this.legacy || this.version < 2) {
-            for (int i = 0; i < noiseGen.length; i++) {
-                noiseGen[i] = new SimplexF(this.nukkitRandom, 4, 1 / 4f, 1 / 64f);
+        double outputNoise = NukkitMath.lerp(low, high, selector);
+
+        double threshold = y * 0.125d;
+        double offset = Math.cos(threshold * Math.PI * 6.0d / 17.0d) * 2.0d;
+
+        if (threshold > 8.0d) {
+            threshold = 16.0d - threshold;
+        }
+        if (threshold < 4.0d) {
+            threshold = 4.0d - threshold;
+            offset -= threshold * threshold * threshold * 10.0d;
+        }
+
+        return outputNoise - offset;
+    }
+
+    private double[] densityGet(double[] arr, int x, int z) {
+        int totalSize = CACHE_X * CACHE_Y * CACHE_Z;
+        if (arr == null || arr.length < totalSize) {
+            arr = new double[totalSize];
+        }
+
+        for (int i = 0, dx = 0; dx < CACHE_X; dx++) {
+            for (int dz = 0; dz < CACHE_Z; dz++) {
+                for (int dy = 0; dy < CACHE_Y; dy++) {
+                    arr[i++] = densityGet(x + dx * STEP_X, dy * STEP_Y, z + dz * STEP_Z);
+                }
             }
-        } else {
-            this.selector = new ScaleOctavesOffsetFilter(new PerlinNoiseEngine(PRandom.wrap(new Random(this.level.getSeed()))), 0.01670927734375, 0.0334185546875, 0.01670927734375, 8, 12.75, 0.5);
-            this.low = new ScaleOctavesOffsetFilter(new PerlinNoiseEngine(PRandom.wrap(new Random(this.level.getSeed()))), 0.005221649169921875, 0.0078324737548828125, 0.005221649169921875, 16, 1.0, 0);
-            this.high = new ScaleOctavesOffsetFilter(new PerlinNoiseEngine(PRandom.wrap(new Random(this.level.getSeed()))), 0.005221649169921875, 0.0078324737548828125, 0.005221649169921875, 16, 1.0, 0);
         }
-
-        this.nukkitRandom.setSeed(this.level.getSeed());
-
-        this.biomeNoise = new SimplexF(this.nukkitRandom, 2F, 1F / 8F, 1F / 2048f);
-
-        PopulatorBedrock bedrock = new PopulatorBedrock(true);
-        this.generationPopulators.add(bedrock);
-
-        PopulatorOre ores;
-        if (this.legacy) {
-            ores = new PopulatorOre(NETHERRACK, new OreType[]{
-                    new OreType(Block.get(BlockID.QUARTZ_ORE), 16, 24, 10, 117, NETHERRACK),
-                    new OreType(Block.get(BlockID.SOUL_SAND), 12, 23, 0, /*31*/ 105, NETHERRACK),
-                    new OreType(Block.get(BlockID.GRAVEL), 2, 64, 5, /*41*/ 105, NETHERRACK),
-                    new OreType(Block.get(BlockID.MAGMA), 4, 64, 26, /*37*/ lavaHeight + 1, NETHERRACK),
-                    new OreType(Block.get(BlockID.LAVA), 1, 16, 0, lavaHeight, NETHERRACK),
-            });
-        } else {
-            ores = new PopulatorOre(NETHERRACK, new OreType[]{
-                    new OreType(Block.get(BlockID.QUARTZ_ORE), 16, 24, 10, 117, NETHERRACK),
-                    new OreType(Block.get(BlockID.SOUL_SAND), 12, 23, 0, /*31*/ 105, NETHERRACK),
-                    new OreType(Block.get(BlockID.GRAVEL), 2, 64, 5, /*41*/ 105, NETHERRACK),
-                    new OreType(Block.get(BlockID.MAGMA), 4, 64, 26, /*37*/ lavaHeight + 1, NETHERRACK),
-                    new OreType(Block.get(BlockID.LAVA), 1, 16, 0, lavaHeight, NETHERRACK),
-                    new OreType(Block.get(BlockID.NETHER_GOLD_ORE), 10, 16, 10, 117, NETHERRACK),
-                    new OreType(Block.get(BlockID.ANCIENT_DEBRIS), 2, 3, 8, 23, NETHERRACK),
-                    new OreType(Block.get(BlockID.ANCIENT_DEBRIS), 3, 2, 8, 119, NETHERRACK),
-            });
-        }
-        this.populators.add(ores);
-
-        this.populators.add(new PopulatorNetherFire(FIRE, NETHERRACK));
-
-        PopulatorLava lava = new PopulatorLava();
-        lava.setRandomAmount(2);
-        this.populators.add(lava);
-
-        this.populators.add(new PopulatorGlowStone());
+        return arr;
     }
 
     @Override
@@ -178,7 +167,7 @@ public class Nether extends Generator {
                     }
                 }
             }
-        } else { // use generator from Cloudburst
+        } else {
             CoveredBiome[][] biomes = new CoveredBiome[16][16];
 
             for (int x = 0; x < 16; ++x) {
@@ -190,7 +179,7 @@ public class Nether extends Generator {
             }
 
             final ThreadData threadData = THREAD_DATA_CACHE.get();
-            final double[] densityCache = threadData.densityCache = densityGet(threadData.densityCache, baseX, 0, baseZ);
+            final double[] densityCache = threadData.densityCache = densityGet(threadData.densityCache, baseX, baseZ);
 
             for (int i = 0, sectionX = 0; sectionX < SAMPLES_X; sectionX++) {
                 for (int sectionZ = 0; sectionZ < SAMPLES_Z; sectionZ++) {
@@ -284,45 +273,71 @@ public class Nether extends Generator {
         }
     }
 
-    private double densityGet(int x, int y, int z) {
-        if (y >= 128) {
-            return 0.0d;
+    public float getNoise(int x, int y, int z) {
+        float val = 0f;
+        for (int i = 0; i < noiseGen.length; i++) {
+            val += noiseGen[i].noise3D(x >> i, y, z >> i, true);
         }
-
-        double selector = NukkitMath.clamp(this.selector.get(x, y, (double) z), 0.0d, 1.0d);
-        double low = this.low.get(x, y, (double) z) * NOISE_SCALE_FACTOR;
-        double high = this.high.get(x, y, (double) z) * NOISE_SCALE_FACTOR;
-
-        double outputNoise = NukkitMath.lerp(low, high, selector);
-
-        double threshold = y * 0.125d;
-        double offset = Math.cos(threshold * Math.PI * 6.0d / 17.0d) * 2.0d;
-
-        if (threshold > 8.0d) {
-            threshold = 16.0d - threshold;
-        }
-        if (threshold < 4.0d) {
-            threshold = 4.0d - threshold;
-            offset -= threshold * threshold * threshold * 10.0d;
-        }
-
-        return outputNoise - offset;
+        return val;
     }
 
-    private double[] densityGet(double[] arr, int x, int y, int z) {
-        int totalSize = CACHE_X * CACHE_Y * CACHE_Z;
-        if (arr == null || arr.length < totalSize) {
-            arr = new double[totalSize];
+    @Override
+    public void init(ChunkManager level, NukkitRandom random) {
+        this.level = level;
+        this.nukkitRandom = random;
+        this.nukkitRandom.setSeed(this.level.getSeed());
+
+        SplittableRandom random1 = new SplittableRandom(this.level.getSeed());
+        this.localSeed1 = random1.nextLong();
+        this.localSeed2 = random1.nextLong();
+
+        if (this.legacy || this.version < 2) {
+            for (int i = 0; i < noiseGen.length; i++) {
+                noiseGen[i] = new SimplexF(this.nukkitRandom, 4, 1 / 4f, 1 / 64f);
+            }
+        } else {
+            this.selector = new ScaleOctavesOffsetFilter(new PerlinNoiseEngine(PRandom.wrap(new Random(this.level.getSeed()))), 0.01670927734375, 0.0334185546875, 0.01670927734375, 8, 12.75, 0.5);
+            this.low = new ScaleOctavesOffsetFilter(new PerlinNoiseEngine(PRandom.wrap(new Random(this.level.getSeed()))), 0.005221649169921875, 0.0078324737548828125, 0.005221649169921875, 16, 1.0, 0);
+            this.high = new ScaleOctavesOffsetFilter(new PerlinNoiseEngine(PRandom.wrap(new Random(this.level.getSeed()))), 0.005221649169921875, 0.0078324737548828125, 0.005221649169921875, 16, 1.0, 0);
         }
 
-        for (int i = 0, dx = 0; dx < CACHE_X; dx++) {
-            for (int dz = 0; dz < CACHE_Z; dz++) {
-                for (int dy = 0; dy < CACHE_Y; dy++) {
-                    arr[i++] = densityGet(x + dx * STEP_X, dy * STEP_Y, z + dz * STEP_Z);
-                }
-            }
+        this.nukkitRandom.setSeed(this.level.getSeed());
+
+        this.biomeNoise = new SimplexF(this.nukkitRandom, 2F, 1F / 8F, 1F / 2048f);
+
+        PopulatorBedrock bedrock = new PopulatorBedrock(true);
+        this.generationPopulators.add(bedrock);
+
+        PopulatorOre ores;
+        if (this.legacy) {
+            ores = new PopulatorOre(NETHERRACK, new OreType[]{
+                    new OreType(Block.get(BlockID.QUARTZ_ORE), 16, 24, 10, 117, NETHERRACK),
+                    new OreType(Block.get(BlockID.SOUL_SAND), 12, 23, 0, /*31*/ 105, NETHERRACK),
+                    new OreType(Block.get(BlockID.GRAVEL), 2, 64, 5, /*41*/ 105, NETHERRACK),
+                    new OreType(Block.get(BlockID.MAGMA), 4, 64, 26, /*37*/ lavaHeight + 1, NETHERRACK),
+                    new OreType(Block.get(BlockID.LAVA), 1, 16, 0, lavaHeight, NETHERRACK),
+            });
+        } else {
+            ores = new PopulatorOre(NETHERRACK, new OreType[]{
+                    new OreType(Block.get(BlockID.QUARTZ_ORE), 16, 24, 10, 117, NETHERRACK),
+                    new OreType(Block.get(BlockID.SOUL_SAND), 12, 23, 0, /*31*/ 105, NETHERRACK),
+                    new OreType(Block.get(BlockID.GRAVEL), 2, 64, 5, /*41*/ 105, NETHERRACK),
+                    new OreType(Block.get(BlockID.MAGMA), 4, 64, 26, /*37*/ lavaHeight + 1, NETHERRACK),
+                    new OreType(Block.get(BlockID.LAVA), 1, 16, 0, lavaHeight, NETHERRACK),
+                    new OreType(Block.get(BlockID.NETHER_GOLD_ORE), 10, 16, 10, 117, NETHERRACK),
+                    new OreType(Block.get(BlockID.ANCIENT_DEBRIS), 2, 3, 8, 23, NETHERRACK),
+                    new OreType(Block.get(BlockID.ANCIENT_DEBRIS), 3, 2, 8, 119, NETHERRACK),
+            });
         }
-        return arr;
+        this.populators.add(ores);
+
+        this.populators.add(new PopulatorNetherFire(FIRE, NETHERRACK));
+
+        PopulatorLava lava = new PopulatorLava();
+        lava.setRandomAmount(2);
+        this.populators.add(lava);
+
+        this.populators.add(new PopulatorGlowStone());
     }
 
     private Biome pickBiome(int x, int z) {
@@ -354,21 +369,5 @@ public class Nether extends Generator {
             Biome biome = Biome.getBiome(chunk.getBiomeId(7, 7));
             biome.populateChunk(this.level, chunkX, chunkZ, this.nukkitRandom);
         }
-    }
-
-    public Vector3 getSpawn() {
-        return new Vector3(0.5, 64, 0.5);
-    }
-
-    public float getNoise(int x, int y, int z)  {
-        float val = 0f;
-        for (int i = 0; i < noiseGen.length; i++)   {
-            val += noiseGen[i].noise3D(x >> i, y, z >> i, true);
-        }
-        return val;
-    }
-
-    private static final class ThreadData {
-        private double[] densityCache;
     }
 }

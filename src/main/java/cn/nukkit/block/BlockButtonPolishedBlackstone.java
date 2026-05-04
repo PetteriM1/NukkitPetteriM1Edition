@@ -11,12 +11,12 @@ public class BlockButtonPolishedBlackstone extends BlockButtonStone {
     }
 
     @Override
-    public String getName() {
-        return "Polished Blackstone Button";
+    public int getId() {
+        return POLISHED_BLACKSTONE_BUTTON;
     }
 
     @Override
-    public int getId() {
-        return POLISHED_BLACKSTONE_BUTTON;
+    public String getName() {
+        return "Polished Blackstone Button";
     }
 }

@@ -14,18 +14,13 @@ public class BlockJungleWallSign extends BlockWallSign {
     }
 
     @Override
-    public String getName() {
-        return "Jungle Wall Sign";
-    }
-
-    @Override
     public int getId() {
         return JUNGLE_WALL_SIGN;
     }
 
     @Override
-    public Item toItem() {
-        return Item.get(ItemID.JUNGLE_SIGN);
+    public String getName() {
+        return "Jungle Wall Sign";
     }
 
     @Override
@@ -36,5 +31,10 @@ public class BlockJungleWallSign extends BlockWallSign {
     @Override
     protected int getWallId() {
         return JUNGLE_WALL_SIGN;
+    }
+
+    @Override
+    public Item toItem() {
+        return Item.get(ItemID.JUNGLE_SIGN);
     }
 }

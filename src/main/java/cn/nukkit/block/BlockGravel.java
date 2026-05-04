@@ -18,13 +18,23 @@ import java.util.concurrent.ThreadLocalRandom;
 public class BlockGravel extends BlockFallable {
 
     @Override
-    public int getId() {
-        return GRAVEL;
+    public BlockColor getColor() {
+        return BlockColor.GRAY_BLOCK_COLOR;
     }
 
     @Override
     public double getHardness() {
         return 0.6;
+    }
+
+    @Override
+    public int getId() {
+        return GRAVEL;
+    }
+
+    @Override
+    public String getName() {
+        return "Gravel";
     }
 
     @Override
@@ -38,8 +48,13 @@ public class BlockGravel extends BlockFallable {
     }
 
     @Override
-    public String getName() {
-        return "Gravel";
+    public boolean canBeActivated() {
+        return true;
+    }
+
+    @Override
+    public boolean canSilkTouch() {
+        return true;
     }
 
     @Override
@@ -53,16 +68,6 @@ public class BlockGravel extends BlockFallable {
                     toItem()
             };
         }
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.GRAY_BLOCK_COLOR;
-    }
-
-    @Override
-    public boolean canSilkTouch() {
-        return true;
     }
 
     @Override
@@ -82,10 +87,5 @@ public class BlockGravel extends BlockFallable {
         }
 
         return false;
-    }
-
-    @Override
-    public boolean canBeActivated() {
-        return true;
     }
 }

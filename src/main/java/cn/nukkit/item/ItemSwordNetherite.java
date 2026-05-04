@@ -1,5 +1,7 @@
 package cn.nukkit.item;
 
+import cn.nukkit.network.protocol.ProtocolInfo;
+
 public class ItemSwordNetherite extends ItemTool {
 
     public ItemSwordNetherite() {
@@ -15,13 +17,13 @@ public class ItemSwordNetherite extends ItemTool {
     }
 
     @Override
-    public boolean isSword() {
-        return true;
+    public int getAttackDamage() {
+        return 8;
     }
 
     @Override
-    public int getAttackDamage() {
-        return 8;
+    public int getMaxDurability() {
+        return ItemTool.DURABILITY_NETHERITE;
     }
 
     @Override
@@ -30,7 +32,12 @@ public class ItemSwordNetherite extends ItemTool {
     }
 
     @Override
-    public int getMaxDurability() {
-        return ItemTool.DURABILITY_NETHERITE;
+    public boolean isSword() {
+        return true;
+    }
+
+    @Override
+    public boolean isSupportedOn(int protocol) {
+        return protocol >= ProtocolInfo.v1_16_0;
     }
 }

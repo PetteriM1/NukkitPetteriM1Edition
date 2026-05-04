@@ -3,7 +3,9 @@ package cn.nukkit.block;
 import cn.nukkit.Player;
 import cn.nukkit.item.Item;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockStrippedCherryLog extends BlockWoodStripped {
 
@@ -13,22 +15,6 @@ public class BlockStrippedCherryLog extends BlockWoodStripped {
 
     public BlockStrippedCherryLog(int meta) {
         super(meta);
-    }
-
-    @Override
-    public String getName() {
-        return "Stripped Cherry Log";
-    }
-
-    @Override
-    public int getId() {
-        return STRIPPED_CHERRY_LOG;
-    }
-
-    @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        this.setPillarAxis(face.getAxis());
-        return this.getLevel().setBlock(block, this, true, true);
     }
 
     public void setPillarAxis(BlockFace.Axis axis) {
@@ -45,6 +31,26 @@ public class BlockStrippedCherryLog extends BlockWoodStripped {
         }
     }
 
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.WHITE_TERRACOTA_BLOCK_COLOR;
+    }
+
+    @Override
+    public int getId() {
+        return STRIPPED_CHERRY_LOG;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_20_0_23;
+    }
+
+    @Override
+    public String getName() {
+        return "Stripped Cherry Log";
+    }
+
     public BlockFace.Axis getPillarAxis() {
         switch (this.getDamage() % 3) {
             case 2:
@@ -58,7 +64,13 @@ public class BlockStrippedCherryLog extends BlockWoodStripped {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.WHITE_TERRACOTA_BLOCK_COLOR;
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.STRIPPED_OAK_LOG;
+    }
+
+    @Override
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        this.setPillarAxis(face.getAxis());
+        return this.getLevel().setBlock(block, this, true, true);
     }
 }

@@ -20,18 +20,18 @@ public class BlockSlabBlackstonePolished extends BlockSlab {
     }
 
     @Override
-    public int getId() {
-        return POLISHED_BLACKSTONE_SLAB;
-    }
-
-    @Override
-    public boolean hasTopBit() {
-        return (this.getDamage() & 0x01) == 1;
-    }
-
-    @Override
     public void setTopBit(boolean topBit) {
         this.setDamage(topBit ? 1 : 0);
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.BLACK_BLOCK_COLOR;
+    }
+
+    @Override
+    public int getId() {
+        return POLISHED_BLACKSTONE_SLAB;
     }
 
     @Override
@@ -40,30 +40,30 @@ public class BlockSlabBlackstonePolished extends BlockSlab {
     }
 
     @Override
-    public boolean canHarvestWithHand() {
-        return false;
-    }
-
-    @Override
     public int getToolType() {
         return ItemTool.TYPE_PICKAXE;
     }
 
     @Override
+    public boolean canHarvestWithHand() {
+        return false;
+    }
+
+    @Override
     public Item[] getDrops(Item item) {
         if (item.isPickaxe()) {
-            return new Item[]{ this.toItem() };
+            return new Item[]{this.toItem()};
         }
         return new Item[0];
     }
 
     @Override
-    public Item toItem() {
-        return new ItemBlock(Block.get(this.getId(), 0), 0);
+    public boolean hasTopBit() {
+        return (this.getDamage() & 0x01) == 1;
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.BLACK_BLOCK_COLOR;
+    public Item toItem() {
+        return new ItemBlock(Block.get(this.getId(), 0), 0);
     }
 }

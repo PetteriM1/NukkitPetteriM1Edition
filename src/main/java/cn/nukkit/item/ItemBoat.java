@@ -11,6 +11,7 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.DoubleTag;
 import cn.nukkit.nbt.tag.FloatTag;
 import cn.nukkit.nbt.tag.ListTag;
+import cn.nukkit.network.protocol.ProtocolInfo;
 
 /**
  * Created by yescallop on 2016/2/13.
@@ -30,8 +31,28 @@ public class ItemBoat extends Item {
     }
 
     @Override
+    public int getMaxStackSize() {
+        return 1;
+    }
+
+    @Override
     public boolean canBeActivated() {
         return true;
+    }
+
+    @Override
+    public boolean isSupportedOn(int protocol) {
+        int meta = this.getDamage();
+        if (meta <= 5) {
+            return true;
+        }
+        if (meta == 6) {
+            return protocol >= ProtocolInfo.v1_19_0_29;
+        }
+        if (meta == 7) {
+            return protocol >= ProtocolInfo.v1_20_0_23;
+        }
+        return protocol >= ProtocolInfo.v1_21_50_28;
     }
 
     @Override
@@ -39,18 +60,18 @@ public class ItemBoat extends Item {
         if (face != BlockFace.UP || block instanceof BlockWater) return false;
         Entity.createEntity(EntityBoat.NETWORK_ID,
                 level.getChunk(block.getChunkX(), block.getChunkZ()), new CompoundTag("")
-                .putList(new ListTag<DoubleTag>("Pos")
-                        .add(new DoubleTag("", block.getX() + 0.5))
-                        .add(new DoubleTag("", block.getY() - (target instanceof BlockWater ? 0.1 : 0)))
-                        .add(new DoubleTag("", block.getZ() + 0.5)))
-                .putList(new ListTag<DoubleTag>("Motion")
-                        .add(new DoubleTag("", 0))
-                        .add(new DoubleTag("", 0))
-                        .add(new DoubleTag("", 0)))
-                .putList(new ListTag<FloatTag>("Rotation")
-                        .add(new FloatTag("", (float) ((player.yaw + 90f) % 360)))
-                        .add(new FloatTag("", 0)))
-                .putInt("Variant", this.getDamage())
+                        .putList(new ListTag<DoubleTag>("Pos")
+                                .add(new DoubleTag("", block.getX() + 0.5))
+                                .add(new DoubleTag("", block.getY() - (target instanceof BlockWater ? 0.1 : 0)))
+                                .add(new DoubleTag("", block.getZ() + 0.5)))
+                        .putList(new ListTag<DoubleTag>("Motion")
+                                .add(new DoubleTag("", 0))
+                                .add(new DoubleTag("", 0))
+                                .add(new DoubleTag("", 0)))
+                        .putList(new ListTag<FloatTag>("Rotation")
+                                .add(new FloatTag("", (float) ((player.yaw + 90f) % 360)))
+                                .add(new FloatTag("", 0)))
+                        .putInt("Variant", this.getDamage())
         ).spawnToAll();
 
         if (!player.isCreative()) {
@@ -58,10 +79,5 @@ public class ItemBoat extends Item {
         }
 
         return true;
-    }
-
-    @Override
-    public int getMaxStackSize() {
-        return 1;
     }
 }

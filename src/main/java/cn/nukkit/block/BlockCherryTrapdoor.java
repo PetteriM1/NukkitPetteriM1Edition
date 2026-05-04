@@ -1,6 +1,8 @@
 package cn.nukkit.block;
 
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockCherryTrapdoor extends BlockTrapdoor {
 
@@ -13,8 +15,8 @@ public class BlockCherryTrapdoor extends BlockTrapdoor {
     }
 
     @Override
-    public String getName() {
-        return "Cherry Trapdoor";
+    public BlockColor getColor() {
+        return BlockColor.WHITE_TERRACOTA_BLOCK_COLOR;
     }
 
     @Override
@@ -23,7 +25,17 @@ public class BlockCherryTrapdoor extends BlockTrapdoor {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.WHITE_TERRACOTA_BLOCK_COLOR;
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_20_0_23;
+    }
+
+    @Override
+    public String getName() {
+        return "Cherry Trapdoor";
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.TRAPDOOR;
     }
 }

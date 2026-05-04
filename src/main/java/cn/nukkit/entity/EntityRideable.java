@@ -6,6 +6,8 @@ package cn.nukkit.entity;
  */
 public interface EntityRideable {
 
+    boolean dismountEntity(Entity entity);
+
     /**
      * Mount or Dismounts an Entity from a rideable entity
      *
@@ -13,6 +15,4 @@ public interface EntityRideable {
      * @return {@code true} if the mounting successful
      */
     boolean mountEntity(Entity entity);
-
-    boolean dismountEntity(Entity entity);
 }

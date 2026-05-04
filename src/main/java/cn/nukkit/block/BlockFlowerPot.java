@@ -24,6 +24,66 @@ public class BlockFlowerPot extends BlockFlowable {
         super(meta);
     }
 
+    @Override
+    public int getId() {
+        return FLOWER_POT_BLOCK;
+    }
+
+    @Override
+    public double getMaxX() {
+        return this.x + 0.6875;
+    }
+
+    @Override
+    public double getMaxY() {
+        return this.y + 0.375;
+    }
+
+    @Override
+    public double getMaxZ() {
+        return this.z + 0.6875;
+    }
+
+    @Override
+    public double getMinX() {
+        return this.x + 0.3125;
+    }
+
+    @Override
+    public double getMinZ() {
+        return this.z + 0.3125;
+    }
+
+    @Override
+    public String getName() {
+        return "Flower Pot";
+    }
+
+    @Override
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.WHEN_PLACED_IN_WATER;
+    }
+
+    @Override
+    public boolean breakWhenPushed() {
+        return true;
+    }
+
+    @Override
+    public boolean canBeActivated() {
+        return true;
+    }
+
+    @Override
+    public boolean canBePushed() {
+        return false; // prevent item loss issue with pistons until a working implementation
+    }
+
+    @Override
+    public boolean canPassThrough() {
+        return false;
+    }
+
     private static boolean canPlaceIntoFlowerPot(Item item) {
         switch (item.getId()) {
             case SAPLING:
@@ -69,54 +129,38 @@ public class BlockFlowerPot extends BlockFlowable {
     }
 
     @Override
-    public String getName() {
-        return "Flower Pot";
-    }
+    public Item[] getDrops(Item item) {
+        boolean dropInside = false;
+        int insideID = 0;
+        int insideMeta = 0;
+        BlockEntity blockEntity = getLevel().getBlockEntity(this);
+        if (blockEntity instanceof BlockEntityFlowerPot) {
+            dropInside = true;
+            insideID = blockEntity.namedTag.getShort("item");
+            insideMeta = blockEntity.namedTag.getInt("data");
+        }
 
-    @Override
-    public int getId() {
-        return FLOWER_POT_BLOCK;
+        if (dropInside) {
+            if (insideID > 255) {
+                return new Item[]{
+                        Item.get(Item.FLOWER_POT),
+                        new ItemBlock(Block.get(insideID))
+                };
+            } else {
+                return new Item[]{
+                        Item.get(Item.FLOWER_POT),
+                        Item.get(insideID, insideMeta, 1)
+                };
+            }
+        } else {
+            return new Item[]{
+                    Item.get(Item.FLOWER_POT)
+            };
+        }
     }
 
     private static boolean isSupportValid(Block block) {
         return block.isSolid() || block.isNarrowSurface() || Block.canStayOnFullSolid(block);
-    }
-
-    @Override
-    public int onUpdate(int type) {
-        if (type == Level.BLOCK_UPDATE_NORMAL) {
-            if (!isSupportValid(down())) {
-                level.useBreakOn(this);
-                return type;
-            }
-        }
-        return 0;
-    }
-
-    @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        if (!isSupportValid(down())) return false;
-        CompoundTag nbt = new CompoundTag()
-                .putString("id", BlockEntity.FLOWER_POT)
-                .putInt("x", (int) this.x)
-                .putInt("y", (int) this.y)
-                .putInt("z", (int) this.z)
-                .putShort("item", 0)
-                .putInt("data", 0);
-        if (item.hasCustomBlockData()) {
-            for (Tag aTag : item.getCustomBlockData().getAllTags()) {
-                nbt.put(aTag.getName(), aTag);
-            }
-        }
-        BlockEntity.createBlockEntity(BlockEntity.FLOWER_POT, this.getChunk(), nbt);
-
-        this.getLevel().setBlock(this, this, true, true);
-        return true;
-    }
-
-    @Override
-    public boolean canBeActivated() {
-        return true;
     }
 
     @Override
@@ -172,34 +216,35 @@ public class BlockFlowerPot extends BlockFlowable {
     }
 
     @Override
-    public Item[] getDrops(Item item) {
-        boolean dropInside = false;
-        int insideID = 0;
-        int insideMeta = 0;
-        BlockEntity blockEntity = getLevel().getBlockEntity(this);
-        if (blockEntity instanceof BlockEntityFlowerPot) {
-            dropInside = true;
-            insideID = blockEntity.namedTag.getShort("item");
-            insideMeta = blockEntity.namedTag.getInt("data");
-        }
-
-        if (dropInside) {
-            if (insideID > 255) {
-                return new Item[]{
-                        Item.get(Item.FLOWER_POT),
-                        new ItemBlock(Block.get(insideID))
-                };
-            } else {
-                return new Item[]{
-                        Item.get(Item.FLOWER_POT),
-                        Item.get(insideID, insideMeta, 1)
-                };
+    public int onUpdate(int type) {
+        if (type == Level.BLOCK_UPDATE_NORMAL) {
+            if (!isSupportValid(down())) {
+                level.useBreakOn(this);
+                return type;
             }
-        } else {
-            return new Item[]{
-                    Item.get(Item.FLOWER_POT)
-            };
         }
+        return 0;
+    }
+
+    @Override
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        if (!isSupportValid(down())) return false;
+        CompoundTag nbt = new CompoundTag()
+                .putString("id", BlockEntity.FLOWER_POT)
+                .putInt("x", (int) this.x)
+                .putInt("y", (int) this.y)
+                .putInt("z", (int) this.z)
+                .putShort("item", 0)
+                .putInt("data", 0);
+        if (item.hasCustomBlockData()) {
+            for (Tag aTag : item.getCustomBlockData().getAllTags()) {
+                nbt.put(aTag.getName(), aTag);
+            }
+        }
+        BlockEntity.createBlockEntity(BlockEntity.FLOWER_POT, this.getChunk(), nbt);
+
+        this.getLevel().setBlock(this, this, true, true);
+        return true;
     }
 
     @Override
@@ -208,52 +253,7 @@ public class BlockFlowerPot extends BlockFlowable {
     }
 
     @Override
-    public double getMinX() {
-        return this.x + 0.3125;
-    }
-
-    @Override
-    public double getMinZ() {
-        return this.z + 0.3125;
-    }
-
-    @Override
-    public double getMaxX() {
-        return this.x + 0.6875;
-    }
-
-    @Override
-    public double getMaxY() {
-        return this.y + 0.375;
-    }
-
-    @Override
-    public double getMaxZ() {
-        return this.z + 0.6875;
-    }
-
-    @Override
-    public boolean canPassThrough() {
-        return false;
-    }
-
-    @Override
     public Item toItem() {
         return Item.get(Item.FLOWER_POT);
-    }
-
-    @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.WHEN_PLACED_IN_WATER;
-    }
-
-    @Override
-    public boolean breakWhenPushed() {
-        return true;
-    }
-
-    @Override
-    public boolean canBePushed() {
-        return false; // prevent item loss issue with pistons until a working implementation
     }
 }

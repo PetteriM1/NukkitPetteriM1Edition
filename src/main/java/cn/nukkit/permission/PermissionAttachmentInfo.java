@@ -25,6 +25,19 @@ public class PermissionAttachmentInfo {
         this.value = value;
     }
 
+    /**
+     * Set value.
+     *
+     * @param value value
+     */
+    public void setValue(boolean value) {
+        this.value = value;
+    }
+
+    public PermissionAttachment getAttachment() {
+        return attachment;
+    }
+
     public Permissible getPermissible() {
         return permissible;
     }
@@ -33,20 +46,7 @@ public class PermissionAttachmentInfo {
         return permission;
     }
 
-    public PermissionAttachment getAttachment() {
-        return attachment;
-    }
-
     public boolean getValue() {
         return value;
-    }
-
-    /**
-     * Set value.
-     *
-     * @param value value
-     */
-    public void setValue(boolean value) {
-        this.value = value;
     }
 }

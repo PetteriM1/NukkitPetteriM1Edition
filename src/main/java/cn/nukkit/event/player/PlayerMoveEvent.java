@@ -7,14 +7,8 @@ import cn.nukkit.level.Location;
 
 public class PlayerMoveEvent extends PlayerEvent implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
-
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private Location from;
     private Location to;
-
     private boolean resetBlocksAround;
 
     public PlayerMoveEvent(Player player, Location from, Location to) {
@@ -28,27 +22,31 @@ public class PlayerMoveEvent extends PlayerEvent implements Cancellable {
         this.resetBlocksAround = resetBlocks;
     }
 
-    public Location getFrom() {
-        return from;
-    }
-
     public void setFrom(Location from) {
         this.from = from;
     }
 
-    public Location getTo() {
-        return to;
+    public void setResetBlocksAround(boolean value) {
+        this.resetBlocksAround = value;
     }
 
     public void setTo(Location to) {
         this.to = to;
     }
 
-    public boolean isResetBlocksAround() {
-        return resetBlocksAround;
+    public Location getFrom() {
+        return from;
     }
 
-    public void setResetBlocksAround(boolean value) {
-        this.resetBlocksAround = value;
+    public static HandlerList getHandlers() {
+        return handlers;
+    }
+
+    public Location getTo() {
+        return to;
+    }
+
+    public boolean isResetBlocksAround() {
+        return resetBlocksAround;
     }
 }

@@ -19,6 +19,16 @@ public class EntityCod extends EntityFish {
     }
 
     @Override
+    public Item[] getDrops() {
+        return new Item[]{Item.get(Item.RAW_FISH, 0, 1), Item.get(Item.BONE, 0, Utils.rand(0, 2))};
+    }
+
+    @Override
+    public float getHeight() {
+        return 0.2f;
+    }
+
+    @Override
     public int getNetworkId() {
         return NETWORK_ID;
     }
@@ -29,18 +39,8 @@ public class EntityCod extends EntityFish {
     }
 
     @Override
-    public float getHeight() {
-        return 0.2f;
-    }
-
-    @Override
     public void initEntity() {
         this.setMaxHealth(3);
         super.initEntity();
-    }
-
-    @Override
-    public Item[] getDrops() {
-        return new Item[]{Item.get(Item.RAW_FISH, 0, 1), Item.get(Item.BONE, 0, Utils.rand(0, 2))};
     }
 }

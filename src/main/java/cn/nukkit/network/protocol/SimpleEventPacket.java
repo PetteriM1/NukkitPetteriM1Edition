@@ -14,18 +14,18 @@ public class SimpleEventPacket extends DataPacket {
     public short eventType;
 
     @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
-    @Override
     public void decode() {
-        this.eventType = (short) this.getShort();
+        this.eventType = (short) this.getLShort();
     }
 
     @Override
     public void encode() {
         this.reset();
-        this.putShort(this.eventType);
+        this.putLShort(this.eventType);
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

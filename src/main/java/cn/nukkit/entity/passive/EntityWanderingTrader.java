@@ -12,24 +12,8 @@ public class EntityWanderingTrader extends EntityWalkingAnimal {
     }
 
     @Override
-    public int getNetworkId() {
-        return NETWORK_ID;
-    }
-
-    @Override
-    public float getWidth() {
-        return 0.6f;
-    }
-
-    @Override
     public float getHeight() {
         return 1.9f;
-    }
-
-    @Override
-    public void initEntity() {
-        this.setMaxHealth(20);
-        super.initEntity();
     }
 
     @Override
@@ -40,5 +24,21 @@ public class EntityWanderingTrader extends EntityWalkingAnimal {
     @Override
     public String getName() {
         return this.hasCustomName() ? this.getNameTag() : "Wandering Trader";
+    }
+
+    @Override
+    public int getNetworkId() {
+        return NETWORK_ID;
+    }
+
+    @Override
+    public float getWidth() {
+        return 0.6f;
+    }
+
+    @Override
+    public void initEntity() {
+        this.setMaxHealth(20);
+        super.initEntity();
     }
 }

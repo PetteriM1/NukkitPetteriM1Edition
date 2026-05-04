@@ -15,11 +15,6 @@ public class SetDisplayObjectivePacket extends DataPacket {
     public Scoreboard.SortOrder sortOrder;
 
     @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
-    @Override
     public void decode() {
         this.decodeUnsupported();
     }
@@ -32,5 +27,10 @@ public class SetDisplayObjectivePacket extends DataPacket {
         this.putString(this.displayName);
         this.putString(this.criteria);
         this.putVarInt(this.sortOrder.ordinal());
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

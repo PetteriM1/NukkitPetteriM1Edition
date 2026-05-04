@@ -18,9 +18,20 @@ public class EntityEndCrystal extends Entity implements EntityExplosive {
     private boolean detonated = false;
     private String nameTag;
 
+    public EntityEndCrystal(FullChunk chunk, CompoundTag nbt) {
+        super(chunk, nbt);
+    }
+
     @Override
-    public float getLength() {
-        return 2f;
+    public void setNameTag(String name) {
+        this.nameTag = name;
+        if (this.namedTag.contains("CustomNameVisible") || this.namedTag.contains("CustomNameAlwaysVisible")) { // Hack: Vanilla: Disable client side name tag while keeping custom name in nbt
+            this.setDataProperty(new StringEntityData(DATA_NAMETAG, name));
+        }
+    }
+
+    public void setShowBase(boolean value) {
+        this.setDataFlag(DATA_FLAGS, DATA_FLAG_SHOWBASE, value);
     }
 
     @Override
@@ -29,8 +40,18 @@ public class EntityEndCrystal extends Entity implements EntityExplosive {
     }
 
     @Override
-    public float getWidth() {
+    public float getLength() {
         return 2f;
+    }
+
+    @Override
+    public String getName() {
+        return this.hasCustomName() ? this.getNameTag() : "End Crystal";
+    }
+
+    @Override
+    public String getNameTag() {
+        return this.nameTag == null ? "" : this.nameTag;
     }
 
     @Override
@@ -38,26 +59,9 @@ public class EntityEndCrystal extends Entity implements EntityExplosive {
         return NETWORK_ID;
     }
 
-    public EntityEndCrystal(FullChunk chunk, CompoundTag nbt) {
-        super(chunk, nbt);
-    }
-
     @Override
-    protected void initEntity() {
-        super.initEntity();
-
-        if (this.namedTag.contains("ShowBottom")) {
-            this.setShowBase(this.namedTag.getBoolean("ShowBottom"));
-        }
-
-        this.fireProof = true;
-    }
-
-    @Override
-    public void saveNBT() {
-        super.saveNBT();
-
-        this.namedTag.putBoolean("ShowBottom", this.showBase());
+    public float getWidth() {
+        return 2f;
     }
 
     @Override
@@ -88,18 +92,10 @@ public class EntityEndCrystal extends Entity implements EntityExplosive {
         return true;
     }
 
-    public boolean showBase() {
-        return this.getDataFlag(DATA_FLAGS, DATA_FLAG_SHOWBASE);
-    }
-
-    public void setShowBase(boolean value) {
-        this.setDataFlag(DATA_FLAGS, DATA_FLAG_SHOWBASE, value);
-    }
-
     @Override
     public void explode() {
         this.close();
-        if (!this.detonated && this.level.getGameRules().getBoolean(GameRule.MOB_GRIEFING)) {
+        if (!this.detonated && ((level.getServer().suomiCraftPEMode() && this.level.getGameRules().getBoolean(GameRule.TNT_EXPLODES)) || (!this.level.getServer().suomiCraftPEMode() && this.level.getGameRules().getBoolean(GameRule.MOB_GRIEFING)))) {
             EntityExplosionPrimeEvent ev = new EntityExplosionPrimeEvent(this, 6);
             this.server.getPluginManager().callEvent(ev);
             if (ev.isCancelled()) {
@@ -124,16 +120,12 @@ public class EntityEndCrystal extends Entity implements EntityExplosive {
     }
 
     @Override
-    public String getName() {
-        return this.hasCustomName() ? this.getNameTag() : "End Crystal";
-    }
-
-    @Override
-    public void setNameTag(String name) {
-        this.nameTag = name;
-        if (this.namedTag.contains("CustomNameVisible") || this.namedTag.contains("CustomNameAlwaysVisible")) { // Hack: Vanilla: Disable client side name tag while keeping custom name in nbt
-            this.setDataProperty(new StringEntityData(DATA_NAMETAG, name));
+    public boolean goToNewChunk(FullChunk chunk) {
+        if (chunk.getEntities().size() > 200) {
+            this.close();
+            return false;
         }
+        return true;
     }
 
     @Override
@@ -142,8 +134,19 @@ public class EntityEndCrystal extends Entity implements EntityExplosive {
     }
 
     @Override
-    public String getNameTag() {
-        return this.nameTag == null ? "" : this.nameTag;
+    public boolean ignoredAsSaveReason() {
+        return true;
+    }
+
+    @Override
+    protected void initEntity() {
+        super.initEntity();
+
+        if (this.namedTag.contains("ShowBottom")) {
+            this.setShowBase(this.namedTag.getBoolean("ShowBottom"));
+        }
+
+        this.fireProof = true;
     }
 
     @Override // Minimal
@@ -167,7 +170,13 @@ public class EntityEndCrystal extends Entity implements EntityExplosive {
     }
 
     @Override
-    public boolean ignoredAsSaveReason() {
-        return true;
+    public void saveNBT() {
+        super.saveNBT();
+
+        this.namedTag.putBoolean("ShowBottom", this.showBase());
+    }
+
+    public boolean showBase() {
+        return this.getDataFlag(DATA_FLAGS, DATA_FLAG_SHOWBASE);
     }
 }

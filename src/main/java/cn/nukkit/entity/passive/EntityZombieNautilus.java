@@ -14,16 +14,16 @@ public class EntityZombieNautilus extends EntityNautilus {
     }
 
     @Override
-    public int getNetworkId() {
-        return NETWORK_ID;
-    }
-
-    @Override
     public Item[] getDrops() {
         if (!this.isBaby()) {
             return new Item[]{Item.get(Item.ROTTEN_FLESH, 0, Utils.rand(0, 3))};
         }
 
         return new Item[0];
+    }
+
+    @Override
+    public int getNetworkId() {
+        return NETWORK_ID;
     }
 }

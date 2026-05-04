@@ -1,0 +1,91 @@
+/*
+ * Copyright (C) 2011 the original author or authors.
+ * See the notice.md file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.iq80.leveldb.impl;
+
+import java.util.concurrent.atomic.AtomicInteger;
+
+public class FileMetaData {
+    private final long number;
+
+    /**
+     * File size in bytes
+     */
+    private final long fileSize;
+
+    /**
+     * Smallest internal key served by table
+     */
+    private final InternalKey smallest;
+
+    /**
+     * Largest internal key served by table
+     */
+    private final InternalKey largest;
+
+    /**
+     * Seeks allowed until compaction
+     */
+    // todo this mutable state should be moved elsewhere
+    private final AtomicInteger allowedSeeks = new AtomicInteger(1 << 30);
+
+    public FileMetaData(long number, long fileSize, InternalKey smallest, InternalKey largest) {
+        this.number = number;
+        this.fileSize = fileSize;
+        this.smallest = smallest.compact();
+        this.largest = largest.compact();
+    }
+
+    public void setAllowedSeeks(int allowedSeeks) {
+        this.allowedSeeks.set(allowedSeeks);
+    }
+
+    public int getAllowedSeeks() {
+        return allowedSeeks.get();
+    }
+
+    public long getFileSize() {
+        return fileSize;
+    }
+
+    public InternalKey getLargest() {
+        return largest;
+    }
+
+    public long getNumber() {
+        return number;
+    }
+
+    public InternalKey getSmallest() {
+        return smallest;
+    }
+
+    public void decrementAllowedSeeks() {
+        allowedSeeks.getAndDecrement();
+    }
+
+    @Override
+    public String toString() {
+        return "FileMetaData" +
+                "{number=" + number +
+                ", fileSize=" + fileSize +
+                ", smallest=" + smallest +
+                ", largest=" + largest +
+                ", allowedSeeks=" + allowedSeeks +
+                '}';
+    }
+}

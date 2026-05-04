@@ -12,8 +12,18 @@ import cn.nukkit.utils.BlockColor;
 public class BlockGrassPath extends BlockGrass {
 
     @Override
+    public BlockColor getColor() {
+        return BlockColor.DIRT_BLOCK_COLOR;
+    }
+
+    @Override
     public int getId() {
         return GRASS_PATH;
+    }
+
+    @Override
+    public double getMaxY() {
+        return this.y + 0.9375;
     }
 
     @Override
@@ -24,11 +34,6 @@ public class BlockGrassPath extends BlockGrass {
     @Override
     public double getResistance() {
         return 3.25;
-    }
-
-    @Override
-    public int onUpdate(int type) {
-        return 0;
     }
 
     @Override
@@ -49,12 +54,7 @@ public class BlockGrassPath extends BlockGrass {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.DIRT_BLOCK_COLOR;
-    }
-
-    @Override
-    public double getMaxY() {
-        return this.y + 0.9375;
+    public int onUpdate(int type) {
+        return 0;
     }
 }

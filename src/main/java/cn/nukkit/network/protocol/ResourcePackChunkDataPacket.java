@@ -25,7 +25,12 @@ public class ResourcePackChunkDataPacket extends DataPacket {
         this.putString(this.packId.toString());
         this.putLInt(this.chunkIndex);
         this.putLLong(this.progress);
-        this.putByteArray(this.data);
+        if (protocol < 388) {
+            this.putLInt(this.data.length);
+            this.put(this.data);
+        } else {
+            this.putByteArray(this.data);
+        }
     }
 
     @Override

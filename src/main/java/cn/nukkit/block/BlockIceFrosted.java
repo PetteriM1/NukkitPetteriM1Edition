@@ -19,6 +19,21 @@ public class BlockIceFrosted extends BlockTransparentMeta {
     }
 
     @Override
+    public BlockColor getColor() {
+        return BlockColor.ICE_BLOCK_COLOR;
+    }
+
+    @Override
+    public double getFrictionFactor() {
+        return 0.98;
+    }
+
+    @Override
+    public double getHardness() {
+        return 0.1; //0.5
+    }
+
+    @Override
     public int getId() {
         return ICE_FROSTED;
     }
@@ -30,26 +45,22 @@ public class BlockIceFrosted extends BlockTransparentMeta {
 
     @Override
     public double getResistance() {
-        return 0.5;
+        return 2.5;
     }
 
     @Override
-    public double getHardness() {
-        return 0.5;
+    public boolean canHarvestWithHand() {
+        return false;
     }
 
-    @Override
-    public double getFrictionFactor() {
-        return 0.98;
-    }
-
-    @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        boolean success = super.place(item, block, target, face, fx, fy, fz, player);
-        if (success) {
-            level.scheduleUpdate(this, ThreadLocalRandom.current().nextInt(20, 40));
+    private int countNeighbors() {
+        int neighbors = 0;
+        for (BlockFace face : BlockFace.values()) {
+            if (getSide(face).getId() == ICE_FROSTED && ++neighbors >= 4) {
+                return neighbors;
+            }
         }
-        return success;
+        return neighbors;
     }
 
     @Override
@@ -81,18 +92,12 @@ public class BlockIceFrosted extends BlockTransparentMeta {
     }
 
     @Override
-    public Item toItem() {
-        return Item.get(AIR);
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.ICE_BLOCK_COLOR;
-    }
-
-    @Override
-    public boolean canHarvestWithHand() {
-        return false;
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        boolean success = super.place(item, block, target, face, fx, fy, fz, player);
+        if (success) {
+            level.scheduleUpdate(this, ThreadLocalRandom.current().nextInt(20, 40));
+        }
+        return success;
     }
 
     protected void slightlyMelt(boolean isSource) {
@@ -100,7 +105,7 @@ public class BlockIceFrosted extends BlockTransparentMeta {
         if (age < 3) {
             setDamage(age + 1);
             level.setBlock(this, this, true);
-            level.scheduleUpdate(level.getBlock(this), ThreadLocalRandom.current().nextInt(20, 40));
+            level.scheduleUpdate(this, ThreadLocalRandom.current().nextInt(20, 40));
         } else {
             level.setBlock(this, get(WATER), true);
             if (isSource) {
@@ -114,13 +119,8 @@ public class BlockIceFrosted extends BlockTransparentMeta {
         }
     }
 
-    private int countNeighbors() {
-        int neighbors = 0;
-        for (BlockFace face : BlockFace.values()) {
-            if (getSide(face).getId() == ICE_FROSTED && ++neighbors >= 4) {
-                return neighbors;
-            }
-        }
-        return neighbors;
+    @Override
+    public Item toItem() {
+        return Item.get(AIR);
     }
 }

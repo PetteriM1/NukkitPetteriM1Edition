@@ -1,7 +1,10 @@
 package cn.nukkit.block;
 
+import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.utils.material.BlockType;
+
 public class BlockDoubleSlabDeepslateCobbled extends BlockDoubleSlabBase {
-    
+
     public BlockDoubleSlabDeepslateCobbled() {
         this(0);
     }
@@ -16,8 +19,13 @@ public class BlockDoubleSlabDeepslateCobbled extends BlockDoubleSlabBase {
     }
 
     @Override
-    public String getSlabName() {
-        return "Cobbled Deepslate";
+    public int getItemDamage() {
+        return 0;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_17_0;
     }
 
     @Override
@@ -26,7 +34,12 @@ public class BlockDoubleSlabDeepslateCobbled extends BlockDoubleSlabBase {
     }
 
     @Override
-    public int getItemDamage() {
-        return 0;
+    public String getSlabName() {
+        return "Cobbled Deepslate";
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.DOUBLE_STONE_SLAB;
     }
 }

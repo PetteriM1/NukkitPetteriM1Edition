@@ -14,18 +14,13 @@ public class BlockAcaciaWallSign extends BlockWallSign {
     }
 
     @Override
-    public String getName() {
-        return "Acacia Wall Sign";
-    }
-
-    @Override
     public int getId() {
         return ACACIA_WALL_SIGN;
     }
 
     @Override
-    public Item toItem() {
-        return Item.get(ItemID.ACACIA_SIGN);
+    public String getName() {
+        return "Acacia Wall Sign";
     }
 
     @Override
@@ -36,5 +31,10 @@ public class BlockAcaciaWallSign extends BlockWallSign {
     @Override
     protected int getWallId() {
         return ACACIA_WALL_SIGN;
+    }
+
+    @Override
+    public Item toItem() {
+        return Item.get(ItemID.ACACIA_SIGN);
     }
 }

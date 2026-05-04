@@ -4,6 +4,8 @@ import cn.nukkit.Player;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockTorchflower extends BlockFlowable {
 
@@ -21,19 +23,23 @@ public class BlockTorchflower extends BlockFlowable {
     }
 
     @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_20_0_23;
+    }
+
+    @Override
     public String getName() {
         return "Torchflower";
     }
 
     @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        Block down = this.down();
-        int id = down.getId();
-        if (id == Block.GRASS || id == Block.DIRT || id == Block.FARMLAND || id == Block.PODZOL || id == MYCELIUM || id == MOSS_BLOCK || id == MUD || id == MUDDY_MANGROVE_ROOTS) {
-            this.getLevel().setBlock(this, this, true, true);
-            return true;
-        }
-        return false;
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.FLOWER;
+    }
+
+    @Override
+    public int getAlternateMeta(int protocol) {
+        return BlockFlower.TYPE_ORANGE_TULIP;
     }
 
     @Override
@@ -47,5 +53,16 @@ public class BlockTorchflower extends BlockFlowable {
         }
 
         return 0;
+    }
+
+    @Override
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        Block down = this.down();
+        int id = down.getId();
+        if (id == Block.GRASS || id == Block.DIRT || id == Block.FARMLAND || id == Block.PODZOL || id == MYCELIUM || id == MOSS_BLOCK || id == MUD || id == MUDDY_MANGROVE_ROOTS) {
+            this.getLevel().setBlock(this, this, true, true);
+            return true;
+        }
+        return false;
     }
 }

@@ -13,13 +13,8 @@ public class BlockHyphaeStrippedCrimson extends BlockStemStripped {
     }
 
     @Override
-    public int getId() {
-        return STRIPPED_CRIMSON_HYPHAE;
-    }
-
-    @Override
-    public String getName() {
-        return "Crimson Stripped Hyphae";
+    public BlockColor getColor() {
+        return BlockColor.CRIMSON_HYPHAE_BLOCK_COLOR;
     }
 
     @Override
@@ -28,7 +23,12 @@ public class BlockHyphaeStrippedCrimson extends BlockStemStripped {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.CRIMSON_HYPHAE_BLOCK_COLOR;
+    public int getId() {
+        return STRIPPED_CRIMSON_HYPHAE;
+    }
+
+    @Override
+    public String getName() {
+        return "Crimson Stripped Hyphae";
     }
 }

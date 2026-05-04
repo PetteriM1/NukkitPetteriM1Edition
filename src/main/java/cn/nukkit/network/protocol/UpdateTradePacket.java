@@ -19,11 +19,6 @@ public class UpdateTradePacket extends DataPacket {
     public byte[] offers;
 
     @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
-    @Override
     public void decode() {
         this.decodeUnsupported();
     }
@@ -34,12 +29,27 @@ public class UpdateTradePacket extends DataPacket {
         this.putByte(windowId);
         this.putByte(windowType);
         this.putVarInt(size);
-        this.putVarInt(tradeTier);
+        if (protocol < 354) {
+            this.putVarInt(0); // unknown
+            if (protocol >= 313) {
+                this.putVarInt(0); // unknown
+            }
+            this.putBoolean(isWilling);
+        } else {
+            this.putVarInt(tradeTier);
+        }
         this.putEntityUniqueId(trader);
         this.putEntityUniqueId(player);
         this.putString(displayName);
-        this.putBoolean(screen2);
-        this.putBoolean(isWilling);
+        if (protocol >= 354) {
+            this.putBoolean(screen2);
+            this.putBoolean(isWilling);
+        }
         this.put(this.offers);
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

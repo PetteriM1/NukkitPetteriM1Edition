@@ -9,7 +9,7 @@ import java.util.List;
 public class ElementDropdown extends Element {
 
     @SuppressWarnings("unused")
-    private final String type = "dropdown"; //This variable is used for JSON import operations. Do NOT delete :) -- @Snake1999
+    private final String type = "dropdown";
     private String text = "";
     @SuppressWarnings("FieldMayBeFinal")
     private List<String> options;
@@ -31,13 +31,21 @@ public class ElementDropdown extends Element {
         this.defaultOptionIndex = defaultOption;
     }
 
-    public int getDefaultOptionIndex() {
-        return defaultOptionIndex;
-    }
-
     public void setDefaultOptionIndex(int index) {
         if (index >= options.size()) return;
         this.defaultOptionIndex = index;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    public void setTooltip(String tooltip) {
+        this.tooltip = tooltip;
+    }
+
+    public int getDefaultOptionIndex() {
+        return defaultOptionIndex;
     }
 
     public List<String> getOptions() {
@@ -48,8 +56,9 @@ public class ElementDropdown extends Element {
         return text;
     }
 
-    public void setText(String text) {
-        this.text = text;
+    @Nullable
+    public String getTooltip() {
+        return tooltip;
     }
 
     public void addOption(String option) {
@@ -59,14 +68,5 @@ public class ElementDropdown extends Element {
     public void addOption(String option, boolean isDefault) {
         options.add(option);
         if (isDefault) this.defaultOptionIndex = options.size() - 1;
-    }
-
-    @Nullable
-    public String getTooltip() {
-        return tooltip;
-    }
-
-    public void setTooltip(String tooltip) {
-        this.tooltip = tooltip;
     }
 }

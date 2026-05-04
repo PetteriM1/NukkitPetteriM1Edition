@@ -31,27 +31,48 @@ public class CommandRequestPacket extends DataPacket {
     public boolean internal;
 
     @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
-    @Override
     public void decode() {
         this.command = this.getString();
 
-        this.getString();
-        CommandOriginData.Origin type = CommandOriginData.Origin.PLAYER;
+        CommandOriginData.Origin type;
+        if (protocol >= ProtocolInfo.v1_21_130_28) {
+            this.getString();
+            type = CommandOriginData.Origin.PLAYER;
+        } else {
+            type = CommandOriginData.Origin.values()[this.getVarInt()];
+        }
 
-        UUID uuid = this.getUUID();
+        UUID uuid = protocol > ProtocolInfo.v1_2_0 ? this.getUUID() : null;
+
         String requestId = this.getString();
-        Long playerId = this.getLLong();
+
+        Long playerId = null;
+        if (protocol >= ProtocolInfo.v1_21_130_28) {
+            playerId = this.getLLong();
+        } else if (type == CommandOriginData.Origin.DEV_CONSOLE || type == CommandOriginData.Origin.TEST) {
+            playerId = this.getVarLong();
+        }
+
         this.data = new CommandOriginData(type, uuid, requestId, playerId);
+
         this.internal = this.getBoolean();
-        this.getString(); // version
+
+        if (protocol >= ProtocolInfo.v1_19_60) {
+            if (protocol >= ProtocolInfo.v1_21_130_28) {
+                this.getString(); // version
+            } else {
+                this.getVarInt(); // version
+            }
+        }
     }
 
     @Override
     public void encode() {
         this.encodeUnsupported();
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

@@ -6,28 +6,26 @@ public interface ResourcePack {
 
     ResourcePack[] EMPTY_ARRAY = new ResourcePack[0];
 
-    String getPackName();
-
-    UUID getPackId();
-
-    String getPackVersion();
-
-    int getPackSize();
-
-    byte[] getSha256();
-
-    byte[] getPackChunk(int off, int len);
+    default String getCDNUrl() {
+        return "";
+    }
 
     default String getEncryptionKey() {
         return "";
     }
 
+    UUID getPackId();
+
+    String getPackName();
+
+    int getPackSize();
+
+    String getPackVersion();
+
+    byte[] getSha256();
+
     default String getSubPackName() {
         return "";
-    }
-
-    default boolean usesScripting() {
-        return false;
     }
 
     default boolean isAddonPack() {
@@ -38,7 +36,9 @@ public interface ResourcePack {
         return false;
     }
 
-    default String getCDNUrl() {
-        return "";
+    byte[] getPackChunk(int off, int len);
+
+    default boolean usesScripting() {
+        return false;
     }
 }

@@ -8,11 +8,6 @@ import cn.nukkit.event.HandlerList;
 public class EndermanBlockPickUpEvent extends EntityEvent implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
-
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private final Block block;
 
     public EndermanBlockPickUpEvent(EntityEnderman entity, Block block) {
@@ -27,5 +22,9 @@ public class EndermanBlockPickUpEvent extends EntityEvent implements Cancellable
     @Override
     public EntityEnderman getEntity() {
         return (EntityEnderman) super.getEntity();
+    }
+
+    public static HandlerList getHandlers() {
+        return handlers;
     }
 }

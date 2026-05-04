@@ -11,16 +11,6 @@ public class BlockAmethystBudLarge extends BlockAmethystBud {
     }
 
     @Override
-    public int getId() {
-        return LARGE_AMETHYST_BUD;
-    }
-
-    @Override
-    protected String getSizeName() {
-        return "Large";
-    }
-
-    @Override
     protected int getCrystalHeight() {
         return 5;
     }
@@ -31,7 +21,17 @@ public class BlockAmethystBudLarge extends BlockAmethystBud {
     }
 
     @Override
+    public int getId() {
+        return LARGE_AMETHYST_BUD;
+    }
+
+    @Override
     public int getLightLevel() {
         return 4;
+    }
+
+    @Override
+    protected String getSizeName() {
+        return "Large";
     }
 }

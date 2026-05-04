@@ -14,6 +14,11 @@ import java.util.concurrent.ThreadLocalRandom;
 public class BlockOreLapis extends BlockOre {
 
     @Override
+    public int getDropExp() {
+        return Utils.rand(2, 5);
+    }
+
+    @Override
     public int getId() {
         return LAPIS_ORE;
     }
@@ -21,6 +26,11 @@ public class BlockOreLapis extends BlockOre {
     @Override
     public String getName() {
         return "Lapis Lazuli Ore";
+    }
+
+    @Override
+    protected int getRawMaterial() {
+        return ItemID.DYE;
     }
 
     @Override
@@ -48,15 +58,5 @@ public class BlockOreLapis extends BlockOre {
         } else {
             return new Item[0];
         }
-    }
-
-    @Override
-    protected int getRawMaterial() {
-        return ItemID.DYE;
-    }
-
-    @Override
-    public int getDropExp() {
-        return Utils.rand(2, 5);
     }
 }

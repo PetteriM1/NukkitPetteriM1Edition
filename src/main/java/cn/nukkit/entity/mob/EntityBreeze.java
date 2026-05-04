@@ -1,5 +1,8 @@
 package cn.nukkit.entity.mob;
 
+import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.EntityCreature;
+import cn.nukkit.entity.EntityLiving;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
@@ -14,6 +17,21 @@ public class EntityBreeze extends EntityFlyingMob {
     }
 
     @Override
+    public Item[] getDrops() {
+        return new Item[]{Item.get(Item.BREEZE_ROD, 0, Utils.rand(1, 2))};
+    }
+
+    @Override
+    public float getHeight() {
+        return 1.77f;
+    }
+
+    @Override
+    public int getKillExperience() {
+        return 10;
+    }
+
+    @Override
     public int getNetworkId() {
         return NETWORK_ID;
     }
@@ -24,8 +42,8 @@ public class EntityBreeze extends EntityFlyingMob {
     }
 
     @Override
-    public float getHeight() {
-        return 1.77f;
+    public void attackEntity(Entity player) {
+        //TODO
     }
 
     @Override
@@ -35,12 +53,13 @@ public class EntityBreeze extends EntityFlyingMob {
     }
 
     @Override
-    public Item[] getDrops() {
-        return new Item[]{Item.get(Item.BREEZE_ROD, 0, Utils.rand(1, 2))};
+    protected int nearbyDistanceMultiplier() {
+        return target instanceof EntityLiving || followTarget instanceof EntityLiving ? 1000 : 1; // don't follow
     }
 
     @Override
-    public int getKillExperience() {
-        return 10;
+    public boolean targetOption(EntityCreature creature, double distance) {
+        //TODO
+        return false;
     }
 }

@@ -12,23 +12,23 @@ public class EntityTadpole extends EntityFish {
     }
 
     @Override
-    public int getKillExperience() {
-        return 0;
-    }
-
-    @Override
     protected int getBucketMeta() {
         return 13;
     }
 
     @Override
-    public int getNetworkId() {
-        return NETWORK_ID;
+    public float getHeight() {
+        return 0.8f;
     }
 
     @Override
-    public float getHeight() {
-        return 0.8f;
+    public int getKillExperience() {
+        return 0;
+    }
+
+    @Override
+    public int getNetworkId() {
+        return NETWORK_ID;
     }
 
     @Override

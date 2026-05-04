@@ -19,16 +19,6 @@ public class ItemLeggingsGold extends ItemArmor {
     }
 
     @Override
-    public int getTier() {
-        return ItemArmor.TIER_GOLD;
-    }
-
-    @Override
-    public boolean isLeggings() {
-        return true;
-    }
-
-    @Override
     public int getArmorPoints() {
         return 3;
     }
@@ -36,5 +26,15 @@ public class ItemLeggingsGold extends ItemArmor {
     @Override
     public int getMaxDurability() {
         return 106;
+    }
+
+    @Override
+    public int getTier() {
+        return ItemArmor.TIER_GOLD;
+    }
+
+    @Override
+    public boolean isLeggings() {
+        return true;
     }
 }

@@ -13,8 +13,8 @@ public class BlockCrimsonRoots extends BlockRoots {
     }
 
     @Override
-    public String getName() {
-        return "Crimson Roots";
+    public BlockColor getColor() {
+        return BlockColor.NETHERRACK_BLOCK_COLOR;
     }
 
     @Override
@@ -23,17 +23,17 @@ public class BlockCrimsonRoots extends BlockRoots {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.NETHERRACK_BLOCK_COLOR;
-    }
-
-    @Override
-    public boolean canBeReplaced() {
-        return true;
+    public String getName() {
+        return "Crimson Roots";
     }
 
     @Override
     public boolean breakWhenPushed() {
+        return true;
+    }
+
+    @Override
+    public boolean canBeReplaced() {
         return true;
     }
 }

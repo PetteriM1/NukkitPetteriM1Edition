@@ -14,13 +14,13 @@ public class BlockVinesTwisting extends BlockVinesNether {
     }
 
     @Override
-    public String getName() {
-        return "Twisting Vines";
+    public void setVineAge(int vineAge) {
+        this.setDamage(vineAge & 0x19);
     }
 
     @Override
-    public int getId() {
-        return TWISTING_VINES;
+    public BlockColor getColor() {
+        return BlockColor.CYAN_BLOCK_COLOR;
     }
 
     @Override
@@ -29,13 +29,8 @@ public class BlockVinesTwisting extends BlockVinesNether {
     }
 
     @Override
-    public int getVineAge() {
-        return this.getDamage();
-    }
-
-    @Override
-    public void setVineAge(int vineAge) {
-        this.setDamage(vineAge & 0x19);
+    public int getId() {
+        return TWISTING_VINES;
     }
 
     @Override
@@ -44,7 +39,12 @@ public class BlockVinesTwisting extends BlockVinesNether {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.CYAN_BLOCK_COLOR;
+    public String getName() {
+        return "Twisting Vines";
+    }
+
+    @Override
+    public int getVineAge() {
+        return this.getDamage();
     }
 }

@@ -35,11 +35,11 @@ public final class PopulatorHelpers implements BlockID {
         return EnsureCover.ensureCover(x, y, z, chunk) && EnsureGrassBelow.ensureGrassBelow(x, y, z, chunk);
     }
 
-    public static boolean isNonSolid(int id)   {
-        return nonSolidBlocks.contains(id);
-    }
-
     public static boolean isNonOceanSolid(int id) {
         return nonOceanSolidBlocks.contains(id);
+    }
+
+    public static boolean isNonSolid(int id) {
+        return nonSolidBlocks.contains(id);
     }
 }

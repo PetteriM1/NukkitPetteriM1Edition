@@ -19,16 +19,6 @@ public class ItemChestplateDiamond extends ItemArmor {
     }
 
     @Override
-    public int getTier() {
-        return ItemArmor.TIER_DIAMOND;
-    }
-
-    @Override
-    public boolean isChestplate() {
-        return true;
-    }
-
-    @Override
     public int getArmorPoints() {
         return 8;
     }
@@ -39,7 +29,17 @@ public class ItemChestplateDiamond extends ItemArmor {
     }
 
     @Override
+    public int getTier() {
+        return ItemArmor.TIER_DIAMOND;
+    }
+
+    @Override
     public int getToughness() {
         return 2;
+    }
+
+    @Override
+    public boolean isChestplate() {
+        return true;
     }
 }

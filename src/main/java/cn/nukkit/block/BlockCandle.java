@@ -7,6 +7,8 @@ import cn.nukkit.item.ItemID;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
+import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockCandle extends BlockTransparentMeta {
 
@@ -18,14 +20,16 @@ public class BlockCandle extends BlockTransparentMeta {
         super(meta);
     }
 
-    @Override
-    public String getName() {
-        return "Candle";
+    public void setLit(boolean dead) {
+        if (dead) {
+            this.setDamage(getDamage() | 0x4);
+        } else {
+            this.setDamage(getDamage() ^ 0x4);
+        }
     }
 
-    @Override
-    public int getId() {
-        return CANDLE;
+    public int getCandleCount() {
+        return (getDamage() & 0b11) + 1;
     }
 
     @Override
@@ -34,13 +38,84 @@ public class BlockCandle extends BlockTransparentMeta {
     }
 
     @Override
+    public int getId() {
+        return CANDLE;
+    }
+
+    @Override
+    public int getLightLevel() {
+        if (!this.isLit()) {
+            return 0;
+        }
+
+        return getCandleCount() * 3;
+    }
+
+    @Override
+    public double getMaxX() {
+        return this.x + 0.6;
+    }
+
+    @Override
+    public double getMaxY() {
+        return this.y + 0.4;
+    }
+
+    @Override
+    public double getMaxZ() {
+        return this.z + 0.6;
+    }
+
+    @Override
+    public double getMinX() {
+        return this.x + 0.4;
+    }
+
+    @Override
+    public double getMinZ() {
+        return this.z + 0.4;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_17_0;
+    }
+
+    @Override
+    public String getName() {
+        return "Candle";
+    }
+
+    @Override
     public double getResistance() {
-        return 0.1;
+        return 2.5;
     }
 
     @Override
     public WaterloggingType getWaterloggingType() {
         return WaterloggingType.WHEN_PLACED_IN_WATER;
+    }
+
+    public boolean isLit() {
+        return (getDamage() & 0x4) == 0x4;
+    }
+
+    private boolean isSupportValidBelow() {
+        Block block = this.down();
+        if (!block.isTransparent() || block.isNarrowSurface()) {
+            return true;
+        }
+        return Block.canStayOnFullSolid(block);
+    }
+
+    @Override
+    public boolean breakWhenPushed() {
+        return true;
+    }
+
+    @Override
+    public boolean canBeActivated() {
+        return true;
     }
 
     @Override
@@ -49,8 +124,30 @@ public class BlockCandle extends BlockTransparentMeta {
     }
 
     @Override
-    public boolean breakWhenPushed() {
-        return true;
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.TORCH;
+    }
+
+    @Override
+    public Item[] getDrops(Item item) {
+        return new Item[]{new ItemBlock(Block.get(this.getId()), 0, getCandleCount())};
+    }
+
+    @Override
+    public boolean onActivate(Item item, Player player) {
+        if (item.getId() == ItemID.FLINT_AND_STEEL && !this.isLit()) {
+            item.useOn(this);
+            this.setLit(true);
+            level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_IGNITE);
+            level.setBlock(this, this, true, true);
+            return true;
+        } else if (item.getId() == AIR && this.isLit()) {
+            this.setLit(false);
+            level.setBlock(this, this, true, true);
+            return true;
+        }
+
+        return false;
     }
 
     @Override
@@ -82,93 +179,8 @@ public class BlockCandle extends BlockTransparentMeta {
         return false;
     }
 
-    private boolean isSupportValidBelow() {
-        Block block = this.down();
-        if (!block.isTransparent() || block.isNarrowSurface()) {
-            return true;
-        }
-        return Block.canStayOnFullSolid(block);
-    }
-
     @Override
     public Item toItem() {
         return new ItemBlock(Block.get(this.getId(), 0), 0);
-    }
-
-    @Override
-    public Item[] getDrops(Item item) {
-        return new Item[]{new ItemBlock(Block.get(this.getId()), 0, getCandleCount())};
-    }
-
-    @Override
-    public int getLightLevel() {
-        if (!this.isLit()) {
-            return 0;
-        }
-
-        return getCandleCount() * 3;
-    }
-
-    public int getCandleCount() {
-        return (getDamage() & 0b11) + 1;
-    }
-
-    public boolean isLit() {
-        return (getDamage() & 0x4) == 0x4;
-    }
-
-    public void setLit(boolean dead) {
-        if (dead) {
-            this.setDamage(getDamage() | 0x4);
-        } else {
-            this.setDamage(getDamage() ^ 0x4);
-        }
-    }
-
-    @Override
-    public boolean canBeActivated() {
-        return true;
-    }
-
-    @Override
-    public boolean onActivate(Item item, Player player) {
-        if (item.getId() == ItemID.FLINT_AND_STEEL && !this.isLit()) {
-            item.useOn(this);
-            this.setLit(true);
-            level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_IGNITE);
-            level.setBlock(this, this, true, true);
-            return true;
-        } else if (item.getId() == AIR && this.isLit()) {
-            this.setLit(false);
-            level.setBlock(this, this, true, true);
-            return true;
-        }
-
-        return false;
-    }
-
-    @Override
-    public double getMinX() {
-        return this.x + 0.4;
-    }
-
-    @Override
-    public double getMinZ() {
-        return this.z + 0.4;
-    }
-
-    @Override
-    public double getMaxX() {
-        return this.x + 0.6;
-    }
-
-    @Override
-    public double getMaxZ() {
-        return this.z + 0.6;
-    }
-
-    @Override
-    public double getMaxY() {
-        return this.y + 0.4;
     }
 }

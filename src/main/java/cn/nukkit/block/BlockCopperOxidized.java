@@ -10,8 +10,8 @@ public class BlockCopperOxidized extends BlockCopper {
     }
 
     @Override
-    public String getName() {
-        return "Oxidized Copper";
+    public BlockColor getColor() {
+        return BlockColor.WARPED_NYLIUM_BLOCK_COLOR;
     }
 
     @Override
@@ -20,8 +20,8 @@ public class BlockCopperOxidized extends BlockCopper {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.WARPED_NYLIUM_BLOCK_COLOR;
+    public String getName() {
+        return "Oxidized Copper";
     }
 
     @Override

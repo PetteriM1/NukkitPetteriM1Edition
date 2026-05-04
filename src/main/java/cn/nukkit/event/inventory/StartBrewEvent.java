@@ -11,15 +11,9 @@ import cn.nukkit.item.Item;
 public class StartBrewEvent extends InventoryEvent implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
-
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private final BlockEntityBrewingStand brewingStand;
     private final Item ingredient;
     private final Item[] potions;
-
     public StartBrewEvent(BlockEntityBrewingStand blockEntity) {
         super(blockEntity.getInventory());
         this.brewingStand = blockEntity;
@@ -34,6 +28,10 @@ public class StartBrewEvent extends InventoryEvent implements Cancellable {
 
     public BlockEntityBrewingStand getBrewingStand() {
         return brewingStand;
+    }
+
+    public static HandlerList getHandlers() {
+        return handlers;
     }
 
     public Item getIngredient() {

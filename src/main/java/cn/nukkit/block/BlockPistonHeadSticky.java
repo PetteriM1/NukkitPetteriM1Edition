@@ -11,12 +11,12 @@ public class BlockPistonHeadSticky extends BlockPistonHead {
     }
 
     @Override
-    public String getName() {
-        return "Sticky Piston Head";
+    public int getId() {
+        return PISTON_HEAD_STICKY;
     }
 
     @Override
-    public int getId() {
-        return PISTON_HEAD_STICKY;
+    public String getName() {
+        return "Sticky Piston Head";
     }
 }

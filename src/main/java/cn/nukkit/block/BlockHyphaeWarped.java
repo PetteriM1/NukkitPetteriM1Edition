@@ -13,13 +13,17 @@ public class BlockHyphaeWarped extends BlockStem {
     }
 
     @Override
-    public int getId() {
-        return WARPED_HYPHAE;
+    public BlockColor getColor() {
+        return BlockColor.WARPED_HYPHAE_BLOCK_COLOR;
+    }
+
+    public double getHardness() {
+        return 0.3; // 2
     }
 
     @Override
-    public int getStrippedId() {
-        return STRIPPED_WARPED_HYPHAE;
+    public int getId() {
+        return WARPED_HYPHAE;
     }
 
     @Override
@@ -28,16 +32,12 @@ public class BlockHyphaeWarped extends BlockStem {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.WARPED_HYPHAE_BLOCK_COLOR;
-    }
-
-    public double getHardness() {
+    public double getResistance() {
         return 2;
     }
 
     @Override
-    public double getResistance() {
-        return 2;
+    public int getStrippedId() {
+        return STRIPPED_WARPED_HYPHAE;
     }
 }

@@ -10,6 +10,8 @@ import cn.nukkit.item.ItemTool;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.utils.material.BlockType;
 
 import java.util.EnumSet;
 import java.util.Set;
@@ -35,18 +37,8 @@ public class BlockSculkVein extends BlockTransparentMeta implements BlockPropert
     }
 
     @Override
-    public int getId() {
-        return SCULK_VEIN;
-    }
-
-    @Override
-    public String getName() {
-        return "Sculk Vein";
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_HOE;
+    public BlockProperties getBlockProperties() {
+        return PROPERTIES;
     }
 
     @Override
@@ -55,13 +47,58 @@ public class BlockSculkVein extends BlockTransparentMeta implements BlockPropert
     }
 
     @Override
-    public double getResistance() {
-        return 0.2;
+    public int getId() {
+        return SCULK_VEIN;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_19_0;
+    }
+
+    @Override
+    public String getName() {
+        return "Sculk Vein";
+    }
+
+    private Set<BlockFace> getSupportedFaces() {
+        EnumSet<BlockFace> faces = EnumSet.noneOf(BlockFace.class);
+        for (BlockFace face : BlockFace.values()) {
+            if (this.hasBlockFace(face)) {
+                faces.add(face);
+            }
+        }
+        return faces;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_HOE;
+    }
+
+    @Override
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.WHEN_PLACED_IN_WATER;
+    }
+
+    @Override
+    public boolean isSolid() {
+        return false;
     }
 
     @Override
     public boolean canHarvestWithHand() {
         return false;
+    }
+
+    @Override
+    public boolean canPassThrough() {
+        return true;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.AIR;
     }
 
     @Override
@@ -74,46 +111,23 @@ public class BlockSculkVein extends BlockTransparentMeta implements BlockPropert
         return new Item[0];
     }
 
-    @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.WHEN_PLACED_IN_WATER;
-    }
+    public boolean hasBlockFace(BlockFace face) {
+        switch (face) {
+            case UP:
+                return this.getBooleanValue(CONNECTION_UP);
+            case DOWN:
+                return this.getBooleanValue(CONNECTION_DOWN);
+            case NORTH:
+                return this.getBooleanValue(CONNECTION_NORTH);
+            case SOUTH:
+                return this.getBooleanValue(CONNECTION_SOUTH);
+            case WEST:
+                return this.getBooleanValue(CONNECTION_WEST);
+            case EAST:
+                return this.getBooleanValue(CONNECTION_EAST);
 
-    @Override
-    public boolean canPassThrough() {
-        return true;
-    }
-
-    @Override
-    public boolean isSolid() {
+        }
         return false;
-    }
-
-    @Override
-    public Item toItem() {
-        return new ItemBlock(Block.get(this.getId(), 0), 0);
-    }
-
-    @Override
-    public BlockProperties getBlockProperties() {
-        return PROPERTIES;
-    }
-
-    @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        if (!this.canPlaceOn(block.down(), target) || !target.isSolid()) {
-            return false;
-        }
-
-        if (block.getId() == SCULK_VEIN) {
-            this.setDamage(block.getDamage());
-        } else {
-            this.setDamage(0);
-        }
-
-        this.setBlockFace(face.getOpposite(), true);
-        this.getLevel().setBlock(this, this, false, true);
-        return true;
     }
 
     @Override
@@ -146,6 +160,23 @@ public class BlockSculkVein extends BlockTransparentMeta implements BlockPropert
         return type;
     }
 
+    @Override
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        if (!this.canPlaceOn(block.down(), target) || !target.isSolid()) {
+            return false;
+        }
+
+        if (block.getId() == SCULK_VEIN) {
+            this.setDamage(block.getDamage());
+        } else {
+            this.setDamage(0);
+        }
+
+        this.setBlockFace(face.getOpposite(), true);
+        this.getLevel().setBlock(this, this, false, true);
+        return true;
+    }
+
     public void setBlockFace(BlockFace face, boolean value) {
         switch (face) {
             case UP:
@@ -170,32 +201,8 @@ public class BlockSculkVein extends BlockTransparentMeta implements BlockPropert
         }
     }
 
-    public boolean hasBlockFace(BlockFace face) {
-        switch (face) {
-            case UP:
-                return this.getBooleanValue(CONNECTION_UP);
-            case DOWN:
-                return this.getBooleanValue(CONNECTION_DOWN);
-            case NORTH:
-                return this.getBooleanValue(CONNECTION_NORTH);
-            case SOUTH:
-                return this.getBooleanValue(CONNECTION_SOUTH);
-            case WEST:
-                return this.getBooleanValue(CONNECTION_WEST);
-            case EAST:
-                return this.getBooleanValue(CONNECTION_EAST);
-
-        }
-        return false;
-    }
-
-    private Set<BlockFace> getSupportedFaces() {
-        EnumSet<BlockFace> faces = EnumSet.noneOf(BlockFace.class);
-        for (BlockFace face : BlockFace.values()) {
-            if (this.hasBlockFace(face)) {
-                faces.add(face);
-            }
-        }
-        return faces;
+    @Override
+    public Item toItem() {
+        return new ItemBlock(Block.get(this.getId(), 0), 0);
     }
 }

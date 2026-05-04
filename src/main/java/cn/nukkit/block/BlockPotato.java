@@ -18,18 +18,13 @@ public class BlockPotato extends BlockCrops {
     }
 
     @Override
-    public String getName() {
-        return "Potato Block";
-    }
-
-    @Override
     public int getId() {
         return POTATO_BLOCK;
     }
 
     @Override
-    public Item toItem() {
-        return Item.get(Item.POTATO);
+    public String getName() {
+        return "Potato Block";
     }
 
     @Override
@@ -50,5 +45,10 @@ public class BlockPotato extends BlockCrops {
                     Item.get(Item.POTATO)
             };
         }
+    }
+
+    @Override
+    public Item toItem() {
+        return Item.get(Item.POTATO);
     }
 }

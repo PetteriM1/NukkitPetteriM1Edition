@@ -11,16 +11,6 @@ public class BlockAmethystBudMedium extends BlockAmethystBud {
     }
 
     @Override
-    public int getId() {
-        return MEDIUM_AMETHYST_BUD;
-    }
-
-    @Override
-    protected String getSizeName() {
-        return "Medium";
-    }
-
-    @Override
     protected int getCrystalHeight() {
         return 4;
     }
@@ -31,7 +21,17 @@ public class BlockAmethystBudMedium extends BlockAmethystBud {
     }
 
     @Override
+    public int getId() {
+        return MEDIUM_AMETHYST_BUD;
+    }
+
+    @Override
     public int getLightLevel() {
         return 2;
+    }
+
+    @Override
+    protected String getSizeName() {
+        return "Medium";
     }
 }

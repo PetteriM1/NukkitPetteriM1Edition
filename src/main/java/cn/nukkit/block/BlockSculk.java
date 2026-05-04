@@ -3,13 +3,35 @@ package cn.nukkit.block;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.item.enchantment.Enchantment;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockSculk extends BlockSolid {
 
     @Override
+    public BlockColor getColor() {
+        return BlockColor.BLACK_BLOCK_COLOR;
+    }
+
+    @Override
+    public int getDropExp() {
+        return 1;
+    }
+
+    @Override
+    public double getHardness() {
+        return 0.2;
+    }
+
+    @Override
     public int getId() {
         return SCULK;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_19_0;
     }
 
     @Override
@@ -23,18 +45,8 @@ public class BlockSculk extends BlockSolid {
     }
 
     @Override
-    public double getHardness() {
-        return 0.2;
-    }
-
-    @Override
-    public double getResistance() {
-        return 0.2;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.BLACK_BLOCK_COLOR;
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.STONE;
     }
 
     @Override
@@ -45,10 +57,5 @@ public class BlockSculk extends BlockSolid {
             };
         }
         return new Item[0];
-    }
-
-    @Override
-    public int getDropExp() {
-        return 1;
     }
 }

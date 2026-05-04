@@ -14,6 +14,16 @@ public class CraftingTakeResultAction extends InventoryAction {
         super(sourceItem, targetItem);
     }
 
+    @Override
+    public boolean execute(Player source) {
+        return true;
+    }
+
+    @Override
+    public boolean isValid(Player source) {
+        return true;
+    }
+
     public void onAddToTransaction(InventoryTransaction transaction) {
         if (transaction instanceof CraftingTransaction) {
             ((CraftingTransaction) transaction).setPrimaryOutput(this.getSourceItem());
@@ -23,20 +33,10 @@ public class CraftingTakeResultAction extends InventoryAction {
     }
 
     @Override
-    public boolean isValid(Player source) {
-        return true;
-    }
-
-    @Override
-    public boolean execute(Player source) {
-        return true;
+    public void onExecuteFail(Player source) {
     }
 
     @Override
     public void onExecuteSuccess(Player $source) {
-    }
-
-    @Override
-    public void onExecuteFail(Player source) {
     }
 }

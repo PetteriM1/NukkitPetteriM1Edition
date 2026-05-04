@@ -10,8 +10,8 @@ public class GUIDataPickItemPacket extends DataPacket {
     public int hotbarSlot;
 
     @Override
-    public byte pid() {
-        return NETWORK_ID;
+    public void decode() {
+        this.hotbarSlot = this.getLInt();
     }
 
     @Override
@@ -21,7 +21,7 @@ public class GUIDataPickItemPacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
-        this.hotbarSlot = this.getLInt();
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

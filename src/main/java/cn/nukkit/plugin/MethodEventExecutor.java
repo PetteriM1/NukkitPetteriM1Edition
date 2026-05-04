@@ -19,6 +19,10 @@ public class MethodEventExecutor implements EventExecutor {
         this.method = method;
     }
 
+    public Method getMethod() {
+        return method;
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public void execute(Listener listener, Event event) throws EventException {
@@ -37,9 +41,5 @@ public class MethodEventExecutor implements EventExecutor {
         } catch (Throwable t) {
             throw new EventException(t);
         }
-    }
-
-    public Method getMethod() {
-        return method;
     }
 }

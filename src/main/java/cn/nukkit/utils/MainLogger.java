@@ -11,7 +11,6 @@ import lombok.extern.log4j.Log4j2;
  * @author MagicDroidX
  * Nukkit
  */
-//We need to keep this class for backwards compatibility
 @Log4j2
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class MainLogger extends Thread implements Logger {
@@ -23,13 +22,13 @@ public class MainLogger extends Thread implements Logger {
     }
 
     @Override
-    public void emergency(String message) {
-        log.fatal(message);
+    public void alert(String message) {
+        log.warn(message);
     }
 
     @Override
-    public void alert(String message) {
-        log.warn(message);
+    public void alert(String message, Throwable t) {
+        log.warn(message, t);
     }
 
     @Override
@@ -38,23 +37,8 @@ public class MainLogger extends Thread implements Logger {
     }
 
     @Override
-    public void error(String message) {
-        log.error(message);
-    }
-
-    @Override
-    public void warning(String message) {
-        log.warn(message);
-    }
-
-    @Override
-    public void notice(String message) {
-        log.warn(message);
-    }
-
-    @Override
-    public void info(String message) {
-        log.info(message);
+    public void critical(String message, Throwable t) {
+        log.fatal(message, t);
     }
 
     @Override
@@ -64,13 +48,14 @@ public class MainLogger extends Thread implements Logger {
         }
     }
 
-    public void logException(Throwable t) {
-        log.throwing(t);
+    @Override
+    public void debug(String message, Throwable t) {
+        log.debug(message, t);
     }
 
     @Override
-    public void log(LogLevel level, String message) {
-        level.log(this, message);
+    public void emergency(String message) {
+        log.fatal(message);
     }
 
     @Override
@@ -79,13 +64,8 @@ public class MainLogger extends Thread implements Logger {
     }
 
     @Override
-    public void alert(String message, Throwable t) {
-        log.warn(message, t);
-    }
-
-    @Override
-    public void critical(String message, Throwable t) {
-        log.fatal(message, t);
+    public void error(String message) {
+        log.error(message);
     }
 
     @Override
@@ -94,13 +74,8 @@ public class MainLogger extends Thread implements Logger {
     }
 
     @Override
-    public void warning(String message, Throwable t) {
-        log.warn(message, t);
-    }
-
-    @Override
-    public void notice(String message, Throwable t) {
-        log.warn(message, t);
+    public void info(String message) {
+        log.info(message);
     }
 
     @Override
@@ -109,12 +84,36 @@ public class MainLogger extends Thread implements Logger {
     }
 
     @Override
-    public void debug(String message, Throwable t) {
-        log.debug(message, t);
+    public void log(LogLevel level, String message) {
+        level.log(this, message);
     }
 
     @Override
     public void log(LogLevel level, String message, Throwable t) {
         level.log(this, message, t);
+    }
+
+    public void logException(Throwable t) {
+        log.throwing(t);
+    }
+
+    @Override
+    public void notice(String message) {
+        log.warn(message);
+    }
+
+    @Override
+    public void notice(String message, Throwable t) {
+        log.warn(message, t);
+    }
+
+    @Override
+    public void warning(String message) {
+        log.warn(message);
+    }
+
+    @Override
+    public void warning(String message, Throwable t) {
+        log.warn(message, t);
     }
 }

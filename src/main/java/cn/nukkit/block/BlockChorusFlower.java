@@ -4,10 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.item.EntityFirework;
-import cn.nukkit.entity.projectile.EntityArrow;
-import cn.nukkit.entity.projectile.EntityEgg;
-import cn.nukkit.entity.projectile.EntitySnowball;
-import cn.nukkit.entity.projectile.EntityThrownTrident;
+import cn.nukkit.entity.projectile.*;
 import cn.nukkit.event.block.BlockGrowEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
@@ -30,14 +27,17 @@ public class BlockChorusFlower extends BlockTransparentMeta {
         super(meta);
     }
 
-    @Override
-    public int getId() {
-        return CHORUS_FLOWER;
+    public void setAge(int age) {
+        this.setDamage(age);
+    }
+
+    public int getAge() {
+        return getDamage();
     }
 
     @Override
-    public String getName() {
-        return "Chorus Flower";
+    public BlockColor getColor() {
+        return BlockColor.PURPLE_BLOCK_COLOR;
     }
 
     @Override
@@ -46,13 +46,31 @@ public class BlockChorusFlower extends BlockTransparentMeta {
     }
 
     @Override
+    public int getId() {
+        return CHORUS_FLOWER;
+    }
+
+    public int getMaxAge() {
+        return 5;
+    }
+
+    @Override
+    public String getName() {
+        return "Chorus Flower";
+    }
+
+    @Override
     public double getResistance() {
-        return 0.4;
+        return 2;
     }
 
     @Override
     public int getToolType() {
         return ItemTool.TYPE_AXE;
+    }
+
+    public boolean isFullyAged() {
+        return getAge() >= getMaxAge();
     }
 
     private boolean isPositionValid() {
@@ -77,6 +95,50 @@ public class BlockChorusFlower extends BlockTransparentMeta {
         }
 
         return foundPlant;
+    }
+
+    @Override
+    public boolean breakWhenPushed() {
+        return true;
+    }
+
+    @Override
+    public Item[] getDrops(Item item) {
+        return new Item[]{this.toItem()};
+    }
+
+    @Override
+    public boolean hasEntityCollision() {
+        return true;
+    }
+
+    private boolean isHorizontalAir(Block block) {
+        for (BlockFace face : BlockFace.Plane.HORIZONTAL) {
+            if (block.getSide(face).getId() != AIR) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean isHorizontalAirExcept(Block block, BlockFace except) {
+        for (BlockFace face : BlockFace.Plane.HORIZONTAL) {
+            if (face != except) {
+                if (block.getSide(face).getId() != AIR) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public void onEntityCollide(Entity entity) {
+        int e = entity.getNetworkId();
+        if (e == EntityArrow.NETWORK_ID || e == EntityThrownTrident.NETWORK_ID || e == EntityFirework.NETWORK_ID || e == EntitySnowball.NETWORK_ID || e == EntityEgg.NETWORK_ID || e == EntityGhastFireBall.NETWORK_ID || e == EntityBlazeFireBall.NETWORK_ID || e == EntityEnderCharge.NETWORK_ID || e == EntityWitherSkull.NETWORK_ID) {
+            entity.close();
+            this.getLevel().useBreakOn(this);
+        }
     }
 
     @Override
@@ -188,72 +250,7 @@ public class BlockChorusFlower extends BlockTransparentMeta {
     }
 
     @Override
-    public Item[] getDrops(Item item) {
-        return new Item[]{this.toItem()};
-    }
-
-    @Override
     public Item toItem() {
         return new ItemBlock(Block.get(this.getId(), 0), 0);
-    }
-
-    @Override
-    public boolean hasEntityCollision() {
-        return true;
-    }
-
-    @Override
-    public void onEntityCollide(Entity entity) {
-        int e = entity.getNetworkId();
-        if (e == EntityArrow.NETWORK_ID || e == EntityThrownTrident.NETWORK_ID || e == EntityFirework.NETWORK_ID || e == EntitySnowball.NETWORK_ID || e == EntityEgg.NETWORK_ID || e == 85 || e == 94 || e == 79 || e == 89) {
-            entity.close();
-            this.getLevel().useBreakOn(this);
-        }
-    }
-
-    public int getMaxAge() {
-        return 5;
-    }
-
-    public int getAge() {
-        return getDamage();
-    }
-
-    public void setAge(int age) {
-        this.setDamage(age);
-    }
-
-    public boolean isFullyAged() {
-        return getAge() >= getMaxAge();
-    }
-
-    private boolean isHorizontalAir(Block block) {
-        for (BlockFace face : BlockFace.Plane.HORIZONTAL) {
-            if (block.getSide(face).getId() != AIR) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private boolean isHorizontalAirExcept(Block block, BlockFace except) {
-        for (BlockFace face : BlockFace.Plane.HORIZONTAL) {
-            if (face != except) {
-                if (block.getSide(face).getId() != AIR) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    @Override
-    public boolean breakWhenPushed() {
-        return true;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.PURPLE_BLOCK_COLOR;
     }
 }

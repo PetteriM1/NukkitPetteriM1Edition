@@ -26,6 +26,13 @@ public abstract class Event {
     protected String eventName = null;
     private boolean isCancelled = false;
 
+    public void setCancelled(boolean value) {
+        if (!(this instanceof Cancellable)) {
+            throw new EventException("Event is not Cancellable");
+        }
+        isCancelled = value;
+    }
+
     final public String getEventName() {
         return eventName == null ? getClass().getName() : eventName;
     }
@@ -37,22 +44,15 @@ public abstract class Event {
         return isCancelled;
     }
 
-    public void setCancelled() {
-        setCancelled(true);
-    }
-
-    public void setCancelled(boolean value) {
-        if (!(this instanceof Cancellable)) {
-            throw new EventException("Event is not Cancellable");
-        }
-        isCancelled = value;
-    }
-
     /**
      * Shortcut for PluginManager.callEvent
      */
     public final Event call() {
         Server.getInstance().getPluginManager().callEvent(this);
         return this;
+    }
+
+    public void setCancelled() {
+        setCancelled(true);
     }
 }

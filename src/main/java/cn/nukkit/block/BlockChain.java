@@ -4,6 +4,8 @@ import cn.nukkit.Player;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockChain extends BlockTransparentMeta {
 
@@ -13,25 +15,6 @@ public class BlockChain extends BlockTransparentMeta {
 
     public BlockChain(int meta) {
         super(meta);
-    }
-
-    @Override
-    public String getName() {
-        return "Iron Chain";
-    }
-
-    @Override
-    public int getId() {
-        return CHAIN_BLOCK;
-    }
-
-    @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        this.setPillarAxis(face.getAxis());
-        if (super.place(item, block, target, face, fx, fy, fz, player)) {
-            return true;
-        }
-        return false;
     }
 
     public void setPillarAxis(BlockFace.Axis axis) {
@@ -48,6 +31,46 @@ public class BlockChain extends BlockTransparentMeta {
         }
     }
 
+    @Override
+    public double getHardness() {
+        return 5;
+    }
+
+    @Override
+    public int getId() {
+        return CHAIN_BLOCK;
+    }
+
+    @Override
+    public double getMaxX() {
+        return x + 9 / 16.0;
+    }
+
+    @Override
+    public double getMaxZ() {
+        return z + 9 / 16.0;
+    }
+
+    @Override
+    public double getMinX() {
+        return x + 7 / 16.0;
+    }
+
+    @Override
+    public double getMinZ() {
+        return z + 7 / 16.0;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_16_0;
+    }
+
+    @Override
+    public String getName() {
+        return "Iron Chain";
+    }
+
     public BlockFace.Axis getPillarAxis() {
         switch (this.getDamage() % 3) {
             case 2:
@@ -61,16 +84,6 @@ public class BlockChain extends BlockTransparentMeta {
     }
 
     @Override
-    public double getHardness() {
-        return 5;
-    }
-
-    @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.WHEN_PLACED_IN_WATER;
-    }
-
-    @Override
     public double getResistance() {
         return 6;
     }
@@ -81,32 +94,31 @@ public class BlockChain extends BlockTransparentMeta {
     }
 
     @Override
-    public double getMinX() {
-        return x + 7 / 16.0;
-    }
-
-    @Override
-    public double getMaxX() {
-        return x + 9 / 16.0;
-    }
-
-    @Override
-    public double getMinZ() {
-        return z + 7 / 16.0;
-    }
-
-    @Override
-    public double getMaxZ() {
-        return z + 9 / 16.0;
-    }
-
-    @Override
-    public Item toItem() {
-        return Item.get(Item.CHAIN);
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.WHEN_PLACED_IN_WATER;
     }
 
     @Override
     public boolean canHarvestWithHand() {
         return false;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.GLASS_PANE;
+    }
+
+    @Override
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        this.setPillarAxis(face.getAxis());
+        if (super.place(item, block, target, face, fx, fy, fz, player)) {
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public Item toItem() {
+        return Item.get(Item.CHAIN);
     }
 }

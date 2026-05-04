@@ -25,8 +25,14 @@ public abstract class Generator implements BlockID {
     public static final int TYPE_NETHER = 3;
     public static final int TYPE_THE_END = 4;
     public static final int TYPE_VOID = 5;
+    private static final Map<String, Class<? extends Generator>> nameList = new HashMap<>();
+    private static final Map<Integer, Class<? extends Generator>> typeList = new HashMap<>();
 
-    public abstract int getId();
+    public abstract ChunkManager getChunkManager();
+
+    public int getDimension() {
+        return Level.DIMENSION_OVERWORLD;
+    }
 
     public DimensionData getDimensionData() {
         DimensionData dimensionData = DimensionEnum.getDataFromId(this.getDimension());
@@ -37,13 +43,18 @@ public abstract class Generator implements BlockID {
         return dimensionData;
     }
 
-    public int getDimension() {
-        return Level.DIMENSION_OVERWORLD;
+    public static String[] getGeneratorList() {
+        String[] keys = new String[Generator.nameList.size()];
+        return Generator.nameList.keySet().toArray(keys);
     }
 
-    private static final Map<String, Class<? extends Generator>> nameList = new HashMap<>();
+    public abstract int getId();
 
-    private static final Map<Integer, Class<? extends Generator>> typeList = new HashMap<>();
+    public abstract String getName();
+
+    public abstract Map<String, Object> getSettings();
+
+    public abstract Vector3 getSpawn();
 
     public static boolean addGenerator(Class<? extends Generator> clazz, String name, int type) {
         name = name.toLowerCase(Locale.ROOT);
@@ -57,22 +68,19 @@ public abstract class Generator implements BlockID {
         return false;
     }
 
-    public static String[] getGeneratorList() {
-        String[] keys = new String[Generator.nameList.size()];
-        return Generator.nameList.keySet().toArray(keys);
+    public abstract void generateChunk(int chunkX, int chunkZ);
+
+    public static Class<? extends Generator> getGenerator(int type) {
+        if (Generator.typeList.containsKey(type)) {
+            return Generator.typeList.get(type);
+        }
+        return Normal.class;
     }
 
     public static Class<? extends Generator> getGenerator(String name) {
         name = name.toLowerCase(Locale.ROOT);
         if (Generator.nameList.containsKey(name)) {
             return Generator.nameList.get(name);
-        }
-        return Normal.class;
-    }
-
-    public static Class<? extends Generator> getGenerator(int type) {
-        if (Generator.typeList.containsKey(type)) {
-            return Generator.typeList.get(type);
         }
         return Normal.class;
     }
@@ -97,15 +105,5 @@ public abstract class Generator implements BlockID {
 
     public abstract void init(ChunkManager level, NukkitRandom random);
 
-    public abstract void generateChunk(int chunkX, int chunkZ);
-
     public abstract void populateChunk(int chunkX, int chunkZ);
-
-    public abstract Map<String, Object> getSettings();
-
-    public abstract String getName();
-
-    public abstract Vector3 getSpawn();
-
-    public abstract ChunkManager getChunkManager();
 }

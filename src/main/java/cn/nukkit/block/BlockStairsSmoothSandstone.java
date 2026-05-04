@@ -14,13 +14,13 @@ public class BlockStairsSmoothSandstone extends BlockStairsSandstone {
     }
 
     @Override
-    public String getName() {
-        return "Smooth Sandstone Stairs";
+    public int getId() {
+        return SMOOTH_SANDSTONE_STAIRS;
     }
 
     @Override
-    public int getId() {
-        return SMOOTH_SANDSTONE_STAIRS;
+    public String getName() {
+        return "Smooth Sandstone Stairs";
     }
 
     @Override

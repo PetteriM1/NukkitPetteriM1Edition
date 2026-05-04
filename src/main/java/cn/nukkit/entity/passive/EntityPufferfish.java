@@ -28,6 +28,16 @@ public class EntityPufferfish extends EntityFish {
     }
 
     @Override
+    public Item[] getDrops() {
+        return new Item[]{Item.get(Item.PUFFERFISH, 0, 1), Item.get(Item.BONE, 0, Utils.rand(0, 2))};
+    }
+
+    @Override
+    public float getHeight() {
+        return 0.35f;
+    }
+
+    @Override
     public int getNetworkId() {
         return NETWORK_ID;
     }
@@ -37,20 +47,13 @@ public class EntityPufferfish extends EntityFish {
         return 0.35f;
     }
 
-    @Override
-    public float getHeight() {
-        return 0.35f;
-    }
-
-    @Override
-    public void initEntity() {
-        this.setMaxHealth(3);
-        super.initEntity();
-    }
-
-    @Override
-    public Item[] getDrops() {
-        return new Item[]{Item.get(Item.PUFFERFISH, 0, 1), Item.get(Item.BONE, 0, Utils.rand(0, 2))};
+    /**
+     * Is puffed
+     *
+     * @return whether the pufferfish is puffed
+     */
+    public boolean isPuffed() {
+        return this.puffed > 0;
     }
 
     @Override
@@ -83,11 +86,9 @@ public class EntityPufferfish extends EntityFish {
         return super.entityBaseTick(tickDiff);
     }
 
-    /**
-     * Is puffed
-     * @return whether the pufferfish is puffed
-     */
-    public boolean isPuffed() {
-        return this.puffed > 0;
+    @Override
+    public void initEntity() {
+        this.setMaxHealth(3);
+        super.initEntity();
     }
 }

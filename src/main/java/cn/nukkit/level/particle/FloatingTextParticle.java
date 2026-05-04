@@ -2,6 +2,7 @@ package cn.nukkit.level.particle;
 
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.data.EntityMetadata;
+import cn.nukkit.entity.item.EntityArmorStand;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Location;
 import cn.nukkit.math.Vector3;
@@ -17,7 +18,7 @@ import java.util.ArrayList;
 public class FloatingTextParticle extends Particle {
 
     protected final Level level;
-    protected long entityId = -1;
+    protected final long entityId = Entity.entityCount++;
     protected boolean invisible = false;
     protected String title;
     protected String text;
@@ -59,8 +60,16 @@ public class FloatingTextParticle extends Particle {
         updateNameTag();
     }
 
-    public String getText() {
-        return this.text == null ? "" : this.text;
+    public void setInvisible(boolean invisible) {
+        this.invisible = invisible;
+
+        if (this.level != null) {
+            if (invisible) {
+                this.level.addChunkPacket(getChunkX(), getChunkZ(), getRemovePacket());
+            } else {
+                this.level.addChunkPacket(getChunkX(), getChunkZ(), getAddPacket());
+            }
+        }
     }
 
     public void setText(String text) {
@@ -69,14 +78,69 @@ public class FloatingTextParticle extends Particle {
         sendMetadata();
     }
 
-    public String getTitle() {
-        return this.title == null ? "" : this.title;
-    }
-
     public void setTitle(String title) {
         this.title = title;
         updateNameTag();
         sendMetadata();
+    }
+
+    private AddEntityPacket getAddPacket() {
+        AddEntityPacket pk = new AddEntityPacket();
+        pk.type = EntityArmorStand.NETWORK_ID;
+        pk.entityUniqueId = this.entityId;
+        pk.entityRuntimeId = this.entityId;
+        pk.x = (float) this.x;
+        pk.y = (float) this.y - 0.75f;
+        pk.z = (float) this.z;
+        pk.metadata = this.metadata;
+        return pk;
+    }
+
+    public long getEntityId() {
+        return this.entityId;
+    }
+
+    private RemoveEntityPacket getRemovePacket() {
+        RemoveEntityPacket pk = new RemoveEntityPacket();
+        pk.eid = this.entityId;
+        return pk;
+    }
+
+    public String getText() {
+        return this.text == null ? "" : this.text;
+    }
+
+    public String getTitle() {
+        return this.title == null ? "" : this.title;
+    }
+
+    public boolean isInvisible() {
+        return this.invisible;
+    }
+
+    @Override
+    public DataPacket[] mvEncode(int protocol) {
+        ArrayList<DataPacket> packets = new ArrayList<>();
+
+        if (!this.invisible) {
+            packets.add(getAddPacket());
+        }
+
+        return packets.toArray(new DataPacket[0]);
+    }
+
+    private void sendMetadata() {
+        if (this.level != null) {
+            SetEntityDataPacket packet = new SetEntityDataPacket();
+            packet.eid = entityId;
+            packet.metadata = this.metadata;
+
+            this.level.addChunkPacket(getChunkX(), getChunkZ(), packet);
+        }
+    }
+
+    public void setInvisible() {
+        this.setInvisible(true);
     }
 
     private void updateNameTag() {
@@ -94,74 +158,5 @@ public class FloatingTextParticle extends Particle {
             tag += this.text;
         }
         this.metadata.putString(Entity.DATA_NAMETAG, tag);
-    }
-
-    private void sendMetadata() {
-        if (this.level != null) {
-            SetEntityDataPacket packet = new SetEntityDataPacket();
-            packet.eid = entityId;
-            packet.metadata = this.metadata;
-
-            this.level.addChunkPacket(getChunkX(), getChunkZ(), packet);
-        }
-    }
-
-    public boolean isInvisible() {
-        return this.invisible;
-    }
-
-    public void setInvisible(boolean invisible) {
-        this.invisible = invisible;
-
-        if (this.level != null) {
-            if (invisible) {
-                this.level.addChunkPacket(getChunkX(), getChunkZ(), getRemovePacket());
-            } else {
-                this.level.addChunkPacket(getChunkX(), getChunkZ(), getAddPacket());
-            }
-        }
-    }
-
-    public void setInvisible() {
-        this.setInvisible(true);
-    }
-
-    public long getEntityId() {
-        return this.entityId;
-    }
-
-    @Override
-    public DataPacket[] encode() {
-        ArrayList<DataPacket> packets = new ArrayList<>();
-
-        if (this.entityId == -1) {
-            this.entityId = Entity.entityCount++;
-        } else {
-            packets.add(getRemovePacket());
-        }
-
-        if (!this.invisible) {
-            packets.add(getAddPacket());
-        }
-
-        return packets.toArray(new DataPacket[0]);
-    }
-
-    private AddEntityPacket getAddPacket() {
-        AddEntityPacket pk = new AddEntityPacket();
-        pk.id = "minecraft:armor_stand";
-        pk.entityUniqueId = this.entityId;
-        pk.entityRuntimeId = this.entityId;
-        pk.x = (float) this.x;
-        pk.y = (float) this.y - 0.75f;
-        pk.z = (float) this.z;
-        pk.metadata = this.metadata;
-        return pk;
-    }
-
-    private RemoveEntityPacket getRemovePacket() {
-        RemoveEntityPacket pk = new RemoveEntityPacket();
-        pk.eid = this.entityId;
-        return pk;
     }
 }

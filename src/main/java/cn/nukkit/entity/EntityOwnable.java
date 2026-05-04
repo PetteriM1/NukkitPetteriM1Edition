@@ -8,9 +8,9 @@ import cn.nukkit.Player;
  */
 public interface EntityOwnable {
 
-    String getOwnerName();
-
     void setOwnerName(String playerName);
 
     Player getOwner();
+
+    String getOwnerName();
 }

@@ -6,11 +6,13 @@ import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityLiving;
 import cn.nukkit.entity.item.*;
 import cn.nukkit.entity.mob.EntityBlaze;
+import cn.nukkit.entity.mob.EntityEnderDragon;
 import cn.nukkit.event.entity.*;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
 import cn.nukkit.level.MovingObjectPosition;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.AxisAlignedBB;
+import cn.nukkit.math.FastMathLite;
 import cn.nukkit.math.NukkitMath;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
@@ -55,17 +57,7 @@ public abstract class EntityProjectile extends Entity {
 
     @Getter
     protected int collidedTick;
-
-    protected double getDamage() {
-        return namedTag.contains("damage") ? namedTag.getDouble("damage") : getBaseDamage();
-    }
-
-    protected double getBaseDamage() {
-        return 0;
-    }
-
     public boolean hadCollision = false;
-
     public int piercing;
 
     public EntityProjectile(FullChunk chunk, CompoundTag nbt) {
@@ -80,8 +72,17 @@ public abstract class EntityProjectile extends Entity {
         }*/
     }
 
+    protected double getBaseDamage() {
+        return 0;
+    }
+
+    protected double getDamage() {
+        return namedTag.contains("damage") ? namedTag.getDouble("damage") : getBaseDamage();
+    }
+
     /**
      * Get the amount of damage this projectile will deal to the entity it hits.
+     *
      * @return damage
      */
     public int getResultDamage() {
@@ -90,6 +91,41 @@ public abstract class EntityProjectile extends Entity {
 
     public boolean attack(EntityDamageEvent source) {
         return source.getCause() == DamageCause.VOID && super.attack(source);
+    }
+
+    @Override
+    public boolean canCollideWith(Entity entity) {
+        return (entity instanceof EntityLiving || entity instanceof EntityEndCrystal || entity instanceof EntityMinecartAbstract || entity instanceof EntityBoat || entity instanceof EntityPainting) && !this.onGround && !entity.noClip && !this.noClip;
+    }
+
+    /**
+     * Add inaccuracy to projectile movement. Used internally with dispensers.
+     *
+     * @param modifier multiplier
+     */
+    public void inaccurate(float modifier) {
+        ThreadLocalRandom rand = ThreadLocalRandom.current();
+
+        this.motionX += rand.nextGaussian() * 0.007499999832361937 * modifier;
+        this.motionY += rand.nextGaussian() * 0.007499999832361937 * modifier;
+        this.motionZ += rand.nextGaussian() * 0.007499999832361937 * modifier;
+    }
+
+    @Override
+    protected void initEntity() {
+        this.setMaxHealth(1);
+        super.initEntity();
+        this.setHealth(1);
+
+        if (this.namedTag.contains("Age")) {
+            this.age = this.namedTag.getShort("Age");
+        }
+
+        if (this.namedTag.contains("knockback")) {
+            this.knockBack = this.namedTag.getFloat("knockback");
+        }
+
+        this.updateRotation();
     }
 
     public void onCollideWithEntity(Entity entity) {
@@ -124,32 +160,14 @@ public abstract class EntityProjectile extends Entity {
         this.close();
     }
 
-    @Override
-    protected void initEntity() {
-        this.setMaxHealth(1);
-        super.initEntity();
-        this.setHealth(1);
+    protected void onHit() {
 
-        if (this.namedTag.contains("Age")) {
-            this.age = this.namedTag.getShort("Age");
-        }
-
-        if (this.namedTag.contains("knockback")) {
-            this.knockBack = this.namedTag.getFloat("knockback");
-        }
-
-        this.updateRotation();
     }
 
-    @Override
-    public boolean canCollideWith(Entity entity) {
-        return (entity instanceof EntityLiving || entity instanceof EntityEndCrystal || entity instanceof EntityMinecartAbstract || entity instanceof EntityBoat || entity instanceof EntityPainting) && !this.onGround && !entity.noClip && !this.noClip;
-    }
-
-    @Override
-    public void saveNBT() {
-        super.saveNBT();
-        this.namedTag.putShort("Age", this.age);
+    protected void onHitGround(Vector3 moveVector) {
+        this.collidedTick = level.getServer().getTick();
+        Block block = level.getBlock(this.chunk, moveVector.getFloorX(), moveVector.getFloorY(), moveVector.getFloorZ(), false);
+        block.onEntityCollide(this);
     }
 
     @Override
@@ -196,7 +214,8 @@ public abstract class EntityProjectile extends Entity {
             Entity nearEntity = null;
 
             for (Entity entity : list) {
-                if (/*!entity.canCollideWith(this) || */(entity == this.shootingEntity && this.age < 5) || (entity instanceof Player && ((Player) entity).getGamemode() == Player.SPECTATOR)) {
+                if (/*!entity.canCollideWith(this) || */(entity == this.shootingEntity && this.age < 5) || (entity instanceof Player && ((Player) entity).getGamemode() == Player.SPECTATOR) ||
+                        (this instanceof EntityEnderCharge && entity instanceof EntityEnderDragon)) {
                     continue;
                 }
 
@@ -231,7 +250,8 @@ public abstract class EntityProjectile extends Entity {
             if (this.isCollided && !this.hadCollision) { // Collide with block
                 // Make sure last move tick is broadcast
                 // However previous yaw & pitch are actually the correct ones
-                if (!(this instanceof EntityFishingHook)) this.addMovement(this.x, this.y, this.z, this.lastYaw, this.lastPitch, this.lastYaw);
+                if (!(this instanceof EntityFishingHook))
+                    this.addMovement(this.x, this.y, this.z, this.lastYaw, this.lastPitch, this.lastYaw);
 
                 this.hadCollision = true;
 
@@ -262,35 +282,18 @@ public abstract class EntityProjectile extends Entity {
         return hasUpdate;
     }
 
+    @Override
+    public void saveNBT() {
+        super.saveNBT();
+        this.namedTag.putShort("Age", this.age);
+    }
+
     /**
      * Update projectile rotation to match its motion.
      */
     public void updateRotation() {
         double f = Math.sqrt((this.motionX * this.motionX) + (this.motionZ * this.motionZ));
-        this.yaw = Math.atan2(this.motionX, this.motionZ) * 180 / Math.PI;
-        this.pitch = Math.atan2(this.motionY, f) * 180 / Math.PI;
-    }
-
-    /**
-     * Add inaccuracy to projectile movement. Used internally with dispensers.
-     *
-     * @param modifier multiplier
-     */
-    public void inaccurate(float modifier) {
-        ThreadLocalRandom rand = ThreadLocalRandom.current();
-
-        this.motionX += rand.nextGaussian() * 0.007499999832361937 * modifier;
-        this.motionY += rand.nextGaussian() * 0.007499999832361937 * modifier;
-        this.motionZ += rand.nextGaussian() * 0.007499999832361937 * modifier;
-    }
-
-    protected void onHit() {
-
-    }
-
-    protected void onHitGround(Vector3 moveVector) {
-        this.collidedTick = level.getServer().getTick();
-        Block block = level.getBlock(this.chunk, moveVector.getFloorX(), moveVector.getFloorY(), moveVector.getFloorZ(), false);
-        block.onEntityCollide(this);
+        this.yaw = FastMathLite.atan2(this.motionX, this.motionZ) * 180 / Math.PI;
+        this.pitch = FastMathLite.atan2(this.motionY, f) * 180 / Math.PI;
     }
 }

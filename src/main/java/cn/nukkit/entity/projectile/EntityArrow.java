@@ -23,36 +23,6 @@ public class EntityArrow extends EntityProjectile {
     private int arrowData;
     private boolean isFromCrossbow;
 
-    @Override
-    public int getNetworkId() {
-        return NETWORK_ID;
-    }
-
-    @Override
-    public float getWidth() {
-        return 0.05f;
-    }
-
-    @Override
-    public float getLength() {
-        return 0.5f;
-    }
-
-    @Override
-    public float getHeight() {
-        return 0.05f;
-    }
-
-    @Override
-    public float getGravity() {
-        return 0.05f;
-    }
-
-    @Override
-    public float getDrag() {
-        return 0.01f;
-    }
-
     public EntityArrow(FullChunk chunk, CompoundTag nbt) {
         this(chunk, nbt, null);
     }
@@ -71,6 +41,13 @@ public class EntityArrow extends EntityProjectile {
         this.isFromCrossbow = isFromCrossbow;
     }
 
+    public void setCritical(boolean value) {
+        if (this.critical != value) {
+            this.critical = value;
+            this.setDataFlag(DATA_FLAGS, DATA_FLAG_CRITICAL, value);
+        }
+    }
+
     /**
      * Set arrow data.
      * Used internally for tipped arrows.
@@ -84,6 +61,15 @@ public class EntityArrow extends EntityProjectile {
         this.setDataProperty(new ByteEntityData(DATA_HAS_DISPLAY, this.arrowData), false);
     }
 
+    public void setPickupMode(int pickupMode) {
+        this.pickupMode = pickupMode;
+    }
+
+    @Override
+    protected double getBaseDamage() {
+        return 2;
+    }
+
     /**
      * Get arrow data.
      *
@@ -91,6 +77,59 @@ public class EntityArrow extends EntityProjectile {
      */
     public int getData() {
         return this.arrowData;
+    }
+
+    @Override
+    public float getDrag() {
+        return 0.01f;
+    }
+
+    @Override
+    public float getGravity() {
+        return 0.05f;
+    }
+
+    @Override
+    public float getHeight() {
+        return 0.05f;
+    }
+
+    @Override
+    public float getLength() {
+        return 0.5f;
+    }
+
+    @Override
+    public int getNetworkId() {
+        return NETWORK_ID;
+    }
+
+    public int getPickupMode() {
+        return this.pickupMode;
+    }
+
+    @Override
+    public int getResultDamage() {
+        int base = NukkitMath.ceilDouble(Math.sqrt(this.motionX * this.motionX + this.motionY * this.motionY + this.motionZ * this.motionZ) * getDamage());
+
+        if (this.isCritical()) {
+            base += ThreadLocalRandom.current().nextInt((base >> 1) + 2);
+        }
+
+        if (this.isFromCrossbow) {
+            base += 2; // magic value
+        }
+
+        return base;
+    }
+
+    @Override
+    public float getWidth() {
+        return 0.05f;
+    }
+
+    public boolean isCritical() {
+        return this.critical;
     }
 
     /**
@@ -116,39 +155,16 @@ public class EntityArrow extends EntityProjectile {
         this.isFromCrossbow = namedTag.getBoolean("isFromCrossbow");
     }
 
-    public void setCritical() {
-        this.setCritical(true);
-    }
-
-    public void setCritical(boolean value) {
-        if (this.critical != value) {
-            this.critical = value;
-            this.setDataFlag(DATA_FLAGS, DATA_FLAG_CRITICAL, value);
-        }
-    }
-
-    public boolean isCritical() {
-        return this.critical;
+    @Override
+    public void onHit() {
+        this.getLevel().addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_BOW_HIT);
     }
 
     @Override
-    public int getResultDamage() {
-        int base = NukkitMath.ceilDouble(Math.sqrt(this.motionX * this.motionX + this.motionY * this.motionY + this.motionZ * this.motionZ) * getDamage());
+    public void onHitGround(Vector3 moveVector) {
+        super.onHitGround(moveVector);
 
-        if (this.isCritical()) {
-            base += ThreadLocalRandom.current().nextInt((base >> 1) + 2);
-        }
-
-        if (this.isFromCrossbow) {
-            base += 2; // magic value
-        }
-
-        return base;
-    }
-
-    @Override
-    protected double getBaseDamage() {
-        return 2;
+        this.setCritical(false);
     }
 
     @Override
@@ -178,23 +194,7 @@ public class EntityArrow extends EntityProjectile {
         this.namedTag.putBoolean("isFromCrossbow", this.isFromCrossbow);
     }
 
-    public int getPickupMode() {
-        return this.pickupMode;
-    }
-
-    public void setPickupMode(int pickupMode) {
-        this.pickupMode = pickupMode;
-    }
-
-    @Override
-    public void onHit() {
-        this.getLevel().addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_BOW_HIT);
-    }
-
-    @Override
-    public void onHitGround(Vector3 moveVector) {
-        super.onHitGround(moveVector);
-
-        this.setCritical(false);
+    public void setCritical() {
+        this.setCritical(true);
     }
 }

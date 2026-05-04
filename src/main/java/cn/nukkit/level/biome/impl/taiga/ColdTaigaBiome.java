@@ -20,11 +20,6 @@ public class ColdTaigaBiome extends TaigaBiome {
     }
 
     @Override
-    public int getCoverId(int x, int z) {
-        return Block.SNOW_LAYER << Block.DATA_BITS;
-    }
-
-    @Override
     public boolean isFreezing() {
         return true;
     }
@@ -32,5 +27,10 @@ public class ColdTaigaBiome extends TaigaBiome {
     @Override
     public boolean canRain() {
         return false;
+    }
+
+    @Override
+    public int getCoverId(int x, int z) {
+        return Block.SNOW_LAYER << Block.DATA_BITS;
     }
 }

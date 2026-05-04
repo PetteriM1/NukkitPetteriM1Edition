@@ -31,6 +31,24 @@ public class EntityMinecartChest extends EntityMinecartAbstract implements Inven
     }
 
     @Override
+    public String getInteractButtonText() {
+        return "action.interact.opencontainer";
+    }
+
+    @Override
+    public MinecartChestInventory getInventory() {
+        if (this.inventory == null) {
+            this.initInventory();
+        }
+        return inventory;
+    }
+
+    @Override
+    public int getNetworkId() {
+        return NETWORK_ID;
+    }
+
+    @Override
     public MinecartType getType() {
         return MinecartType.valueOf(1);
     }
@@ -38,11 +56,6 @@ public class EntityMinecartChest extends EntityMinecartAbstract implements Inven
     @Override
     public boolean isRideable() {
         return false;
-    }
-
-    @Override
-    public int getNetworkId() {
-        return NETWORK_ID;
     }
 
     @Override
@@ -65,27 +78,6 @@ public class EntityMinecartChest extends EntityMinecartAbstract implements Inven
             }
             this.inventory.clearAll();
         }
-    }
-
-    @Override
-    public boolean mountEntity(Entity entity, byte mode) {
-        return false;
-    }
-
-    @Override
-    public boolean onInteract(Player player, Item item, Vector3 clickedPos) {
-        if (this.isAlive()) {
-            player.addWindow(this.getInventory());
-        }
-        return false; // If true, the count of items player has in hand decreases
-    }
-
-    @Override
-    public MinecartChestInventory getInventory() {
-        if (this.inventory == null) {
-            this.initInventory();
-        }
-        return inventory;
     }
 
     @Override
@@ -115,6 +107,19 @@ public class EntityMinecartChest extends EntityMinecartAbstract implements Inven
     }
 
     @Override
+    public boolean mountEntity(Entity entity, byte mode) {
+        return false;
+    }
+
+    @Override
+    public boolean onInteract(Player player, Item item, Vector3 clickedPos) {
+        if (this.isAlive()) {
+            player.addWindow(this.getInventory());
+        }
+        return false; // If true, the count of items player has in hand decreases
+    }
+
+    @Override
     public void saveNBT() {
         super.saveNBT();
 
@@ -128,10 +133,5 @@ public class EntityMinecartChest extends EntityMinecartAbstract implements Inven
                 }
             }
         }
-    }
-
-    @Override
-    public String getInteractButtonText() {
-        return "action.interact.opencontainer";
     }
 }

@@ -1,5 +1,6 @@
 package cn.nukkit.entity.mob;
 
+import cn.nukkit.entity.Entity;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 
@@ -12,9 +13,13 @@ public class EntityCreaking extends EntityWalkingMob {
     }
 
     @Override
-    public void initEntity() {
-        this.setMaxHealth(1);
-        super.initEntity();
+    public float getHeight() {
+        return 2.7f;
+    }
+
+    @Override
+    public int getKillExperience() {
+        return 0;
     }
 
     @Override
@@ -28,12 +33,13 @@ public class EntityCreaking extends EntityWalkingMob {
     }
 
     @Override
-    public float getHeight() {
-        return 2.7f;
+    public void attackEntity(Entity player) {
+
     }
 
     @Override
-    public int getKillExperience() {
-        return 0;
+    public void initEntity() {
+        this.setMaxHealth(1);
+        super.initEntity();
     }
 }

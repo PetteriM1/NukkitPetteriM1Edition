@@ -28,16 +28,6 @@ public class BlockWood2 extends BlockWood {
     }
 
     @Override
-    public int getId() {
-        return WOOD2;
-    }
-
-    @Override
-    public String getName() {
-        return NAMES[this.getDamage() > 2 ? 0 : this.getDamage()];
-    }
-
-    @Override
     public BlockColor getColor() {
         switch (getDamage() & 0x07) {
             case ACACIA:
@@ -50,17 +40,28 @@ public class BlockWood2 extends BlockWood {
     }
 
     @Override
-    public boolean canBeActivated() {
-        return true;
+    public int getId() {
+        return WOOD2;
     }
 
     @Override
-    public Item toItem() {
-        if (this.getDamage() > 11) {
-            int variant = this.getDamage() & 0x07;
-            return new ItemBlock(Block.get(WOOD_BARK, variant), variant);
+    public String getName() {
+        return NAMES[this.getDamage() > 2 ? 0 : this.getDamage()];
+    }
+
+    @Override
+    protected int getStrippedDamage() {
+        int damage = getDamage();
+        if ((damage & 0b1100) == 0b1100) { // Only bark
+            int typeId = damage & 0x3;
+            if (typeId == 0) {
+                return 0x4 | 0x8;
+            } else {
+                return 0x5 | 0x8;
+            }
         }
-        return new ItemBlock(this, this.getDamage() & 0x03);
+
+        return super.getStrippedDamage();
     }
 
     @Override
@@ -79,17 +80,16 @@ public class BlockWood2 extends BlockWood {
     }
 
     @Override
-    protected int getStrippedDamage() {
-        int damage = getDamage();
-        if ((damage & 0b1100) == 0b1100) { // Only bark
-            int typeId = damage & 0x3;
-            if (typeId == 0) {
-                return 0x4 | 0x8;
-            } else {
-                return 0x5 | 0x8;
-            }
-        }
+    public boolean canBeActivated() {
+        return true;
+    }
 
-        return super.getStrippedDamage();
+    @Override
+    public Item toItem() {
+        if (this.getDamage() > 11) {
+            int variant = this.getDamage() & 0x07;
+            return new ItemBlock(Block.get(WOOD_BARK, variant), variant);
+        }
+        return new ItemBlock(this, this.getDamage() & 0x03);
     }
 }

@@ -24,13 +24,17 @@ public class BlockEndPortalFrame extends BlockTransparentMeta implements Faceabl
     }
 
     @Override
-    public int getId() {
-        return END_PORTAL_FRAME;
+    public BlockFace getBlockFace() {
+        return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
     }
 
     @Override
-    public double getResistance() {
-        return 18000000;
+    public BlockColor getColor() {
+        return BlockColor.GREEN_BLOCK_COLOR;
+    }
+
+    public int getComparatorInputOverride() {
+        return (getDamage() & 4) != 0 ? 15 : 0;
     }
 
     @Override
@@ -39,18 +43,13 @@ public class BlockEndPortalFrame extends BlockTransparentMeta implements Faceabl
     }
 
     @Override
+    public int getId() {
+        return END_PORTAL_FRAME;
+    }
+
+    @Override
     public int getLightLevel() {
         return 1;
-    }
-
-    @Override
-    public String getName() {
-        return "End Portal Frame";
-    }
-
-    @Override
-    public boolean isBreakable(Item item) {
-        return false;
     }
 
     @Override
@@ -59,7 +58,32 @@ public class BlockEndPortalFrame extends BlockTransparentMeta implements Faceabl
     }
 
     @Override
+    public String getName() {
+        return "End Portal Frame";
+    }
+
+    @Override
+    public double getResistance() {
+        return 18000000;
+    }
+
+    @Override
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.WHEN_PLACED_IN_WATER;
+    }
+
+    @Override
+    public boolean canBeActivated() {
+        return true;
+    }
+
+    @Override
     public boolean canBePushed() {
+        return false;
+    }
+
+    @Override
+    public boolean canHarvestWithHand() {
         return false;
     }
 
@@ -67,12 +91,20 @@ public class BlockEndPortalFrame extends BlockTransparentMeta implements Faceabl
         return true;
     }
 
-    public int getComparatorInputOverride() {
-        return (getDamage() & 4) != 0 ? 15 : 0;
+    @Override
+    public boolean isBreakable(Item item) {
+        return false;
     }
 
-    @Override
-    public boolean canBeActivated() {
+    private static boolean isCompletedPortal(Block center) {
+        for (int i = 0; i < 4; i++) {
+            for (int j = -1; j <= 1; j++) {
+                Block block = center.getSide(BlockFace.fromHorizontalIndex(i), 2).getSide(BlockFace.fromHorizontalIndex((i + 1) % 4), j);
+                if (block.getId() != Block.END_PORTAL_FRAME || (block.getDamage() & 0x4) == 0) {
+                    return false;
+                }
+            }
+        }
         return true;
     }
 
@@ -102,21 +134,6 @@ public class BlockEndPortalFrame extends BlockTransparentMeta implements Faceabl
     }
 
     @Override
-    public boolean canHarvestWithHand() {
-        return false;
-    }
-
-    @Override
-    public Item toItem() {
-        return new ItemBlock(Block.get(this.getId(), 0), 0);
-    }
-
-    @Override
-    public BlockFace getBlockFace() {
-        return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
-    }
-
-    @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
         this.setDamage(FACES[player != null ? player.getDirection().getHorizontalIndex() : 0]);
 
@@ -124,25 +141,8 @@ public class BlockEndPortalFrame extends BlockTransparentMeta implements Faceabl
         return true;
     }
 
-    private static boolean isCompletedPortal(Block center) {
-        for (int i = 0; i < 4; i++) {
-            for (int j = -1; j <= 1; j++) {
-                Block block = center.getSide(BlockFace.fromHorizontalIndex(i), 2).getSide(BlockFace.fromHorizontalIndex((i + 1) % 4), j);
-                if (block.getId() != Block.END_PORTAL_FRAME || (block.getDamage() & 0x4) == 0) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
     @Override
-    public BlockColor getColor() {
-        return BlockColor.GREEN_BLOCK_COLOR;
-    }
-
-    @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.WHEN_PLACED_IN_WATER;
+    public Item toItem() {
+        return new ItemBlock(Block.get(this.getId(), 0), 0);
     }
 }

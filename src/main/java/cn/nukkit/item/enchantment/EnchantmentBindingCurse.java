@@ -7,8 +7,8 @@ public class EnchantmentBindingCurse extends Enchantment {
     }
 
     @Override
-    public int getMinEnchantAbility(int level) {
-        return 25;
+    public boolean isTreasure() {
+        return true;
     }
 
     @Override
@@ -17,7 +17,7 @@ public class EnchantmentBindingCurse extends Enchantment {
     }
 
     @Override
-    public boolean isTreasure() {
-        return true;
+    public int getMinEnchantAbility(int level) {
+        return 25;
     }
 }

@@ -5,7 +5,7 @@ import cn.nukkit.block.properties.OxidizationLevel;
 import java.util.Locale;
 
 public class BlockSlabCopperCut extends BlockSlabCopperBase {
-    
+
     public BlockSlabCopperCut() {
         this(0);
     }
@@ -21,6 +21,11 @@ public class BlockSlabCopperCut extends BlockSlabCopperBase {
     @Override
     public int getId() {
         return CUT_COPPER_SLAB;
+    }
+
+    @Override
+    public OxidizationLevel getOxidizationLevel() {
+        return OxidizationLevel.UNAFFECTED;
     }
 
     @Override
@@ -55,10 +60,5 @@ public class BlockSlabCopperCut extends BlockSlabCopperBase {
             default:
                 return getId();
         }
-    }
-
-    @Override
-    public OxidizationLevel getOxidizationLevel() {
-        return OxidizationLevel.UNAFFECTED;
     }
 }

@@ -18,13 +18,8 @@ public class EntitySquid extends EntityWaterAnimal {
     }
 
     @Override
-    public int getNetworkId() {
-        return NETWORK_ID;
-    }
-
-    @Override
-    public float getWidth() {
-        return 0.95f;
+    public Item[] getDrops() {
+        return new Item[]{Item.get(Item.DYE, DyeColor.BLACK.getDyeData(), Utils.rand(1, 3))};
     }
 
     @Override
@@ -33,19 +28,18 @@ public class EntitySquid extends EntityWaterAnimal {
     }
 
     @Override
-    public void initEntity() {
-        this.setMaxHealth(10);
-        super.initEntity();
-    }
-
-    @Override
-    public Item[] getDrops() {
-        return new Item[]{Item.get(Item.DYE, DyeColor.BLACK.getDyeData(), Utils.rand(1, 3))};
-    }
-
-    @Override
     public int getKillExperience() {
         return this.isBaby() ? 0 : Utils.rand(1, 3);
+    }
+
+    @Override
+    public int getNetworkId() {
+        return NETWORK_ID;
+    }
+
+    @Override
+    public float getWidth() {
+        return 0.95f;
     }
 
     @Override
@@ -62,5 +56,11 @@ public class EntitySquid extends EntityWaterAnimal {
             this.level.addChunkPacket(this.getChunkX(), this.getChunkZ(), pk);
         }
         return att;
+    }
+
+    @Override
+    public void initEntity() {
+        this.setMaxHealth(10);
+        super.initEntity();
     }
 }

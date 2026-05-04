@@ -9,8 +9,6 @@ import cn.nukkit.item.ItemBlock;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
-import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
-import it.unimi.dsi.fastutil.ints.IntSet;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -26,14 +24,28 @@ public class BlockEntitySmoker extends BlockEntityFurnace {
     }
 
     @Override
+    public CompoundTag getSpawnCompound() {
+        CompoundTag c = new CompoundTag()
+                .putString("id", BlockEntity.SMOKER)
+                .putInt("x", (int) this.x)
+                .putInt("y", (int) this.y)
+                .putInt("z", (int) this.z)
+                .putShort("BurnDuration", burnDuration)
+                .putShort("BurnTime", burnTime)
+                .putShort("CookTime", cookTime);
+
+        if (this.hasName()) {
+            c.put("CustomName", this.namedTag.get("CustomName"));
+        }
+
+        return c;
+    }
+
+    @Override
     public boolean isBlockEntityValid() {
         int blockID = level.getBlockIdAt(chunk, (int) x, (int) y, (int) z);
         return blockID == Block.SMOKER || blockID == Block.LIT_SMOKER;
     }
-
-    private static final IntSet CAN_SMELT = new IntOpenHashSet(new int[]{
-            Item.RAW_PORKCHOP, Item.RAW_BEEF, Item.RAW_RABBIT, Item.RAW_FISH, Item.RAW_CHICKEN, Item.RAW_MUTTON, Item.RAW_SALMON, Item.POTATO
-    });
 
     @Override
     public boolean onUpdate() {
@@ -41,30 +53,10 @@ public class BlockEntitySmoker extends BlockEntityFurnace {
             return false;
         }
 
-        Item raw = this.inventory.getSmelting();
-        // TODO: smoker recipes
-        if (!CAN_SMELT.contains(raw.getId())) {
-            if (burnTime > 0) {
-                burnTime--;
-                burnDuration = (int) Math.ceil((float) burnTime / maxTime * 100);
-
-                if (burnTime == 0) {
-                    Block block = this.level.getBlock(this.chunk, (int) x, (int) y, (int) z, true);
-                    if (block.getId() == BlockID.LIT_SMOKER) {
-                        this.level.setBlock(this, Block.get(BlockID.SMOKER, block.getDamage()), true);
-                    }
-                    return false;
-                }
-            }
-
-            cookTime = 0;
-            sendPacket();
-            return true;
-        }
-
         boolean ret = false;
+        Item raw = this.inventory.getSmelting();
         Item product = this.inventory.getResult();
-        FurnaceRecipe smelt = this.server.getCraftingManager().matchFurnaceRecipe(raw);
+        FurnaceRecipe smelt = this.server.getCraftingManager().matchSmokerRecipe(raw);
         boolean canSmelt = (smelt != null && raw.getCount() > 0 && ((smelt.getResult().equals(product) && product.getCount() < product.getMaxStackSize()) || product.getId() == Item.AIR));
 
         Item fuel;
@@ -122,23 +114,5 @@ public class BlockEntitySmoker extends BlockEntityFurnace {
         sendPacket();
 
         return ret;
-    }
-
-    @Override
-    public CompoundTag getSpawnCompound() {
-        CompoundTag c = new CompoundTag()
-                .putString("id", BlockEntity.SMOKER)
-                .putInt("x", (int) this.x)
-                .putInt("y", (int) this.y)
-                .putInt("z", (int) this.z)
-                .putShort("BurnDuration", burnDuration)
-                .putShort("BurnTime", burnTime)
-                .putShort("CookTime", cookTime);
-
-        if (this.hasName()) {
-            c.put("CustomName", this.namedTag.get("CustomName"));
-        }
-
-        return c;
     }
 }

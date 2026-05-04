@@ -19,30 +19,23 @@ public class BooleanBlockProperty extends BlockProperty<Boolean> {
     }
 
     @Override
-    public int setValue(int currentMeta, int bitOffset, Boolean newValue) {
-        boolean value = newValue != null && newValue;
-        return this.setValue(currentMeta, bitOffset, value);
+    public Boolean getDefaultValue() {
+        return Boolean.FALSE;
     }
 
     @Override
-    public long setValue(long currentBigMeta, int bitOffset, Boolean newValue) {
-        boolean value = newValue != null && newValue;
-        return this.setValue(currentBigMeta, bitOffset, value);
-    }
-
-    public int setValue(int currentMeta, int bitOffset, boolean newValue) {
-        int mask = 1 << bitOffset;
-        return newValue ? (currentMeta | mask) : (currentMeta & ~mask);
+    public Class<Boolean> getValueClass() {
+        return Boolean.class;
     }
 
     @Override
-    public Boolean getValue(int currentMeta, int bitOffset) {
-        return this.getBooleanValue(currentMeta, bitOffset);
+    public BooleanBlockProperty copy() {
+        return new BooleanBlockProperty(this.getName(), this.isExportedToItem(), this.getPersistenceName());
     }
 
     @Override
-    public Boolean getValue(long currentBigMeta, int bitOffset) {
-        return this.getBooleanValue(currentBigMeta, bitOffset);
+    public BooleanBlockProperty exportingToItems(boolean exportedToItem) {
+        return new BooleanBlockProperty(this.getName(), exportedToItem, this.getPersistenceName());
     }
 
     public boolean getBooleanValue(int currentMeta, int bitOffset) {
@@ -60,29 +53,6 @@ public class BooleanBlockProperty extends BlockProperty<Boolean> {
         return mask.equals(currentHugeData.and(mask));
     }
 
-    @Override
-    public int getIntValue(int currentMeta, int bitOffset) {
-        return this.getBooleanValue(currentMeta, bitOffset)? 1 : 0;
-    }
-
-    @Override
-    public int getIntValueForMeta(int meta) {
-        if (meta == 1 || meta == 0) {
-            return meta;
-        }
-        throw new InvalidBlockPropertyMetaException(this, meta, meta, "Only 1 or 0 was expected");
-    }
-
-    @Override
-    public int getMetaForValue(Boolean value) {
-        return Boolean.TRUE.equals(value)? 1 : 0;
-    }
-
-    @Override
-    public Boolean getValueForMeta(int meta) {
-        return this.getBooleanValueForMeta(meta);
-    }
-
     public boolean getBooleanValueForMeta(int meta) {
         if (meta == 0) {
             return false;
@@ -94,14 +64,16 @@ public class BooleanBlockProperty extends BlockProperty<Boolean> {
     }
 
     @Override
-    public Serializable getPersistenceValueForMeta(int meta) {
-        if (meta == 1) {
-            return true;
-        } else if (meta == 0) {
-            return false;
-        } else {
-            throw new InvalidBlockPropertyMetaException(this, meta, meta, "Only 1 or 0 was expected");
+    public int getIntValue(int currentMeta, int bitOffset) {
+        return this.getBooleanValue(currentMeta, bitOffset) ? 1 : 0;
+    }
+
+    @Override
+    public int getIntValueForMeta(int meta) {
+        if (meta == 1 || meta == 0) {
+            return meta;
         }
+        throw new InvalidBlockPropertyMetaException(this, meta, meta, "Only 1 or 0 was expected");
     }
 
     @Override
@@ -116,8 +88,34 @@ public class BooleanBlockProperty extends BlockProperty<Boolean> {
     }
 
     @Override
-    public Boolean getDefaultValue() {
-        return Boolean.FALSE;
+    public int getMetaForValue(Boolean value) {
+        return Boolean.TRUE.equals(value) ? 1 : 0;
+    }
+
+    @Override
+    public Serializable getPersistenceValueForMeta(int meta) {
+        if (meta == 1) {
+            return true;
+        } else if (meta == 0) {
+            return false;
+        } else {
+            throw new InvalidBlockPropertyMetaException(this, meta, meta, "Only 1 or 0 was expected");
+        }
+    }
+
+    @Override
+    public Boolean getValue(int currentMeta, int bitOffset) {
+        return this.getBooleanValue(currentMeta, bitOffset);
+    }
+
+    @Override
+    public Boolean getValue(long currentBigMeta, int bitOffset) {
+        return this.getBooleanValue(currentBigMeta, bitOffset);
+    }
+
+    @Override
+    public Boolean getValueForMeta(int meta) {
+        return this.getBooleanValueForMeta(meta);
     }
 
     @Override
@@ -126,22 +124,24 @@ public class BooleanBlockProperty extends BlockProperty<Boolean> {
     }
 
     @Override
+    public int setValue(int currentMeta, int bitOffset, Boolean newValue) {
+        boolean value = newValue != null && newValue;
+        return this.setValue(currentMeta, bitOffset, value);
+    }
+
+    @Override
+    public long setValue(long currentBigMeta, int bitOffset, Boolean newValue) {
+        boolean value = newValue != null && newValue;
+        return this.setValue(currentBigMeta, bitOffset, value);
+    }
+
+    public int setValue(int currentMeta, int bitOffset, boolean newValue) {
+        int mask = 1 << bitOffset;
+        return newValue ? (currentMeta | mask) : (currentMeta & ~mask);
+    }
+
+    @Override
     protected void validateMetaDirectly(int meta) {
         Preconditions.checkArgument(meta == 1 || meta == 0, "Must be 1 or 0");
-    }
-
-    @Override
-    public Class<Boolean> getValueClass() {
-        return Boolean.class;
-    }
-
-    @Override
-    public BooleanBlockProperty exportingToItems(boolean exportedToItem) {
-        return new BooleanBlockProperty(this.getName(), exportedToItem, this.getPersistenceName());
-    }
-
-    @Override
-    public BooleanBlockProperty copy() {
-        return new BooleanBlockProperty(this.getName(), this.isExportedToItem(), this.getPersistenceName());
     }
 }

@@ -4,8 +4,6 @@ import lombok.Getter;
 
 public interface ItemTrimPattern {
 
-    Type getPattern();
-
     enum Type {
 
         BOLT("bolt"),
@@ -34,4 +32,6 @@ public interface ItemTrimPattern {
             this.trimPattern = name;
         }
     }
+
+    Type getPattern();
 }

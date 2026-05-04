@@ -8,11 +8,6 @@ public class DeathInfoPacket extends DataPacket {
     public String[] messageParameters = new String[0];
 
     @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
-    @Override
     public void decode() {
         this.decodeUnsupported();
     }
@@ -25,5 +20,10 @@ public class DeathInfoPacket extends DataPacket {
         for (String parameter : this.messageParameters) {
             this.putString(parameter);
         }
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

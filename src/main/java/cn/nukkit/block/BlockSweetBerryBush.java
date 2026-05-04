@@ -32,18 +32,8 @@ public class BlockSweetBerryBush extends BlockFlowable {
     }
 
     @Override
-    public String getName() {
-        return "Sweet Berry Bush";
-    }
-
-    @Override
-    public int getId() {
-        return SWEET_BERRY_BUSH;
-    }
-
-    @Override
-    public boolean canBeActivated() {
-        return true;
+    public int getBurnAbility() {
+        return 60;
     }
 
     @Override
@@ -52,37 +42,23 @@ public class BlockSweetBerryBush extends BlockFlowable {
     }
 
     @Override
-    public int getBurnAbility() {
-        return 60;
+    public BlockColor getColor() {
+        return BlockColor.FOLIAGE_BLOCK_COLOR;
     }
 
     @Override
-    public Item toItem() {
-        return Item.get(ItemID.SWEET_BERRIES);
+    public int getId() {
+        return SWEET_BERRY_BUSH;
     }
 
     @Override
-    public void onEntityCollide(Entity entity) {
-        if (this.getDamage() > 0 && !(entity instanceof EntityItem)) {
-            entity.resetFallDistance();
-            if (!entity.isSneaking() && ThreadLocalRandom.current().nextInt(20) == 0) {
-                if (entity.attack(new EntityDamageByBlockEvent(this, entity, EntityDamageEvent.DamageCause.CONTACT, 1))) {
-                    this.level.addLevelSoundEvent(entity, LevelSoundEventPacket.SOUND_BLOCK_SWEET_BERRY_BUSH_HURT);
-                }
-            }
-        }
+    public String getName() {
+        return "Sweet Berry Bush";
     }
 
     @Override
-    public boolean hasEntityCollision() {
-        return this.getDamage() > 0;
-    }
-
-    protected AxisAlignedBB recalculateBoundingBox() {
-        if (this.getDamage() > 0) {
-            return this;
-        }
-        return null;
+    public boolean canBeActivated() {
+        return true;
     }
 
     @Override
@@ -98,6 +74,24 @@ public class BlockSweetBerryBush extends BlockFlowable {
         }
 
         return new Item[]{Item.get(ItemID.SWEET_BERRIES, 0, amount)};
+    }
+
+    @Override
+    public boolean hasEntityCollision() {
+        return this.getDamage() > 0;
+    }
+
+    public static boolean isSupportValid(Block block) {
+        switch (block.getId()) {
+            case GRASS:
+            case DIRT:
+            case PODZOL:
+            case MYCELIUM:
+            case FARMLAND:
+                return true;
+            default:
+                return false;
+        }
     }
 
     @Override
@@ -155,6 +149,18 @@ public class BlockSweetBerryBush extends BlockFlowable {
     }
 
     @Override
+    public void onEntityCollide(Entity entity) {
+        if (this.getDamage() > 0 && !(entity instanceof EntityItem)) {
+            entity.resetFallDistance();
+            if (!entity.isSneaking() && ThreadLocalRandom.current().nextInt(20) == 0) {
+                if (entity.attack(new EntityDamageByBlockEvent(this, entity, EntityDamageEvent.DamageCause.CONTACT, 1))) {
+                    this.level.addLevelSoundEvent(entity, LevelSoundEventPacket.SOUND_BLOCK_SWEET_BERRY_BUSH_HURT);
+                }
+            }
+        }
+    }
+
+    @Override
     public int onUpdate(int type) {
         if (type == Level.BLOCK_UPDATE_NORMAL) {
             if (!isSupportValid(this.down())) {
@@ -185,22 +191,15 @@ public class BlockSweetBerryBush extends BlockFlowable {
         return false;
     }
 
-
-    public static boolean isSupportValid(Block block) {
-        switch (block.getId()) {
-            case GRASS:
-            case DIRT:
-            case PODZOL:
-            case MYCELIUM:
-            case FARMLAND:
-                return true;
-            default:
-                return false;
+    protected AxisAlignedBB recalculateBoundingBox() {
+        if (this.getDamage() > 0) {
+            return this;
         }
+        return null;
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.FOLIAGE_BLOCK_COLOR;
+    public Item toItem() {
+        return Item.get(ItemID.SWEET_BERRIES);
     }
 }

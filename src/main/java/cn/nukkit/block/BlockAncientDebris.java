@@ -10,6 +10,16 @@ public class BlockAncientDebris extends BlockSolid {
     }
 
     @Override
+    public BlockColor getColor() {
+        return BlockColor.BLACK_BLOCK_COLOR;
+    }
+
+    @Override
+    public double getHardness() {
+        return 30;
+    }
+
+    @Override
     public int getId() {
         return ANCIENT_DEBRIS;
     }
@@ -27,16 +37,6 @@ public class BlockAncientDebris extends BlockSolid {
     @Override
     public int getToolType() {
         return ItemTool.TYPE_PICKAXE;
-    }
-
-    @Override
-    public double getHardness() {
-        return 30;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.BLACK_BLOCK_COLOR;
     }
 
     @Override

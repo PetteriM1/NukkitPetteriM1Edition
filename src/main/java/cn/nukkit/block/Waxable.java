@@ -9,10 +9,16 @@ import cn.nukkit.level.particle.WaxOffParticle;
 import cn.nukkit.level.particle.WaxOnParticle;
 
 public interface Waxable {
-    
+
     Location getLocation();
 
+    boolean isWaxed();
+
     default boolean onActivate(Item item, Player player) {
+        if (item == null || player == null) {
+            return false;
+        }
+
         boolean waxed = isWaxed();
         if ((item.getId() != ItemID.HONEYCOMB || waxed) && (!item.isAxe() || !waxed)) {
             return false;
@@ -23,18 +29,17 @@ public interface Waxable {
             return false;
         }
 
-        Position location = this instanceof Block? (Position) this : getLocation();
+        Position location = this instanceof Block ? (Position) this : getLocation();
         if (player == null || !player.isCreative()) {
             if (waxed) {
                 item.count--;
             } else {
-                item.useOn(this instanceof Block? (Block) this : location.getLevelBlock());
+                item.useOn(this instanceof Block ? (Block) this : location.getLevelBlock());
             }
         }
         location.getLevel().addParticle(waxed ? new WaxOnParticle(location) : new WaxOffParticle(location));
         return true;
     }
 
-    boolean isWaxed();
     boolean setWaxed(boolean waxed);
 }

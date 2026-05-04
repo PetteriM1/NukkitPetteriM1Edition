@@ -37,39 +37,30 @@ public abstract class SimpleConfig {
         configFile.getParentFile().mkdirs();
     }
 
-    /**
-     * Save the config to disk
-     *
-     * @return saved
-     */
-    public boolean save() {
-        return save(false);
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.FIELD)
+    public @interface Path {
+        String value() default "";
     }
 
-    /**
-     * Save the config to disk
-     *
-     * @param async async
-     * @return saved
-     */
-    public boolean save(boolean async) {
-        if (configFile.exists()) try {
-            configFile.createNewFile();
-        } catch (Exception e) {
-            return false;
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.FIELD)
+    public @interface Skip {
+        boolean skipLoad() default true;
+
+        boolean skipSave() default true;
+    }
+
+    private static String getPath(Field field) {
+        String path = null;
+        if (field.isAnnotationPresent(Path.class)) {
+            Path pathDefine = field.getAnnotation(Path.class);
+            path = pathDefine.value();
         }
-        Config cfg = new Config(configFile, Config.YAML);
-        for (Field field : this.getClass().getDeclaredFields()) {
-            if (skipSave(field)) continue;
-            String path = getPath(field);
-            try {
-                if (path != null) cfg.set(path, field.get(this));
-            } catch (Exception e) {
-                return false;
-            }
-        }
-        cfg.save(async);
-        return true;
+        if (path == null || path.isEmpty()) path = field.getName().replace("_", ".");
+        if (Modifier.isFinal(field.getModifiers())) return null;
+        if (Modifier.isPrivate(field.getModifiers())) field.setAccessible(true);
+        return path;
     }
 
     /**
@@ -124,21 +115,39 @@ public abstract class SimpleConfig {
         return true;
     }
 
-    private static String getPath(Field field) {
-        String path = null;
-        if (field.isAnnotationPresent(Path.class)) {
-            Path pathDefine = field.getAnnotation(Path.class);
-            path = pathDefine.value();
-        }
-        if (path == null || path.isEmpty()) path = field.getName().replace("_", ".");
-        if (Modifier.isFinal(field.getModifiers())) return null;
-        if (Modifier.isPrivate(field.getModifiers())) field.setAccessible(true);
-        return path;
+    /**
+     * Save the config to disk
+     *
+     * @return saved
+     */
+    public boolean save() {
+        return save(false);
     }
 
-    private static boolean skipSave(Field field) {
-        if (!field.isAnnotationPresent(Skip.class)) return false;
-        return field.getAnnotation(Skip.class).skipSave();
+    /**
+     * Save the config to disk
+     *
+     * @param async async
+     * @return saved
+     */
+    public boolean save(boolean async) {
+        if (configFile.exists()) try {
+            configFile.createNewFile();
+        } catch (Exception e) {
+            return false;
+        }
+        Config cfg = new Config(configFile, Config.YAML);
+        for (Field field : this.getClass().getDeclaredFields()) {
+            if (skipSave(field)) continue;
+            String path = getPath(field);
+            try {
+                if (path != null) cfg.set(path, field.get(this));
+            } catch (Exception e) {
+                return false;
+            }
+        }
+        cfg.save(async);
+        return true;
     }
 
     private boolean skipLoad(Field field) {
@@ -146,17 +155,8 @@ public abstract class SimpleConfig {
         return field.getAnnotation(Skip.class).skipLoad();
     }
 
-    @Retention(RetentionPolicy.RUNTIME)
-    @Target(ElementType.FIELD)
-    public @interface Path {
-        String value() default "";
-    }
-
-    @Retention(RetentionPolicy.RUNTIME)
-    @Target(ElementType.FIELD)
-    public @interface Skip {
-        boolean skipSave() default true;
-
-        boolean skipLoad() default true;
+    private static boolean skipSave(Field field) {
+        if (!field.isAnnotationPresent(Skip.class)) return false;
+        return field.getAnnotation(Skip.class).skipSave();
     }
 }

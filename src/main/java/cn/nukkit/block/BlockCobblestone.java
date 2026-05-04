@@ -10,13 +10,18 @@ import cn.nukkit.item.ItemTool;
 public class BlockCobblestone extends BlockSolid {
 
     @Override
+    public double getHardness() {
+        return 2;
+    }
+
+    @Override
     public int getId() {
         return COBBLESTONE;
     }
 
     @Override
-    public double getHardness() {
-        return 2;
+    public String getName() {
+        return "Cobblestone";
     }
 
     @Override
@@ -30,8 +35,8 @@ public class BlockCobblestone extends BlockSolid {
     }
 
     @Override
-    public String getName() {
-        return "Cobblestone";
+    public boolean canHarvestWithHand() {
+        return false;
     }
 
     @Override
@@ -43,10 +48,5 @@ public class BlockCobblestone extends BlockSolid {
         } else {
             return new Item[0];
         }
-    }
-
-    @Override
-    public boolean canHarvestWithHand() {
-        return false;
     }
 }

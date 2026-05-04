@@ -14,6 +14,11 @@ public class BlockSoulFire extends BlockFire {
     }
 
     @Override
+    public BlockColor getColor() {
+        return BlockColor.LIGHT_BLUE_BLOCK_COLOR;
+    }
+
+    @Override
     public int getId() {
         return SOUL_FIRE;
     }
@@ -33,10 +38,5 @@ public class BlockSoulFire extends BlockFire {
             return type;
         }
         return 0;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.LIGHT_BLUE_BLOCK_COLOR;
     }
 }

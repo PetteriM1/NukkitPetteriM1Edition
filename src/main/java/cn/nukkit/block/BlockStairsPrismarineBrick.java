@@ -13,6 +13,11 @@ public class BlockStairsPrismarineBrick extends BlockStairsPrismarine {
     }
 
     @Override
+    public BlockColor getColor() {
+        return BlockColor.DIAMOND_BLOCK_COLOR;
+    }
+
+    @Override
     public int getId() {
         return PRISMARINE_BRICKS_STAIRS;
     }
@@ -20,10 +25,5 @@ public class BlockStairsPrismarineBrick extends BlockStairsPrismarine {
     @Override
     public String getName() {
         return "Prismarine Brick Stairs";
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.DIAMOND_BLOCK_COLOR;
     }
 }

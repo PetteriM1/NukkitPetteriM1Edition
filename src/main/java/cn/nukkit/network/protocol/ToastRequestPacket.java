@@ -11,11 +11,6 @@ public class ToastRequestPacket extends DataPacket {
     public String content = "";
 
     @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
-    @Override
     public void decode() {
         this.decodeUnsupported();
     }
@@ -25,5 +20,10 @@ public class ToastRequestPacket extends DataPacket {
         this.reset();
         this.putString(this.title);
         this.putString(this.content);
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

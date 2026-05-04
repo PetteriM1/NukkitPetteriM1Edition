@@ -6,18 +6,8 @@ import cn.nukkit.utils.BlockColor;
 public class BlockBarrier extends BlockTransparent {
 
     @Override
-    public String getName() {
-        return "Barrier";
-    }
-
-    @Override
-    public int getId() {
-        return BARRIER;
-    }
-
-    @Override
-    public double getResistance() {
-        return 18000000;
+    public BlockColor getColor() {
+        return BlockColor.TRANSPARENT_BLOCK_COLOR;
     }
 
     @Override
@@ -26,7 +16,27 @@ public class BlockBarrier extends BlockTransparent {
     }
 
     @Override
-    public boolean isBreakable(Item item) {
+    public int getId() {
+        return BARRIER;
+    }
+
+    @Override
+    public String getName() {
+        return "Barrier";
+    }
+
+    @Override
+    public double getResistance() {
+        return 18000000;
+    }
+
+    @Override
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.WHEN_PLACED_IN_WATER;
+    }
+
+    @Override
+    public boolean canBeFlowedInto() {
         return false;
     }
 
@@ -41,17 +51,7 @@ public class BlockBarrier extends BlockTransparent {
     }
 
     @Override
-    public boolean canBeFlowedInto() {
+    public boolean isBreakable(Item item) {
         return false;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.TRANSPARENT_BLOCK_COLOR;
-    }
-
-    @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.WHEN_PLACED_IN_WATER;
     }
 }

@@ -13,32 +13,12 @@ public class BlockUndyedShulkerBox extends BlockShulkerBox {
     }
 
     @Override
-    public int getId() {
-        return UNDYED_SHULKER_BOX;
-    }
-
-    @Override
-    public String getName() {
-        return "Shulker Box";
+    public void setDamage(int meta) {
     }
 
     @Override
     public BlockColor getColor() {
         return BlockColor.PURPLE_BLOCK_COLOR;
-    }
-
-    @Override
-    public DyeColor getDyeColor() {
-        return null;
-    }
-
-    @Override
-    public void setDamage(int meta) {
-    }
-
-    @Override
-    public boolean hasComparatorInputOverride() {
-        return true;
     }
 
     @Override
@@ -50,5 +30,25 @@ public class BlockUndyedShulkerBox extends BlockShulkerBox {
         }
 
         return ContainerInventory.calculateRedstone(((InventoryHolder) be).getInventory());
+    }
+
+    @Override
+    public DyeColor getDyeColor() {
+        return null;
+    }
+
+    @Override
+    public int getId() {
+        return UNDYED_SHULKER_BOX;
+    }
+
+    @Override
+    public String getName() {
+        return "Shulker Box";
+    }
+
+    @Override
+    public boolean hasComparatorInputOverride() {
+        return true;
     }
 }

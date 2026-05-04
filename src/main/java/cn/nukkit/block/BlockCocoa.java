@@ -27,7 +27,7 @@ public class BlockCocoa extends BlockTransparentMeta implements Faceable {
     protected static final AxisAlignedBB[] NORTH = {new SimpleAxisAlignedBB(0.375D, 0.4375D, 0.0625D, 0.625D, 0.75D, 0.3125D), new SimpleAxisAlignedBB(0.3125D, 0.3125D, 0.0625D, 0.6875D, 0.75D, 0.4375D), new SimpleAxisAlignedBB(0.3125D, 0.3125D, 0.0625D, 0.6875D, 0.75D, 0.4375D)};
     protected static final AxisAlignedBB[] SOUTH = {new SimpleAxisAlignedBB(0.375D, 0.4375D, 0.6875D, 0.625D, 0.75D, 0.9375D), new SimpleAxisAlignedBB(0.3125D, 0.3125D, 0.5625D, 0.6875D, 0.75D, 0.9375D), new SimpleAxisAlignedBB(0.3125D, 0.3125D, 0.5625D, 0.6875D, 0.75D, 0.9375D)};
 
-    private static final short[] FACES = {
+    private static final short[] faces = {
             0,
             0,
             0,
@@ -36,7 +36,7 @@ public class BlockCocoa extends BlockTransparentMeta implements Faceable {
             1,
     };
 
-    private static final short[] FACES_2 = {
+    private static final short[] faces2 = {
             3, 4, 2, 5, 3, 4, 2, 5, 3, 4, 2, 5
     };
 
@@ -49,6 +49,16 @@ public class BlockCocoa extends BlockTransparentMeta implements Faceable {
     }
 
     @Override
+    public BlockFace getBlockFace() {
+        return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
+    }
+
+    @Override
+    public double getHardness() {
+        return 0.2;
+    }
+
+    @Override
     public int getId() {
         return COCOA;
     }
@@ -56,6 +66,119 @@ public class BlockCocoa extends BlockTransparentMeta implements Faceable {
     @Override
     public String getName() {
         return "Cocoa";
+    }
+
+    @Override
+    public double getResistance() {
+        return 15;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_AXE;
+    }
+
+    @Override
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.FLOW_INTO_BLOCK;
+    }
+
+    @Override
+    public boolean breakWhenPushed() {
+        return true;
+    }
+
+    @Override
+    public boolean canBeActivated() {
+        return true;
+    }
+
+    @Override
+    public boolean canBeFlowedInto() {
+        return false;
+    }
+
+    @Override
+    public Item[] getDrops(Item item) {
+        if (this.getDamage() >= 8) {
+            return new Item[]{
+                    Item.get(Item.DYE, 3, Utils.rand(2, 3))
+            };
+        } else {
+            return new Item[]{
+                    Item.get(Item.DYE, 3, 1)
+            };
+        }
+    }
+
+    @Override
+    public boolean onActivate(Item item, Player player) {
+        if (item.getId() == Item.DYE && item.getDamage() == ItemDye.BONE_MEAL) {
+            Block block = this.clone();
+            if (this.getDamage() >> 2 < 2) {
+                block.setDamage(block.getDamage() + 4);
+                BlockGrowEvent ev = new BlockGrowEvent(this, block);
+                Server.getInstance().getPluginManager().callEvent(ev);
+
+                if (ev.isCancelled()) {
+                    return false;
+                }
+
+                this.getLevel().setBlock(this, ev.getNewState(), true, true);
+                this.level.addParticle(new BoneMealParticle(this));
+
+                if (player != null && !player.isCreative()) {
+                    item.count--;
+                }
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public int onUpdate(int type) {
+        if (type == Level.BLOCK_UPDATE_NORMAL) {
+            Block side = this.getSide(BlockFace.fromIndex(faces2[this.getDamage() >= faces2.length ? 0 : this.getDamage()]));
+
+            if (side.getId() != Block.WOOD && (side.getDamage() & 0x03) != BlockWood.JUNGLE) {
+                this.getLevel().useBreakOn(this);
+                return Level.BLOCK_UPDATE_NORMAL;
+            }
+        } else if (type == Level.BLOCK_UPDATE_RANDOM) {
+            if (ThreadLocalRandom.current().nextInt(2) == 1) {
+                if (this.getDamage() >> 2 < 2) {
+                    BlockCocoa block = (BlockCocoa) this.clone();
+                    block.setDamage(block.getDamage() + 4);
+                    BlockGrowEvent ev = new BlockGrowEvent(this, block);
+                    Server.getInstance().getPluginManager().callEvent(ev);
+
+                    if (!ev.isCancelled()) {
+                        this.getLevel().setBlock(this, ev.getNewState(), true, true);
+                    } else {
+                        return Level.BLOCK_UPDATE_RANDOM;
+                    }
+                }
+            } else {
+                return Level.BLOCK_UPDATE_RANDOM;
+            }
+        }
+
+        return 0;
+    }
+
+    @Override
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        if (target.getId() == Block.WOOD && (target.getDamage() & 0x03) == BlockWood.JUNGLE) {
+            if (face != BlockFace.DOWN && face != BlockFace.UP) {
+                this.setDamage(faces[face.getIndex()]);
+                this.level.setBlock(block, this, true, true);
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -92,130 +215,7 @@ public class BlockCocoa extends BlockTransparentMeta implements Faceable {
     }
 
     @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        if (target.getId() == Block.WOOD && (target.getDamage() & 0x03) == BlockWood.JUNGLE) {
-            if (face != BlockFace.DOWN && face != BlockFace.UP) {
-                this.setDamage(FACES[face.getIndex()]);
-                this.level.setBlock(block, this, true, true);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public int onUpdate(int type) {
-        if (type == Level.BLOCK_UPDATE_NORMAL) {
-            Block side = this.getSide(BlockFace.fromIndex(FACES_2[this.getDamage()]));
-
-            if (side.getId() != Block.WOOD && (side.getDamage() & 0x03) != BlockWood.JUNGLE) {
-                this.getLevel().useBreakOn(this);
-                return Level.BLOCK_UPDATE_NORMAL;
-            }
-        } else if (type == Level.BLOCK_UPDATE_RANDOM) {
-            if (ThreadLocalRandom.current().nextInt(2) == 1) {
-                if (this.getDamage() >> 2 < 2) {
-                    BlockCocoa block = (BlockCocoa) this.clone();
-                    block.setDamage(block.getDamage() + 4);
-                    BlockGrowEvent ev = new BlockGrowEvent(this, block);
-                    Server.getInstance().getPluginManager().callEvent(ev);
-
-                    if (!ev.isCancelled()) {
-                        this.getLevel().setBlock(this, ev.getNewState(), true, true);
-                    } else {
-                        return Level.BLOCK_UPDATE_RANDOM;
-                    }
-                }
-            } else {
-                return Level.BLOCK_UPDATE_RANDOM;
-            }
-        }
-
-        return 0;
-    }
-
-    @Override
-    public boolean canBeActivated() {
-        return true;
-    }
-
-    @Override
-    public boolean onActivate(Item item, Player player) {
-        if (item.getId() == Item.DYE && item.getDamage() == ItemDye.BONE_MEAL) {
-            Block block = this.clone();
-            if (this.getDamage() >> 2 < 2) {
-                block.setDamage(block.getDamage() + 4);
-                BlockGrowEvent ev = new BlockGrowEvent(this, block);
-                Server.getInstance().getPluginManager().callEvent(ev);
-
-                if (ev.isCancelled()) {
-                    return false;
-                }
-
-                this.getLevel().setBlock(this, ev.getNewState(), true, true);
-                this.level.addParticle(new BoneMealParticle(this));
-
-                if (player != null && !player.isCreative()) {
-                    item.count--;
-                }
-            }
-
-            return true;
-        }
-
-        return false;
-    }
-
-    @Override
-    public double getResistance() {
-        return 15;
-    }
-
-    @Override
-    public double getHardness() {
-        return 0.2;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_AXE;
-    }
-
-    @Override
     public Item toItem() {
         return Item.get(Item.DYE, DyeColor.BROWN.getDyeData());
-    }
-
-    @Override
-    public Item[] getDrops(Item item) {
-        if (this.getDamage() >= 8) {
-            return new Item[]{
-                    Item.get(Item.DYE, 3, Utils.rand(2, 3))
-            };
-        } else {
-            return new Item[]{
-                    Item.get(Item.DYE, 3, 1)
-            };
-        }
-    }
-
-    @Override
-    public BlockFace getBlockFace() {
-        return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
-    }
-
-    @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.FLOW_INTO_BLOCK;
-    }
-
-    @Override
-    public boolean canBeFlowedInto() {
-        return false;
-    }
-
-    @Override
-    public boolean breakWhenPushed() {
-        return true;
     }
 }

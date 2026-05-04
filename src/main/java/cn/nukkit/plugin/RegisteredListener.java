@@ -42,6 +42,10 @@ public class RegisteredListener {
         return priority;
     }
 
+    public boolean isIgnoringCancelled() {
+        return ignoreCancelled;
+    }
+
     public void callEvent(Event event) throws EventException {
         if (event instanceof Cancellable) {
             if (event.isCancelled() && ignoreCancelled) {
@@ -49,9 +53,5 @@ public class RegisteredListener {
             }
         }
         executor.execute(listener, event);
-    }
-
-    public boolean isIgnoringCancelled() {
-        return ignoreCancelled;
     }
 }

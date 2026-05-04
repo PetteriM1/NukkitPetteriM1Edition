@@ -1,5 +1,8 @@
 package cn.nukkit.block;
 
+import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.utils.material.BlockType;
+
 public class BlockFenceGateWarped extends BlockFenceGate {
 
     public BlockFenceGateWarped() {
@@ -11,12 +14,22 @@ public class BlockFenceGateWarped extends BlockFenceGate {
     }
 
     @Override
+    public int getId() {
+        return WARPED_FENCE_GATE;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_16_0;
+    }
+
+    @Override
     public String getName() {
         return "Warped Fence Gate";
     }
 
     @Override
-    public int getId() {
-        return WARPED_FENCE_GATE;
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.FENCE_GATE;
     }
 }

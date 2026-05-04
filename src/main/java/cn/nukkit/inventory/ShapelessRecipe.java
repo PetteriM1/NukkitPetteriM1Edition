@@ -1,6 +1,7 @@
 package cn.nukkit.inventory;
 
 import cn.nukkit.item.Item;
+import lombok.Getter;
 
 import java.util.*;
 
@@ -14,7 +15,8 @@ public class ShapelessRecipe implements CraftingRecipe {
 
     private final Item output;
 
-    private long least, most;
+    @Getter
+    private UUID id;
 
     private final List<Item> ingredients;
     private final List<Item> ingredientsAggregate;
@@ -23,15 +25,17 @@ public class ShapelessRecipe implements CraftingRecipe {
 
     private final int networkId;
 
+    @Deprecated
     public ShapelessRecipe(Item result, Collection<Item> ingredients) {
         this(null, 10, result, ingredients);
     }
 
-    public ShapelessRecipe(String recipeId, int priority, Item result, Collection<Item> ingredients) {
-        this(recipeId, priority, result, ingredients, null);
+    @Deprecated
+    public ShapelessRecipe(String recipeId, int priority, Item result, Collection<Item> ingredients, Integer networkId) {
+        this(recipeId, priority, result, ingredients);
     }
 
-    public ShapelessRecipe(String recipeId, int priority, Item result, Collection<Item> ingredients, Integer networkId) {
+    public ShapelessRecipe(String recipeId, int priority, Item result, Collection<Item> ingredients) {
         this.recipeId = recipeId;
         this.priority = priority;
         this.output = result.clone();
@@ -61,32 +65,30 @@ public class ShapelessRecipe implements CraftingRecipe {
         }
 
         this.ingredientsAggregate.sort(CraftingManager.recipeComparator);
-        this.networkId = networkId != null ? networkId : ++CraftingManager.NEXT_NETWORK_ID;
-    }
-
-    @Override
-    public Item getResult() {
-        return this.output.clone();
-    }
-
-    @Override
-    public String getRecipeId() {
-        return this.recipeId;
-    }
-
-    @Override
-    public UUID getId() {
-        return new UUID(least, most);
+        this.networkId = ++CraftingManager.NEXT_NETWORK_ID;
     }
 
     @Override
     public void setId(UUID uuid) {
-        this.least = uuid.getLeastSignificantBits();
-        this.most = uuid.getMostSignificantBits();
+        this.id = uuid;
 
         if (this.recipeId == null) {
             this.recipeId = this.getId().toString();
         }
+    }
+
+    @Override
+    public List<Item> getAllResults() {
+        return null;
+    }
+
+    @Override
+    public List<Item> getExtraResults() {
+        return new ArrayList<>();
+    }
+
+    public int getIngredientCount() {
+        return ingredients.size();
     }
 
     public List<Item> getIngredientList() {
@@ -98,13 +100,28 @@ public class ShapelessRecipe implements CraftingRecipe {
         return ingredients;
     }
 
-    public int getIngredientCount() {
-        return ingredients.size();
+    @Override
+    public List<Item> getIngredientsAggregate() {
+        return ingredientsAggregate;
+    }
+
+    public int getNetworkId() {
+        return this.networkId;
     }
 
     @Override
-    public void registerToCraftingManager(CraftingManager manager) {
-        manager.registerShapelessRecipe(this);
+    public int getPriority() {
+        return this.priority;
+    }
+
+    @Override
+    public String getRecipeId() {
+        return this.recipeId;
+    }
+
+    @Override
+    public Item getResult() {
+        return this.output.clone();
     }
 
     @Override
@@ -112,24 +129,37 @@ public class ShapelessRecipe implements CraftingRecipe {
         return RecipeType.SHAPELESS;
     }
 
-    @Override
-    public boolean requiresCraftingTable() {
-        return this.ingredients.size() > 4;
+    private static boolean matchItemList(List<Item> haveItems, List<Item> needItems) {
+        for (Item needItem : new ArrayList<>(needItems)) {
+            for (Item haveItem : new ArrayList<>(haveItems)) {
+                if (needItem.equals(haveItem, needItem.hasMeta(), needItem.hasCompoundTag())) {
+                    int amount = Math.min(haveItem.getCount(), needItem.getCount());
+                    needItem.setCount(needItem.getCount() - amount);
+                    haveItem.setCount(haveItem.getCount() - amount);
+                    if (haveItem.getCount() == 0) {
+                        haveItems.remove(haveItem);
+                    }
+                    if (needItem.getCount() == 0) {
+                        needItems.remove(needItem);
+                        break;
+                    }
+                }
+            }
+        }
+        return haveItems.isEmpty() && needItems.isEmpty();
     }
 
+    /**
+     * Returns whether the specified list of crafting grid inputs and outputs matches this recipe. Outputs DO NOT
+     * include the primary result item.
+     *
+     * @param inputList       list of items taken from the crafting grid
+     * @param extraOutputList list of items put back into the crafting grid (secondary results)
+     * @return bool
+     */
     @Override
-    public List<Item> getExtraResults() {
-        return new ArrayList<>();
-    }
-
-    @Override
-    public List<Item> getAllResults() {
-        return null;
-    }
-
-    @Override
-    public int getPriority() {
-        return this.priority;
+    public boolean matchItems(List<Item> inputList, List<Item> extraOutputList) {
+        return matchItems(inputList, extraOutputList, 1);
     }
 
     public boolean matchItems(List<Item> inputList, List<Item> extraOutputList, int multiplier) {
@@ -188,45 +218,13 @@ public class ShapelessRecipe implements CraftingRecipe {
         return matchItemList(haveOutputs, needOutputs);
     }
 
-    /**
-     * Returns whether the specified list of crafting grid inputs and outputs matches this recipe. Outputs DO NOT
-     * include the primary result item.
-     *
-     * @param inputList  list of items taken from the crafting grid
-     * @param extraOutputList list of items put back into the crafting grid (secondary results)
-     * @return bool
-     */
     @Override
-    public boolean matchItems(List<Item> inputList, List<Item> extraOutputList) {
-        return matchItems(inputList, extraOutputList, 1);
-    }
-
-    private static boolean matchItemList(List<Item> haveItems, List<Item> needItems) {
-        for (Item needItem : new ArrayList<>(needItems)) {
-            for (Item haveItem : new ArrayList<>(haveItems)) {
-                if (needItem.equals(haveItem, needItem.hasMeta(), needItem.hasCompoundTag())) {
-                    int amount = Math.min(haveItem.getCount(), needItem.getCount());
-                    needItem.setCount(needItem.getCount() - amount);
-                    haveItem.setCount(haveItem.getCount() - amount);
-                    if (haveItem.getCount() == 0) {
-                        haveItems.remove(haveItem);
-                    }
-                    if (needItem.getCount() == 0) {
-                        needItems.remove(needItem);
-                        break;
-                    }
-                }
-            }
-        }
-        return haveItems.isEmpty() && needItems.isEmpty();
+    public void registerToCraftingManager(CraftingManager manager) {
+        manager.registerShapelessRecipe(this);
     }
 
     @Override
-    public List<Item> getIngredientsAggregate() {
-        return ingredientsAggregate;
-    }
-
-    public int getNetworkId() {
-        return this.networkId;
+    public boolean requiresCraftingTable() {
+        return this.ingredients.size() > 4;
     }
 }

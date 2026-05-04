@@ -22,18 +22,27 @@ public class BlockWeightedPressurePlateHeavy extends BlockPressurePlateBase {
     }
 
     @Override
-    public int getId() {
-        return HEAVY_WEIGHTED_PRESSURE_PLATE;
-    }
-
-    @Override
-    public String getName() {
-        return "Weighted Pressure Plate (Heavy)";
+    public BlockColor getColor() {
+        return BlockColor.IRON_BLOCK_COLOR;
     }
 
     @Override
     public double getHardness() {
         return 0.5D;
+    }
+
+    @Override
+    public int getId() {
+        return HEAVY_WEIGHTED_PRESSURE_PLATE;
+    }
+
+    public int getMaxWeight() {
+        return 150;
+    }
+
+    @Override
+    public String getName() {
+        return "Weighted Pressure Plate (Heavy)";
     }
 
     @Override
@@ -44,6 +53,18 @@ public class BlockWeightedPressurePlateHeavy extends BlockPressurePlateBase {
     @Override
     public int getToolType() {
         return ItemTool.TYPE_PICKAXE;
+    }
+
+    @Override
+    protected int computeRedstoneStrength() {
+        int count = Math.min(this.level.getCollidingEntities(getCollisionBoundingBox()).length, this.getMaxWeight());
+
+        if (count > 0) {
+            float f = (float) Math.min(this.getMaxWeight(), count) / (float) this.getMaxWeight();
+            return Math.max(1, NukkitMath.ceilFloat(f * 15.0F));
+        } else {
+            return 0;
+        }
     }
 
     @Override
@@ -60,26 +81,5 @@ public class BlockWeightedPressurePlateHeavy extends BlockPressurePlateBase {
     @Override
     public Item toItem() {
         return new ItemBlock(Block.get(this.getId(), 0), 0);
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.IRON_BLOCK_COLOR;
-    }
-
-    @Override
-    protected int computeRedstoneStrength() {
-        int count = Math.min(this.level.getCollidingEntities(getCollisionBoundingBox()).length, this.getMaxWeight());
-
-        if (count > 0) {
-            float f = (float) Math.min(this.getMaxWeight(), count) / (float) this.getMaxWeight();
-            return Math.max(1, NukkitMath.ceilFloat(f * 15.0F));
-        } else {
-            return 0;
-        }
-    }
-
-    public int getMaxWeight() {
-        return 150;
     }
 }

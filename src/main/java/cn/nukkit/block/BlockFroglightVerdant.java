@@ -13,8 +13,8 @@ public class BlockFroglightVerdant extends BlockFroglight {
     }
 
     @Override
-    public String getName() {
-        return "Verdant Froglight";
+    public BlockColor getColor() {
+        return BlockColor.GLOW_LICHEN_BLOCK_COLOR;
     }
 
     @Override
@@ -23,7 +23,7 @@ public class BlockFroglightVerdant extends BlockFroglight {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.GLOW_LICHEN_BLOCK_COLOR;
+    public String getName() {
+        return "Verdant Froglight";
     }
 }

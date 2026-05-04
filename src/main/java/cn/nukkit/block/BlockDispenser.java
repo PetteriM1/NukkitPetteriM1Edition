@@ -32,24 +32,20 @@ public class BlockDispenser extends BlockSolidMeta implements Faceable {
         super(meta);
     }
 
-    @Override
-    public boolean hasComparatorInputOverride() {
-        return true;
+    public void setTriggered(boolean value) {
+        int i = 0;
+        i |= getBlockFace().getIndex();
+
+        if (value) {
+            i |= 8;
+        }
+
+        this.setDamage(i);
     }
 
     @Override
-    public String getName() {
-        return "Dispenser";
-    }
-
-    @Override
-    public int getId() {
-        return DISPENSER;
-    }
-
-    @Override
-    public Item toItem() {
-        return new ItemBlock(Block.get(Block.DISPENSER));
+    public BlockFace getBlockFace() {
+        return BlockFace.fromIndex(this.getDamage() & 0x07);
     }
 
     @Override
@@ -63,19 +59,32 @@ public class BlockDispenser extends BlockSolidMeta implements Faceable {
         return 0;
     }
 
-    public boolean isTriggered() {
-        return (this.getDamage() & 8) > 0;
+    public Vector3 getDispensePosition() {
+        BlockFace facing = getBlockFace();
+        return this.add(
+                0.5 + 0.7 * facing.getXOffset(),
+                0.5 + 0.7 * facing.getYOffset(),
+                0.5 + 0.7 * facing.getZOffset()
+        );
     }
 
-    public void setTriggered(boolean value) {
-        int i = 0;
-        i |= getBlockFace().getIndex();
+    @Override
+    public double getHardness() {
+        return 3.5;
+    }
 
-        if (value) {
-            i |= 8;
-        }
+    @Override
+    public int getId() {
+        return DISPENSER;
+    }
 
-        this.setDamage(i);
+    @Override
+    public String getName() {
+        return "Dispenser";
+    }
+
+    public boolean isTriggered() {
+        return (this.getDamage() & 8) > 0;
     }
 
     @Override
@@ -84,69 +93,8 @@ public class BlockDispenser extends BlockSolidMeta implements Faceable {
     }
 
     @Override
-    public boolean onActivate(Item item, Player player) {
-        if (player == null) {
-            return false;
-        }
-
-        BlockEntity blockEntity = this.level.getBlockEntity(this);
-
-        if (!(blockEntity instanceof BlockEntityDispenser)) {
-            return false;
-        }
-
-        if (blockEntity.namedTag.contains("Lock") && blockEntity.namedTag.get("Lock") instanceof StringTag) {
-            if (!blockEntity.namedTag.getString("Lock").equals(item.getCustomName())) {
-                return true;
-            }
-        }
-
-        player.addWindow(((BlockEntityDispenser) blockEntity).getInventory());
-        return true;
-    }
-
-    @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        if (player != null) {
-            if (Math.abs(player.x - this.x) < 2 && Math.abs(player.z - this.z) < 2) {
-                double y = player.y + player.getEyeHeight();
-
-                if (y - this.y > 2) {
-                    this.setDamage(BlockFace.UP.getIndex());
-                } else if (this.y - y > 0) {
-                    this.setDamage(BlockFace.DOWN.getIndex());
-                } else {
-                    this.setDamage(player.getHorizontalFacing().getOpposite().getIndex());
-                }
-            } else {
-                this.setDamage(player.getHorizontalFacing().getOpposite().getIndex());
-            }
-        }
-
-        this.getLevel().setBlock(block, this, true);
-
-        BlockEntity.createBlockEntity(BlockEntity.DISPENSER, this.getChunk(), BlockEntity.getDefaultCompound(this, BlockEntity.DISPENSER));
-        return true;
-    }
-
-    @Override
-    public int onUpdate(int type) {
-        if (type == Level.BLOCK_UPDATE_SCHEDULED) {
-            this.setTriggered(false);
-            this.level.setBlock((int) this.x, (int) this.y, (int) this.z, BlockLayer.NORMAL, this, false, false, false); // No need to send this to client
-            dispense();
-            return type;
-        } else if (type == Level.BLOCK_UPDATE_REDSTONE) {
-            if (!isTriggered() && (level.isBlockPowered(this) || level.isBlockPowered(this.getSideVec(BlockFace.UP)))) {
-                this.setTriggered(true);
-                this.level.setBlock((int) this.x, (int) this.y, (int) this.z, BlockLayer.NORMAL, this, false, false, false); // No need to send this to client
-                level.scheduleUpdate(this, this, 4);
-            }
-
-            return type;
-        }
-
-        return 0;
+    public boolean canBePushed() {
+        return false; // prevent item loss issue with pistons until a working implementation
     }
 
     public void dispense() {
@@ -198,27 +146,79 @@ public class BlockDispenser extends BlockSolidMeta implements Faceable {
         }
     }
 
-    public Vector3 getDispensePosition() {
-        BlockFace facing = getBlockFace();
-        return this.add(
-                0.5 + 0.7 * facing.getXOffset(),
-                0.5 + 0.7 * facing.getYOffset(),
-                0.5 + 0.7 * facing.getZOffset()
-        );
+    @Override
+    public boolean hasComparatorInputOverride() {
+        return true;
     }
 
     @Override
-    public BlockFace getBlockFace() {
-        return BlockFace.fromIndex(this.getDamage() & 0x07);
+    public boolean onActivate(Item item, Player player) {
+        if (player == null) {
+            return false;
+        }
+
+        BlockEntity blockEntity = this.level.getBlockEntity(this);
+
+        if (!(blockEntity instanceof BlockEntityDispenser)) {
+            return false;
+        }
+
+        if (blockEntity.namedTag.contains("Lock") && blockEntity.namedTag.get("Lock") instanceof StringTag) {
+            if (!blockEntity.namedTag.getString("Lock").equals(item.getCustomName())) {
+                return true;
+            }
+        }
+
+        player.addWindow(((BlockEntityDispenser) blockEntity).getInventory());
+        return true;
     }
 
     @Override
-    public double getHardness() {
-        return 3.5;
+    public int onUpdate(int type) {
+        if (type == Level.BLOCK_UPDATE_SCHEDULED) {
+            this.setTriggered(false);
+            this.level.setBlock((int) this.x, (int) this.y, (int) this.z, BlockLayer.NORMAL, this, false, false, false); // No need to send this to client
+            dispense();
+            return type;
+        } else if (type == Level.BLOCK_UPDATE_REDSTONE) {
+            if (!isTriggered() && (level.isBlockPowered(this) || level.isBlockPowered(this.getSideVec(BlockFace.UP)))) {
+                this.setTriggered(true);
+                this.level.setBlock((int) this.x, (int) this.y, (int) this.z, BlockLayer.NORMAL, this, false, false, false); // No need to send this to client
+                level.scheduleUpdate(this, this, 4);
+            }
+
+            return type;
+        }
+
+        return 0;
     }
 
     @Override
-    public boolean canBePushed() {
-        return false; // prevent item loss issue with pistons until a working implementation
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        if (player != null) {
+            if (Math.abs(player.x - this.x) < 2 && Math.abs(player.z - this.z) < 2) {
+                double y = player.y + player.getEyeHeight();
+
+                if (y - this.y > 2) {
+                    this.setDamage(BlockFace.UP.getIndex());
+                } else if (this.y - y > 0) {
+                    this.setDamage(BlockFace.DOWN.getIndex());
+                } else {
+                    this.setDamage(player.getHorizontalFacing().getOpposite().getIndex());
+                }
+            } else {
+                this.setDamage(player.getHorizontalFacing().getOpposite().getIndex());
+            }
+        }
+
+        this.getLevel().setBlock(block, this, true);
+
+        BlockEntity.createBlockEntity(BlockEntity.DISPENSER, this.getChunk(), BlockEntity.getDefaultCompound(this, BlockEntity.DISPENSER));
+        return true;
+    }
+
+    @Override
+    public Item toItem() {
+        return new ItemBlock(Block.get(Block.DISPENSER));
     }
 }

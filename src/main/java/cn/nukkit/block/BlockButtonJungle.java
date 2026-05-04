@@ -11,12 +11,12 @@ public class BlockButtonJungle extends BlockButtonWooden {
     }
 
     @Override
-    public String getName() {
-        return "Jungle Button";
+    public int getId() {
+        return JUNGLE_BUTTON;
     }
 
     @Override
-    public int getId() {
-        return JUNGLE_BUTTON;
+    public String getName() {
+        return "Jungle Button";
     }
 }

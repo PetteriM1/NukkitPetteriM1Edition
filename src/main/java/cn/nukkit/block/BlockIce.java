@@ -14,6 +14,21 @@ import cn.nukkit.utils.BlockColor;
 public class BlockIce extends BlockTransparent {
 
     @Override
+    public BlockColor getColor() {
+        return BlockColor.ICE_BLOCK_COLOR;
+    }
+
+    @Override
+    public double getFrictionFactor() {
+        return 0.98;
+    }
+
+    @Override
+    public double getHardness() {
+        return 0.5;
+    }
+
+    @Override
     public int getId() {
         return ICE;
     }
@@ -25,22 +40,25 @@ public class BlockIce extends BlockTransparent {
 
     @Override
     public double getResistance() {
-        return 0.5;
-    }
-
-    @Override
-    public double getHardness() {
-        return 0.5;
-    }
-
-    @Override
-    public double getFrictionFactor() {
-        return 0.98;
+        return 2.5;
     }
 
     @Override
     public int getToolType() {
         return ItemTool.TYPE_PICKAXE;
+    }
+
+    @Override
+    public boolean canSilkTouch() {
+        return true;
+    }
+
+    @Override
+    public Item[] getDrops(Item item) {
+        if (item.hasEnchantment(Enchantment.ID_SILK_TOUCH)) {
+            return new Item[]{this.toItem()};
+        }
+        return new Item[0];
     }
 
     @Override
@@ -64,23 +82,5 @@ public class BlockIce extends BlockTransparent {
             }
         }
         return 0;
-    }
-
-    @Override
-    public Item[] getDrops(Item item) {
-        if (item.hasEnchantment(Enchantment.ID_SILK_TOUCH)) {
-            return new Item[]{this.toItem()};
-        }
-        return new Item[0];
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.ICE_BLOCK_COLOR;
-    }
-    
-    @Override
-    public boolean canSilkTouch() {
-        return true;
     }
 }

@@ -22,8 +22,22 @@ public class BlockConcretePowder extends BlockFallableMeta {
     }
 
     @Override
+    public BlockColor getColor() {
+        return DyeColor.getByWoolData(getDamage()).getColor();
+    }
+
+    public DyeColor getDyeColor() {
+        return DyeColor.getByWoolData(getDamage());
+    }
+
+    @Override
     public int getFullId() {
         return (CONCRETE_POWDER << Block.DATA_BITS) + getDamage();
+    }
+
+    @Override
+    public double getHardness() {
+        return 0.5;
     }
 
     @Override
@@ -42,15 +56,10 @@ public class BlockConcretePowder extends BlockFallableMeta {
     }
 
     @Override
-    public double getHardness() {
-        return 0.5;
-    }
-
-    @Override
     public int getToolType() {
         return ItemTool.TYPE_SHOVEL;
     }
-    
+
     @Override
     public int onUpdate(int type) {
         if (type == Level.BLOCK_UPDATE_NORMAL) {
@@ -87,14 +96,5 @@ public class BlockConcretePowder extends BlockFallableMeta {
         }
 
         return true;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return DyeColor.getByWoolData(getDamage()).getColor();
-    }
-
-    public DyeColor getDyeColor() {
-        return DyeColor.getByWoolData(getDamage());
     }
 }

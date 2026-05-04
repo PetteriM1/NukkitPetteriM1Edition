@@ -15,11 +15,6 @@ public class BlockPumpkinLit extends BlockPumpkin {
     }
 
     @Override
-    public String getName() {
-        return "Jack o'Lantern";
-    }
-
-    @Override
     public int getId() {
         return LIT_PUMPKIN;
     }
@@ -27,6 +22,11 @@ public class BlockPumpkinLit extends BlockPumpkin {
     @Override
     public int getLightLevel() {
         return 15;
+    }
+
+    @Override
+    public String getName() {
+        return "Jack o'Lantern";
     }
 
     @Override

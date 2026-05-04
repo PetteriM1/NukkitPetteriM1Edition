@@ -13,8 +13,8 @@ public class BlockStairsStone extends BlockStairs {
     }
 
     @Override
-    public String getName() {
-        return "Stone Stairs";
+    public double getHardness() {
+        return 1.5;
     }
 
     @Override
@@ -23,18 +23,18 @@ public class BlockStairsStone extends BlockStairs {
     }
 
     @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
-    }
-
-    @Override
-    public double getHardness() {
-        return 1.5;
+    public String getName() {
+        return "Stone Stairs";
     }
 
     @Override
     public double getResistance() {
         return 30;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
     }
 
     @Override

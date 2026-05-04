@@ -2,9 +2,9 @@ package cn.nukkit.item;
 
 import lombok.Getter;
 
-public interface ItemTrimMaterial {
+import javax.annotation.Nullable;
 
-    Type getMaterial();
+public interface ItemTrimMaterial {
 
     enum Type {
 
@@ -26,4 +26,7 @@ public interface ItemTrimMaterial {
             this.materialName = input;
         }
     }
+
+    @Nullable
+    Type getMaterial();
 }

@@ -36,16 +36,6 @@ public class SimpleCommand extends Command {
         this.minArgs = minArgs;
     }
 
-    public void sendUsageMessage(CommandSender sender) {
-        if (!this.usageMessage.isEmpty()) {
-            sender.sendMessage(new TranslationContainer("commands.generic.usage", this.usageMessage));
-        }
-    }
-
-    public void sendInGameMessage(CommandSender sender) {
-        sender.sendMessage(new TranslationContainer("commands.generic.ingame"));
-    }
-
     @Override
     public boolean execute(CommandSender sender, String commandLabel, String[] args) {
         if (this.forbidConsole && sender instanceof ConsoleCommandSender) {
@@ -74,5 +64,15 @@ public class SimpleCommand extends Command {
         }
 
         return success;
+    }
+
+    public void sendInGameMessage(CommandSender sender) {
+        sender.sendMessage(new TranslationContainer("commands.generic.ingame"));
+    }
+
+    public void sendUsageMessage(CommandSender sender) {
+        if (!this.usageMessage.isEmpty()) {
+            sender.sendMessage(new TranslationContainer("commands.generic.usage", this.usageMessage));
+        }
     }
 }

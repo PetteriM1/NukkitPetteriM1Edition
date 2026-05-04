@@ -3,8 +3,13 @@ package cn.nukkit.block;
 public class BlockBlueIce extends BlockIcePacked {
 
     @Override
-    public String getName() {
-        return "Blue Ice";
+    public double getFrictionFactor() {
+        return 0.989;
+    }
+
+    @Override
+    public double getHardness() {
+        return 2.8;
     }
 
     @Override
@@ -13,13 +18,8 @@ public class BlockBlueIce extends BlockIcePacked {
     }
 
     @Override
-    public double getFrictionFactor() {
-        return 0.989;
-    }
-
-    @Override
-    public double getHardness() {
-        return 2.8;
+    public String getName() {
+        return "Blue Ice";
     }
 
     @Override

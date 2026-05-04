@@ -19,30 +19,8 @@ public class IntArrayTag extends Tag {
         this.data = data;
     }
 
-    @Override
-    void write(NBTOutputStream dos) throws IOException {
-        dos.writeInt(data.length);
-        for (int aData : data) {
-            dos.writeInt(aData);
-        }
-    }
-
-    @Override
-    public void load(NBTInputStream dis) throws IOException {
-        int length = dis.readInt();
-        data = new int[length];
-        for (int i = 0; i < length; i++) {
-            data[i] = dis.readInt();
-        }
-    }
-
     public int[] getData() {
         return data;
-    }
-
-    @Override
-    public int[] parseValue() {
-        return this.data;
     }
 
     @Override
@@ -51,8 +29,10 @@ public class IntArrayTag extends Tag {
     }
 
     @Override
-    public String toString() {
-        return "IntArrayTag " + this.getName() + " [" + data.length + " bytes]";
+    public Tag copy() {
+        int[] cp = new int[data.length];
+        System.arraycopy(data, 0, cp, 0, data.length);
+        return new IntArrayTag(getName(), cp);
     }
 
     @Override
@@ -65,9 +45,29 @@ public class IntArrayTag extends Tag {
     }
 
     @Override
-    public Tag copy() {
-        int[] cp = new int[data.length];
-        System.arraycopy(data, 0, cp, 0, data.length);
-        return new IntArrayTag(getName(), cp);
+    public void load(NBTInputStream dis) throws IOException {
+        int length = dis.readInt();
+        data = new int[length];
+        for (int i = 0; i < length; i++) {
+            data[i] = dis.readInt();
+        }
+    }
+
+    @Override
+    public int[] parseValue() {
+        return this.data;
+    }
+
+    @Override
+    public String toString() {
+        return "IntArrayTag " + this.getName() + " [" + data.length + " bytes]";
+    }
+
+    @Override
+    public void write(NBTOutputStream dos) throws IOException {
+        dos.writeInt(data.length);
+        for (int aData : data) {
+            dos.writeInt(aData);
+        }
     }
 }

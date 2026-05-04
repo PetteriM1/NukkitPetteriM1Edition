@@ -14,8 +14,8 @@ public class BlockDoorDarkOak extends BlockDoorWood {
     }
 
     @Override
-    public String getName() {
-        return "Dark Oak Door Block";
+    public BlockColor getColor() {
+        return BlockColor.BROWN_BLOCK_COLOR;
     }
 
     @Override
@@ -24,12 +24,12 @@ public class BlockDoorDarkOak extends BlockDoorWood {
     }
 
     @Override
-    public Item toItem() {
-        return Item.get(Item.DARK_OAK_DOOR);
+    public String getName() {
+        return "Dark Oak Door Block";
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.BROWN_BLOCK_COLOR;
+    public Item toItem() {
+        return Item.get(Item.DARK_OAK_DOOR);
     }
 }

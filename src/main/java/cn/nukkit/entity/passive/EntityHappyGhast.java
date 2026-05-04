@@ -13,6 +13,19 @@ public class EntityHappyGhast extends EntityFlyingAnimal {
     }
 
     @Override
+    public float getHeight() {
+        if (this.isBaby()) {
+            return 0.95f;
+        }
+        return 4f;
+    }
+
+    @Override
+    public int getKillExperience() {
+        return this.isBaby() ? 0 : Utils.rand(2, 3);
+    }
+
+    @Override
     public int getNetworkId() {
         return NETWORK_ID;
     }
@@ -26,21 +39,8 @@ public class EntityHappyGhast extends EntityFlyingAnimal {
     }
 
     @Override
-    public float getHeight() {
-        if (this.isBaby()) {
-            return 0.95f;
-        }
-        return 4f;
-    }
-
-    @Override
     public void initEntity() {
         this.setMaxHealth(20);
         super.initEntity();
-    }
-
-    @Override
-    public int getKillExperience() {
-        return this.isBaby() ? 0 : Utils.rand(2, 3);
     }
 }

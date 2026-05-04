@@ -9,6 +9,7 @@ import cn.nukkit.network.auth.TokenPayload;
 import cn.nukkit.network.encryption.EncryptionUtils;
 import cn.nukkit.network.encryption.util.ChainValidationResult;
 import cn.nukkit.network.protocol.LoginPacket;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -28,6 +29,7 @@ import java.util.*;
  * To get chain data, you can use player.getLoginChainData() or read(loginPacket)
  * <p>
  * ===============
+ *
  * @author boybook
  * Nukkit Project
  * ===============
@@ -35,133 +37,15 @@ import java.util.*;
 public final class ClientChainData implements LoginChainData {
 
     private static final Gson GSON = new Gson();
-
-    public static ClientChainData of(byte[] buffer) {
-        return new ClientChainData(buffer);
-    }
-
-    public static ClientChainData read(LoginPacket pk) {
-        return of(pk.getBuffer());
-    }
-
-    @Override
-    public String getUsername() {
-        return username;
-    }
-
-    @Override
-    public UUID getClientUUID() {
-        return clientUUID;
-    }
-
-    @Override
-    public String getIdentityPublicKey() {
-        return identityPublicKey;
-    }
-
-    @Override
-    public long getClientId() {
-        return clientId;
-    }
-
-    @Override
-    public String getServerAddress() {
-        return serverAddress;
-    }
-
-    @Override
-    public String getDeviceModel() {
-        return deviceModel;
-    }
-
-    @Override
-    public int getDeviceOS() {
-        return deviceOS;
-    }
-
-    @Override
-    public String getDeviceId() {
-        return deviceId;
-    }
-
-    @Override
-    public String getGameVersion() {
-        return gameVersion;
-    }
-
-    @Override
-    public int getGuiScale() {
-        return guiScale;
-    }
-
-    @Override
-    public String getLanguageCode() {
-        return languageCode;
-    }
-
-    @Override
-    public String getXUID() {
-        return xuid;
-    }
-
     private boolean xboxAuthed;
-
-    @Override
-    public int getCurrentInputMode() {
-        return currentInputMode;
-    }
-
-    @Override
-    public int getDefaultInputMode() {
-        return defaultInputMode;
-    }
-
-    @Override
-    public String getCapeData() {
-        return capeData;
-    }
-
     public final static int UI_PROFILE_CLASSIC = 0;
     public final static int UI_PROFILE_POCKET = 1;
-
-    @Override
-    public int getUIProfile() {
-        return UIProfile;
-    }
-
-    @Override
-    public String getTitleId() {
-        return titleId;
-    }
-
-    @Override
-    public JsonObject getRawData() {
-        return rawData;
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // Override
-    ///////////////////////////////////////////////////////////////////////////
-
-    @Override
-    public boolean equals(Object obj) {
-        return obj instanceof ClientChainData && Objects.equals(bs, ((ClientChainData) obj).bs);
-    }
-
-    @Override
-    public int hashCode() {
-        return bs.hashCode();
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // Internal
-    ///////////////////////////////////////////////////////////////////////////
+    /// ////////////////////////////////////////////////////////////////////////
 
     private String username;
     private UUID clientUUID;
     private String xuid;
     private String identityPublicKey;
-
     private long clientId;
     private String serverAddress;
     private String deviceModel;
@@ -177,15 +61,116 @@ public final class ClientChainData implements LoginChainData {
     private String titleId;
     @Getter
     private Skin skin;
-
     private JsonObject rawData;
-
     private final BinaryStream bs = new BinaryStream();
 
-    private ClientChainData(byte[] buffer) {
+    ///////////////////////////////////////////////////////////////////////////
+    // Override
+
+    private ClientChainData(byte[] buffer, int protocol) {
         bs.setBuffer(buffer, 0);
-        decodeChainData();
-        decodeSkinData();
+        decodeChainData(protocol);
+        decodeSkinData(protocol);
+    }
+
+    public static class TooBigSkinException extends RuntimeException {
+
+        public TooBigSkinException(String s) {
+            super(s);
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Internal
+
+    @Override
+    public String getCapeData() {
+        return capeData;
+    }
+
+    @Override
+    public long getClientId() {
+        return clientId;
+    }
+
+    @Override
+    public UUID getClientUUID() {
+        return clientUUID;
+    }
+
+    @Override
+    public int getCurrentInputMode() {
+        return currentInputMode;
+    }
+
+    @Override
+    public int getDefaultInputMode() {
+        return defaultInputMode;
+    }
+
+    @Override
+    public String getDeviceId() {
+        return deviceId;
+    }
+
+    @Override
+    public String getDeviceModel() {
+        return deviceModel;
+    }
+
+    @Override
+    public int getDeviceOS() {
+        return deviceOS;
+    }
+
+    @Override
+    public String getGameVersion() {
+        return gameVersion;
+    }
+
+    @Override
+    public int getGuiScale() {
+        return guiScale;
+    }
+
+    @Override
+    public String getIdentityPublicKey() {
+        return identityPublicKey;
+    }
+
+    @Override
+    public String getLanguageCode() {
+        return languageCode;
+    }
+
+    @Override
+    public JsonObject getRawData() {
+        return rawData;
+    }
+
+    @Override
+    public String getServerAddress() {
+        return serverAddress;
+    }
+
+    @Override
+    public String getTitleId() {
+        return titleId;
+    }
+
+    @Override
+    public int getUIProfile() {
+        return UIProfile;
+    }
+
+    @Override
+    public String getUsername() {
+        return username;
+    }
+
+    @Override
+    public String getXUID() {
+        return xuid;
     }
 
     @Override
@@ -193,10 +178,139 @@ public final class ClientChainData implements LoginChainData {
         return xboxAuthed;
     }
 
-    private void decodeSkinData() {
+    private void decodeChainData(int protocol) {
         int size = bs.getLInt();
-        if (size > 52428800) {
-            throw new TooBigSkinException("The skin data is too big: " + size);
+        if (size > 3145728) {
+            throw new IllegalArgumentException("The chain data is too big: " + size);
+        }
+
+        String authJwt = new String(bs.get(size), StandardCharsets.US_ASCII);
+
+        ChainValidationResult result;
+        try {
+            if (protocol < 818) {
+                result = EncryptionUtils.validatePayload(readAuthJwt291(authJwt));
+            } else {
+                result = EncryptionUtils.validatePayload(readAuthJwt818(authJwt));
+            }
+
+            this.xboxAuthed = result.signed();
+        } catch (Throwable e) {
+            this.xboxAuthed = false;
+            Server.getInstance().getLogger().logException(e);
+            return;
+        }
+
+        ChainValidationResult.IdentityData extraData = result.identityClaims().extraData;
+        this.username = extraData.displayName;
+        this.clientUUID = extraData.identity;
+        this.xuid = extraData.xuid;
+        this.titleId = extraData.titleId;
+        this.identityPublicKey = result.identityClaims().identityPublicKey;
+    }
+
+    private Skin decodeSkin(JsonObject skinToken, int protocol) {
+        Skin skin = new Skin();
+        skin.setTrusted(false); // Don't trust player skins
+
+        if (skinToken.has("SkinId")) {
+            skin.setSkinId(skinToken.get("SkinId").getAsString());
+        } else {
+            skin.setSkinId(UUID.randomUUID().toString());
+        }
+
+        skin.setFullSkinId(skin.getSkinId());
+
+        if (protocol < 388) {
+            if (skinToken.has("SkinData")) {
+                skin.setSkinData(Base64.getDecoder().decode(skinToken.get("SkinData").getAsString()));
+            }
+
+            if (skinToken.has("CapeData")) {
+                skin.setCapeData(Base64.getDecoder().decode(skinToken.get("CapeData").getAsString()));
+            }
+
+            if (skinToken.has("SkinGeometryName")) {
+                skin.setGeometryName(skinToken.get("SkinGeometryName").getAsString());
+            }
+
+            if (skinToken.has("SkinGeometry")) {
+                skin.setGeometryData(new String(Base64.getDecoder().decode(skinToken.get("SkinGeometry").getAsString()), StandardCharsets.UTF_8));
+            }
+        } else {
+            if (skinToken.has("PlayFabId")) {
+                skin.setPlayFabId(skinToken.get("PlayFabId").getAsString());
+            }
+
+            if (skinToken.has("CapeId")) {
+                skin.setCapeId(skinToken.get("CapeId").getAsString());
+            }
+
+            skin.setSkinData(getImage(skinToken, "Skin"));
+            skin.setCapeData(getImage(skinToken, "Cape"));
+
+            if (skinToken.has("PremiumSkin")) {
+                skin.setPremium(skinToken.get("PremiumSkin").getAsBoolean());
+            }
+
+            if (skinToken.has("PersonaSkin")) {
+                skin.setPersona(skinToken.get("PersonaSkin").getAsBoolean());
+            }
+
+            if (skinToken.has("CapeOnClassicSkin")) {
+                skin.setCapeOnClassic(skinToken.get("CapeOnClassicSkin").getAsBoolean());
+            }
+
+            if (skinToken.has("SkinResourcePatch")) {
+                skin.setSkinResourcePatch(new String(Base64.getDecoder().decode(skinToken.get("SkinResourcePatch").getAsString()), StandardCharsets.UTF_8));
+            }
+
+            if (skinToken.has("SkinGeometryData")) {
+                skin.setGeometryData(new String(Base64.getDecoder().decode(skinToken.get("SkinGeometryData").getAsString()), StandardCharsets.UTF_8));
+            }
+
+            if (skinToken.has("SkinAnimationData")) {
+                skin.setAnimationData(new String(Base64.getDecoder().decode(skinToken.get("SkinAnimationData").getAsString()), StandardCharsets.UTF_8));
+            }
+
+            if (skinToken.has("AnimatedImageData")) {
+                for (JsonElement element : skinToken.get("AnimatedImageData").getAsJsonArray()) {
+                    skin.getAnimations().add(getAnimation(protocol, element.getAsJsonObject()));
+                }
+            }
+
+            if (skinToken.has("SkinColor")) {
+                skin.setSkinColor(skinToken.get("SkinColor").getAsString());
+            }
+
+            if (skinToken.has("ArmSize")) {
+                skin.setArmSize(skinToken.get("ArmSize").getAsString());
+            }
+
+            if (skinToken.has("PersonaPieces")) {
+                for (JsonElement object : skinToken.get("PersonaPieces").getAsJsonArray()) {
+                    skin.getPersonaPieces().add(getPersonaPiece(object.getAsJsonObject()));
+                }
+            }
+
+            if (skinToken.has("PieceTintColors")) {
+                for (JsonElement object : skinToken.get("PieceTintColors").getAsJsonArray()) {
+                    skin.getTintColors().add(getTint(object.getAsJsonObject()));
+                }
+            }
+        }
+
+        return skin;
+    }
+
+    private void decodeSkinData(int protocol) {
+        int size = bs.getLInt();
+        if (size > 4194304) {
+            if (Server.getInstance().doNotLimitSkinGeometry) {
+                Server.getInstance().getLogger().warning(username + ": got large skin data but do-not-limit-skin-geometry is enabled: " + size);
+            } else {
+                throw new TooBigSkinException("The skin data is too big: " + size);
+            }
         }
 
         String valueJwt = new String(bs.get(size), StandardCharsets.UTF_8);
@@ -223,8 +337,8 @@ public final class ClientChainData implements LoginChainData {
         if (skinToken.has("DefaultInputMode")) this.defaultInputMode = skinToken.get("DefaultInputMode").getAsInt();
         if (skinToken.has("UIProfile")) this.UIProfile = skinToken.get("UIProfile").getAsInt();
         if (skinToken.has("CapeData")) this.capeData = skinToken.get("CapeData").getAsString();
-        this.skin = decodeSkin(skinToken);
-        this.rawData = skinToken;
+        this.skin = decodeSkin(skinToken, protocol);
+        if (!Server.getInstance().suomiCraftPEMode()) this.rawData = skinToken;
     }
 
     public static JsonObject decodeToken(String token) {
@@ -240,148 +354,20 @@ public final class ClientChainData implements LoginChainData {
         return GSON.fromJson(new String(decoded, StandardCharsets.UTF_8), JsonObject.class);
     }
 
-    private AuthPayload readAuthJwt(String authJwt) {
-        try {
-            Map<String, Object> payload = JsonUtil.parseJson(authJwt);
-            if (!payload.containsKey("AuthenticationType")) {
-                throw new IllegalArgumentException("Missing AuthenticationType in JWT");
-            }
+    /// ////////////////////////////////////////////////////////////////////////
 
-            int authTypeOrdinal = ((Number) payload.get("AuthenticationType")).intValue();
-            if (authTypeOrdinal < 0 || authTypeOrdinal >= AuthType.values().length - 1) {
-                throw new IllegalArgumentException("Invalid AuthenticationType ordinal: " + authTypeOrdinal);
-            }
-            AuthType authType = AuthType.values()[authTypeOrdinal + 1];
-
-            if (payload.containsKey("Token") && payload.get("Token") instanceof String && !((String) payload.get("Token")).isEmpty()) {
-                String token = (String) payload.get("Token");
-                return new TokenPayload(token, authType);
-            } else if (payload.containsKey("Certificate") && payload.get("Certificate") instanceof String && !((String) payload.get("Certificate")).isEmpty()) {
-                String certJson = (String) payload.get("Certificate");
-                Map<String, Object> certData = JsonUtil.parseJson(certJson);
-                if (!certData.containsKey("chain") || !(certData.get("chain") instanceof List)) {
-                    throw new IllegalArgumentException("Invalid Certificate chain in JWT");
-                }
-                List<String> chain = (List<String>) certData.get("chain");
-                return new CertificateChainPayload(chain, authType);
-            } else {
-                throw new IllegalArgumentException("Invalid AuthPayload in JWT");
-            }
-        } catch (JoseException e) {
-            throw new IllegalArgumentException("Failed to parse auth payload", e);
-        }
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof ClientChainData && Objects.equals(bs, ((ClientChainData) obj).bs);
     }
 
-    private void decodeChainData() {
-        int size = bs.getLInt();
-        if (size > 3145728) {
-            throw new IllegalArgumentException("The chain data is too big: " + size);
-        }
-
-        String authJwt = new String(bs.get(size), StandardCharsets.US_ASCII);
-
-        ChainValidationResult result;
-        try {
-            result = EncryptionUtils.validatePayload(readAuthJwt(authJwt));
-
-            this.xboxAuthed = result.signed();
-        } catch (Throwable e) {
-            this.xboxAuthed = false;
-            Server.getInstance().getLogger().logException(e);
-            return;
-        }
-
-        ChainValidationResult.IdentityData extraData = result.identityClaims().extraData;
-        this.username = extraData.displayName;
-        this.clientUUID = extraData.identity;
-        this.xuid = extraData.xuid;
-        this.titleId = extraData.titleId;
-        this.identityPublicKey = result.identityClaims().identityPublicKey;
-    }
-
-    private Skin decodeSkin(JsonObject skinToken) {
-        Skin skin = new Skin();
-        skin.setTrusted(false); // Don't trust player skins
-
-        if (skinToken.has("SkinId")) {
-            skin.setSkinId(skinToken.get("SkinId").getAsString());
-        } else {
-            skin.setSkinId(UUID.randomUUID().toString());
-        }
-
-        skin.setFullSkinId(skin.getSkinId());
-
-        if (skinToken.has("PlayFabId")) {
-            skin.setPlayFabId(skinToken.get("PlayFabId").getAsString());
-        }
-
-        if (skinToken.has("CapeId")) {
-            skin.setCapeId(skinToken.get("CapeId").getAsString());
-        }
-
-        skin.setSkinData(getImage(skinToken, "Skin"));
-        skin.setCapeData(getImage(skinToken, "Cape"));
-
-        if (skinToken.has("PremiumSkin")) {
-            skin.setPremium(skinToken.get("PremiumSkin").getAsBoolean());
-        }
-
-        if (skinToken.has("PersonaSkin")) {
-            skin.setPersona(skinToken.get("PersonaSkin").getAsBoolean());
-        }
-
-        if (skinToken.has("CapeOnClassicSkin")) {
-            skin.setCapeOnClassic(skinToken.get("CapeOnClassicSkin").getAsBoolean());
-        }
-
-        if (skinToken.has("SkinResourcePatch")) {
-            skin.setSkinResourcePatch(new String(Base64.getDecoder().decode(skinToken.get("SkinResourcePatch").getAsString()), StandardCharsets.UTF_8));
-        }
-
-        if (skinToken.has("SkinGeometryData")) {
-            skin.setGeometryData(new String(Base64.getDecoder().decode(skinToken.get("SkinGeometryData").getAsString()), StandardCharsets.UTF_8));
-        }
-
-        if (skinToken.has("SkinAnimationData")) {
-            skin.setAnimationData(new String(Base64.getDecoder().decode(skinToken.get("SkinAnimationData").getAsString()), StandardCharsets.UTF_8));
-        }
-
-        if (skinToken.has("AnimatedImageData")) {
-            for (JsonElement element : skinToken.get("AnimatedImageData").getAsJsonArray()) {
-                skin.getAnimations().add(getAnimation(element.getAsJsonObject()));
-            }
-        }
-
-        if (skinToken.has("SkinColor")) {
-            skin.setSkinColor(skinToken.get("SkinColor").getAsString());
-        }
-
-        if (skinToken.has("ArmSize")) {
-            skin.setArmSize(skinToken.get("ArmSize").getAsString());
-        }
-
-        if (skinToken.has("PersonaPieces")) {
-            for (JsonElement object : skinToken.get("PersonaPieces").getAsJsonArray()) {
-                skin.getPersonaPieces().add(getPersonaPiece(object.getAsJsonObject()));
-            }
-        }
-
-        if (skinToken.has("PieceTintColors")) {
-            for (JsonElement object : skinToken.get("PieceTintColors").getAsJsonArray()) {
-                skin.getTintColors().add(getTint(object.getAsJsonObject()));
-            }
-        }
-
-        return skin;
-    }
-
-    private static SkinAnimation getAnimation(JsonObject element) {
+    private static SkinAnimation getAnimation(int protocol, JsonObject element) {
         float frames = element.get("Frames").getAsFloat();
         int type = element.get("Type").getAsInt();
         byte[] data = Base64.getDecoder().decode(element.get("Image").getAsString());
         int width = element.get("ImageWidth").getAsInt();
         int height = element.get("ImageHeight").getAsInt();
-        int expression = element.get("AnimationExpression").getAsInt();
+        int expression = protocol >= ProtocolInfo.v1_16_100 ? element.get("AnimationExpression").getAsInt() : 0;
         return new SkinAnimation(new SerializedImage(width, height, data), type, frames, expression);
     }
 
@@ -417,10 +403,72 @@ public final class ClientChainData implements LoginChainData {
         return new PersonaPieceTint(pieceType, colors);
     }
 
-    public static class TooBigSkinException extends RuntimeException {
+    @Override
+    public int hashCode() {
+        return bs.hashCode();
+    }
 
-        public TooBigSkinException(String s) {
-            super(s);
+    public static ClientChainData of(byte[] buffer, int protocol) {
+        return new ClientChainData(buffer, protocol);
+    }
+
+    public static ClientChainData read(LoginPacket pk) {
+        return of(pk.getBuffer(), pk.getProtocol());
+    }
+
+    private AuthPayload readAuthJwt291(String authJwt) {
+        try {
+            Map<String, Object> json = JsonUtil.parseJson(authJwt);
+            if (json == null || !(json.get("chain") instanceof List)) {
+                throw new IllegalArgumentException("Invalid login chain");
+            }
+
+            //noinspection unchecked
+            List<Object> chain = (List<Object>) json.get("chain");
+
+            List<String> chainList = new ArrayList<>(3);
+            for (Object node : chain) {
+                if (!(node instanceof String)) {
+                    throw new IllegalArgumentException("Expected String in login chain");
+                }
+
+                chainList.add((String) node);
+            }
+            return new CertificateChainPayload(chainList);
+        } catch (JoseException e) {
+            throw new IllegalArgumentException("Failed to parse auth payload", e);
+        }
+    }
+
+    private AuthPayload readAuthJwt818(String authJwt) {
+        try {
+            Map<String, Object> payload = JsonUtil.parseJson(authJwt);
+            if (!payload.containsKey("AuthenticationType")) {
+                throw new IllegalArgumentException("Missing AuthenticationType in JWT");
+            }
+
+            int authTypeOrdinal = ((Number) payload.get("AuthenticationType")).intValue();
+            if (authTypeOrdinal < 0 || authTypeOrdinal >= AuthType.values().length - 1) {
+                throw new IllegalArgumentException("Invalid AuthenticationType ordinal: " + authTypeOrdinal);
+            }
+            AuthType authType = AuthType.values()[authTypeOrdinal + 1];
+
+            if (payload.containsKey("Token") && payload.get("Token") instanceof String && !((String) payload.get("Token")).isEmpty()) {
+                String token = (String) payload.get("Token");
+                return new TokenPayload(token, authType);
+            } else if (payload.containsKey("Certificate") && payload.get("Certificate") instanceof String && !((String) payload.get("Certificate")).isEmpty()) {
+                String certJson = (String) payload.get("Certificate");
+                Map<String, Object> certData = JsonUtil.parseJson(certJson);
+                if (!certData.containsKey("chain") || !(certData.get("chain") instanceof List)) {
+                    throw new IllegalArgumentException("Invalid Certificate chain in JWT");
+                }
+                List<String> chain = (List<String>) certData.get("chain");
+                return new CertificateChainPayload(chain, authType);
+            } else {
+                throw new IllegalArgumentException("Invalid AuthPayload in JWT");
+            }
+        } catch (JoseException e) {
+            throw new IllegalArgumentException("Failed to parse auth payload", e);
         }
     }
 }

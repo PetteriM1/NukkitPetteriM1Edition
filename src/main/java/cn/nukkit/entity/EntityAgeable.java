@@ -6,9 +6,9 @@ package cn.nukkit.entity;
  */
 public interface EntityAgeable {
 
-    boolean isBaby();
-
     default void setBaby(boolean baby) {
 
     }
+
+    boolean isBaby();
 }

@@ -21,8 +21,13 @@ public class BlockCobweb extends BlockFlowable {
     }
 
     @Override
-    public String getName() {
-        return "Cobweb";
+    public BlockColor getColor() {
+        return BlockColor.CLOTH_BLOCK_COLOR;
+    }
+
+    @Override
+    public double getHardness() {
+        return 4;
     }
 
     @Override
@@ -31,8 +36,8 @@ public class BlockCobweb extends BlockFlowable {
     }
 
     @Override
-    public double getHardness() {
-        return 4;
+    public String getName() {
+        return "Cobweb";
     }
 
     @Override
@@ -46,13 +51,18 @@ public class BlockCobweb extends BlockFlowable {
     }
 
     @Override
-    public boolean hasEntityCollision() {
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.WHEN_PLACED_IN_WATER;
+    }
+
+    @Override
+    public boolean breakWhenPushed() {
         return true;
     }
 
     @Override
-    public void onEntityCollide(Entity entity) {
-        entity.resetFallDistance();
+    public boolean canHarvestWithHand() {
+        return false;
     }
 
     @Override
@@ -71,27 +81,17 @@ public class BlockCobweb extends BlockFlowable {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.CLOTH_BLOCK_COLOR;
+    public boolean hasEntityCollision() {
+        return true;
     }
 
     @Override
-    public boolean canHarvestWithHand() {
-        return false;
+    public void onEntityCollide(Entity entity) {
+        entity.resetFallDistance();
     }
 
     @Override
     protected AxisAlignedBB recalculateBoundingBox() {
         return this;
-    }
-
-    @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.WHEN_PLACED_IN_WATER;
-    }
-
-    @Override
-    public boolean breakWhenPushed() {
-        return true;
     }
 }

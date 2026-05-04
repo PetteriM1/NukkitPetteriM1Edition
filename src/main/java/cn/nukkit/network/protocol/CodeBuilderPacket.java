@@ -11,11 +11,6 @@ public class CodeBuilderPacket extends DataPacket {
     public String url = "";
 
     @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
-    @Override
     public void decode() {
         this.decodeUnsupported();
     }
@@ -25,5 +20,10 @@ public class CodeBuilderPacket extends DataPacket {
         this.reset();
         this.putString(url);
         this.putBoolean(isOpening);
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

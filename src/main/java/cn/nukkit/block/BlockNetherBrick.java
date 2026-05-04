@@ -11,18 +11,8 @@ import cn.nukkit.utils.BlockColor;
 public class BlockNetherBrick extends BlockSolid {
 
     @Override
-    public String getName() {
-        return "Nether Bricks";
-    }
-
-    @Override
-    public int getId() {
-        return NETHER_BRICKS;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
+    public BlockColor getColor() {
+        return BlockColor.NETHERRACK_BLOCK_COLOR;
     }
 
     @Override
@@ -31,8 +21,28 @@ public class BlockNetherBrick extends BlockSolid {
     }
 
     @Override
+    public int getId() {
+        return NETHER_BRICKS;
+    }
+
+    @Override
+    public String getName() {
+        return "Nether Bricks";
+    }
+
+    @Override
     public double getResistance() {
         return 10;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
+    }
+
+    @Override
+    public boolean canHarvestWithHand() {
+        return false;
     }
 
     @Override
@@ -44,15 +54,5 @@ public class BlockNetherBrick extends BlockSolid {
         } else {
             return new Item[0];
         }
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.NETHERRACK_BLOCK_COLOR;
-    }
-
-    @Override
-    public boolean canHarvestWithHand() {
-        return false;
     }
 }

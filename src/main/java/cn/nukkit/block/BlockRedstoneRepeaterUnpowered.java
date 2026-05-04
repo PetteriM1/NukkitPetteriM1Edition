@@ -19,22 +19,8 @@ public class BlockRedstoneRepeaterUnpowered extends BlockRedstoneDiode {
     }
 
     @Override
-    public int getId() {
-        return UNPOWERED_REPEATER;
-    }
-
-    @Override
-    public String getName() {
-        return "Unpowered Repeater";
-    }
-
-    @Override
-    public boolean onActivate(Item item, Player player) {
-        this.setDamage(this.getDamage() + 4);
-        if (this.getDamage() > 15) this.setDamage(this.getDamage() % 4);
-
-        this.level.setBlock(this, this, true, true);
-        return true;
+    protected int getDelay() {
+        return (1 + (getDamage() >> 2)) << 1;
     }
 
     @Override
@@ -43,18 +29,13 @@ public class BlockRedstoneRepeaterUnpowered extends BlockRedstoneDiode {
     }
 
     @Override
-    protected boolean isAlternateInput(Block block) {
-        return isDiode(block);
+    public int getId() {
+        return UNPOWERED_REPEATER;
     }
 
     @Override
-    public Item toItem() {
-        return Item.get(Item.REPEATER);
-    }
-
-    @Override
-    protected int getDelay() {
-        return (1 + (getDamage() >> 2)) << 1;
+    public String getName() {
+        return "Unpowered Repeater";
     }
 
     @Override
@@ -70,5 +51,24 @@ public class BlockRedstoneRepeaterUnpowered extends BlockRedstoneDiode {
     @Override
     public boolean isLocked() {
         return this.getPowerOnSides() > 0;
+    }
+
+    @Override
+    protected boolean isAlternateInput(Block block) {
+        return isDiode(block);
+    }
+
+    @Override
+    public boolean onActivate(Item item, Player player) {
+        this.setDamage(this.getDamage() + 4);
+        if (this.getDamage() > 15) this.setDamage(this.getDamage() % 4);
+
+        this.level.setBlock(this, this, true, true);
+        return true;
+    }
+
+    @Override
+    public Item toItem() {
+        return Item.get(Item.REPEATER);
     }
 }

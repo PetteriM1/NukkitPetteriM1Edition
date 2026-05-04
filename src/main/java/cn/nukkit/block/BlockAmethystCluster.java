@@ -18,11 +18,6 @@ public class BlockAmethystCluster extends BlockAmethystBud {
     }
 
     @Override
-    public int getId() {
-        return AMETHYST_CLUSTER;
-    }
-
-    @Override
     protected int getCrystalHeight() {
         return 7;
     }
@@ -33,8 +28,13 @@ public class BlockAmethystCluster extends BlockAmethystBud {
     }
 
     @Override
-    protected String getSizeName() {
-        return "Cluster";
+    public int getId() {
+        return AMETHYST_CLUSTER;
+    }
+
+    @Override
+    public int getLightLevel() {
+        return 5;
     }
 
     @Override
@@ -43,8 +43,8 @@ public class BlockAmethystCluster extends BlockAmethystBud {
     }
 
     @Override
-    public int getLightLevel() {
-        return 5;
+    protected String getSizeName() {
+        return "Cluster";
     }
 
     @Override

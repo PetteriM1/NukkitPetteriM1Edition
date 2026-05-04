@@ -1,5 +1,7 @@
 package cn.nukkit.item;
 
+import cn.nukkit.network.protocol.ProtocolInfo;
+
 public class ItemRecordPigstep extends ItemRecord {
 
     public ItemRecordPigstep() {
@@ -15,12 +17,17 @@ public class ItemRecordPigstep extends ItemRecord {
     }
 
     @Override
+    public String getDiscName() {
+        return "Lena Raine - Pigstep";
+    }
+
+    @Override
     public String getSoundId() {
         return "record.pigstep";
     }
 
     @Override
-    public String getDiscName() {
-        return "Lena Raine - Pigstep";
+    public boolean isSupportedOn(int protocol) {
+        return protocol >= ProtocolInfo.v1_16_0;
     }
 }

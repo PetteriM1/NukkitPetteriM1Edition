@@ -1,6 +1,8 @@
 package cn.nukkit.block;
 
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockDoubleSlabMangrove extends BlockDoubleSlabWood {
 
@@ -13,8 +15,8 @@ public class BlockDoubleSlabMangrove extends BlockDoubleSlabWood {
     }
 
     @Override
-    public String getName() {
-        return "Mangrove Double Slab";
+    public BlockColor getColor() {
+        return BlockColor.RED_BLOCK_COLOR;
     }
 
     @Override
@@ -23,12 +25,22 @@ public class BlockDoubleSlabMangrove extends BlockDoubleSlabWood {
     }
 
     @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_17_0;
+    }
+
+    @Override
+    public String getName() {
+        return "Mangrove Double Slab";
+    }
+
+    @Override
     public int getSingleSlabId() {
         return MANGROVE_SLAB;
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.RED_BLOCK_COLOR;
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.DOUBLE_WOOD_SLAB;
     }
 }

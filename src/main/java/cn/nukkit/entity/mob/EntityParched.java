@@ -19,11 +19,6 @@ public class EntityParched extends EntitySkeleton {
     }
 
     @Override
-    public int getNetworkId() {
-        return NETWORK_ID;
-    }
-
-    @Override
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
 
@@ -44,5 +39,10 @@ public class EntityParched extends EntitySkeleton {
         }
 
         return drops.toArray(new Item[0]);
+    }
+
+    @Override
+    public int getNetworkId() {
+        return NETWORK_ID;
     }
 }

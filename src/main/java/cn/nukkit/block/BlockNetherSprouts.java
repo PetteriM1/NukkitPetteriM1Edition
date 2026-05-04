@@ -15,8 +15,8 @@ public class BlockNetherSprouts extends BlockRoots {
     }
 
     @Override
-    public String getName() {
-        return "Nether Sprouts";
+    public BlockColor getColor() {
+        return BlockColor.CYAN_BLOCK_COLOR;
     }
 
     @Override
@@ -25,30 +25,30 @@ public class BlockNetherSprouts extends BlockRoots {
     }
 
     @Override
+    public String getName() {
+        return "Nether Sprouts";
+    }
+
+    @Override
     public int getToolType() {
         return ItemTool.TYPE_SHEARS;
     }
 
     @Override
-    public Item toItem() {
-        return Item.get(Item.NETHER_SPROUTS);
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.CYAN_BLOCK_COLOR;
+    public boolean canBeReplaced() {
+        return true;
     }
 
     @Override
     public Item[] getDrops(Item item) {
         if (item.isShears()) {
-            return new Item[]{ toItem() };
+            return new Item[]{toItem()};
         }
         return new Item[0];
     }
 
     @Override
-    public boolean canBeReplaced() {
-        return true;
+    public Item toItem() {
+        return Item.get(Item.NETHER_SPROUTS);
     }
 }

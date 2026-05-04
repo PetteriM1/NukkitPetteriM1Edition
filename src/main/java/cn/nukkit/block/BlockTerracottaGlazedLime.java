@@ -15,6 +15,10 @@ public class BlockTerracottaGlazedLime extends BlockTerracottaGlazed {
         super(meta);
     }
 
+    public DyeColor getDyeColor() {
+        return DyeColor.LIME;
+    }
+
     @Override
     public int getId() {
         return LIME_GLAZED_TERRACOTTA;
@@ -23,9 +27,5 @@ public class BlockTerracottaGlazedLime extends BlockTerracottaGlazed {
     @Override
     public String getName() {
         return "Lime Glazed Terracotta";
-    }
-
-    public DyeColor getDyeColor() {
-        return DyeColor.LIME;
     }
 }

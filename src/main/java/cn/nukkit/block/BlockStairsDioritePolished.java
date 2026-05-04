@@ -11,12 +11,12 @@ public class BlockStairsDioritePolished extends BlockStairsDiorite {
     }
 
     @Override
-    public String getName() {
-        return "Polished Diorite Stairs";
+    public int getId() {
+        return POLISHED_DIORITE_STAIRS;
     }
 
     @Override
-    public int getId() {
-        return POLISHED_DIORITE_STAIRS;
+    public String getName() {
+        return "Polished Diorite Stairs";
     }
 }

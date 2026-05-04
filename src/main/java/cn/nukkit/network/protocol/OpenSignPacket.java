@@ -8,11 +8,6 @@ public class OpenSignPacket extends DataPacket {
     public boolean frontSide;
 
     @Override
-    public byte pid() {
-        return ProtocolInfo.__INTERNAL__OPEN_SIGN_PACKET;
-    }
-
-    @Override
     public void decode() {
         this.decodeUnsupported();
     }
@@ -20,7 +15,12 @@ public class OpenSignPacket extends DataPacket {
     @Override
     public void encode() {
         this.reset();
-        this.putBlockVector3(this.position);
+        this.putBlockVector3(protocol, this.position);
         this.putBoolean(this.frontSide);
+    }
+
+    @Override
+    public byte pid() {
+        return ProtocolInfo.__INTERNAL__OPEN_SIGN_PACKET;
     }
 }

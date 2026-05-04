@@ -11,12 +11,12 @@ public class BlockCandleCakeLime extends BlockCandleCake {
     }
 
     @Override
-    public String getName() {
-        return "Lime Candle Cake";
+    public int getId() {
+        return LIME_CANDLE_CAKE;
     }
 
     @Override
-    public int getId() {
-        return LIME_CANDLE_CAKE;
+    public String getName() {
+        return "Lime Candle Cake";
     }
 }

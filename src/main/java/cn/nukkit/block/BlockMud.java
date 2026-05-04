@@ -1,7 +1,9 @@
 package cn.nukkit.block;
 
 import cn.nukkit.item.ItemTool;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockMud extends BlockSolid {
 
@@ -9,13 +11,8 @@ public class BlockMud extends BlockSolid {
     }
 
     @Override
-    public String getName() {
-        return "Mud";
-    }
-
-    @Override
-    public int getId() {
-        return MUD;
+    public BlockColor getColor() {
+        return BlockColor.CYAN_TERRACOTA_BLOCK_COLOR;
     }
 
     @Override
@@ -24,13 +21,23 @@ public class BlockMud extends BlockSolid {
     }
 
     @Override
-    public double getResistance() {
-        return 0.5;
+    public int getId() {
+        return MUD;
     }
 
     @Override
-    public int getToolType() {
-        return ItemTool.TYPE_SHOVEL;
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_19_0;
+    }
+
+    @Override
+    public String getName() {
+        return "Mud";
+    }
+
+    @Override
+    public double getResistance() {
+        return 2.5;
     }
 
     @Override
@@ -39,7 +46,12 @@ public class BlockMud extends BlockSolid {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.CYAN_TERRACOTA_BLOCK_COLOR;
+    public int getToolType() {
+        return ItemTool.TYPE_SHOVEL;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.DIRT;
     }
 }

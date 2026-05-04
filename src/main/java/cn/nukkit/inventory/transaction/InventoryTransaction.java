@@ -6,11 +6,13 @@ import cn.nukkit.Server;
 import cn.nukkit.event.inventory.InventoryClickEvent;
 import cn.nukkit.event.inventory.InventoryTransactionEvent;
 import cn.nukkit.inventory.Inventory;
+import cn.nukkit.inventory.PlayerInventory;
 import cn.nukkit.inventory.transaction.action.InventoryAction;
 import cn.nukkit.inventory.transaction.action.SlotChangeAction;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemDye;
 import cn.nukkit.item.enchantment.Enchantment;
+import cn.nukkit.network.protocol.ProtocolInfo;
 
 import java.util.*;
 
@@ -39,17 +41,12 @@ public class InventoryTransaction {
         }
     }
 
-    protected void init(Player source, List<InventoryAction> actions) {
-        //creationTime = System.currentTimeMillis();
-        this.source = source;
-
-        for (InventoryAction action : actions) {
-            this.addAction(action);
-        }
+    public List<InventoryAction> getActionList() {
+        return actions;
     }
 
-    public Player getSource() {
-        return source;
+    public Set<InventoryAction> getActions() {
+        return new HashSet<>(actions);
     }
 
     @Deprecated
@@ -61,34 +58,33 @@ public class InventoryTransaction {
         return inventories;
     }
 
-    public List<InventoryAction> getActionList() {
-        return actions;
-    }
-
-    public Set<InventoryAction> getActions() {
-        return new HashSet<>(actions);
+    public Player getSource() {
+        return source;
     }
 
     public void addAction(InventoryAction action) {
         if (this.invalid) {
-            if (Nukkit.DEBUG > 1) Server.getInstance().getLogger().debug("Failed to add " + action.getClass().getSimpleName() + " for " + source.getName() + ": previous run was marked as invalid");
+            if (Nukkit.DEBUG > 1)
+                Server.getInstance().getLogger().debug("Failed to add " + action.getClass().getSimpleName() + " for " + source.getName() + ": previous run was marked as invalid");
             return;
         }
 
         if (action instanceof SlotChangeAction) {
-            SlotChangeAction slotChangeAction = (SlotChangeAction)action;
+            SlotChangeAction slotChangeAction = (SlotChangeAction) action;
 
             Item targetItem = slotChangeAction.getTargetItemUnsafe();
             Item sourceItem = slotChangeAction.getSourceItemUnsafe();
             if (targetItem.getCount() > targetItem.getMaxStackSize() || sourceItem.getCount() > sourceItem.getMaxStackSize()) {
                 this.invalid = true;
-                if (Nukkit.DEBUG > 1) Server.getInstance().getLogger().debug("Failed to add SlotChangeAction for " + source.getName() + ": illegal item stack size");
+                if (Nukkit.DEBUG > 1)
+                    Server.getInstance().getLogger().debug("Failed to add SlotChangeAction for " + source.getName() + ": illegal item stack size");
                 return;
             }
 
             if (!slotChangeAction.getInventory().allowedToAdd(targetItem)) {
                 this.invalid = true;
-                if (Nukkit.DEBUG > 1) Server.getInstance().getLogger().debug("Failed to add SlotChangeAction for " + source.getName() + ": " + slotChangeAction.getInventory().getName() + " inventory doesn't allow item " + targetItem.getId());
+                if (Nukkit.DEBUG > 1)
+                    Server.getInstance().getLogger().debug("Failed to add SlotChangeAction for " + source.getName() + ": " + slotChangeAction.getInventory().getName() + " inventory doesn't allow item " + targetItem.getId());
                 return;
             }
 
@@ -97,7 +93,8 @@ public class InventoryTransaction {
                 if (slot == 36 || slot == 37 || slot == 38 || slot == 39) {
                     if (sourceItem.hasEnchantment(Enchantment.ID_BINDING_CURSE)) {
                         this.invalid = true;
-                        if (Nukkit.DEBUG > 1) Server.getInstance().getLogger().debug("Failed to add SlotChangeAction for " + source.getName() + ": armor has binding curse");
+                        if (Nukkit.DEBUG > 1)
+                            Server.getInstance().getLogger().debug("Failed to add SlotChangeAction for " + source.getName() + ": armor has binding curse");
                         return;
                     }
                 }
@@ -141,6 +138,98 @@ public class InventoryTransaction {
      */
     public void addInventory(Inventory inventory) {
         this.inventories.add(inventory);
+    }
+
+    protected boolean callExecuteEvent() {
+        InventoryTransactionEvent ev = new InventoryTransactionEvent(this);
+        this.source.getServer().getPluginManager().callEvent(ev);
+
+        SlotChangeAction from = null;
+        SlotChangeAction to = null;
+        Player who = null;
+
+        for (InventoryAction action : this.actions) {
+            if (!(action instanceof SlotChangeAction)) {
+                continue;
+            }
+            SlotChangeAction slotChange = (SlotChangeAction) action;
+
+            if (slotChange.getInventory().getHolder() instanceof Player) {
+                who = (Player) slotChange.getInventory().getHolder();
+            }
+
+            if (from == null) {
+                from = slotChange;
+            } else {
+                to = slotChange;
+            }
+        }
+
+        if (who != null && to != null) {
+            if (from.getTargetItemUnsafe().getCount() > from.getSourceItemUnsafe().getCount()) {
+                from = to;
+            }
+
+            InventoryClickEvent ev2 = new InventoryClickEvent(who, from.getInventory(), from.getSlot(), from.getSourceItem(), from.getTargetItem());
+            this.source.getServer().getPluginManager().callEvent(ev2);
+
+            if (ev2.isCancelled()) {
+                return false;
+            }
+        }
+
+        return !ev.isCancelled();
+    }
+
+    public boolean canExecute() {
+        return matchItems() && !this.invalid && !this.actions.isEmpty();
+    }
+
+    public boolean checkForItemPart(List<InventoryAction> actions) {
+        return false;
+    }
+
+    public boolean execute() {
+        if (this.hasExecuted() || !this.canExecute() || this.invalid) {
+            this.sendInventories();
+            return false;
+        }
+
+        if (!this.callExecuteEvent()) {
+            this.sendInventories();
+            return true;
+        }
+
+        for (InventoryAction action : this.actions) {
+            if (!action.onPreExecute(this.source)) {
+                this.sendInventories();
+                return true;
+            }
+        }
+
+        for (InventoryAction action : this.actions) {
+            if (action.execute(this.source)) {
+                action.onExecuteSuccess(this.source);
+            } else {
+                action.onExecuteFail(this.source);
+            }
+        }
+
+        this.hasExecuted = true;
+        return true;
+    }
+
+    public boolean hasExecuted() {
+        return this.hasExecuted;
+    }
+
+    protected void init(Player source, List<InventoryAction> actions) {
+        //creationTime = System.currentTimeMillis();
+        this.source = source;
+
+        for (InventoryAction action : actions) {
+            this.addAction(action);
+        }
     }
 
     protected boolean matchItems() {
@@ -191,99 +280,33 @@ public class InventoryTransaction {
         }
 
         boolean valid = needItems.isEmpty() && haveItems.isEmpty();
-        if (!valid && Nukkit.DEBUG > 1) source.getServer().getLogger().debug("!matchItems " + needItems + " / " + haveItems);
+        if (!valid && Nukkit.DEBUG > 1)
+            source.getServer().getLogger().debug("!matchItems " + needItems + " / " + haveItems);
         return valid;
     }
 
     protected void sendInventories() {
-        for (InventoryAction action : this.actions) {
-            if (action instanceof SlotChangeAction) {
-                SlotChangeAction sca = (SlotChangeAction) action;
-                sca.getInventory().sendSlot(sca.getSlot(), this.source);
+        if (this.getSource().protocol >= ProtocolInfo.v1_16_0) {
+            for (InventoryAction action : this.actions) {
+                if (action instanceof SlotChangeAction) {
+                    SlotChangeAction sca = (SlotChangeAction) action;
+
+                    Inventory inv = sca.getInventory();
+                    if (inv instanceof PlayerInventory) {
+                        ((PlayerInventory) inv).needSendSlot.add(sca.getSlot());
+                    } else {
+                        inv.sendSlot(sca.getSlot(), this.source);
+                    }
+                }
+            }
+        } else {
+            for (Inventory inventory : this.inventories) {
+                if (inventory instanceof PlayerInventory) {
+                    this.source.setNeedSendInventory(true);
+                } else {
+                    inventory.sendContents(this.source);
+                }
             }
         }
-    }
-
-    public boolean canExecute() {
-        return matchItems() && !this.invalid && !this.actions.isEmpty();
-    }
-
-    protected boolean callExecuteEvent() {
-        InventoryTransactionEvent ev = new InventoryTransactionEvent(this);
-        this.source.getServer().getPluginManager().callEvent(ev);
-
-        SlotChangeAction from = null;
-        SlotChangeAction to = null;
-        Player who = null;
-
-        for (InventoryAction action : this.actions) {
-            if (!(action instanceof SlotChangeAction)) {
-                continue;
-            }
-            SlotChangeAction slotChange = (SlotChangeAction) action;
-
-            if (slotChange.getInventory().getHolder() instanceof Player) {
-                who = (Player) slotChange.getInventory().getHolder();
-            }
-
-            if (from == null) {
-                from = slotChange;
-            } else {
-                to = slotChange;
-            }
-        }
-
-        if (who != null && to != null) {
-            if (from.getTargetItemUnsafe().getCount() > from.getSourceItemUnsafe().getCount()) {
-                from = to;
-            }
-
-            InventoryClickEvent ev2 = new InventoryClickEvent(who, from.getInventory(), from.getSlot(), from.getSourceItem(), from.getTargetItem());
-            this.source.getServer().getPluginManager().callEvent(ev2);
-
-            if (ev2.isCancelled()) {
-                return false;
-            }
-        }
-
-        return !ev.isCancelled();
-    }
-
-    public boolean execute() {
-        if (this.hasExecuted() || !this.canExecute() || this.invalid) {
-            this.sendInventories();
-            return false;
-        }
-
-        if (!this.callExecuteEvent()) {
-            this.sendInventories();
-            return true;
-        }
-
-        for (InventoryAction action : this.actions) {
-            if (!action.onPreExecute(this.source)) {
-                this.sendInventories();
-                return true;
-            }
-        }
-
-        for (InventoryAction action : this.actions) {
-            if (action.execute(this.source)) {
-                action.onExecuteSuccess(this.source);
-            } else {
-                action.onExecuteFail(this.source);
-            }
-        }
-
-        this.hasExecuted = true;
-        return true;
-    }
-
-    public boolean hasExecuted() {
-        return this.hasExecuted;
-    }
-
-    public boolean checkForItemPart(List<InventoryAction> actions) {
-        return false;
     }
 }

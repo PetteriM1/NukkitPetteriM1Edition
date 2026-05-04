@@ -14,13 +14,13 @@ public class BlockWarpedTrapdoor extends BlockTrapdoor {
     }
 
     @Override
-    public String getName() {
-        return "Warped Trapdoor";
+    public int getId() {
+        return WARPED_TRAPDOOR;
     }
 
     @Override
-    public int getId() {
-        return WARPED_TRAPDOOR;
+    public String getName() {
+        return "Warped Trapdoor";
     }
 
     @Override

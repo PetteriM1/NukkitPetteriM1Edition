@@ -6,6 +6,7 @@ import cn.nukkit.block.BlockID;
 import cn.nukkit.item.*;
 import cn.nukkit.network.protocol.BatchPacket;
 import cn.nukkit.network.protocol.CraftingDataPacket;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.*;
 import cn.nukkit.utils.material.tags.MaterialTags;
 import io.netty.util.collection.CharObjectHashMap;
@@ -21,11 +22,54 @@ import java.util.zip.Deflater;
  */
 public class CraftingManager {
 
-    private static BatchPacket packet;
-    /* Keep these public for backwards compatibility */
+    private static BatchPacket packet354;
+    private static BatchPacket packet361;
+    private static BatchPacket packet388;
+    private static BatchPacket packet407;
+    private static BatchPacket packet419;
+    private static BatchPacket packet431;
+    private static BatchPacket packet440;
+    private static BatchPacket packet448;
+    private static BatchPacket packet465;
+    private static BatchPacket packet471; // 1.18 (475) doesn't have its own block palette or other changes so 1.17.40 (471) packet can be used
+    private static BatchPacket packet486;
+    private static BatchPacket packet503;
+    private static BatchPacket packet527;
+    private static BatchPacket packet544;
+    private static BatchPacket packet554;
+    private static BatchPacket packet560;
+    private static BatchPacket packet567;
+    private static BatchPacket packet575;
+    private static BatchPacket packet582;
+    private static BatchPacket packet589;
+    private static BatchPacket packet594;
+    private static BatchPacket packet618;
+    private static BatchPacket packet622;
+    private static BatchPacket packet630;
+    private static BatchPacket packet649;
+    private static BatchPacket packet662;
+    private static BatchPacket packet671;
+    private static BatchPacket packet685;
+    private static BatchPacket packet712;
+    private static BatchPacket packet729;
+    private static BatchPacket packet748;
+    private static BatchPacket packet766;
+    private static BatchPacket packet776;
+    private static BatchPacket packet786;
+    private static BatchPacket packet800;
+    private static BatchPacket packet818;
+    private static BatchPacket packet827;
+    private static BatchPacket packet843;
+    private static BatchPacket packet859;
+    private static BatchPacket packet897;
+    private static BatchPacket packet944;
+    private static BatchPacket packet975;
+    private static BatchPacket packet1001;
+
+    /* Keep these public for compatibility with official Nukkit */
 
     @Getter
-    public final Collection<Recipe> recipes = new ArrayDeque<>();
+    public final Collection<Recipe> recipes = new ArrayList<>();
     @Getter
     protected final Map<Integer, Map<UUID, ShapedRecipe>> shapedRecipes = new Int2ObjectOpenHashMap<>();
     @Getter
@@ -36,6 +80,10 @@ public class CraftingManager {
     public final Map<UUID, MultiRecipe> multiRecipes = new HashMap<>();
     @Getter
     public final Map<Integer, FurnaceRecipe> furnaceRecipes = new Int2ObjectOpenHashMap<>();
+    @Getter
+    public final Map<Integer, BlastFurnaceRecipe> blastFurnaceRecipes = new Int2ObjectOpenHashMap<>();
+    @Getter
+    public final Map<Integer, SmokerRecipe> smokerRecipes = new Int2ObjectOpenHashMap<>();
     @Getter
     public final Map<Integer, BrewingRecipe> brewingRecipes = new Int2ObjectOpenHashMap<>();
     @Getter
@@ -66,7 +114,7 @@ public class CraftingManager {
 
         Map<String, Object> root = new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("recipes.json")).getRootSection();
 
-        RuntimeItemMapping itemMapping = RuntimeItems.getMapping();
+        RuntimeItemMapping itemMapping = RuntimeItems.getMapping((int) root.get("version"));
 
         for (Map recipe : (List<Map>) root.get("recipes")) {
             try {
@@ -243,7 +291,7 @@ public class CraftingManager {
                         break;
                     case 3: // smelting
                         String smeltingBlock = (String) recipe.get("block");
-                        if (!"furnace".equals(smeltingBlock) && !"campfire".equals(smeltingBlock)) {
+                        if (!"furnace".equals(smeltingBlock) && !"blast_furnace".equals(smeltingBlock) && !"smoker".equals(smeltingBlock) && !"campfire".equals(smeltingBlock)) {
                             continue;
                         }
 
@@ -258,7 +306,13 @@ public class CraftingManager {
 
                             switch (smeltingBlock) {
                                 case "furnace":
-                                    this.registerRecipe(new FurnaceRecipe(outputItem, inputItem));
+                                    this.registerRecipe(new FurnaceRecipe((String) recipe.get("id"), outputItem, inputItem));
+                                    break;
+                                case "blast_furnace":
+                                    this.registerRecipe(new BlastFurnaceRecipe((String) recipe.get("id"), outputItem, inputItem));
+                                    break;
+                                case "smoker":
+                                    this.registerRecipe(new SmokerRecipe((String) recipe.get("id"), outputItem, inputItem));
                                     break;
                                 case "campfire":
                                     this.registerRecipe(new CampfireRecipe(outputItem, inputItem));
@@ -388,8 +442,97 @@ public class CraftingManager {
         }
     }
 
-    private static boolean needExpandLegacy(int id) {
-        return id == BlockID.WOOL || id == BlockID.STONE || id == BlockID.PLANKS || id == BlockID.WOODEN_SLAB || id == ItemID.COAL;
+    @SuppressWarnings("unchecked")
+    private void buildShapedRecipeItemTagOverrides(RuntimeItemMapping itemMapping, Map<String, Map<String, Object>> input, String[] shape, Item outputItem, String toReplaceTag, String replaceOtherTagKey, String replaceOtherTagValue) {
+        Set<String> tags = MaterialTags.getVanillaDefinitions(toReplaceTag);
+        if (tags == null) {
+            if (Nukkit.DEBUG > 1) {
+                MainLogger.getLogger().debug("Unknown item tag: " + toReplaceTag);
+            }
+            return;
+        }
+
+        top:
+        for (String material : tags) {
+            Map<Character, Item> ingredients = new CharObjectHashMap<>();
+            int expandLegacy = 0;
+
+            for (Map.Entry<String, Map<String, Object>> ingredientEntry : input.entrySet()) {
+                Item inputItem;
+                String type = (String) ingredientEntry.getValue().get("type");
+
+                if (!"default".equals(type)) {
+                    if ("item_tag".equals(type)) {
+                        String itemTag = (String) ingredientEntry.getValue().get("itemTag");
+                        if (!itemTag.equals(toReplaceTag)) {
+                            if (itemTag.equals(replaceOtherTagKey)) {
+                                RuntimeItemMapping.LegacyEntry legacyEntry = itemMapping.fromIdentifier(replaceOtherTagValue);
+                                if (legacyEntry == null || legacyEntry.getLegacyId() == 0) {
+                                    if (Nukkit.DEBUG > 1) {
+                                        MainLogger.getLogger().debug("Unknown multi item tag input: " + replaceOtherTagValue);
+                                    }
+                                    continue top;
+                                }
+                                inputItem = Item.get(legacyEntry.getLegacyId(), legacyEntry.getDamage(), (Integer) ingredientEntry.getValue().getOrDefault("count", 1));
+                                if (needExpandLegacy(legacyEntry.getLegacyId())) {
+                                    expandLegacy = legacyEntry.getLegacyId();
+                                }
+                            } else {
+                                buildShapedRecipeItemTagOverrides(itemMapping, input, shape, outputItem, itemTag, toReplaceTag, material);
+                                continue top;
+                            }
+                        } else {
+                            RuntimeItemMapping.LegacyEntry legacyEntry = itemMapping.fromIdentifier(material);
+                            if (legacyEntry == null || legacyEntry.getLegacyId() == 0) {
+                                if (Nukkit.DEBUG > 1) {
+                                    MainLogger.getLogger().debug("Unknown item tag input: " + material);
+                                }
+                                continue top;
+                            }
+                            inputItem = Item.get(legacyEntry.getLegacyId(), legacyEntry.getDamage(), (Integer) ingredientEntry.getValue().getOrDefault("count", 1));
+                            if (needExpandLegacy(legacyEntry.getLegacyId())) {
+                                expandLegacy = legacyEntry.getLegacyId();
+                            }
+                        }
+                    } else {
+                        throw new RuntimeException("Unsupported type: " + type);
+                    }
+                } else {
+                    RuntimeItemMapping.LegacyEntry legacyEntry = itemMapping.fromRuntime((int) ingredientEntry.getValue().get("itemId"));
+                    if (legacyEntry == null || legacyEntry.getLegacyId() == 0) {
+                        if (Nukkit.DEBUG > 1) {
+                            MainLogger.getLogger().debug("Unknown shaped input: " + input);
+                        }
+                        continue top;
+                    }
+                    int aux = (int) ingredientEntry.getValue().getOrDefault("auxValue", 0);
+                    if (aux == 32767) {
+                        aux = legacyEntry.isHasDamage() ? legacyEntry.getDamage() : -1;
+                    } else if (aux == 0) {
+                        aux = legacyEntry.getDamage();
+                    }
+                    inputItem = Item.get(legacyEntry.getLegacyId(), aux, (Integer) ingredientEntry.getValue().getOrDefault("count", 1));
+                }
+
+                ingredients.put(ingredientEntry.getKey().charAt(0), inputItem);
+            }
+
+            if (expandLegacy != 0) {
+                int lastMeta = expandLegacy == ItemID.COAL ? 1 : expandLegacy == BlockID.PLANKS || expandLegacy == BlockID.WOODEN_SLAB ? 5 : expandLegacy == BlockID.STONE ? 6 : 15;
+
+                for (int meta = 0; meta <= lastMeta; meta++) {
+                    for (Item item : ingredients.values()) {
+                        if (item.getId() == expandLegacy) {
+                            item.setDamage(meta);
+                        }
+                    }
+
+                    this.registerRecipe(new ShapedRecipe(null, 0, outputItem, shape, ingredients, Collections.EMPTY_LIST));
+                }
+            } else {
+                this.registerRecipe(new ShapedRecipe(null, 0, outputItem, shape, ingredients, Collections.EMPTY_LIST));
+            }
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -487,182 +630,212 @@ public class CraftingManager {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private void buildShapedRecipeItemTagOverrides(RuntimeItemMapping itemMapping, Map<String, Map<String, Object>> input, String[] shape, Item outputItem, String toReplaceTag, String replaceOtherTagKey, String replaceOtherTagValue) {
-        Set<String> tags = MaterialTags.getVanillaDefinitions(toReplaceTag);
-        if (tags == null) {
-            if (Nukkit.DEBUG > 1) {
-                MainLogger.getLogger().debug("Unknown item tag: " + toReplaceTag);
-            }
-            return;
+    public BatchPacket getCachedPacket(int protocol) { // Remember to update rebuildPacket
+        if (protocol >= ProtocolInfo.v1_26_30) {
+            if (packet1001 == null) packet1001 = packetFor(protocol);
+            return packet1001;
+        } else if (protocol >= ProtocolInfo.v1_26_20_26) {
+            if (packet975 == null) packet975 = packetFor(protocol);
+            return packet975;
+        } else if (protocol >= ProtocolInfo.v1_26_10) {
+            if (packet944 == null) packet944 = packetFor(protocol);
+            return packet944;
+        } else if (protocol >= ProtocolInfo.v1_21_130_28) {
+            if (packet897 == null) packet897 = packetFor(protocol);
+            return packet897;
+        } else if (protocol >= ProtocolInfo.v1_21_120) {
+            if (packet859 == null) packet859 = packetFor(protocol);
+            return packet859;
+        } else if (protocol >= ProtocolInfo.v1_21_110) {
+            if (packet843 == null) packet843 = packetFor(protocol);
+            return packet843;
+        } else if (protocol >= ProtocolInfo.v1_21_100) {
+            if (packet827 == null) packet827 = packetFor(protocol);
+            return packet827;
+        } else if (protocol >= ProtocolInfo.v1_21_90) {
+            if (packet818 == null) packet818 = packetFor(protocol);
+            return packet818;
+        } else if (protocol >= ProtocolInfo.v1_21_80) {
+            if (packet800 == null) packet800 = packetFor(protocol);
+            return packet800;
+        } else if (protocol >= ProtocolInfo.v1_21_70_24) {
+            if (packet786 == null) packet786 = packetFor(protocol);
+            return packet786;
+        } else if (protocol >= ProtocolInfo.v1_21_60) {
+            if (packet776 == null) packet776 = packetFor(protocol);
+            return packet776;
+        } else if (protocol >= ProtocolInfo.v1_21_50_28) {
+            if (packet766 == null) packet766 = packetFor(protocol);
+            return packet766;
+        } else if (protocol >= ProtocolInfo.v1_21_40) {
+            if (packet748 == null) packet748 = packetFor(protocol);
+            return packet748;
+        } else if (protocol >= ProtocolInfo.v1_21_30) {
+            if (packet729 == null) packet729 = packetFor(protocol);
+            return packet729;
+        } else if (protocol >= ProtocolInfo.v1_21_20) {
+            if (packet712 == null) packet712 = packetFor(protocol);
+            return packet712;
+        } else if (protocol >= ProtocolInfo.v1_21_0) {
+            if (packet685 == null) packet685 = packetFor(protocol);
+            return packet685;
+        } else if (protocol >= ProtocolInfo.v1_20_80) {
+            if (packet671 == null) packet671 = packetFor(protocol);
+            return packet671;
+        } else if (protocol >= ProtocolInfo.v1_20_70) {
+            if (packet662 == null) packet662 = packetFor(protocol);
+            return packet662;
+        } else if (protocol >= ProtocolInfo.v1_20_60) {
+            if (packet649 == null) packet649 = packetFor(protocol);
+            return packet649;
+        } else if (protocol >= ProtocolInfo.v1_20_50) {
+            if (packet630 == null) packet630 = packetFor(protocol);
+            return packet630;
+        } else if (protocol >= ProtocolInfo.v1_20_40) {
+            if (packet622 == null) packet622 = packetFor(protocol);
+            return packet622;
+        } else if (protocol >= ProtocolInfo.v1_20_30) {
+            if (packet618 == null) packet618 = packetFor(protocol);
+            return packet618;
+        } else if (protocol >= ProtocolInfo.v1_20_10_21) {
+            if (packet594 == null) packet594 = packetFor(protocol);
+            return packet594;
+        } else if (protocol >= ProtocolInfo.v1_20_0_23) {
+            if (packet589 == null) packet589 = packetFor(protocol);
+            return packet589;
+        } else if (protocol >= ProtocolInfo.v1_19_80) {
+            if (packet582 == null) packet582 = packetFor(protocol);
+            return packet582;
+        } else if (protocol >= ProtocolInfo.v1_19_70_24) {
+            if (packet575 == null) packet575 = packetFor(protocol);
+            return packet575;
+        } else if (protocol >= ProtocolInfo.v1_19_60) {
+            if (packet567 == null) packet567 = packetFor(protocol);
+            return packet567;
+        } else if (protocol >= ProtocolInfo.v1_19_50) {
+            if (packet560 == null) packet560 = packetFor(protocol);
+            return packet560;
+        } else if (protocol >= ProtocolInfo.v1_19_30_23) {
+            if (packet554 == null) packet554 = packetFor(protocol);
+            return packet554;
+        } else if (protocol >= ProtocolInfo.v1_19_20) {
+            if (packet544 == null) packet544 = packetFor(protocol);
+            return packet544;
+        } else if (protocol >= ProtocolInfo.v1_19_0_29) {
+            if (packet527 == null) packet527 = packetFor(protocol);
+            return packet527;
+        } else if (protocol >= ProtocolInfo.v1_18_30) {
+            if (packet503 == null) packet503 = packetFor(protocol);
+            return packet503;
+        } else if (protocol >= ProtocolInfo.v1_18_10_26) {
+            if (packet486 == null) packet486 = packetFor(protocol);
+            return packet486;
+        } else if (protocol >= ProtocolInfo.v1_17_40) {
+            if (packet471 == null) packet471 = packetFor(protocol);
+            return packet471;
+        } else if (protocol >= ProtocolInfo.v1_17_30) {
+            if (packet465 == null) packet465 = packetFor(protocol);
+            return packet465;
+        } else if (protocol >= ProtocolInfo.v1_17_10) {
+            if (packet448 == null) packet448 = packetFor(protocol);
+            return packet448;
+        } else if (protocol >= ProtocolInfo.v1_17_0) {
+            if (packet440 == null) packet440 = packetFor(protocol);
+            return packet440;
+        } else if (protocol >= ProtocolInfo.v1_16_220) {
+            if (packet431 == null) packet431 = packetFor(protocol);
+            return packet431;
+        } else if (protocol >= ProtocolInfo.v1_16_100) {
+            if (packet419 == null) packet419 = packetFor(protocol);
+            return packet419;
+        } else if (protocol >= ProtocolInfo.v1_16_0) {
+            if (packet407 == null) packet407 = packetFor(protocol);
+            return packet407;
+        } else if (protocol >= ProtocolInfo.v1_13_0) {
+            if (packet388 == null) packet388 = packetFor(protocol);
+            return packet388;
+        } else if (protocol >= ProtocolInfo.v1_12_0) {
+            if (packet361 == null) packet361 = packetFor(protocol);
+            return packet361;
+        } else if (protocol >= ProtocolInfo.v1_11_0) {
+            if (packet354 == null) packet354 = packetFor(protocol);
+            return packet354;
         }
-
-        top:
-        for (String material : tags) {
-            Map<Character, Item> ingredients = new CharObjectHashMap<>();
-            int expandLegacy = 0;
-
-            for (Map.Entry<String, Map<String, Object>> ingredientEntry : input.entrySet()) {
-                Item inputItem;
-                String type = (String) ingredientEntry.getValue().get("type");
-
-                if (!"default".equals(type)) {
-                    if ("item_tag".equals(type)) {
-                        String itemTag = (String) ingredientEntry.getValue().get("itemTag");
-                        if (!itemTag.equals(toReplaceTag)) {
-                            if (itemTag.equals(replaceOtherTagKey)) {
-                                RuntimeItemMapping.LegacyEntry legacyEntry = itemMapping.fromIdentifier(replaceOtherTagValue);
-                                if (legacyEntry == null || legacyEntry.getLegacyId() == 0) {
-                                    if (Nukkit.DEBUG > 1) {
-                                        MainLogger.getLogger().debug("Unknown multi item tag input: " + replaceOtherTagValue);
-                                    }
-                                    continue top;
-                                }
-                                inputItem = Item.get(legacyEntry.getLegacyId(), legacyEntry.getDamage(), (Integer) ingredientEntry.getValue().getOrDefault("count", 1));
-                                if (needExpandLegacy(legacyEntry.getLegacyId())) {
-                                    expandLegacy = legacyEntry.getLegacyId();
-                                }
-                            } else {
-                                buildShapedRecipeItemTagOverrides(itemMapping, input, shape, outputItem, itemTag, toReplaceTag, material);
-                                continue top;
-                            }
-                        } else {
-                            RuntimeItemMapping.LegacyEntry legacyEntry = itemMapping.fromIdentifier(material);
-                            if (legacyEntry == null || legacyEntry.getLegacyId() == 0) {
-                                if (Nukkit.DEBUG > 1) {
-                                    MainLogger.getLogger().debug("Unknown item tag input: " + material);
-                                }
-                                continue top;
-                            }
-                            inputItem = Item.get(legacyEntry.getLegacyId(), legacyEntry.getDamage(), (Integer) ingredientEntry.getValue().getOrDefault("count", 1));
-                            if (needExpandLegacy(legacyEntry.getLegacyId())) {
-                                expandLegacy = legacyEntry.getLegacyId();
-                            }
-                        }
-                    } else {
-                        throw new RuntimeException("Unsupported type: " + type);
-                    }
-                } else {
-                    RuntimeItemMapping.LegacyEntry legacyEntry = itemMapping.fromRuntime((int) ingredientEntry.getValue().get("itemId"));
-                    if (legacyEntry == null || legacyEntry.getLegacyId() == 0) {
-                        if (Nukkit.DEBUG > 1) {
-                            MainLogger.getLogger().debug("Unknown shaped input: " + input);
-                        }
-                        continue top;
-                    }
-                    int aux = (int) ingredientEntry.getValue().getOrDefault("auxValue", 0);
-                    if (aux == 32767) {
-                        aux = legacyEntry.isHasDamage() ? legacyEntry.getDamage() : -1;
-                    } else if (aux == 0) {
-                        aux = legacyEntry.getDamage();
-                    }
-                    inputItem = Item.get(legacyEntry.getLegacyId(), aux, (Integer) ingredientEntry.getValue().getOrDefault("count", 1));
-                }
-
-                ingredients.put(ingredientEntry.getKey().charAt(0), inputItem);
-            }
-
-            if (expandLegacy != 0) {
-                int lastMeta = expandLegacy == ItemID.COAL ? 1 : expandLegacy == BlockID.PLANKS || expandLegacy == BlockID.WOODEN_SLAB ? 5 : expandLegacy == BlockID.STONE ? 6 : 15;
-
-                for (int meta = 0; meta <= lastMeta; meta++) {
-                    for (Item item : ingredients.values()) {
-                        if (item.getId() == expandLegacy) {
-                            item.setDamage(meta);
-                        }
-                    }
-
-                    this.registerRecipe(new ShapedRecipe(null, 0, outputItem, shape, ingredients, Collections.EMPTY_LIST));
-                }
-            } else {
-                this.registerRecipe(new ShapedRecipe(null, 0, outputItem, shape, ingredients, Collections.EMPTY_LIST));
-            }
-        }
+        return null;
     }
 
-    /**
-     * Rebuild cached CraftingDataPacket for all protocols after the recipe list has been changed
-     */
-    public void rebuildPacket() {
-        CraftingDataPacket pk = new CraftingDataPacket();
-        for (Recipe recipe : this.recipes) {
-            if (recipe instanceof ShapedRecipe) {
-                pk.addShapedRecipe((ShapedRecipe) recipe);
-            } else if (recipe instanceof ShapelessRecipe) {
-                pk.addShapelessRecipe((ShapelessRecipe) recipe);
-            }
-        }
-        for (FurnaceRecipe recipe : this.furnaceRecipes.values()) {
-            pk.addFurnaceRecipe(recipe);
-        }
-        for (BrewingRecipe recipe : this.brewingRecipes.values()) {
-            pk.addBrewingRecipe(recipe);
-        }
-        for (ContainerRecipe recipe : this.containerRecipes.values()) {
-            pk.addContainerRecipe(recipe);
-        }
-        // Note: Currently not implemented
-        for (MultiRecipe recipe : this.multiRecipes.values()) {
-            pk.addMultiRecipe(recipe);
-        }
-        pk.tryEncode();
-        CraftingManager.packet = pk.compress(Deflater.BEST_COMPRESSION);
+    private static int getContainerHash(int ingredientId, int containerId) {
+        return (ingredientId << 15) | containerId;
     }
 
-    public BatchPacket getCachedPacket() {
-        return packet;
+    private static int getFullItemHash(Item item) {
+        return (getItemHash(item) << 6) | (item.getCount() & 0x3f);
+    }
+
+    private static int getItemHash(Item item) {
+        return getItemHash(item.getId(), item.getDamage());
     }
 
     /* Register recipes start */
 
-    public void registerRecipe(Recipe recipe) {
-        if (recipe instanceof CraftingRecipe) {
-            UUID id = Utils.dataToUUID(String.valueOf(++RECIPE_COUNT), String.valueOf(recipe.getResult().getId()), String.valueOf(recipe.getResult().getDamage()), String.valueOf(recipe.getResult().getCount()), Arrays.toString(recipe.getResult().getCompoundTag()));
-            ((CraftingRecipe) recipe).setId(id);
-            this.recipes.add(recipe);
+    private static int getItemHash(int id, int meta) {
+        return (id << 12) | (meta & 0xfff);
+    }
+
+    private static UUID getMultiItemHash(Collection<Item> items) {
+        BinaryStream stream = new BinaryStream(new byte[5 * items.size()]).reset();
+        for (Item item : items) {
+            stream.putVarInt(getFullItemHash(item));
         }
-        recipe.registerToCraftingManager(this);
+        return UUID.nameUUIDFromBytes(stream.getBuffer());
     }
 
-    public void registerShapedRecipe(ShapedRecipe recipe) {
-        int resultHash = getItemHash(recipe.getResult());
-        Map<UUID, ShapedRecipe> map;
-        map = this.shapedRecipes.computeIfAbsent(resultHash, k -> new HashMap<>());
-        map.put(getMultiItemHash(new LinkedList<>(recipe.getIngredientsAggregate())), recipe);
+    private static int getPotionHash(Item ingredient, Item potion) {
+        int ingredientHash = ((ingredient.getId() & 0x3FF) << 6) | (ingredient.getDamage() & 0x3F);
+        int potionHash = ((potion.getId() & 0x3FF) << 6) | (potion.getDamage() & 0x3F);
+        return ingredientHash << 16 | potionHash;
     }
 
-    public void registerShapelessRecipe(ShapelessRecipe recipe) {
-        int resultHash = getItemHash(recipe.getResult());
-        Map<UUID, ShapelessRecipe> map;
-        map = this.shapelessRecipes.computeIfAbsent(resultHash, k -> new HashMap<>());
-        map.put(getMultiItemHash(recipe.getIngredientsAggregate()), recipe);
+    public BlastFurnaceRecipe matchBlastFurnaceRecipe(Item input) {
+        BlastFurnaceRecipe recipe = this.blastFurnaceRecipes.get(getItemHash(input));
+        if (recipe == null) {
+            recipe = this.blastFurnaceRecipes.get(getItemHash(input.getId(), 0));
+        }
+        return recipe;
     }
 
-    public void registerFurnaceRecipe(FurnaceRecipe recipe) {
-        this.furnaceRecipes.put(getItemHash(recipe.getInput()), recipe);
+    public BrewingRecipe matchBrewingRecipe(Item input, Item potion) {
+        return this.brewingRecipes.get(getPotionHash(input, potion));
     }
 
-    public void registerContainerRecipe(ContainerRecipe recipe) {
-        this.containerRecipes.put(getContainerHash(recipe.getIngredient().getId(), recipe.getInput().getId()), recipe);
+    public CampfireRecipe matchCampfireRecipe(Item input) {
+        CampfireRecipe recipe = this.campfireRecipes.get(getItemHash(input));
+        if (recipe == null) {
+            recipe = this.campfireRecipes.get(getItemHash(input.getId(), 0));
+        }
+        return recipe;
     }
 
-    public void registerBrewingRecipe(BrewingRecipe recipe) {
-        this.brewingRecipes.put(getPotionHash(recipe.getIngredient(), recipe.getInput()), recipe);
+    public ContainerRecipe matchContainerRecipe(Item input, Item potion) {
+        return this.containerRecipes.get(getContainerHash(input.getId(), potion.getId()));
     }
 
-    public void registerMultiRecipe(MultiRecipe recipe) {
-        this.multiRecipes.put(recipe.getId(), recipe);
+    public FurnaceRecipe matchFurnaceRecipe(Item input) {
+        FurnaceRecipe recipe = this.furnaceRecipes.get(getItemHash(input));
+        if (recipe == null) {
+            recipe = this.furnaceRecipes.get(getItemHash(input.getId(), 0));
+        }
+        return recipe;
     }
 
-    public void registerCampfireRecipe(CampfireRecipe recipe) {
-        this.campfireRecipes.put(getItemHash(recipe.getInput()), recipe);
+    private static boolean matchItemsAccumulation(CraftingRecipe recipe, List<Item> inputList, Item primaryOutput, List<Item> extraOutputList) {
+        Item recipeResult = recipe.getResult();
+        if (primaryOutput.equals(recipeResult, recipeResult.hasMeta(), recipeResult.hasCompoundTag()) && primaryOutput.getCount() % recipeResult.getCount() == 0) {
+            int multiplier = primaryOutput.getCount() / recipeResult.getCount();
+            return recipe.matchItems(inputList, extraOutputList, multiplier);
+        }
+        return false;
     }
-
-    public void registerSmithingRecipe(SmithingRecipe recipe) {
-        this.smithingRecipes.put(getMultiItemHash(recipe.getIngredientsAggregate()), recipe);
-    }
-
-    /* Match recipes start */
 
     public CraftingRecipe matchRecipe(List<Item> inputList, Item primaryOutput, List<Item> extraOutputList) {
         int outputHash = getItemHash(primaryOutput);
@@ -703,39 +876,6 @@ public class CraftingManager {
         return null;
     }
 
-    public FurnaceRecipe matchFurnaceRecipe(Item input) {
-        FurnaceRecipe recipe = this.furnaceRecipes.get(getItemHash(input));
-        if (recipe == null) {
-            recipe = this.furnaceRecipes.get(getItemHash(input.getId(), 0));
-        }
-        return recipe;
-    }
-
-    public ContainerRecipe matchContainerRecipe(Item input, Item potion) {
-        return this.containerRecipes.get(getContainerHash(input.getId(), potion.getId()));
-    }
-
-    public BrewingRecipe matchBrewingRecipe(Item input, Item potion) {
-        return this.brewingRecipes.get(getPotionHash(input, potion));
-    }
-
-    public CampfireRecipe matchCampfireRecipe(Item input) {
-        CampfireRecipe recipe = this.campfireRecipes.get(getItemHash(input));
-        if (recipe == null) {
-            recipe = this.campfireRecipes.get(getItemHash(input.getId(), 0));
-        }
-        return recipe;
-    }
-
-    private static boolean matchItemsAccumulation(CraftingRecipe recipe, List<Item> inputList, Item primaryOutput, List<Item> extraOutputList) {
-        Item recipeResult = recipe.getResult();
-        if (primaryOutput.equals(recipeResult, recipeResult.hasMeta(), recipeResult.hasCompoundTag()) && primaryOutput.getCount() % recipeResult.getCount() == 0) {
-            int multiplier = primaryOutput.getCount() / recipeResult.getCount();
-            return recipe.matchItems(inputList, extraOutputList, multiplier);
-        }
-        return false;
-    }
-
     public SmithingRecipe matchSmithingRecipe(List<Item> inputList) {
         inputList.sort(recipeComparator);
 
@@ -763,35 +903,184 @@ public class CraftingManager {
         return null;
     }
 
+    /* Match recipes start */
+
+    public SmokerRecipe matchSmokerRecipe(Item input) {
+        SmokerRecipe recipe = this.smokerRecipes.get(getItemHash(input));
+        if (recipe == null) {
+            recipe = this.smokerRecipes.get(getItemHash(input.getId(), 0));
+        }
+        return recipe;
+    }
+
+    private static boolean needExpandLegacy(int id) {
+        return id == BlockID.WOOL || id == BlockID.STONE || id == BlockID.PLANKS || id == BlockID.WOODEN_SLAB || id == ItemID.COAL;
+    }
+
+    private BatchPacket packetFor(int protocol) {
+        CraftingDataPacket pk = new CraftingDataPacket();
+        pk.protocol = protocol;
+        top:
+        for (Recipe recipe : this.recipes) {
+            if (recipe instanceof ShapedRecipe) {
+                for (Item item : ((ShapedRecipe) recipe).getAllResults()) {
+                    if (!item.isSupportedOn(protocol)) {
+                        continue top;
+                    }
+                }
+                for (Item item : ((ShapedRecipe) recipe).getIngredientList()) {
+                    if (!item.isSupportedOn(protocol)) {
+                        continue top;
+                    }
+                }
+                pk.addShapedRecipe((ShapedRecipe) recipe);
+            } else if (recipe instanceof ShapelessRecipe) {
+                if (!recipe.getResult().isSupportedOn(protocol)) {
+                    continue;
+                }
+                for (Item item : ((ShapelessRecipe) recipe).getIngredientList()) {
+                    if (!item.isSupportedOn(protocol)) {
+                        continue top;
+                    }
+                }
+                pk.addShapelessRecipe((ShapelessRecipe) recipe);
+            } else if (recipe instanceof FurnaceRecipe) {
+                if (!((FurnaceRecipe) recipe).getInput().isSupportedOn(protocol) || !recipe.getResult().isSupportedOn(protocol)) {
+                    continue;
+                }
+                pk.addFurnaceRecipe((FurnaceRecipe) recipe);
+            }
+        }
+        if (protocol >= ProtocolInfo.v1_13_0) {
+            for (BrewingRecipe recipe : this.brewingRecipes.values()) {
+                if (!recipe.getInput().isSupportedOn(protocol) || !recipe.getIngredient().isSupportedOn(protocol) || !recipe.getResult().isSupportedOn(protocol)) {
+                    continue;
+                }
+                pk.addBrewingRecipe(recipe);
+            }
+            for (ContainerRecipe recipe : this.containerRecipes.values()) {
+                if (!recipe.getInput().isSupportedOn(protocol) || !recipe.getIngredient().isSupportedOn(protocol) || !recipe.getResult().isSupportedOn(protocol)) {
+                    continue;
+                }
+                pk.addContainerRecipe(recipe);
+            }
+            if (protocol >= ProtocolInfo.v1_16_0) {
+                // Note: Currently not implemented
+                for (MultiRecipe recipe : this.multiRecipes.values()) {
+                    pk.addMultiRecipe(recipe);
+                }
+            }
+        }
+        pk.tryEncode();
+        return pk.compress(Deflater.BEST_COMPRESSION);
+    }
+
+    /**
+     * Rebuild cached CraftingDataPacket for all protocols after the recipe list has been changed
+     */
+    public void rebuildPacket() {
+        packet1001 = null;
+        packet975 = null;
+        packet944 = null;
+        packet897 = null;
+        packet859 = null;
+        packet843 = null;
+        packet827 = null;
+        packet818 = null;
+        packet800 = null;
+        packet786 = null;
+        packet776 = null;
+        packet766 = null;
+        packet748 = null;
+        packet729 = null;
+        packet712 = null;
+        packet685 = null;
+        packet671 = null;
+        packet662 = null;
+        packet649 = null;
+        packet630 = null;
+        packet622 = null;
+        packet618 = null;
+        packet594 = null;
+        packet589 = null;
+        packet582 = null;
+        packet575 = null;
+        packet567 = null;
+        packet560 = null;
+        packet554 = null;
+        packet544 = null;
+        packet527 = null;
+        packet503 = null;
+        packet486 = null;
+        packet471 = null;
+        packet465 = null;
+        packet448 = null;
+        packet440 = null;
+        packet431 = null;
+        packet419 = null;
+        packet407 = null;
+        packet388 = null;
+        packet361 = null;
+        packet354 = null;
+        this.getCachedPacket(ProtocolInfo.CURRENT_PROTOCOL); // Always cache the packet for the current protocol
+    }
+
+    public void registerBlastFurnaceRecipe(BlastFurnaceRecipe recipe) {
+        this.blastFurnaceRecipes.put(getItemHash(recipe.getInput()), recipe);
+    }
+
+    public void registerBrewingRecipe(BrewingRecipe recipe) {
+        this.brewingRecipes.put(getPotionHash(recipe.getIngredient(), recipe.getInput()), recipe);
+    }
+
+    public void registerCampfireRecipe(CampfireRecipe recipe) {
+        this.campfireRecipes.put(getItemHash(recipe.getInput()), recipe);
+    }
+
+    public void registerContainerRecipe(ContainerRecipe recipe) {
+        this.containerRecipes.put(getContainerHash(recipe.getIngredient().getId(), recipe.getInput().getId()), recipe);
+    }
+
+    public void registerFurnaceRecipe(FurnaceRecipe recipe) {
+        this.furnaceRecipes.put(getItemHash(recipe.getInput()), recipe);
+    }
+
     /* Hash items start */
 
-    private static int getItemHash(Item item) {
-        return getItemHash(item.getId(), item.getDamage());
+    public void registerMultiRecipe(MultiRecipe recipe) {
+        this.multiRecipes.put(recipe.getId(), recipe);
     }
 
-    private static int getItemHash(int id, int meta) {
-        return (id << 12) | (meta & 0xfff);
-    }
-
-    private static int getFullItemHash(Item item) {
-        return (getItemHash(item) << 6) | (item.getCount() & 0x3f);
-    }
-
-    private static UUID getMultiItemHash(Collection<Item> items) {
-        BinaryStream stream = new BinaryStream(new byte[5 * items.size()]).reset();
-        for (Item item : items) {
-            stream.putVarInt(getFullItemHash(item));
+    public void registerRecipe(Recipe recipe) {
+        if (recipe instanceof CraftingRecipe) {
+            UUID id = Utils.dataToUUID(String.valueOf(++RECIPE_COUNT), String.valueOf(recipe.getResult().getId()), String.valueOf(recipe.getResult().getDamage()), String.valueOf(recipe.getResult().getCount()), Arrays.toString(recipe.getResult().getCompoundTag()));
+            ((CraftingRecipe) recipe).setId(id);
+        } else if (recipe instanceof FurnaceRecipe) {
+            ((FurnaceRecipe) recipe).setId(Utils.dataToUUID(String.valueOf(++RECIPE_COUNT), String.valueOf(recipe.getResult().getId()), String.valueOf(recipe.getResult().getDamage()), String.valueOf(recipe.getResult().getCount()), Arrays.toString(recipe.getResult().getCompoundTag())));
         }
-        return UUID.nameUUIDFromBytes(stream.getBuffer());
+        this.recipes.add(recipe);
+        recipe.registerToCraftingManager(this);
     }
 
-    private static int getContainerHash(int ingredientId, int containerId) {
-        return (ingredientId << 15) | containerId;
+    public void registerShapedRecipe(ShapedRecipe recipe) {
+        int resultHash = getItemHash(recipe.getResult());
+        Map<UUID, ShapedRecipe> map;
+        map = this.shapedRecipes.computeIfAbsent(resultHash, k -> new HashMap<>());
+        map.put(getMultiItemHash(new LinkedList<>(recipe.getIngredientsAggregate())), recipe);
     }
 
-    private static int getPotionHash(Item ingredient, Item potion) {
-        int ingredientHash = ((ingredient.getId() & 0x3FF) << 6) | (ingredient.getDamage() & 0x3F);
-        int potionHash = ((potion.getId() & 0x3FF) << 6) | (potion.getDamage() & 0x3F);
-        return ingredientHash << 16 | potionHash;
+    public void registerShapelessRecipe(ShapelessRecipe recipe) {
+        int resultHash = getItemHash(recipe.getResult());
+        Map<UUID, ShapelessRecipe> map;
+        map = this.shapelessRecipes.computeIfAbsent(resultHash, k -> new HashMap<>());
+        map.put(getMultiItemHash(recipe.getIngredientsAggregate()), recipe);
+    }
+
+    public void registerSmithingRecipe(SmithingRecipe recipe) {
+        this.smithingRecipes.put(getMultiItemHash(recipe.getIngredientsAggregate()), recipe);
+    }
+
+    public void registerSmokerRecipe(SmokerRecipe recipe) {
+        this.smokerRecipes.put(getItemHash(recipe.getInput()), recipe);
     }
 }

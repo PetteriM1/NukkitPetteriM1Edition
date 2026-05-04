@@ -1,5 +1,8 @@
 package cn.nukkit.block;
 
+import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.utils.material.BlockType;
+
 public class BlockPressurePlateWarped extends BlockPressurePlateWood {
 
     public BlockPressurePlateWarped() {
@@ -11,13 +14,23 @@ public class BlockPressurePlateWarped extends BlockPressurePlateWood {
     }
 
     @Override
+    public int getId() {
+        return WARPED_PRESSURE_PLATE;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_16_0;
+    }
+
+    @Override
     public String getName() {
         return "Warped Pressure Plate";
     }
 
     @Override
-    public int getId() {
-        return WARPED_PRESSURE_PLATE;
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.WOODEN_PRESSURE_PLATE;
     }
 }
 

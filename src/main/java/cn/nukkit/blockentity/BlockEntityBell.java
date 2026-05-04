@@ -20,6 +20,62 @@ public class BlockEntityBell extends BlockEntitySpawnable {
         super(chunk, nbt);
     }
 
+    public void setDirection(int direction) {
+        if (this.direction != direction) {
+            this.direction = direction;
+            setDirty();
+        }
+    }
+
+    public void setRinging(boolean ringing) {
+        if (this.level != null && this.ringing != ringing) {
+            this.ringing = ringing;
+            scheduleUpdate();
+            setDirty();
+        }
+    }
+
+    public void setTicks(int ticks) {
+        if (this.ticks != ticks) {
+            this.ticks = ticks;
+            setDirty();
+        }
+    }
+
+    public int getDirection() {
+        return direction;
+    }
+
+    @Override
+    public String getName() {
+        return "Bell";
+    }
+
+    @Override
+    public CompoundTag getSpawnCompound() {
+        return new CompoundTag()
+                .putString("id", BlockEntity.BELL)
+                .putInt("x", (int) this.x)
+                .putInt("y", (int) this.y)
+                .putInt("z", (int) this.z)
+                .putBoolean("Ringing", this.ringing)
+                .putInt("Direction", this.direction)
+                .putInt("Ticks", this.ticks);
+    }
+
+    public int getTicks() {
+        return ticks;
+    }
+
+    @Override
+    public boolean isBlockEntityValid() {
+        return level.getBlockIdAt(chunk, (int) x, (int) y, (int) z) == BlockID.BELL;
+    }
+
+    public boolean isRinging() {
+        return ringing;
+    }
+
     @Override
     protected void initBlockEntity() {
         if (!namedTag.contains("Ringing") || !(namedTag.get("Ringing") instanceof ByteTag)) {
@@ -42,14 +98,6 @@ public class BlockEntityBell extends BlockEntitySpawnable {
 
         super.initBlockEntity();
         scheduleUpdate();
-    }
-
-    @Override
-    public void saveNBT() {
-        namedTag.putBoolean("Ringing", ringing);
-        namedTag.putInt("Direction", direction);
-        namedTag.putInt("Ticks", ticks);
-        super.saveNBT();
     }
 
     @Override
@@ -82,67 +130,19 @@ public class BlockEntityBell extends BlockEntitySpawnable {
         return false;
     }
 
+    @Override
+    public void saveNBT() {
+        namedTag.putBoolean("Ringing", ringing);
+        namedTag.putInt("Direction", direction);
+        namedTag.putInt("Ticks", ticks);
+        super.saveNBT();
+    }
+
     private void spawnToAllWithExceptions() {
         for (Player player : this.getLevel().getChunkPlayers(this.chunk.getX(), this.chunk.getZ()).values()) {
             if (player.spawned && !spawnExceptions.contains(player.getId())) {
                 this.spawnTo(player);
             }
         }
-    }
-
-    public boolean isRinging() {
-        return ringing;
-    }
-
-    public void setRinging(boolean ringing) {
-        if (this.level != null && this.ringing != ringing) {
-            this.ringing = ringing;
-            scheduleUpdate();
-            setDirty();
-        }
-    }
-
-    public int getDirection() {
-        return direction;
-    }
-
-    public void setDirection(int direction) {
-        if (this.direction != direction) {
-            this.direction = direction;
-            setDirty();
-        }
-    }
-
-    public int getTicks() {
-        return ticks;
-    }
-
-    public void setTicks(int ticks) {
-        if (this.ticks != ticks) {
-            this.ticks = ticks;
-            setDirty();
-        }
-    }
-
-    @Override
-    public CompoundTag getSpawnCompound() {
-        return new CompoundTag()
-                .putString("id", BlockEntity.BELL)
-                .putInt("x", (int) this.x)
-                .putInt("y", (int) this.y)
-                .putInt("z", (int) this.z)
-                .putBoolean("Ringing", this.ringing)
-                .putInt("Direction", this.direction)
-                .putInt("Ticks", this.ticks);
-    }
-
-    @Override
-    public String getName() {
-        return "Bell";
-    }
-
-    @Override
-    public boolean isBlockEntityValid() {
-        return level.getBlockIdAt(chunk, (int) x, (int) y, (int) z) == BlockID.BELL;
     }
 }

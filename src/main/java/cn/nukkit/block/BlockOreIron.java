@@ -1,5 +1,6 @@
 package cn.nukkit.block;
 
+import cn.nukkit.Server;
 import cn.nukkit.item.ItemID;
 
 /**
@@ -14,12 +15,12 @@ public class BlockOreIron extends BlockOre {
     }
 
     @Override
-    protected int getRawMaterial() {
-        return ItemID.RAW_IRON;
+    public String getName() {
+        return "Iron Ore";
     }
 
     @Override
-    public String getName() {
-        return "Iron Ore";
+    protected int getRawMaterial() {
+        return Server.getInstance().useRawOres ? ItemID.RAW_IRON : AIR;
     }
 }

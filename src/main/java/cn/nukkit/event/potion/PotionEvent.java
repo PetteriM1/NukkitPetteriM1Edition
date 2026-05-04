@@ -15,11 +15,11 @@ public abstract class PotionEvent extends Event {
         this.potion = potion;
     }
 
-    public Potion getPotion() {
-        return potion;
-    }
-
     public void setPotion(Potion potion) {
         this.potion = potion;
+    }
+
+    public Potion getPotion() {
+        return potion;
     }
 }

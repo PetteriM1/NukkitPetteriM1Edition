@@ -8,19 +8,19 @@ public interface EntityTameable {
 
     String NAMED_TAG_SITTING = "Sitting";
 
-    Player getOwner();
-
-    boolean hasOwner();
-
     void setOwner(Player player);
-
-    String getOwnerUUID();
 
     void setOwnerUUID(String uuid);
 
+    void setSitting(boolean sitting);
+
+    Player getOwner();
+
+    String getOwnerUUID();
+
     boolean isSitting();
 
-    void setSitting(boolean sitting);
+    boolean hasOwner();
 
     default boolean isOwner(Entity entity) {
         return entity instanceof Player && ((Player) entity).getUniqueId().toString().equals(this.getOwnerUUID());

@@ -1,7 +1,9 @@
 package cn.nukkit.level.particle;
 
+import cn.nukkit.Server;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.network.protocol.DataPacket;
+import cn.nukkit.network.protocol.ProtocolInfo;
 
 import java.lang.reflect.Field;
 import java.util.Locale;
@@ -96,21 +98,22 @@ public abstract class Particle extends Vector3 {
     public static final int TYPE_SHRIEK = 83;
     public static final int TYPE_SCULK_SOUL = 84;
     public static final int TYPE_SONIC_EXPLOSION = 85;
-    public static final int TYPE_BRUSH_DUST = 86;
+    public static final int TYPE_BRUSH_DUST = 86; // Since 1.19.70
     public static final int TYPE_CHERRY_LEAVES = 87;
-    public static final int TYPE_DUST_PLUME = 88;
+    public static final int TYPE_DUST_PLUME = 88; // Since 1.20.50
     public static final int TYPE_WHITE_SMOKE = 89;
-    public static final int TYPE_VAULT_CONNECTION = 90;
+    public static final int TYPE_VAULT_CONNECTION = 90; // Since 662
     public static final int TYPE_WIND_EXPLOSION = 91;
-    public static final int TYPE_WOLF_ARMOR_BREAK = 92;
-    public static final int TYPE_OMINOUS_ITEM_SPAWNER = 93;
-    public static final int TYPE_CREAKING_CRUMBLE = 94;
+    public static final int TYPE_WOLF_ARMOR_BREAK = 92; // Since 671
+    public static final int TYPE_OMINOUS_ITEM_SPAWNER = 93; // Since 685
+    public static final int TYPE_CREAKING_CRUMBLE = 94; // Since 766
     public static final int TYPE_PALE_OAK_LEAVES = 95;
     public static final int TYPE_EYEBLOSSOM_OPEN = 96;
     public static final int TYPE_EYEBLOSSOM_CLOSE = 97;
     public static final int TYPE_GREEN_FLAME = 98;
     public static final int TYPE_PAUSE_MOB_GROWTH = 99;
     public static final int TYPE_RESET_MOB_GROWTH = 100;
+    public static final int TYPE_SULFUR_CUBE = 101; // Since 975
 
     public Particle() {
         super(0, 0, 0);
@@ -128,7 +131,32 @@ public abstract class Particle extends Vector3 {
         super(x, y, z);
     }
 
-    public abstract DataPacket[] encode();
+    public DataPacket[] encode() {
+        Server.mvw("Particle#encode()");
+        return this.mvEncode(ProtocolInfo.CURRENT_PROTOCOL);
+    }
+
+    public static int getMultiversionId(int protocol, int particle) {
+        int id = particle;
+        if (protocol < ProtocolInfo.v1_20_60 && id >= 19) {
+            id -= 1;
+        }
+        if (protocol < ProtocolInfo.v1_17_10 && id >= 9) {
+            id -= 1;
+        }
+        if (protocol < ProtocolInfo.v1_16_220 && id > 28) {
+            id -= 2;
+        }
+        if (protocol == ProtocolInfo.v1_13_0) {
+            if (id > 27) {
+                return id - 1;
+            } else {
+                return id;
+            }
+        } else {
+            return id;
+        }
+    }
 
     public static Integer getParticleIdByName(String name) {
         name = name.toUpperCase(Locale.ROOT);
@@ -141,9 +169,12 @@ public abstract class Particle extends Vector3 {
             if (type == int.class) {
                 return field.getInt(null);
             }
-        } catch (NoSuchFieldException | IllegalAccessException ignored) {}
+        } catch (NoSuchFieldException | IllegalAccessException ignored) {
+        }
         return null;
     }
+
+    public abstract DataPacket[] mvEncode(int protocol);
 
     public static boolean particleExists(String name) {
         return getParticleIdByName(name) != null;

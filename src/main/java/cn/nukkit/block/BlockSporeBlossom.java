@@ -5,25 +5,12 @@ import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockSporeBlossom extends BlockTransparent {
 
     public BlockSporeBlossom() {
-    }
-
-    @Override
-    public int getId() {
-        return SPORE_BLOSSOM;
-    }
-
-    @Override
-    public String getName() {
-        return "Spore Blossom";
-    }
-
-    @Override
-    public double getResistance() {
-        return 0;
     }
 
     @Override
@@ -32,14 +19,18 @@ public class BlockSporeBlossom extends BlockTransparent {
     }
 
     @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        if (Block.canConnectToFullSolid(this.up())) {
-            if (super.place(item, block, target, face, fx, fy, fz, player)) {
-                BlockEntity.createBlockEntity(BlockEntity.SPORE_BLOSSOM, this.getChunk(), BlockEntity.getDefaultCompound(this, BlockEntity.SPORE_BLOSSOM));
-                return true;
-            }
-        }
-        return false;
+    public int getId() {
+        return SPORE_BLOSSOM;
+    }
+
+    @Override
+    public double getMaxX() {
+        return this.x + 14D / 16D;
+    }
+
+    @Override
+    public double getMaxZ() {
+        return this.z + 14D / 16D;
     }
 
     @Override
@@ -58,13 +49,28 @@ public class BlockSporeBlossom extends BlockTransparent {
     }
 
     @Override
-    public double getMaxX() {
-        return this.x + 14D / 16D;
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_17_0;
     }
 
     @Override
-    public double getMaxZ() {
-        return this.z + 14D / 16D;
+    public String getName() {
+        return "Spore Blossom";
+    }
+
+    @Override
+    public double getResistance() {
+        return 0;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.DOUBLE_PLANT;
+    }
+
+    @Override
+    public int getAlternateMeta(int protocol) {
+        return BlockDoublePlant.LILAC ^ BlockDoublePlant.TOP_HALF_BITMASK;
     }
 
     @Override
@@ -75,5 +81,16 @@ public class BlockSporeBlossom extends BlockTransparent {
             this.getLevel().scheduleUpdate(this, 1);
         }
         return type;
+    }
+
+    @Override
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        if (Block.canConnectToFullSolid(this.up())) {
+            if (super.place(item, block, target, face, fx, fy, fz, player)) {
+                BlockEntity.createBlockEntity(BlockEntity.SPORE_BLOSSOM, this.getChunk(), BlockEntity.getDefaultCompound(this, BlockEntity.SPORE_BLOSSOM));
+                return true;
+            }
+        }
+        return false;
     }
 }

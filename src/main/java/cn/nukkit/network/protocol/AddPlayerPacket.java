@@ -16,12 +16,6 @@ import java.util.UUID;
 public class AddPlayerPacket extends DataPacket {
 
     public static final byte NETWORK_ID = ProtocolInfo.ADD_PLAYER_PACKET;
-
-    @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
     public UUID uuid;
     public String username;
     public long entityUniqueId;
@@ -52,30 +46,63 @@ public class AddPlayerPacket extends DataPacket {
         this.reset();
         this.putUUID(this.uuid);
         this.putString(this.username);
+        if (protocol >= 223 && protocol <= 282) {
+            this.putString("");
+            this.putVarInt(0);
+        }
+        if (protocol < ProtocolInfo.v1_19_10) {
+            this.putEntityUniqueId(this.entityUniqueId);
+        }
         this.putEntityRuntimeId(this.entityRuntimeId);
-        this.putString(this.platformChatId);
+        if (protocol >= 223) {
+            this.putString(this.platformChatId);
+        }
         this.putVector3f(this.x, this.y, this.z);
         this.putVector3f(this.speedX, this.speedY, this.speedZ);
         this.putLFloat(this.pitch);
         this.putLFloat(this.yaw);
         this.putLFloat(this.headYaw == -1 ? this.yaw : this.headYaw);
-        this.putSlot(this.item);
-        this.putVarInt(this.gameType);
-        this.put(Binary.writeMetadata(this.metadata));
-        this.putUnsignedVarInt(0); // Entity properties int
-        this.putUnsignedVarInt(0); // Entity properties float
-        this.putLLong(entityUniqueId);
-        this.putUnsignedVarInt(0); // getPlayerPermission().ordinal()
-        this.putUnsignedVarInt(0); // getCommandPermission().ordinal()
-        this.putUnsignedVarInt(1); // getAbilityLayers().size()
-        this.putLShort(1); // getLayerType().ordinal() == BASE
-        this.putLInt(262143); // getAbilitiesSet()
-        this.putLInt(63); // getAbilityValues()
-        this.putLFloat(0.1f); // getFlySpeed()
-        this.putLFloat(1.0f); // getVerticalFlySpeed()
-        this.putLFloat(0.05f); // getWalkSpeed()
-        this.putUnsignedVarInt(0); // Entity links
-        this.putString(deviceId);
-        this.putLInt(buildPlatform);
+        this.putSlot(protocol, this.item);
+        if (protocol >= ProtocolInfo.v1_18_30) {
+            this.putVarInt(this.gameType);
+        }
+        this.put(Binary.writeMetadata(protocol, this.metadata));
+        if (protocol > 274) {
+            if (protocol >= ProtocolInfo.v1_19_10) {
+                if (protocol >= ProtocolInfo.v1_19_40) {
+                    this.putUnsignedVarInt(0); // Entity properties int
+                    this.putUnsignedVarInt(0); // Entity properties float
+                }
+                this.putLLong(entityUniqueId);
+                this.putUnsignedVarInt(0); // getPlayerPermission().ordinal()
+                this.putUnsignedVarInt(0); // getCommandPermission().ordinal()
+                this.putUnsignedVarInt(1); // getAbilityLayers().size()
+                this.putLShort(1); // getLayerType().ordinal() == BASE
+                this.putLInt(262143); // getAbilitiesSet()
+                this.putLInt(63); // getAbilityValues()
+                this.putLFloat(0.1f); // getFlySpeed()
+                if (protocol >= ProtocolInfo.v1_21_60) {
+                    this.putLFloat(1.0f); // getVerticalFlySpeed()
+                }
+                this.putLFloat(0.05f); // getWalkSpeed()
+            } else {
+                this.putUnsignedVarInt(0); // Adventure settings
+                this.putUnsignedVarInt(0);
+                this.putUnsignedVarInt(0);
+                this.putUnsignedVarInt(0);
+                this.putUnsignedVarInt(0);
+                this.putLLong(entityUniqueId);
+            }
+            this.putUnsignedVarInt(0); // Entity links
+            this.putString(deviceId);
+            if (protocol >= 388) {
+                this.putLInt(buildPlatform);
+            }
+        }
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

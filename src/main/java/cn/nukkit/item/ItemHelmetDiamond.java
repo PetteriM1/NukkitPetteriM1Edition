@@ -19,16 +19,6 @@ public class ItemHelmetDiamond extends ItemArmor {
     }
 
     @Override
-    public int getTier() {
-        return ItemArmor.TIER_DIAMOND;
-    }
-
-    @Override
-    public boolean isHelmet() {
-        return true;
-    }
-
-    @Override
     public int getArmorPoints() {
         return 3;
     }
@@ -39,7 +29,17 @@ public class ItemHelmetDiamond extends ItemArmor {
     }
 
     @Override
+    public int getTier() {
+        return ItemArmor.TIER_DIAMOND;
+    }
+
+    @Override
     public int getToughness() {
         return 2;
+    }
+
+    @Override
+    public boolean isHelmet() {
+        return true;
     }
 }

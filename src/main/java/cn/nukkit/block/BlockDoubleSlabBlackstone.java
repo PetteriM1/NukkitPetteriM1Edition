@@ -14,8 +14,13 @@ public class BlockDoubleSlabBlackstone extends BlockDoubleSlabBase {
     }
 
     @Override
-    public String getSlabName() {
-        return "Double Blackstone Slab";
+    public BlockColor getColor() {
+        return BlockColor.BLACK_BLOCK_COLOR;
+    }
+
+    @Override
+    public double getHardness() {
+        return 2;
     }
 
     @Override
@@ -34,23 +39,18 @@ public class BlockDoubleSlabBlackstone extends BlockDoubleSlabBase {
     }
 
     @Override
-    public double getHardness() {
-        return 2;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
-    }
-
-    @Override
     public int getSingleSlabId() {
         return BLACKSTONE_SLAB;
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.BLACK_BLOCK_COLOR;
+    public String getSlabName() {
+        return "Double Blackstone Slab";
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
     }
 
     @Override

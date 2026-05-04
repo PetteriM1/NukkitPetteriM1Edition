@@ -19,6 +19,11 @@ public abstract class BlockRawOreVariant extends BlockSolid {
     }
 
     @Override
+    public int getToolTier() {
+        return ItemTool.TIER_STONE;
+    }
+
+    @Override
     public int getToolType() {
         return ItemTool.TYPE_PICKAXE;
     }
@@ -34,11 +39,6 @@ public abstract class BlockRawOreVariant extends BlockSolid {
             return new Item[0];
         }
         return super.getDrops(item);
-    }
-
-    @Override
-    public int getToolTier() {
-        return ItemTool.TIER_STONE;
     }
 
     // TODO:

@@ -21,21 +21,21 @@ public class BlockEntityComparator extends BlockEntity {
         this.outputSignal = nbt.getInt("OutputSignal");
     }
 
-    @Override
-    public boolean isBlockEntityValid() {
-        int blockID = level.getBlockIdAt(chunk, (int) x, (int) y, (int) z);
-        return blockID == Block.POWERED_COMPARATOR || blockID == Block.UNPOWERED_COMPARATOR;
+    public void setOutputSignal(int outputSignal) {
+        if (this.outputSignal != outputSignal) {
+            this.outputSignal = outputSignal;
+            setDirty();
+        }
     }
 
     public int getOutputSignal() {
         return outputSignal;
     }
 
-    public void setOutputSignal(int outputSignal) {
-        if (this.outputSignal != outputSignal) {
-            this.outputSignal = outputSignal;
-            setDirty();
-        }
+    @Override
+    public boolean isBlockEntityValid() {
+        int blockID = level.getBlockIdAt(chunk, (int) x, (int) y, (int) z);
+        return blockID == Block.POWERED_COMPARATOR || blockID == Block.UNPOWERED_COMPARATOR;
     }
 
     @Override

@@ -15,8 +15,8 @@ public class BlockTrapdoorAcacia extends BlockTrapdoor {
     }
 
     @Override
-    public String getName() {
-        return "Acacia Trapdoor";
+    public BlockColor getColor() {
+        return BlockColor.ORANGE_BLOCK_COLOR;
     }
 
     @Override
@@ -25,17 +25,17 @@ public class BlockTrapdoorAcacia extends BlockTrapdoor {
     }
 
     @Override
-    public Item toItem() {
-        return new ItemBlock(Block.get(this.getId(), 0), 0);
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.ORANGE_BLOCK_COLOR;
+    public String getName() {
+        return "Acacia Trapdoor";
     }
 
     @Override
     public WaterloggingType getWaterloggingType() {
         return WaterloggingType.WHEN_PLACED_IN_WATER;
+    }
+
+    @Override
+    public Item toItem() {
+        return new ItemBlock(Block.get(this.getId(), 0), 0);
     }
 }

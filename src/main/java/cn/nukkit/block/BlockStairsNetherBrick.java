@@ -18,13 +18,23 @@ public class BlockStairsNetherBrick extends BlockStairs {
     }
 
     @Override
-    public int getId() {
-        return NETHER_BRICKS_STAIRS;
+    public BlockColor getColor() {
+        return BlockColor.NETHERRACK_BLOCK_COLOR;
     }
 
     @Override
     public double getHardness() {
         return 2;
+    }
+
+    @Override
+    public int getId() {
+        return NETHER_BRICKS_STAIRS;
+    }
+
+    @Override
+    public String getName() {
+        return "Nether Bricks Stairs";
     }
 
     @Override
@@ -35,16 +45,6 @@ public class BlockStairsNetherBrick extends BlockStairs {
     @Override
     public int getToolType() {
         return ItemTool.TYPE_PICKAXE;
-    }
-
-    @Override
-    public String getName() {
-        return "Nether Bricks Stairs";
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.NETHERRACK_BLOCK_COLOR;
     }
 
     @Override

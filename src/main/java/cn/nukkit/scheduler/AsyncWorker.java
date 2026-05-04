@@ -16,24 +16,6 @@ public class AsyncWorker extends Thread implements InterruptibleThread {
         this.setName("Asynchronous Worker");
     }
 
-    public void stack(AsyncTask task) {
-        synchronized (stack) {
-            stack.addFirst(task);
-        }
-    }
-
-    public void unstack() {
-        synchronized (stack) {
-            stack.clear();
-        }
-    }
-
-    public void unstack(AsyncTask task) {
-        synchronized (stack) {
-            stack.remove(task);
-        }
-    }
-
     public void run() {
         while (true) {
             synchronized (stack) {
@@ -45,7 +27,26 @@ public class AsyncWorker extends Thread implements InterruptibleThread {
             }
             try {
                 sleep(5);
-            } catch (InterruptedException ignored) {}
+            } catch (InterruptedException ignored) {
+            }
+        }
+    }
+
+    public void stack(AsyncTask task) {
+        synchronized (stack) {
+            stack.addFirst(task);
+        }
+    }
+
+    public void unstack(AsyncTask task) {
+        synchronized (stack) {
+            stack.remove(task);
+        }
+    }
+
+    public void unstack() {
+        synchronized (stack) {
+            stack.clear();
         }
     }
 }

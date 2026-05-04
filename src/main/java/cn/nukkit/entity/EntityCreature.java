@@ -16,6 +16,17 @@ public abstract class EntityCreature extends EntityLiving {
         super(chunk, nbt);
     }
 
+    /**
+     * Called when player interacts the entity with a name tag item
+     *
+     * @param player  player
+     * @param nameTag name tag item
+     * @return true to reduce name tag item count
+     */
+    protected boolean applyNameTag(Player player, Item nameTag) {
+        return false; // Override in BaseEntity
+    }
+
     @Override
     public boolean onInteract(Player player, Item item, Vector3 clickedPos) {
         if (item.getId() == Item.NAME_TAG && !player.isAdventure()) {
@@ -23,15 +34,5 @@ public abstract class EntityCreature extends EntityLiving {
         }
 
         return false;
-    }
-
-    /**
-     * Called when player interacts the entity with a name tag item
-     * @param player player
-     * @param nameTag name tag item
-     * @return true to reduce name tag item count
-     */
-    protected boolean applyNameTag(Player player, Item nameTag) {
-        return false; // Override in BaseEntity
     }
 }

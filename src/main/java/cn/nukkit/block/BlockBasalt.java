@@ -17,23 +17,6 @@ public class BlockBasalt extends BlockSolidMeta {
         super(meta);
     }
 
-    @Override
-    public double getHardness() {
-        return 1.25;
-    }
-
-    @Override
-    public double getResistance() {
-        return 4.2;
-    }
-
-    @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        this.setPillarAxis(face.getAxis());
-        this.getLevel().setBlock(block, this, true, true);
-        return true;
-    }
-
     public void setPillarAxis(BlockFace.Axis axis) {
         switch (axis) {
             case Y:
@@ -46,6 +29,26 @@ public class BlockBasalt extends BlockSolidMeta {
                 this.setDamage(2);
                 break;
         }
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.BLACK_BLOCK_COLOR;
+    }
+
+    @Override
+    public double getHardness() {
+        return 1.25;
+    }
+
+    @Override
+    public int getId() {
+        return BlockID.BASALT;
+    }
+
+    @Override
+    public String getName() {
+        return "Basalt";
     }
 
     public BlockFace.Axis getPillarAxis() {
@@ -61,18 +64,18 @@ public class BlockBasalt extends BlockSolidMeta {
     }
 
     @Override
+    public double getResistance() {
+        return 4.2;
+    }
+
+    @Override
     public int getToolType() {
         return ItemTool.TYPE_PICKAXE;
     }
 
     @Override
-    public String getName() {
-        return "Basalt";
-    }
-
-    @Override
-    public int getId() {
-        return BlockID.BASALT;
+    public boolean canHarvestWithHand() {
+        return false;
     }
 
     @Override
@@ -87,13 +90,10 @@ public class BlockBasalt extends BlockSolidMeta {
     }
 
     @Override
-    public boolean canHarvestWithHand() {
-        return false;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.BLACK_BLOCK_COLOR;
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        this.setPillarAxis(face.getAxis());
+        this.getLevel().setBlock(block, this, true, true);
+        return true;
     }
 
     @Override

@@ -7,15 +7,9 @@ import cn.nukkit.event.HandlerList;
 public class EntityDamageBlockedEvent extends EntityEvent implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
-
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private final EntityDamageEvent damage;
     private boolean knockBackAttacker;
     private boolean animation;
-
     public EntityDamageBlockedEvent(Entity entity, EntityDamageEvent damage, boolean knockBack, boolean animation) {
         this.entity = entity;
         this.damage = damage;
@@ -23,8 +17,16 @@ public class EntityDamageBlockedEvent extends EntityEvent implements Cancellable
         this.animation = animation;
     }
 
-    public EntityDamageEvent.DamageCause getCause() {
-        return damage.getCause();
+    public void setAnimation(boolean val) {
+        animation = val;
+    }
+
+    public void setKnockBackAttacker(boolean val) {
+        knockBackAttacker = val;
+    }
+
+    public boolean getAnimation() {
+        return animation;
     }
 
     public Entity getAttacker() {
@@ -34,23 +36,19 @@ public class EntityDamageBlockedEvent extends EntityEvent implements Cancellable
         return damage.getEntity();
     }
 
+    public EntityDamageEvent.DamageCause getCause() {
+        return damage.getCause();
+    }
+
     public EntityDamageEvent getDamage() {
         return damage;
     }
 
+    public static HandlerList getHandlers() {
+        return handlers;
+    }
+
     public boolean getKnockBackAttacker() {
         return knockBackAttacker;
-    }
-
-    public boolean getAnimation() {
-        return animation;
-    }
-
-    public void setKnockBackAttacker(boolean val) {
-        knockBackAttacker = val;
-    }
-
-    public void setAnimation(boolean val) {
-        animation = val;
     }
 }

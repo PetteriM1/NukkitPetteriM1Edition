@@ -76,7 +76,8 @@ public class ParticleCommand extends VanillaCommand {
             try {
                 double c = Double.parseDouble(args[4]);
                 count = (int) c;
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
         count = Math.max(1, count);
 
@@ -85,7 +86,8 @@ public class ParticleCommand extends VanillaCommand {
             try {
                 double d = Double.parseDouble(args[8]);
                 data = (int) d;
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
         Particle particle = getParticle(name, position, data);
 
@@ -108,6 +110,17 @@ public class ParticleCommand extends VanillaCommand {
         }
 
         return true;
+    }
+
+    private static double getDouble(String arg, double defaultValue) {
+        if (arg.startsWith("~")) {
+            String relativePos = arg.substring(1);
+            if (relativePos.isEmpty()) {
+                return defaultValue;
+            }
+            return defaultValue + Double.parseDouble(relativePos);
+        }
+        return Double.parseDouble(arg);
     }
 
     private static Particle getParticle(String name, Vector3 pos, int data) {
@@ -196,16 +209,5 @@ public class ParticleCommand extends VanillaCommand {
         }
 
         return null;
-    }
-
-    private static double getDouble(String arg, double defaultValue) {
-        if (arg.startsWith("~")) {
-            String relativePos = arg.substring(1);
-            if (relativePos.isEmpty()) {
-                return defaultValue;
-            }
-            return defaultValue + Double.parseDouble(relativePos);
-        }
-        return Double.parseDouble(arg);
     }
 }

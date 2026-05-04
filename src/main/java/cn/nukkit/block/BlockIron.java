@@ -11,6 +11,16 @@ import cn.nukkit.utils.BlockColor;
 public class BlockIron extends BlockSolid {
 
     @Override
+    public BlockColor getColor() {
+        return BlockColor.IRON_BLOCK_COLOR;
+    }
+
+    @Override
+    public double getHardness() {
+        return 5;
+    }
+
+    @Override
     public int getId() {
         return IRON_BLOCK;
     }
@@ -21,18 +31,18 @@ public class BlockIron extends BlockSolid {
     }
 
     @Override
+    public double getResistance() {
+        return 10;
+    }
+
+    @Override
     public int getToolType() {
         return ItemTool.TYPE_PICKAXE;
     }
 
     @Override
-    public double getHardness() {
-        return 5;
-    }
-
-    @Override
-    public double getResistance() {
-        return 10;
+    public boolean canHarvestWithHand() {
+        return false;
     }
 
     @Override
@@ -44,15 +54,5 @@ public class BlockIron extends BlockSolid {
         } else {
             return new Item[0];
         }
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.IRON_BLOCK_COLOR;
-    }
-
-    @Override
-    public boolean canHarvestWithHand() {
-        return false;
     }
 }

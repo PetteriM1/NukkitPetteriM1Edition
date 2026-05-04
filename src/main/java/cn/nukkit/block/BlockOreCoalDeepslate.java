@@ -1,6 +1,8 @@
 package cn.nukkit.block;
 
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockOreCoalDeepslate extends BlockOreCoal {
 
@@ -8,8 +10,8 @@ public class BlockOreCoalDeepslate extends BlockOreCoal {
     }
 
     @Override
-    public int getId() {
-        return DEEPSLATE_COAL_ORE;
+    public BlockColor getColor() {
+        return BlockColor.DEEPSLATE_GRAY_BLOCK_COLOR;
     }
 
     @Override
@@ -18,12 +20,22 @@ public class BlockOreCoalDeepslate extends BlockOreCoal {
     }
 
     @Override
+    public int getId() {
+        return DEEPSLATE_COAL_ORE;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_17_0;
+    }
+
+    @Override
     public String getName() {
         return "Deepslate Coal Ore";
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.DEEPSLATE_GRAY_BLOCK_COLOR;
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.COAL_ORE;
     }
 }

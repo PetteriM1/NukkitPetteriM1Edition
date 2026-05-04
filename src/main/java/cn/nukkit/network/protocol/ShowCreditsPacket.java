@@ -14,11 +14,6 @@ public class ShowCreditsPacket extends DataPacket {
     public int status;
 
     @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
-    @Override
     public void decode() {
         this.eid = this.getEntityRuntimeId();
         this.status = this.getVarInt();
@@ -29,5 +24,10 @@ public class ShowCreditsPacket extends DataPacket {
         this.reset();
         this.putEntityRuntimeId(this.eid);
         this.putVarInt(this.status);
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

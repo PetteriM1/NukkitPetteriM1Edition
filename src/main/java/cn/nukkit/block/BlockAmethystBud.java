@@ -4,11 +4,14 @@ import cn.nukkit.Player;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemTool;
+import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.SimpleAxisAlignedBB;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
 import cn.nukkit.utils.Faceable;
+import cn.nukkit.utils.material.BlockType;
 
 public abstract class BlockAmethystBud extends BlockTransparentMeta implements Faceable {
 
@@ -20,11 +23,76 @@ public abstract class BlockAmethystBud extends BlockTransparentMeta implements F
         super(meta);
     }
 
-    protected abstract String getSizeName();
+    public void setBlockFace(BlockFace face) {
+        this.setDamage(face.getIndex());
+    }
+
+    @Override
+    public BlockFace getBlockFace() {
+        return BlockFace.fromIndex(this.getDamage());
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.PURPLE_BLOCK_COLOR;
+    }
+
+    protected abstract int getCrystalHeight();
+
+    protected abstract int getCrystalOffset();
+
+    @Override
+    public double getHardness() {
+        return 1.5;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_17_0;
+    }
 
     @Override
     public String getName() {
         return this.getSizeName() + " Amethyst Bud";
+    }
+
+    @Override
+    public double getResistance() {
+        return 7.5;
+    }
+
+    protected abstract String getSizeName();
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
+    }
+
+    @Override
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.WHEN_PLACED_IN_WATER;
+    }
+
+    protected static AxisAlignedBB boundingBox(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
+        return new SimpleAxisAlignedBB(minX / 16.0D, minY / 16.0D, minZ / 16.0D, maxX / 16.0D, maxY / 16.0D, maxZ / 16.0D);
+    }
+
+    @Override
+    public boolean breakWhenPushed() {
+        return true;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.SKULL_BLOCK;
+    }
+
+    @Override
+    public Item[] getDrops(Item item) {
+        if (item.isPickaxe() && item.hasEnchantment(Enchantment.ID_SILK_TOUCH)) {
+            return new Item[]{this.toItem()};
+        }
+        return new Item[0];
     }
 
     @Override
@@ -34,15 +102,6 @@ public abstract class BlockAmethystBud extends BlockTransparentMeta implements F
             return this.getLevel().setBlock(this, this, true, true);
         }
         return false;
-    }
-
-    @Override
-    public BlockFace getBlockFace() {
-        return BlockFace.fromIndex(this.getDamage());
-    }
-
-    public void setBlockFace(BlockFace face) {
-        this.setDamage(face.getIndex());
     }
 
     @Override
@@ -71,49 +130,7 @@ public abstract class BlockAmethystBud extends BlockTransparentMeta implements F
     }
 
     @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
-    }
-
-    @Override
-    public double getHardness() {
-        return 1.5;
-    }
-
-    @Override
-    public double getResistance() {
-        return 1.5;
-    }
-
-    @Override
-    public boolean breakWhenPushed() {
-        return true;
-    }
-
-    protected abstract int getCrystalHeight();
-    protected abstract int getCrystalOffset();
-
-    @Override
     public Item toItem() {
         return new ItemBlock(Block.get(this.getId()), 0, 1);
-    }
-
-    protected static AxisAlignedBB boundingBox(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
-        return new SimpleAxisAlignedBB(minX / 16.0D, minY / 16.0D, minZ / 16.0D, maxX / 16.0D, maxY / 16.0D, maxZ / 16.0D);
-    }
-
-    @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.WHEN_PLACED_IN_WATER;
-    }
-
-    @Override
-    public Item[] getDrops(Item item) {
-        return new Item[0];
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.PURPLE_BLOCK_COLOR;
     }
 }

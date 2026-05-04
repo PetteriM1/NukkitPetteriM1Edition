@@ -14,8 +14,8 @@ public class BlockCopperDoorOxidized extends BlockCopperDoor {
     }
 
     @Override
-    public String getName() {
-        return "Oxidized Copper Door";
+    public BlockColor getColor() {
+        return BlockColor.WARPED_NYLIUM_BLOCK_COLOR;
     }
 
     @Override
@@ -24,8 +24,8 @@ public class BlockCopperDoorOxidized extends BlockCopperDoor {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.WARPED_NYLIUM_BLOCK_COLOR;
+    public String getName() {
+        return "Oxidized Copper Door";
     }
 
     @Override

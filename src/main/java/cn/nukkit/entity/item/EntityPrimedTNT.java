@@ -19,39 +19,7 @@ import cn.nukkit.network.protocol.LevelEventPacket;
 public class EntityPrimedTNT extends Entity implements EntityExplosive {
 
     public static final int NETWORK_ID = 65;
-
-    @Override
-    public float getWidth() {
-        return 0.98f;
-    }
-
-    @Override
-    public float getLength() {
-        return 0.98f;
-    }
-
-    @Override
-    public float getHeight() {
-        return 0.98f;
-    }
-
-    @Override
-    protected float getGravity() {
-        return 0.04f;
-    }
-
-    @Override
-    protected float getDrag() {
-        return 0.02f;
-    }
-
-    @Override
-    protected float getBaseOffset() {
-        return 0.49f;
-    }
-
     protected int fuse;
-
     protected Entity source;
 
     public EntityPrimedTNT(FullChunk chunk, CompoundTag nbt) {
@@ -64,13 +32,65 @@ public class EntityPrimedTNT extends Entity implements EntityExplosive {
     }
 
     @Override
+    protected float getBaseOffset() {
+        return 0.49f;
+    }
+
+    @Override
+    protected float getDrag() {
+        return 0.02f;
+    }
+
+    @Override
+    protected float getGravity() {
+        return 0.04f;
+    }
+
+    @Override
+    public float getHeight() {
+        return 0.98f;
+    }
+
+    @Override
+    public float getLength() {
+        return 0.98f;
+    }
+
+    @Override
     public int getNetworkId() {
         return NETWORK_ID;
+    }
+
+    public Entity getSource() {
+        return source;
+    }
+
+    @Override
+    public float getWidth() {
+        return 0.98f;
     }
 
     @Override
     public boolean attack(EntityDamageEvent source) {
         return source.getCause() == DamageCause.VOID && super.attack(source);
+    }
+
+    @Override
+    public boolean canCollideWith(Entity entity) {
+        return false;
+    }
+
+    public void explode() {
+        EntityExplosionPrimeEvent event = new EntityExplosionPrimeEvent(this, 4);
+        server.getPluginManager().callEvent(event);
+        if (event.isCancelled()) {
+            return;
+        }
+        Explosion explosion = new Explosion(level.getBlock(this) instanceof BlockSlab ? this.add(0, 0.1, 0) : this, event.getForce(), this);
+        if (event.isBlockBreaking()) {
+            explosion.explodeA();
+        }
+        explosion.explodeB();
     }
 
     @Override
@@ -87,17 +107,6 @@ public class EntityPrimedTNT extends Entity implements EntityExplosive {
         this.setDataProperty(new IntEntityData(DATA_FUSE_LENGTH, fuse));
 
         this.getLevel().addLevelEvent(this, LevelEventPacket.EVENT_SOUND_TNT);
-    }
-
-    @Override
-    public boolean canCollideWith(Entity entity) {
-        return false;
-    }
-
-    @Override
-    public void saveNBT() {
-        super.saveNBT();
-        namedTag.putByte("Fuse", fuse);
     }
 
     @Override
@@ -157,20 +166,9 @@ public class EntityPrimedTNT extends Entity implements EntityExplosive {
         return hasUpdate || fuse >= 0 || Math.abs(motionX) > 0.00001 || Math.abs(motionY) > 0.00001 || Math.abs(motionZ) > 0.00001;
     }
 
-    public void explode() {
-        EntityExplosionPrimeEvent event = new EntityExplosionPrimeEvent(this, 4);
-        server.getPluginManager().callEvent(event);
-        if (event.isCancelled()) {
-            return;
-        }
-        Explosion explosion = new Explosion(level.getBlock(this) instanceof BlockSlab ? this.add(0, 0.1, 0) : this, event.getForce(), this);
-        if (event.isBlockBreaking()) {
-            explosion.explodeA();
-        }
-        explosion.explodeB();
-    }
-
-    public Entity getSource() {
-        return source;
+    @Override
+    public void saveNBT() {
+        super.saveNBT();
+        namedTag.putByte("Fuse", fuse);
     }
 }

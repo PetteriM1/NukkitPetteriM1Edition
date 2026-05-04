@@ -11,12 +11,12 @@ public class BlockStairsSmoothQuartz extends BlockStairsQuartz {
     }
 
     @Override
-    public String getName() {
-        return "Smooth Quartz Stairs";
+    public int getId() {
+        return SMOOTH_QUARTZ_STAIRS;
     }
 
     @Override
-    public int getId() {
-        return SMOOTH_QUARTZ_STAIRS;
+    public String getName() {
+        return "Smooth Quartz Stairs";
     }
 }

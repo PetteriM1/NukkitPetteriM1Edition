@@ -25,18 +25,16 @@ public abstract class EntityVehicle extends Entity implements EntityRideable, En
     public EntityVehicle(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
     }
+    protected boolean rollingDirection = true;
 
-    public int getRollingAmplitude() {
-        return hurtTime;
+    public void setDamage(int damage) {
+        this.damage = damage;
+        this.setDataProperty(new IntEntityData(DATA_HEALTH, damage)); // false data name (should be DATA_DAMAGE_TAKEN)
     }
 
     public void setRollingAmplitude(int time) {
         this.hurtTime = time;
         this.setDataProperty(new IntEntityData(DATA_HURT_TIME, time));
-    }
-
-    public int getRollingDirection() {
-        return hurtDirection;
     }
 
     public void setRollingDirection(int direction) {
@@ -48,37 +46,17 @@ public abstract class EntityVehicle extends Entity implements EntityRideable, En
         return damage;
     }
 
-    public void setDamage(int damage) {
-        this.damage = damage;
-        this.setDataProperty(new IntEntityData(DATA_HEALTH, damage)); // false data name (should be DATA_DAMAGE_TAKEN)
-    }
-
     @Override
     public String getInteractButtonText() {
         return "action.interact.mount";
     }
 
-    @Override
-    public boolean canDoInteraction() {
-        return passengers.isEmpty();
+    public int getRollingAmplitude() {
+        return hurtTime;
     }
 
-    @Override
-    public boolean entityBaseTick(int tickDiff) {
-        if (getRollingAmplitude() > 0) {
-            setRollingAmplitude(getRollingAmplitude() - 1);
-        }
-
-        return super.entityBaseTick(tickDiff);
-    }
-
-    protected boolean rollingDirection = true;
-
-    protected boolean performHurtAnimation() {
-        setRollingAmplitude(9);
-        setRollingDirection(rollingDirection ? 1 : -1);
-        rollingDirection = !rollingDirection;
-        return true;
+    public int getRollingDirection() {
+        return hurtDirection;
     }
 
     @Override
@@ -110,5 +88,26 @@ public abstract class EntityVehicle extends Entity implements EntityRideable, En
         }
 
         return super.attack(source);
+    }
+
+    @Override
+    public boolean canDoInteraction() {
+        return passengers.isEmpty();
+    }
+
+    @Override
+    public boolean entityBaseTick(int tickDiff) {
+        if (getRollingAmplitude() > 0) {
+            setRollingAmplitude(getRollingAmplitude() - 1);
+        }
+
+        return super.entityBaseTick(tickDiff);
+    }
+
+    protected boolean performHurtAnimation() {
+        setRollingAmplitude(9);
+        setRollingDirection(rollingDirection ? 1 : -1);
+        rollingDirection = !rollingDirection;
+        return true;
     }
 }

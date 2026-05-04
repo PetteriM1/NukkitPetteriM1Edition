@@ -13,13 +13,13 @@ public class BlockWarpedDoor extends BlockDoor {
     }
 
     @Override
-    public String getName() {
-        return "Warped Door";
+    public int getId() {
+        return WARPED_DOOR_BLOCK;
     }
 
     @Override
-    public int getId() {
-        return WARPED_DOOR_BLOCK;
+    public String getName() {
+        return "Warped Door";
     }
 
     @Override
