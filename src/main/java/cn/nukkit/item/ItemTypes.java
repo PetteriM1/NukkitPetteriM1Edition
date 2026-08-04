@@ -406,6 +406,12 @@ public class ItemTypes {
     public static final ItemType SOUL_CAMPFIRE = register("minecraft:soul_campfire", ItemID.SOUL_CAMPFIRE);
     public static final ItemType GLOW_ITEM_FRAME = register("minecraft:glow_frame", ItemID.GLOW_ITEM_FRAME);
 
+    @Data
+    private static class ItemTypeImpl implements ItemType {
+        private final String identifier;
+        private final int legacyId;
+    }
+
     private static ItemType register(String identifier, int legacyId) {
         return register(new ItemTypeImpl(identifier, legacyId));
     }
@@ -425,11 +431,5 @@ public class ItemTypes {
 
     public static ItemType get(String identifier) {
         return identifiers.get(identifier);
-    }
-
-    @Data
-    private static class ItemTypeImpl implements ItemType {
-        private final String identifier;
-        private final int legacyId;
     }
 }

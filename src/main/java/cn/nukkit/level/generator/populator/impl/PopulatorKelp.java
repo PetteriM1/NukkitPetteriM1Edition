@@ -14,7 +14,6 @@ public class PopulatorKelp extends PopulatorOceanFloorSurfaceBlock {
 
     @Override
     protected boolean canStay(int x, int y, int z, FullChunk chunk) {
-        if (chunk instanceof cn.nukkit.level.format.anvil.Chunk) return false;
         return EnsureCover.ensureWaterCover(x, y, z, chunk) && EnsureBelow.ensureBelow(x, y, z, GRAVEL, chunk);
     }
 

@@ -73,7 +73,7 @@ public abstract class DefaultPermissions {
         time.recalculatePermissibles();
 
         Permission kill = registerPermission(new Permission("nukkit.command.kill", "Allows the user to kill players", Permission.DEFAULT_OP), commands);
-        registerPermission(new Permission("nukkit.command.kill.self", "Allows the user to commit suicide", Permission.DEFAULT_TRUE), kill);
+        registerPermission(new Permission("nukkit.command.kill.self", "Allows the user to commit suicide", Server.getInstance().suomiCraftPEMode() ? Permission.DEFAULT_OP : Permission.DEFAULT_TRUE), kill);
         registerPermission(new Permission("nukkit.command.kill.other", "Allows the user to kill other players"), kill);
         kill.recalculatePermissibles();
 
@@ -109,13 +109,20 @@ public abstract class DefaultPermissions {
         registerPermission(new Permission("nukkit.command.setworldspawn", "Allows the user to change the world spawn", Permission.DEFAULT_OP), commands);
         registerPermission(new Permission("nukkit.command.weather", "Allows the user to change the weather", Permission.DEFAULT_OP), commands);
         registerPermission(new Permission("nukkit.command.xp", "Allows the user to give experience", Permission.DEFAULT_OP), commands);
+        registerPermission(new Permission("nukkit.command.transferserver", "Allows the user to transfer to other server", Permission.DEFAULT_OP), commands);
         registerPermission(new Permission("nukkit.command.summon", "Allows the user to summon entities", Permission.DEFAULT_OP), commands);
+        registerPermission(new Permission("nukkit.command.world", "Allows the user to switch world", Server.getInstance().suomiCraftPEMode() ? Permission.DEFAULT_TRUE : Permission.DEFAULT_OP), commands);
+        registerPermission(new Permission("nukkit.command.world.others", "Allows the user to switch world for other players", Permission.DEFAULT_OP), commands);
+        registerPermission(new Permission("nukkit.command.generateworld", "Allows the user to generate new world", Permission.DEFAULT_OP), commands);
         registerPermission(new Permission("nukkit.command.seed", "Allows the user to see world's seed", Permission.DEFAULT_OP), commands);
         registerPermission(new Permission("nukkit.command.playsound", "Allows the user to play sounds", Permission.DEFAULT_OP), commands);
+        registerPermission(new Permission("nukkit.command.debug.perform", "Allows the user to create debug paste", Permission.DEFAULT_OP), commands);
         registerPermission(new Permission("nukkit.command.gamerule", "Allows the user to change game rules", Permission.DEFAULT_OP), commands);
+        registerPermission(new Permission("nukkit.command.spawn", "Allows the user to use spawn command", Permission.DEFAULT_OP), commands);
         registerPermission(new Permission("nukkit.command.enchant", "Allows the user to enchant items", Permission.DEFAULT_OP), commands);
         registerPermission(new Permission("nukkit.command.difficulty", "Allows the user to change difficulty", Permission.DEFAULT_OP), commands);
         registerPermission(new Permission("nukkit.command.world.convert", "Allows the user to convert worlds to LevelDB format", Permission.DEFAULT_FALSE), commands); // Console only
+        registerPermission(new Permission("nukkit.command.world.biome", "Allows the user to use biome command", Permission.DEFAULT_OP), commands);
 
         registerPermission(new Permission("nukkit.textcolor", "Allows the user to write colored text", Permission.DEFAULT_OP), commands);
 

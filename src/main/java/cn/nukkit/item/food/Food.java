@@ -100,6 +100,28 @@ public abstract class Food {
     public static final Food suspicious_stew_wither = registerDefaultFood(new FoodEffectiveInBow(6, 7.2F)
             .addEffect(Effect.getEffect(Effect.WITHER).setAmplifier(1).setDuration(120)).addRelative(Item.SUSPICIOUS_STEW, 9));
     public static final Food honey_bottle = registerDefaultFood(new FoodNormal(6, 1.2F).addRelative(Item.HONEY_BOTTLE));
+    protected int restoreFood;
+    protected float restoreSaturation;
+    protected final List<NodeIDMeta> relativeIDs = new ArrayList<>();
+
+    static class NodeIDMeta {
+        final int id;
+        final int meta;
+
+        NodeIDMeta(int id, int meta) {
+            this.id = id;
+            this.meta = meta;
+        }
+    }
+
+    static class NodeIDMetaPlugin extends NodeIDMeta {
+        final Plugin plugin;
+
+        NodeIDMetaPlugin(int id, int meta, Plugin plugin) {
+            super(id, meta);
+            this.plugin = plugin;
+        }
+    }
 
     public static Food registerFood(Food food, Plugin plugin) {
         Objects.requireNonNull(food);
@@ -135,10 +157,6 @@ public abstract class Food {
         }
         return result[0];
     }
-
-    protected int restoreFood;
-    protected float restoreSaturation;
-    protected final List<NodeIDMeta> relativeIDs = new ArrayList<>();
 
     public final boolean eatenBy(Player player) {
         PlayerEatFoodEvent event = new PlayerEatFoodEvent(player, this);
@@ -182,24 +200,5 @@ public abstract class Food {
     public Food setRestoreSaturation(float restoreSaturation) {
         this.restoreSaturation = restoreSaturation;
         return this;
-    }
-
-    static class NodeIDMeta {
-        final int id;
-        final int meta;
-
-        NodeIDMeta(int id, int meta) {
-            this.id = id;
-            this.meta = meta;
-        }
-    }
-
-    static class NodeIDMetaPlugin extends NodeIDMeta {
-        final Plugin plugin;
-
-        NodeIDMetaPlugin(int id, int meta, Plugin plugin) {
-            super(id, meta);
-            this.plugin = plugin;
-        }
     }
 }

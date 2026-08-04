@@ -28,6 +28,9 @@ public class BanList {
         this.file = file;
     }
 
+    private static class LinkedListTypeToken extends TypeToken<LinkedList<TreeMap<String, String>>> {
+    }
+
     public boolean isEnable() {
         return enable;
     }
@@ -87,7 +90,6 @@ public class BanList {
         }
     }
 
-
     public void removeExpired() {
         for (String name : new ArrayList<>(this.list.keySet())) {
             BanEntry entry = this.list.get(name);
@@ -134,8 +136,5 @@ public class BanList {
         } catch (IOException e) {
             MainLogger.getLogger().error("Could not save ban list", e);
         }
-    }
-
-    private static class LinkedListTypeToken extends TypeToken<LinkedList<TreeMap<String, String>>> {
     }
 }

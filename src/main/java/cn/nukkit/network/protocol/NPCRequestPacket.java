@@ -34,7 +34,9 @@ public class NPCRequestPacket extends DataPacket {
         this.requestType = RequestType.values()[this.getByte()];
         this.commandString = this.getString();
         this.actionType = this.getByte();
-        this.sceneName = this.getString();
+        if (protocol >= ProtocolInfo.v1_17_10) {
+            this.sceneName = this.getString();
+        }
     }
 
     @Override
@@ -44,6 +46,8 @@ public class NPCRequestPacket extends DataPacket {
         this.putByte((byte) requestType.ordinal());
         this.putString(this.commandString);
         this.putByte((byte) this.actionType);
-        this.putString(this.sceneName);
+        if (protocol >= ProtocolInfo.v1_17_10) {
+            this.putString(this.sceneName);
+        }
     }
 }

@@ -26,6 +26,8 @@ public class StopSoundPacket extends DataPacket {
         this.reset();
         this.putString(this.name);
         this.putBoolean(this.stopAll);
-        this.putBoolean(this.stopMusicLegacy);
+        if (this.protocol >= ProtocolInfo.v1_21_20) {
+            this.putBoolean(this.stopMusicLegacy);
+        }
     }
 }

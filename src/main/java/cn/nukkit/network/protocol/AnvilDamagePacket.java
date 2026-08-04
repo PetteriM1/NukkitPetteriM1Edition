@@ -20,8 +20,10 @@ public class AnvilDamagePacket extends DataPacket {
 
     @Override
     public void decode() {
-        this.damage = this.getByte();
-        BlockVector3 vec = this.getBlockVector3();
+        if (protocol < ProtocolInfo.v1_26_40) {
+            this.damage = this.getByte();
+        }
+        BlockVector3 vec = this.getBlockVector3(protocol);
         this.x = vec.x;
         this.y = vec.y;
         this.z = vec.z;

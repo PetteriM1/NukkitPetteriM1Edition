@@ -17,10 +17,34 @@ public class ResourcePackClientResponsePacket extends DataPacket {
     public byte responseStatus;
     public Entry[] packEntries;
 
+    private static final String[] RESPONSE_STATUS = {"cancel", "downloading", "downloadingfinished", "resourcepackstackfinished"};
+
+    @ToString
+    public static class Entry {
+
+        public final UUID uuid;
+        public final String version;
+
+        public Entry(UUID uuid, String version) {
+            this.uuid = uuid;
+            this.version = version;
+        }
+    }
+
     @Override
     public void decode() {
         this.responseStatus = (byte) this.getByte();
-        int count = this.getLShort();
+        if (protocol >= ProtocolInfo.v1_26_40) {
+            this.responseStatus += 1;
+
+            this.getString(); // type enum string
+        }
+
+        if (protocol >= ProtocolInfo.v1_26_40 && this.responseStatus != STATUS_SEND_PACKS) {
+            return;
+        }
+
+        int count = protocol >= ProtocolInfo.v1_26_40 ? (int) this.getUnsignedVarInt() : this.getLShort();
         if (count > 1024) throw new IllegalArgumentException("Too many entries");
         this.packEntries = new Entry[count];
         for (int i = 0; i < this.packEntries.length; i++) {
@@ -39,7 +63,22 @@ public class ResourcePackClientResponsePacket extends DataPacket {
     public void encode() {
         this.reset();
         this.putByte(this.responseStatus);
-        this.putLShort(this.packEntries.length);
+        if (protocol >= ProtocolInfo.v1_26_40) {
+            this.responseStatus -= 1;
+
+            this.putString(RESPONSE_STATUS[this.responseStatus]);
+        }
+
+        if (protocol >= ProtocolInfo.v1_26_40 && this.responseStatus != STATUS_SEND_PACKS) {
+            return;
+        }
+
+        if (protocol >= ProtocolInfo.v1_26_40) {
+            this.putUnsignedVarInt(this.packEntries.length);
+        } else {
+            this.putLShort(this.packEntries.length);
+        }
+
         for (Entry entry : this.packEntries) {
             this.putString(entry.uuid.toString() + '_' + entry.version);
         }
@@ -48,17 +87,5 @@ public class ResourcePackClientResponsePacket extends DataPacket {
     @Override
     public byte pid() {
         return NETWORK_ID;
-    }
-
-    @ToString
-    public static class Entry {
-
-        public final UUID uuid;
-        public final String version;
-
-        public Entry(UUID uuid, String version) {
-            this.uuid = uuid;
-            this.version = version;
-        }
     }
 }

@@ -18,6 +18,16 @@ public class HandlerList {
     private static final List<HandlerList> allLists = new ObjectArrayList<>();
     private static final Map<Class<?>, HandlerList> eventHandlerLists = new Object2ObjectOpenHashMap<>();
 
+    public HandlerList() {
+        handlerslots = new EnumMap<>(EventPriority.class);
+        for (EventPriority o : EventPriority.values()) {
+            handlerslots.put(o, new ObjectArrayList<>());
+        }
+        synchronized (allLists) {
+            allLists.add(this);
+        }
+    }
+
     public static void bakeAll() {
         synchronized (allLists) {
             for (HandlerList h : allLists) {
@@ -52,16 +62,6 @@ public class HandlerList {
             for (HandlerList h : allLists) {
                 h.unregister(listener);
             }
-        }
-    }
-
-    public HandlerList() {
-        handlerslots = new EnumMap<>(EventPriority.class);
-        for (EventPriority o : EventPriority.values()) {
-            handlerslots.put(o, new ObjectArrayList<>());
-        }
-        synchronized (allLists) {
-            allLists.add(this);
         }
     }
 

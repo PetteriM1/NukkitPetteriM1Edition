@@ -6,9 +6,6 @@ import javax.annotation.Nullable;
 
 public interface ItemTrimMaterial {
 
-    @Nullable
-    Type getMaterial();
-
     enum Type {
 
         AMETHYST("amethyst"),
@@ -29,4 +26,7 @@ public interface ItemTrimMaterial {
             this.materialName = input;
         }
     }
+
+    @Nullable
+    Type getMaterial();
 }

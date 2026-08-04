@@ -4,6 +4,8 @@ import cn.nukkit.Player;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockLeavesMangrove extends BlockLeaves {
 
@@ -65,5 +67,15 @@ public class BlockLeavesMangrove extends BlockLeaves {
     @Override
     public void setCheckDecay(boolean updateBit) {
         this.setDamage(this.getDamage() & ~1 | ((updateBit ? 1 : 0) & 1));
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_19_0;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.LEAVES;
     }
 }

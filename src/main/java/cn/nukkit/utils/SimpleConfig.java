@@ -37,6 +37,20 @@ public abstract class SimpleConfig {
         configFile.getParentFile().mkdirs();
     }
 
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.FIELD)
+    public @interface Path {
+        String value() default "";
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.FIELD)
+    public @interface Skip {
+        boolean skipSave() default true;
+
+        boolean skipLoad() default true;
+    }
+
     /**
      * Save the config to disk
      *
@@ -144,19 +158,5 @@ public abstract class SimpleConfig {
     private boolean skipLoad(Field field) {
         if (!field.isAnnotationPresent(Skip.class)) return false;
         return field.getAnnotation(Skip.class).skipLoad();
-    }
-
-    @Retention(RetentionPolicy.RUNTIME)
-    @Target(ElementType.FIELD)
-    public @interface Path {
-        String value() default "";
-    }
-
-    @Retention(RetentionPolicy.RUNTIME)
-    @Target(ElementType.FIELD)
-    public @interface Skip {
-        boolean skipSave() default true;
-
-        boolean skipLoad() default true;
     }
 }

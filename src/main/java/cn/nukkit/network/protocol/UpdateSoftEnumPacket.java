@@ -11,6 +11,12 @@ public class UpdateSoftEnumPacket extends DataPacket {
     public String name = "";
     public Type type = Type.SET;
 
+    public enum Type {
+        ADD,
+        REMOVE,
+        SET
+    }
+
     @Override
     public byte pid() {
         return NETWORK_ID;
@@ -31,11 +37,5 @@ public class UpdateSoftEnumPacket extends DataPacket {
             this.putString(value);
         }
         this.putByte((byte) type.ordinal());
-    }
-
-    public enum Type {
-        ADD,
-        REMOVE,
-        SET
     }
 }

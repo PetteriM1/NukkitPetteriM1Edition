@@ -9,7 +9,7 @@ import cn.nukkit.math.NukkitMath;
 import cn.nukkit.math.NukkitRandom;
 
 public class PopulatorFallenTree extends Populator {
-    
+
     private ChunkManager level;
     private int type;
 

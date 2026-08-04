@@ -22,7 +22,7 @@ public class BlockLodestone extends BlockSolid {
 
     @Override
     public double getHardness() {
-        return 3.5;
+        return 3; // 3.5
     }
 
     @Override

@@ -2,10 +2,13 @@ package cn.nukkit.utils;
 
 import cn.nukkit.Player;
 import cn.nukkit.Server;
+import cn.nukkit.entity.mob.*;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.Tag;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntSet;
 
 import java.io.*;
 import java.lang.management.ManagementFactory;
@@ -16,6 +19,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.SplittableRandom;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
@@ -28,6 +32,16 @@ import java.util.zip.GZIPInputStream;
  * Nukkit Project
  */
 public class Utils {
+
+    /**
+     * A SplittableRandom you can use without having to create a new object every time.
+     */
+    @Deprecated
+    public static final SplittableRandom random = new SplittableRandom();
+    /**
+     * List of network ids of monsters. Currently used for example to check which entities will make players unable to sleep when nearby the bed.
+     */
+    public static final IntSet monstersList = new IntOpenHashSet(new int[]{EntityBlaze.NETWORK_ID, EntityCaveSpider.NETWORK_ID, EntityCreeper.NETWORK_ID, EntityDrowned.NETWORK_ID, EntityElderGuardian.NETWORK_ID, EntityEnderman.NETWORK_ID, EntityEndermite.NETWORK_ID, EntityEvoker.NETWORK_ID, EntityGhast.NETWORK_ID, EntityGuardian.NETWORK_ID, EntityHoglin.NETWORK_ID, EntityHusk.NETWORK_ID, EntityPiglinBrute.NETWORK_ID, EntityPillager.NETWORK_ID, EntityRavager.NETWORK_ID, EntityShulker.NETWORK_ID, EntitySilverfish.NETWORK_ID, EntitySkeleton.NETWORK_ID, EntitySlime.NETWORK_ID, EntitySpider.NETWORK_ID, EntityStray.NETWORK_ID, EntityVex.NETWORK_ID, EntityVindicator.NETWORK_ID, EntityWitch.NETWORK_ID, EntityWither.NETWORK_ID, EntityWitherSkeleton.NETWORK_ID, EntityZoglin.NETWORK_ID, EntityZombie.NETWORK_ID, EntityZombiePigman.NETWORK_ID, EntityZombieVillagerV1.NETWORK_ID, EntityZombieVillager.NETWORK_ID});
 
     public static void writeFile(String fileName, String content) throws IOException {
         writeFile(fileName, new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8)));
@@ -241,7 +255,7 @@ public class Utils {
         return newArray;
     }
 
-    public static <T,U,V> Map<U,V> getOrCreate(Map<T, Map<U, V>> map, T key) {
+    public static <T, U, V> Map<U, V> getOrCreate(Map<T, Map<U, V>> map, T key) {
         Map<U, V> existing = map.get(key);
         if (existing == null) {
             ConcurrentHashMap<U, V> toPut = new ConcurrentHashMap<>();
@@ -293,16 +307,16 @@ public class Utils {
             if (h == -1 || l == -1)
                 throw new IllegalArgumentException("contains illegal character for hexBinary: " + s);
 
-            out[(i >> 1)] = (byte)((h << 4) + l);
+            out[(i >> 1)] = (byte) ((h << 4) + l);
         }
 
         return out;
     }
 
-    private static int hexToBin( char ch ) {
-        if ('0' <= ch && ch <= '9')    return ch - '0';
-        if ('A' <= ch && ch <= 'F')    return ch - 'A' + 10;
-        if ('a' <= ch && ch <= 'f')    return ch - 'a' + 10;
+    private static int hexToBin(char ch) {
+        if ('0' <= ch && ch <= '9') return ch - '0';
+        if ('A' <= ch && ch <= 'F') return ch - 'A' + 10;
+        if ('a' <= ch && ch <= 'f') return ch - 'a' + 10;
         return -1;
     }
 
@@ -331,7 +345,7 @@ public class Utils {
         if (min == max) {
             return max;
         }
-        return min + ThreadLocalRandom.current().nextDouble() * (max-min);
+        return min + ThreadLocalRandom.current().nextDouble() * (max - min);
     }
 
     /**

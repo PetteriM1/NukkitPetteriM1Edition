@@ -30,7 +30,7 @@ public class BlockFlower extends BlockFlowable {
     public static final int TYPE_CORNFLOWER = 9;
     public static final int TYPE_LILY_OF_THE_VALLEY = 10;
 
-    private static final String[] NAMES = {
+    private static final String[] names = {
             "Poppy",
             "Blue Orchid",
             "Allium",
@@ -64,7 +64,7 @@ public class BlockFlower extends BlockFlowable {
 
     @Override
     public String getName() {
-        return NAMES[this.getDamage() & 0x0f];
+        return names[this.getDamage() & 0x0f];
     }
 
     @Override

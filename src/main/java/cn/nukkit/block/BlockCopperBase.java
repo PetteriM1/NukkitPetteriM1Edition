@@ -4,6 +4,8 @@ import cn.nukkit.Player;
 import cn.nukkit.block.properties.OxidizationLevel;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
+import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.utils.material.BlockType;
 
 public abstract class BlockCopperBase extends BlockSolid implements Oxidizable, Waxable {
 
@@ -94,5 +96,15 @@ public abstract class BlockCopperBase extends BlockSolid implements Oxidizable, 
             default:
                 return this.getId();
         }
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_17_0;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.IRON_BLOCK;
     }
 }

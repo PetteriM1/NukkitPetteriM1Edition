@@ -24,6 +24,11 @@ public abstract class BlockRedstoneComparator extends BlockRedstoneDiode {
         super(meta);
     }
 
+    public enum Mode {
+        COMPARE,
+        SUBTRACT
+    }
+
     @Override
     protected int getDelay() {
         return 2;
@@ -192,11 +197,6 @@ public abstract class BlockRedstoneComparator extends BlockRedstoneDiode {
     @Override
     public Item toItem() {
         return Item.get(Item.COMPARATOR);
-    }
-
-    public enum Mode {
-        COMPARE,
-        SUBTRACT
     }
 
     @Override

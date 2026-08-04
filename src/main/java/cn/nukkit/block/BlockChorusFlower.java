@@ -4,10 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.item.EntityFirework;
-import cn.nukkit.entity.projectile.EntityArrow;
-import cn.nukkit.entity.projectile.EntityEgg;
-import cn.nukkit.entity.projectile.EntitySnowball;
-import cn.nukkit.entity.projectile.EntityThrownTrident;
+import cn.nukkit.entity.projectile.*;
 import cn.nukkit.event.block.BlockGrowEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
@@ -47,7 +44,7 @@ public class BlockChorusFlower extends BlockTransparentMeta {
 
     @Override
     public double getResistance() {
-        return 0.4;
+        return 2;
     }
 
     @Override
@@ -205,7 +202,7 @@ public class BlockChorusFlower extends BlockTransparentMeta {
     @Override
     public void onEntityCollide(Entity entity) {
         int e = entity.getNetworkId();
-        if (e == EntityArrow.NETWORK_ID || e == EntityThrownTrident.NETWORK_ID || e == EntityFirework.NETWORK_ID || e == EntitySnowball.NETWORK_ID || e == EntityEgg.NETWORK_ID || e == 85 || e == 94 || e == 79 || e == 89) {
+        if (e == EntityArrow.NETWORK_ID || e == EntityThrownTrident.NETWORK_ID || e == EntityFirework.NETWORK_ID || e == EntitySnowball.NETWORK_ID || e == EntityEgg.NETWORK_ID || e == EntityGhastFireBall.NETWORK_ID || e == EntityBlazeFireBall.NETWORK_ID || e == EntityEnderCharge.NETWORK_ID || e == EntityWitherSkull.NETWORK_ID) {
             entity.close();
             this.getLevel().useBreakOn(this);
         }

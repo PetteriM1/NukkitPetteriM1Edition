@@ -7,6 +7,7 @@ public interface BlockPropertiesHelper extends BlockStorageContainer {
     int getId();
 
     int getDamage();
+
     void setDamage(int meta);
 
     @Override

@@ -22,7 +22,8 @@ public class JungleBigTreePopulator extends Populator {
         this(BlockSapling.JUNGLE);
     }
 
-    public JungleBigTreePopulator(int type) {}
+    public JungleBigTreePopulator(int type) {
+    }
 
     public void setRandomAmount(int randomAmount) {
         this.randomAmount = randomAmount;

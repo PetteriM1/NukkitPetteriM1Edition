@@ -13,21 +13,19 @@ import lombok.Setter;
 public class EnchantItemEvent extends InventoryEvent implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
-
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private Item oldItem;
     private Item newItem;
     private int xpCost;
     private Player enchanter;
-
     public EnchantItemEvent(EnchantInventory inventory, Item oldItem, Item newItem, int cost, Player p) {
         super(inventory);
         this.oldItem = oldItem;
         this.newItem = newItem;
         this.xpCost = cost;
         this.enchanter = p;
+    }
+
+    public static HandlerList getHandlers() {
+        return handlers;
     }
 }

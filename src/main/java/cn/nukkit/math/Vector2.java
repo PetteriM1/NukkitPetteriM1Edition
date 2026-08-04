@@ -132,6 +132,10 @@ public class Vector2 {
         return this.x * v.x + this.y * v.y;
     }
 
+    public double dot(double vx, double vy) {
+        return this.x * vx + this.y * vy;
+    }
+
     @Override
     public String toString() {
         return "Vector2(x=" + this.x + ",y=" + this.y + ')';

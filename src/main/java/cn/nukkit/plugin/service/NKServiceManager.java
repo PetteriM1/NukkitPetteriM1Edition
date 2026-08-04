@@ -125,7 +125,7 @@ public class NKServiceManager implements ServiceManager {
                 return ImmutableList.of();
             }
             for (RegisteredServiceProvider<?> provider : registered) {
-                builder.add((RegisteredServiceProvider<T>)provider);
+                builder.add((RegisteredServiceProvider<T>) provider);
             }
         }
         return builder.build();

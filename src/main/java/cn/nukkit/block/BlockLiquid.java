@@ -274,7 +274,7 @@ public abstract class BlockLiquid extends BlockTransparentMeta {
             if (decay >= 0) {
                 Block bottomBlock = this.level.getBlock(guessChunk, (int) this.x, (int) this.y - 1, (int) this.z, true);
                 this.flowIntoBlock(bottomBlock, decay | 0x08);
-                if (decay == 0 || !(this.usesWaterLogging()? bottomBlock.canWaterloggingFlowInto(): bottomBlock.canBeFlowedInto())) {
+                if (decay == 0 || !(this.usesWaterLogging() ? bottomBlock.canWaterloggingFlowInto() : bottomBlock.canBeFlowedInto())) {
                     int adjacentDecay;
                     if (decay >= 8) {
                         adjacentDecay = 1;
@@ -356,7 +356,7 @@ public abstract class BlockLiquid extends BlockTransparentMeta {
                 if (!this.canFlowInto(blockSide)) {
                     this.flowCostVisited.put(hash, BLOCKED);
                     status = BLOCKED;
-                } else if (usesWaterLogging()?
+                } else if (usesWaterLogging() ?
                         this.level.getBlock(x, blockY - 1, z).canWaterloggingFlowInto() :
                         this.level.getBlock(chunk, x, blockY - 1, z, true).canBeFlowedInto()) {
                     this.flowCostVisited.put(hash, CAN_FLOW_DOWN);
@@ -417,8 +417,8 @@ public abstract class BlockLiquid extends BlockTransparentMeta {
             Block block = this.level.getBlock(chunk, x, y, z, true);
             if (!this.canFlowInto(block)) {
                 this.flowCostVisited.put(Level.blockHash(x, y, z, this.level.getDimensionData()), BLOCKED);
-            } else if (usesWaterLogging()?
-                    this.level.getBlock(x, y - 1, z).canWaterloggingFlowInto():
+            } else if (usesWaterLogging() ?
+                    this.level.getBlock(x, y - 1, z).canWaterloggingFlowInto() :
                     this.level.getBlock(chunk, x, y - 1, z, true).canBeFlowedInto()) {
                 this.flowCostVisited.put(Level.blockHash(x, y, z, this.level.getDimensionData()), CAN_FLOW_DOWN);
                 flowCost[j] = maxCost = 0;

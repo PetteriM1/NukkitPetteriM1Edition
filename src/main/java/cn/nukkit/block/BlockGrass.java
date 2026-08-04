@@ -2,6 +2,7 @@ package cn.nukkit.block;
 
 import cn.nukkit.Player;
 import cn.nukkit.Server;
+import cn.nukkit.block.properties.BlockNotImplemented;
 import cn.nukkit.event.block.BlockSpreadEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
@@ -88,7 +89,7 @@ public class BlockGrass extends BlockDirt {
     public int onUpdate(int type) {
         if (type == Level.BLOCK_UPDATE_RANDOM) {
             Block up = this.up();
-            if (up instanceof BlockUnknown) {
+            if (up instanceof BlockUnknown || up instanceof BlockNotImplemented) {
                 return 0;
             }
 

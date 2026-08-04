@@ -3,7 +3,9 @@ package cn.nukkit.block;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemTool;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockMudBrickSlab extends BlockSlab {
 
@@ -23,6 +25,21 @@ public class BlockMudBrickSlab extends BlockSlab {
     @Override
     public String getSlabName() {
         return "Mud Brick Slab";
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_19_0;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.STONE_SLAB;
+    }
+
+    @Override
+    public int getAlternateMeta(int protocol) {
+        return BlockSlabStone.SANDSTONE;
     }
 
     @Override

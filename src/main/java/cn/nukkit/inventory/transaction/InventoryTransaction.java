@@ -6,11 +6,13 @@ import cn.nukkit.Server;
 import cn.nukkit.event.inventory.InventoryClickEvent;
 import cn.nukkit.event.inventory.InventoryTransactionEvent;
 import cn.nukkit.inventory.Inventory;
+import cn.nukkit.inventory.PlayerInventory;
 import cn.nukkit.inventory.transaction.action.InventoryAction;
 import cn.nukkit.inventory.transaction.action.SlotChangeAction;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemDye;
 import cn.nukkit.item.enchantment.Enchantment;
+import cn.nukkit.network.protocol.ProtocolInfo;
 
 import java.util.*;
 
@@ -71,24 +73,27 @@ public class InventoryTransaction {
 
     public void addAction(InventoryAction action) {
         if (this.invalid) {
-            if (Nukkit.DEBUG > 1) Server.getInstance().getLogger().debug("Failed to add " + action.getClass().getSimpleName() + " for " + source.getName() + ": previous run was marked as invalid");
+            if (Nukkit.DEBUG > 1)
+                Server.getInstance().getLogger().debug("Failed to add " + action.getClass().getSimpleName() + " for " + source.getName() + ": previous run was marked as invalid");
             return;
         }
 
         if (action instanceof SlotChangeAction) {
-            SlotChangeAction slotChangeAction = (SlotChangeAction)action;
+            SlotChangeAction slotChangeAction = (SlotChangeAction) action;
 
             Item targetItem = slotChangeAction.getTargetItemUnsafe();
             Item sourceItem = slotChangeAction.getSourceItemUnsafe();
             if (targetItem.getCount() > targetItem.getMaxStackSize() || sourceItem.getCount() > sourceItem.getMaxStackSize()) {
                 this.invalid = true;
-                if (Nukkit.DEBUG > 1) Server.getInstance().getLogger().debug("Failed to add SlotChangeAction for " + source.getName() + ": illegal item stack size");
+                if (Nukkit.DEBUG > 1)
+                    Server.getInstance().getLogger().debug("Failed to add SlotChangeAction for " + source.getName() + ": illegal item stack size");
                 return;
             }
 
             if (!slotChangeAction.getInventory().allowedToAdd(targetItem)) {
                 this.invalid = true;
-                if (Nukkit.DEBUG > 1) Server.getInstance().getLogger().debug("Failed to add SlotChangeAction for " + source.getName() + ": " + slotChangeAction.getInventory().getName() + " inventory doesn't allow item " + targetItem.getId());
+                if (Nukkit.DEBUG > 1)
+                    Server.getInstance().getLogger().debug("Failed to add SlotChangeAction for " + source.getName() + ": " + slotChangeAction.getInventory().getName() + " inventory doesn't allow item " + targetItem.getId());
                 return;
             }
 
@@ -97,7 +102,8 @@ public class InventoryTransaction {
                 if (slot == 36 || slot == 37 || slot == 38 || slot == 39) {
                     if (sourceItem.hasEnchantment(Enchantment.ID_BINDING_CURSE)) {
                         this.invalid = true;
-                        if (Nukkit.DEBUG > 1) Server.getInstance().getLogger().debug("Failed to add SlotChangeAction for " + source.getName() + ": armor has binding curse");
+                        if (Nukkit.DEBUG > 1)
+                            Server.getInstance().getLogger().debug("Failed to add SlotChangeAction for " + source.getName() + ": armor has binding curse");
                         return;
                     }
                 }
@@ -191,15 +197,32 @@ public class InventoryTransaction {
         }
 
         boolean valid = needItems.isEmpty() && haveItems.isEmpty();
-        if (!valid && Nukkit.DEBUG > 1) source.getServer().getLogger().debug("!matchItems " + needItems + " / " + haveItems);
+        if (!valid && Nukkit.DEBUG > 1)
+            source.getServer().getLogger().debug("!matchItems " + needItems + " / " + haveItems);
         return valid;
     }
 
     protected void sendInventories() {
-        for (InventoryAction action : this.actions) {
-            if (action instanceof SlotChangeAction) {
-                SlotChangeAction sca = (SlotChangeAction) action;
-                sca.getInventory().sendSlot(sca.getSlot(), this.source);
+        if (this.getSource().protocol >= ProtocolInfo.v1_16_0) {
+            for (InventoryAction action : this.actions) {
+                if (action instanceof SlotChangeAction) {
+                    SlotChangeAction sca = (SlotChangeAction) action;
+
+                    Inventory inv = sca.getInventory();
+                    if (inv instanceof PlayerInventory) {
+                        ((PlayerInventory) inv).needSendSlot.add(sca.getSlot());
+                    } else {
+                        inv.sendSlot(sca.getSlot(), this.source);
+                    }
+                }
+            }
+        } else {
+            for (Inventory inventory : this.inventories) {
+                if (inventory instanceof PlayerInventory) {
+                    this.source.setNeedSendInventory(true);
+                } else {
+                    inventory.sendContents(this.source);
+                }
             }
         }
     }

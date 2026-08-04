@@ -3,6 +3,7 @@ package cn.nukkit.inventory;
 
 import cn.nukkit.blockentity.BlockEntityBrewingStand;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemID;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 
@@ -10,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BrewingInventory extends ContainerInventory {
-  
+
     public BrewingInventory(BlockEntityBrewingStand brewingStand) {
         super(brewingStand, InventoryType.BREWING_STAND);
     }
@@ -107,5 +108,10 @@ public class BrewingInventory extends ContainerInventory {
         }
 
         return itemSlots.toArray(new Item[0]);
+    }
+
+    @Override
+    public boolean allowedToAdd(Item item) {
+        return item.getId() == 0 || !(item instanceof ItemBlock);
     }
 }

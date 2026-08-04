@@ -39,7 +39,7 @@ public class BlockMagma extends BlockSolid {
 
     @Override
     public double getResistance() {
-        return 0.5;
+        return 2.5;
     }
 
     @Override
@@ -85,7 +85,7 @@ public class BlockMagma extends BlockSolid {
     public boolean canHarvestWithHand() {
         return false;
     }
-    
+
     @Override
     public boolean hasEntityCollision() {
         return true;

@@ -5,6 +5,7 @@ import cn.nukkit.Server;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.data.CommandParamType;
 import cn.nukkit.command.data.CommandParameter;
+import cn.nukkit.entity.BaseEntity;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.lang.TranslationContainer;
 import cn.nukkit.level.Position;
@@ -68,6 +69,9 @@ public class SummonCommand extends VanillaCommand {
             Position pos = playerThatSpawns.floor().add(0.5, 0, 0.5);
             Entity ent;
             if ((ent = Entity.createEntity(mob, pos)) != null) {
+                if (ent instanceof BaseEntity) {
+                    ((BaseEntity) ent).setPersistent(true);
+                }
                 ent.spawnToAll();
                 sender.sendMessage(new TranslationContainer("%commands.summon.success"));
             } else {

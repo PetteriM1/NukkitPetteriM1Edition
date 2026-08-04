@@ -35,6 +35,7 @@ public interface ChunkManager {
     void setBlockAt(int x, int y, int z, int id, int data);
 
     boolean setBlockAtLayer(int x, int y, int z, BlockLayer layer, int id);
+
     boolean setBlockAtLayer(int x, int y, int z, BlockLayer layer, int id, int data);
 
     default int getBlockDataAt(int x, int y, int z) {

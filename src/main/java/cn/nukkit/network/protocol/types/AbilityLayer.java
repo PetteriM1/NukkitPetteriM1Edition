@@ -6,7 +6,7 @@ import java.util.EnumSet;
 import java.util.Set;
 
 @Data
-public class AbilityLayer {
+public class AbilityLayer { // Note hardcoded AbilityLayer in AddPlayerPacket
 
     private Type layerType;
     private final Set<PlayerAbility> abilitiesSet = EnumSet.noneOf(PlayerAbility.class);
@@ -20,7 +20,13 @@ public class AbilityLayer {
         BASE,
         SPECTATOR,
         COMMANDS,
+        /**
+         * @since v557
+         */
         EDITOR,
+        /**
+         * @since v705
+         */
         LOADING_SCREEN
     }
 }

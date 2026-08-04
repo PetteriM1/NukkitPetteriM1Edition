@@ -47,7 +47,7 @@ public class BlockSeaLantern extends BlockTransparent {
     public BlockColor getColor() {
         return BlockColor.QUARTZ_BLOCK_COLOR;
     }
-    
+
     @Override
     public boolean canSilkTouch() {
         return true;

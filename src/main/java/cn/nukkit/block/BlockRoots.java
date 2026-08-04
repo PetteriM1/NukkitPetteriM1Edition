@@ -6,7 +6,7 @@ import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
 
 public abstract class BlockRoots extends BlockFlowable {
-    
+
     protected BlockRoots() {
         super(0);
     }
@@ -28,7 +28,7 @@ public abstract class BlockRoots extends BlockFlowable {
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
         return this.isSupportValid() && super.place(item, block, target, face, fx, fy, fz, player);
     }
-    
+
     protected boolean isSupportValid() {
         switch (this.down().getId()) {
             case BlockID.GRASS:

@@ -1,5 +1,7 @@
 package cn.nukkit.item;
 
+import cn.nukkit.network.protocol.ProtocolInfo;
+
 public class ItemHelmetNetherite extends ItemArmor {
 
     public ItemHelmetNetherite() {
@@ -37,5 +39,10 @@ public class ItemHelmetNetherite extends ItemArmor {
     @Override
     public int getToughness() {
         return 3;
+    }
+
+    @Override
+    public boolean isSupportedOn(int protocol) {
+        return protocol >= ProtocolInfo.v1_16_0;
     }
 }

@@ -2,6 +2,8 @@ package cn.nukkit.block;
 
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemID;
+import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockMangroveSignStanding extends BlockSignPost {
 
@@ -21,6 +23,16 @@ public class BlockMangroveSignStanding extends BlockSignPost {
     @Override
     public int getId() {
         return MANGROVE_STANDING_SIGN;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_17_0;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.SIGN_POST;
     }
 
     @Override

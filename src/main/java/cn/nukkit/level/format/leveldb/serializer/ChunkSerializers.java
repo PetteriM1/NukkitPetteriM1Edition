@@ -6,9 +6,8 @@ import org.iq80.leveldb.DB;
 import org.iq80.leveldb.WriteBatch;
 
 public class ChunkSerializers {
-    /*private static final IntObjectMap<ChunkSerializer> SERIALIZERS = new IntObjectHashMap<>();
 
-    static {
+    /*static {
         // SERIALIZERS.put(0, ChunkSerializerV1.INSTANCE);
         // SERIALIZERS.put(1, ChunkSerializerV1.INSTANCE);
         // SERIALIZERS.put(2, ChunkSerializerV1.INSTANCE);

@@ -29,6 +29,23 @@ public interface CompressionProvider {
         }
     };
 
+    CompressionProvider ZLIB = new CompressionProvider() {
+        @Override
+        public byte[] compress(BinaryStream packet, int level) throws Exception {
+            return Zlib.deflatePre16Packet(packet.getBuffer(), level);
+        }
+
+        @Override
+        public byte[] decompress(byte[] compressed) throws Exception {
+            return Zlib.inflate(compressed, 6291456);
+        }
+
+        @Override
+        public byte[] decompress(byte[] compressed, int maxSize) throws Exception {
+            return Zlib.inflate(compressed, maxSize);
+        }
+    };
+
     CompressionProvider ZLIB_RAW = new CompressionProvider() {
         @Override
         public byte[] compress(BinaryStream packet, int level) throws Exception {
@@ -75,17 +92,18 @@ public interface CompressionProvider {
 
 
     byte[] compress(BinaryStream packet, int level) throws Exception;
+
     byte[] decompress(byte[] compressed) throws Exception;
 
     default byte[] decompress(byte[] compressed, int maxSize) throws Exception {
         return this.decompress(compressed);
     }
 
-    static CompressionProvider from(PacketCompressionAlgorithm algorithm) {
+    static CompressionProvider from(PacketCompressionAlgorithm algorithm, int raknetVersion) {
         if (algorithm == null) {
             return NONE;
         } else if (algorithm == PacketCompressionAlgorithm.ZLIB) {
-            return ZLIB_RAW;
+            return raknetVersion < 10 ? ZLIB : ZLIB_RAW;
         } else if (algorithm == PacketCompressionAlgorithm.SNAPPY) {
             return SNAPPY;
         }

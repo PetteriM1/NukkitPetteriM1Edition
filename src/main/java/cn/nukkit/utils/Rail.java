@@ -21,17 +21,6 @@ import static cn.nukkit.utils.Rail.Orientation.State.*;
 public final class Rail {
 
     /**
-     * Check if the block is a rail block
-     *
-     * @param block block
-     * @return is rail block
-     */
-    public static boolean isRailBlock(Block block) {
-        Objects.requireNonNull(block, "Rail block predicate can not accept null block");
-        return isRailBlock(block.getId());
-    }
-
-    /**
      * Rail orientation enum
      */
     public enum Orientation {
@@ -57,6 +46,21 @@ public final class Rail {
             this.state = state;
             this.connectingDirections = Arrays.asList(from, to);
             this.ascendingDirection = ascendingDirection;
+        }
+        private static final Orientation[] CURVED_O = new Orientation[]{CURVED_SOUTH_EAST, CURVED_SOUTH_WEST, CURVED_NORTH_WEST, CURVED_NORTH_EAST};
+        private static final Orientation[] STRAIGHT_OR_CURVED_O = new Orientation[]{STRAIGHT_NORTH_SOUTH, STRAIGHT_EAST_WEST, CURVED_SOUTH_EAST, CURVED_SOUTH_WEST, CURVED_NORTH_WEST, CURVED_NORTH_EAST};
+
+        /**
+         * Rail orientation state enum
+         */
+        public enum State {
+            STRAIGHT, ASCENDING, CURVED
+        }
+
+        static {
+            for (Orientation o : values()) {
+                META_LOOKUP[o.meta] = o;
+            }
         }
 
         public static Orientation byMetadata(int meta) {
@@ -93,8 +97,6 @@ public final class Rail {
             return ASCENDING_EAST;
         }
 
-        private static final Orientation[] CURVED_O = new Orientation[]{CURVED_SOUTH_EAST, CURVED_SOUTH_WEST, CURVED_NORTH_WEST, CURVED_NORTH_EAST};
-
         public static Orientation curved(BlockFace f1, BlockFace f2) {
             for (Orientation o : CURVED_O) {
                 if (o.connectingDirections.contains(f1) && o.connectingDirections.contains(f2)) {
@@ -103,8 +105,6 @@ public final class Rail {
             }
             return CURVED_SOUTH_EAST;
         }
-
-        private static final Orientation[] STRAIGHT_OR_CURVED_O = new Orientation[]{STRAIGHT_NORTH_SOUTH, STRAIGHT_EAST_WEST, CURVED_SOUTH_EAST, CURVED_SOUTH_WEST, CURVED_NORTH_WEST, CURVED_NORTH_EAST};
 
         public static Orientation straightOrCurved(BlockFace f1, BlockFace f2) {
             for (Orientation o : STRAIGHT_OR_CURVED_O) {
@@ -131,13 +131,6 @@ public final class Rail {
             return Optional.ofNullable(ascendingDirection);
         }
 
-        /**
-         * Rail orientation state enum
-         */
-        public enum State {
-            STRAIGHT, ASCENDING, CURVED
-        }
-
         public boolean isStraight() {
             return state == STRAIGHT;
         }
@@ -149,12 +142,21 @@ public final class Rail {
         public boolean isCurved() {
             return state == CURVED;
         }
+    }
 
-        static {
-            for (Orientation o : values()) {
-                META_LOOKUP[o.meta] = o;
-            }
-        }
+    private Rail() {
+        //no instance
+    }
+
+    /**
+     * Check if the block is a rail block
+     *
+     * @param block block
+     * @return is rail block
+     */
+    public static boolean isRailBlock(Block block) {
+        Objects.requireNonNull(block, "Rail block predicate can not accept null block");
+        return isRailBlock(block.getId());
     }
 
     /**
@@ -173,9 +175,5 @@ public final class Rail {
             default:
                 return false;
         }
-    }
-
-    private Rail() {
-        //no instance
     }
 }

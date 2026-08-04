@@ -9,7 +9,7 @@ public class BlockDeepslateChiseled extends BlockDeepslateCobbled {
     public int getId() {
         return CHISELED_DEEPSLATE;
     }
-    
+
     @Override
     public String getName() {
         return "Chiseled Deepslate";

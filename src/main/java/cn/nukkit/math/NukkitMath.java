@@ -7,11 +7,15 @@ package cn.nukkit.math;
 public class NukkitMath {
 
     public static int floorDouble(double n) {
+        if (n <= Integer.MIN_VALUE || n >= Integer.MAX_VALUE)
+            throw new IllegalArgumentException("double to int overflow: " + n);
         int i = (int) n;
         return n >= i ? i : i - 1;
     }
 
     public static int ceilDouble(double n) {
+        if (n <= Integer.MIN_VALUE || n >= Integer.MAX_VALUE)
+            throw new IllegalArgumentException("double to int overflow: " + n);
         int i = (int) (n + 1);
         return n >= i ? i : i - 1;
     }
@@ -63,6 +67,35 @@ public class NukkitMath {
         diffZ = Math.abs(diffZ);
 
         return Math.max(diffX, diffZ);
+    }
+
+    public static double sign(double d) {
+        if (d > 0) {
+            return 1;
+        }
+
+        if (d < 0) {
+            return -1;
+        }
+
+        return 0;
+    }
+
+    public static double boundary(double start, double distance) {
+        if (distance == 0) {
+            return Double.POSITIVE_INFINITY;
+        }
+
+        if (distance < 0) {
+            start = -start;
+            distance = -distance;
+
+            if (Math.floor(start) == start) {
+                return 0;
+            }
+        }
+
+        return (1 - (start - Math.floor(start))) / distance;
     }
 
     public static double lerp(double a, double b, double t) {

@@ -13,5 +13,5 @@ public enum RecipeType {
     REPAIR,
     CAMPFIRE,
     CAMPFIRE_DATA,
-    SMITHING_TRANSFORM // not the correct id, map to 8 on 1.19.60+
+    SMITHING_TRANSFORM // not the correct id, map to 8 on 1.19.60+ or 0
 }

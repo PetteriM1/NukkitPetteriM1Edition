@@ -7,6 +7,8 @@ import cn.nukkit.item.ItemID;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
+import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockCandle extends BlockTransparentMeta {
 
@@ -29,13 +31,23 @@ public class BlockCandle extends BlockTransparentMeta {
     }
 
     @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_17_0;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.TORCH;
+    }
+
+    @Override
     public double getHardness() {
         return 0;
     }
 
     @Override
     public double getResistance() {
-        return 0.1;
+        return 2.5;
     }
 
     @Override

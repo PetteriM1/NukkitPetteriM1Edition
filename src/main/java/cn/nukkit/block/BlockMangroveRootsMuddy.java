@@ -6,6 +6,7 @@ import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockMangroveRootsMuddy extends BlockSolid {
 
@@ -22,6 +23,11 @@ public class BlockMangroveRootsMuddy extends BlockSolid {
     @Override
     public int getToolType() {
         return ItemTool.TYPE_SHOVEL;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.DIRT;
     }
 
     @Override

@@ -106,7 +106,7 @@ public class BlockEntityConduit extends BlockEntitySpawnable {
         Vector2 conduit = new Vector2(x, z);
         int radiusSquared = radius * radius;
 
-        level.getPlayers().values().stream()
+        level.getPlayersList().stream()
                 .filter(this::canAffect)
                 .filter(p -> conduit.distanceSquared(p.x, p.z) <= radiusSquared)
                 .forEach(p -> p.addEffect(Effect.getEffect(Effect.CONDUIT_POWER).setDuration(260).setAmbient(true), EntityPotionEffectEvent.Cause.CONDUIT));

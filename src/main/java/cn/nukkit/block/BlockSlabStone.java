@@ -30,13 +30,7 @@ public class BlockSlabStone extends BlockSlab {
     public BlockSlabStone(int meta, int doubleSlab) {
         super(meta, doubleSlab);
     }
-
-    @Override
-    public int getId() {
-        return STONE_SLAB;
-    }
-
-    private static final String[] NAMES = {
+    private static final String[] names = {
             "Stone",
             "Sandstone",
             "Oak",
@@ -48,8 +42,13 @@ public class BlockSlabStone extends BlockSlab {
     };
 
     @Override
+    public int getId() {
+        return STONE_SLAB;
+    }
+
+    @Override
     public String getName() {
-        return ((this.getDamage() & 0x08) > 0 ? "Upper " : "") + NAMES[this.getDamage() & 0x07] + " Slab";
+        return ((this.getDamage() & 0x08) > 0 ? "Upper " : "") + names[this.getDamage() & 0x07] + " Slab";
     }
 
     @Override

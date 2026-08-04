@@ -34,6 +34,7 @@ public class BlockSlabBlackstone extends BlockSlab {
     public String getName() {
         return "Blackstone Slab";
     }
+
     @Override
     public int getToolType() {
         return ItemTool.TYPE_PICKAXE;

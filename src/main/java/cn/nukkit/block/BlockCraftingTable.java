@@ -55,15 +55,16 @@ public class BlockCraftingTable extends BlockSolid {
                 }
                 player.craftingType = Player.CRAFTING_BIG;
                 player.setCraftingGrid(player.getUIInventory().getBigCraftingGrid());
-
-                ContainerOpenPacket pk = new ContainerOpenPacket();
-                pk.windowId = -1;
-                pk.type = 1;
-                pk.x = (int) x;
-                pk.y = (int) y;
-                pk.z = (int) z;
-                pk.entityId = player.getId();
-                player.dataPacket(pk);
+                if (player.protocol >= 407) {
+                    ContainerOpenPacket pk = new ContainerOpenPacket();
+                    pk.windowId = -1;
+                    pk.type = 1;
+                    pk.x = (int) x;
+                    pk.y = (int) y;
+                    pk.z = (int) z;
+                    pk.entityId = player.getId();
+                    player.dataPacket(pk);
+                }
             }
         }
         return true;

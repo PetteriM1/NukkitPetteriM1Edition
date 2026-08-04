@@ -1,5 +1,7 @@
 package cn.nukkit.item;
 
+import cn.nukkit.network.protocol.ProtocolInfo;
+
 public class ItemRecord5 extends ItemRecord {
 
     public ItemRecord5() {
@@ -22,5 +24,10 @@ public class ItemRecord5 extends ItemRecord {
     @Override
     public String getDiscName() {
         return "Samuel Åberg - 5";
+    }
+
+    @Override
+    public boolean isSupportedOn(int protocol) {
+        return protocol >= ProtocolInfo.v1_19_0_29;
     }
 }

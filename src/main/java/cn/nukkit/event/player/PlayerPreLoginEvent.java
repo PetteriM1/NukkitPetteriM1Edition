@@ -9,16 +9,15 @@ import cn.nukkit.event.HandlerList;
  */
 public class PlayerPreLoginEvent extends PlayerEvent implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
-
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     protected String kickMessage;
 
     public PlayerPreLoginEvent(Player player, String kickMessage) {
         this.player = player;
         this.kickMessage = kickMessage;
+    }
+
+    public static HandlerList getHandlers() {
+        return handlers;
     }
 
     public void setKickMessage(String kickMessage) {

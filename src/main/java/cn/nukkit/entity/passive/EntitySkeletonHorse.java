@@ -1,5 +1,6 @@
 package cn.nukkit.entity.passive;
 
+import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.EntitySmite;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
@@ -45,6 +46,16 @@ public class EntitySkeletonHorse extends EntityHorseBase implements EntitySmite 
     }
 
     @Override
+    public boolean isFeedItem(Item item) {
+        return false;
+    }
+
+    @Override
+    public boolean targetOption(EntityCreature creature, double distance) {
+        return false;
+    }
+
+    @Override
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
 
@@ -56,11 +67,20 @@ public class EntitySkeletonHorse extends EntityHorseBase implements EntitySmite 
             drops.add(Item.get(Item.BONE, 0, Utils.rand(0, 1)));
         }
 
+        if (this.isSaddled()) {
+            drops.add(Item.get(Item.SADDLE, 0, 1));
+        }
+
         return drops.toArray(new Item[0]);
     }
 
     @Override
     public String getName() {
         return this.hasCustomName() ? this.getNameTag() : "Skeleton Horse";
+    }
+
+    @Override
+    public boolean canDespawn() {
+        return false; // TODO: trap only
     }
 }

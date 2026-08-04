@@ -22,7 +22,7 @@ public class MoveEntityAbsolutePacket extends DataPacket {
     public boolean onGround;
     public boolean teleport;
     public boolean forceMoveLocalEntity;
-    public boolean forceCompletion;
+    public boolean forceCompletion; // Since 975
 
     @Override
     public byte pid() {
@@ -36,14 +36,16 @@ public class MoveEntityAbsolutePacket extends DataPacket {
         onGround = (flags & 0x01) != 0;
         teleport = (flags & 0x02) != 0;
         forceMoveLocalEntity = (flags & 0x04) != 0;
-        forceCompletion = (flags & 0x08) != 0;
+        if (protocol >= ProtocolInfo.v1_26_20_26) {
+            forceCompletion = (flags & 0x08) != 0;
+        }
         Vector3f v = this.getVector3f();
         this.x = v.x;
         this.y = v.y;
         this.z = v.z;
-        this.pitch = this.getByte() * (360d / 256d);
-        this.headYaw = this.getByte() * (360d / 256d);
-        this.yaw = this.getByte() * (360d / 256d);
+        this.pitch = this.getByte() * 1.40625;
+        this.headYaw = this.getByte() * 1.40625;
+        this.yaw = this.getByte() * 1.40625;
     }
 
     @Override
@@ -60,13 +62,13 @@ public class MoveEntityAbsolutePacket extends DataPacket {
         if (forceMoveLocalEntity) {
             flags |= 0x04;
         }
-        if (forceCompletion) {
+        if (forceCompletion && protocol >= ProtocolInfo.v1_26_20_26) {
             flags |= 0x08;
         }
         this.putByte(flags);
         this.putVector3f((float) this.x, (float) this.y, (float) this.z);
-        this.putByte((byte) (this.pitch / (360d / 256d)));
-        this.putByte((byte) (this.headYaw / (360d / 256d)));
-        this.putByte((byte) (this.yaw / (360d / 256d)));
+        this.putByte((byte) (this.pitch / 1.40625));
+        this.putByte((byte) (this.headYaw / 1.40625));
+        this.putByte((byte) (this.yaw / 1.40625));
     }
 }

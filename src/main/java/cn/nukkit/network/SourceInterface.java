@@ -13,19 +13,16 @@ import java.net.InetSocketAddress;
  */
 public interface SourceInterface {
 
-    @Deprecated
     default Integer putPacket(Player player, DataPacket packet) {
         player.getNetworkSession().sendPacket(packet);
         return null;
     }
 
-    @Deprecated
     default Integer putPacket(Player player, DataPacket packet, boolean needACK) {
         player.getNetworkSession().sendPacket(packet);
         return null;
     }
 
-    @Deprecated
     default Integer putPacket(Player player, DataPacket packet, boolean needACK, boolean immediate) {
         player.getNetworkSession().sendPacket(packet);
         return null;

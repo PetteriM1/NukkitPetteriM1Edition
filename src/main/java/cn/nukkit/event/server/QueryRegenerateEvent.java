@@ -1,5 +1,6 @@
 package cn.nukkit.event.server;
 
+import cn.nukkit.Nukkit;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.event.HandlerList;
@@ -18,11 +19,6 @@ import java.util.*;
 public class QueryRegenerateEvent extends ServerEvent {
 
     private static final HandlerList handlers = new HandlerList();
-
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private int timeout;
     private String serverName;
     private boolean listPlugins;
@@ -36,7 +32,6 @@ public class QueryRegenerateEvent extends ServerEvent {
     private final String whitelist;
     private final int port;
     private final String ip;
-
     public QueryRegenerateEvent(Server server) {
         this(server, 5);
     }
@@ -46,7 +41,7 @@ public class QueryRegenerateEvent extends ServerEvent {
         this.serverName = server.getMotd();
         this.listPlugins = server.queryPlugins;
         this.plugins = server.getPluginManager().getPlugins().values().toArray(new Plugin[0]);
-        this.players = server.getOnlinePlayers().values().toArray(new Player[0]);
+        this.players = server.getOnlinePlayersList().toArray(new Player[0]);
         this.gameType = server.getGamemode() == 1 ? "CMP" : "SMP";
         this.version = server.getVersion();
         this.map = server.getDefaultLevel() == null ? "unknown" : server.getDefaultLevel().getName();
@@ -55,6 +50,10 @@ public class QueryRegenerateEvent extends ServerEvent {
         this.whitelist = server.hasWhitelist() ? "on" : "off";
         this.port = server.getPort();
         this.ip = server.getIp();
+    }
+
+    public static HandlerList getHandlers() {
+        return handlers;
     }
 
     public int getTimeout() {
@@ -123,7 +122,7 @@ public class QueryRegenerateEvent extends ServerEvent {
 
     public byte[] getLongQuery() {
         ByteBuffer query = ByteBuffer.allocate(65536);
-        StringBuilder plist = new StringBuilder("Nukkit");
+        StringBuilder plist = new StringBuilder(Nukkit.NUKKIT_PM1E);
         if (this.listPlugins && this.plugins.length > 0) {
             plist.append(':');
             for (Plugin p : this.plugins) {
@@ -143,7 +142,7 @@ public class QueryRegenerateEvent extends ServerEvent {
         KVdata.put("gametype", this.gameType);
         KVdata.put("game_id", "MINECRAFTPE");
         KVdata.put("version", this.version);
-        KVdata.put("server_engine", "Nukkit");
+        KVdata.put("server_engine", Nukkit.NUKKIT_PM1E);
         KVdata.put("plugins", plist.toString());
         KVdata.put("map", this.map);
         KVdata.put("numplayers", String.valueOf(this.numPlayers));

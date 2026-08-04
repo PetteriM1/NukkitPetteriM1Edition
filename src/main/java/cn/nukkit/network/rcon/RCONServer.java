@@ -159,11 +159,17 @@ public class RCONServer extends Thread {
                 if (new String(packet.getPayload(), StandardCharsets.UTF_8).equals(this.password)) {
                     this.rconSessions.add(channel);
                     this.send(channel, new RCONPacket(packet.getId(), SERVERDATA_AUTH_RESPONSE, payload));
-                    try { Server.getInstance().getLogger().info("[RCON] " + channel.getRemoteAddress().toString() + " connected"); } catch (Exception ignored) {}
+                    try {
+                        Server.getInstance().getLogger().info("[RCON] " + channel.getRemoteAddress().toString() + " connected");
+                    } catch (Exception ignored) {
+                    }
                     return;
                 }
 
-                try { Server.getInstance().getLogger().info("[RCON] Authentication failed for " + channel.getRemoteAddress().toString()); } catch (Exception ignored) {}
+                try {
+                    Server.getInstance().getLogger().info("[RCON] Authentication failed for " + channel.getRemoteAddress().toString());
+                } catch (Exception ignored) {
+                }
                 this.send(channel, new RCONPacket(-1, SERVERDATA_AUTH_RESPONSE, payload));
                 break;
             case SERVERDATA_EXECCOMMAND:

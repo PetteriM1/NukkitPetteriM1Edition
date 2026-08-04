@@ -343,7 +343,7 @@ public abstract class BlockDoor extends BlockTransparentMeta implements Faceable
 
     public boolean isRightHinged() {
         if (isTop()) {
-            return (this.getDamage() & DOOR_HINGE_BIT ) > 0;
+            return (this.getDamage() & DOOR_HINGE_BIT) > 0;
         }
         return (this.up().getDamage() & DOOR_HINGE_BIT) > 0;
     }

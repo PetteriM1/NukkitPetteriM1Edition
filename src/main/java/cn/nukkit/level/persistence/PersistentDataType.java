@@ -15,14 +15,6 @@ public interface PersistentDataType<T> {
     PersistentDataType<Float> FLOAT = new PrimitiveDataType<>(Float.class, FloatTag.class, val -> new FloatTag(null, val), FloatTag::parseValue);
     PersistentDataType<String> STRING = new PrimitiveDataType<>(String.class, StringTag.class, val -> new StringTag(null, val), StringTag::parseValue);
 
-    Class<T> getImplementation();
-
-    Tag serialize(T value);
-
-    T deserialize(Tag tag);
-
-    boolean validate(Tag tag);
-
     @Getter
     @AllArgsConstructor
     class PrimitiveDataType<T, I extends Tag> implements PersistentDataType<T> {
@@ -46,4 +38,12 @@ public interface PersistentDataType<T> {
             return this.tagClass.isAssignableFrom(tag.getClass());
         }
     }
+
+    Class<T> getImplementation();
+
+    Tag serialize(T value);
+
+    T deserialize(Tag tag);
+
+    boolean validate(Tag tag);
 }

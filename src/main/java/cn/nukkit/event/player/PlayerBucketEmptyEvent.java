@@ -12,10 +12,6 @@ public class PlayerBucketEmptyEvent extends PlayerBucketEvent {
 
     private boolean mobSpawningAllowed;
 
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     public PlayerBucketEmptyEvent(Player who, Block blockClicked, BlockFace blockFace, Item bucket, Item itemInHand) {
         this(who, blockClicked, blockFace, bucket, itemInHand, true);
     }
@@ -23,6 +19,10 @@ public class PlayerBucketEmptyEvent extends PlayerBucketEvent {
     public PlayerBucketEmptyEvent(Player who, Block blockClicked, BlockFace blockFace, Item bucket, Item itemInHand, boolean mobSpawningAllowed) {
         super(who, blockClicked, blockFace, bucket, itemInHand);
         this.mobSpawningAllowed = mobSpawningAllowed;
+    }
+
+    public static HandlerList getHandlers() {
+        return handlers;
     }
 
     /**

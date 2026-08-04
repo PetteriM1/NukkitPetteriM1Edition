@@ -1,5 +1,7 @@
 package cn.nukkit.item;
 
+import cn.nukkit.network.protocol.ProtocolInfo;
+
 public class ItemRecordRelic extends ItemRecord {
 
     public ItemRecordRelic() {
@@ -22,5 +24,10 @@ public class ItemRecordRelic extends ItemRecord {
     @Override
     public String getDiscName() {
         return "Aaron Cherof - Relic";
+    }
+
+    @Override
+    public boolean isSupportedOn(int protocol) {
+        return protocol >= ProtocolInfo.v1_20_0_23;
     }
 }

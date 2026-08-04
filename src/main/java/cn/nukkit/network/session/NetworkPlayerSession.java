@@ -10,6 +10,7 @@ import javax.crypto.SecretKey;
 public interface NetworkPlayerSession {
 
     void sendPacket(DataPacket packet);
+
     void sendImmediatePacket(DataPacket packet, Runnable callback);
 
     void disconnect(String reason);
@@ -17,6 +18,7 @@ public interface NetworkPlayerSession {
     Player getPlayer();
 
     void setCompression(CompressionProvider compression);
+
     CompressionProvider getCompression();
 
     default void setEncryption(SecretKey encryptionKey, Cipher encryptionCipher, Cipher decryptionCipher) {
@@ -25,5 +27,9 @@ public interface NetworkPlayerSession {
 
     default long getPing() {
         return -1;
+    }
+
+    default void flush() {
+
     }
 }

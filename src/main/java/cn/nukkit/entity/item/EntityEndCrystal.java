@@ -18,6 +18,10 @@ public class EntityEndCrystal extends Entity implements EntityExplosive {
     private boolean detonated = false;
     private String nameTag;
 
+    public EntityEndCrystal(FullChunk chunk, CompoundTag nbt) {
+        super(chunk, nbt);
+    }
+
     @Override
     public float getLength() {
         return 2f;
@@ -36,10 +40,6 @@ public class EntityEndCrystal extends Entity implements EntityExplosive {
     @Override
     public int getNetworkId() {
         return NETWORK_ID;
-    }
-
-    public EntityEndCrystal(FullChunk chunk, CompoundTag nbt) {
-        super(chunk, nbt);
     }
 
     @Override
@@ -99,7 +99,7 @@ public class EntityEndCrystal extends Entity implements EntityExplosive {
     @Override
     public void explode() {
         this.close();
-        if (!this.detonated && this.level.getGameRules().getBoolean(GameRule.MOB_GRIEFING)) {
+        if (!this.detonated && ((level.getServer().suomiCraftPEMode() && this.level.getGameRules().getBoolean(GameRule.TNT_EXPLODES)) || (!this.level.getServer().suomiCraftPEMode() && this.level.getGameRules().getBoolean(GameRule.MOB_GRIEFING)))) {
             EntityExplosionPrimeEvent ev = new EntityExplosionPrimeEvent(this, 6);
             this.server.getPluginManager().callEvent(ev);
             if (ev.isCancelled()) {
@@ -126,6 +126,15 @@ public class EntityEndCrystal extends Entity implements EntityExplosive {
     @Override
     public String getName() {
         return this.hasCustomName() ? this.getNameTag() : "End Crystal";
+    }
+
+    @Override
+    public boolean goToNewChunk(FullChunk chunk) {
+        if (chunk.getEntities().size() > 200) {
+            this.close();
+            return false;
+        }
+        return true;
     }
 
     @Override

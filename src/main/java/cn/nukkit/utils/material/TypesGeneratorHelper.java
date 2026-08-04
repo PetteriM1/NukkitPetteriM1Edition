@@ -103,7 +103,7 @@ public class TypesGeneratorHelper {
         return joiner.toString();
     }
 
-    private static void saveFile(String buffer, String path)  {
+    private static void saveFile(String buffer, String path) {
         try {
             Files.write(Paths.get(path), buffer.getBytes(StandardCharsets.UTF_8),
                     StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
@@ -120,4 +120,5 @@ public class TypesGeneratorHelper {
         }
         return identifier;
     }
+
 }

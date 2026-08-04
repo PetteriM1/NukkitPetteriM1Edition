@@ -5,11 +5,14 @@ import cn.nukkit.Server;
 import cn.nukkit.command.PluginCommand;
 import cn.nukkit.command.SimpleCommandMap;
 import cn.nukkit.event.*;
+import cn.nukkit.event.server.BatchPacketsEvent;
+import cn.nukkit.event.server.DataPacketSendEvent;
 import cn.nukkit.permission.Permissible;
 import cn.nukkit.permission.Permission;
 import cn.nukkit.utils.MainLogger;
 import cn.nukkit.utils.PluginException;
 import cn.nukkit.utils.Utils;
+import cn.nukkit.utils.bugreport.ExceptionHandler;
 import com.google.common.reflect.TypeToken;
 import org.lanternpowered.lmbda.LambdaFactory;
 import org.lanternpowered.lmbda.LambdaType;
@@ -28,7 +31,8 @@ import java.util.regex.Pattern;
  */
 public class PluginManager {
     private static final MethodHandles.Lookup CALLER = MethodHandles.lookup();
-    private static final LambdaType<BiConsumer<Listener, Event>> EVENT_EXECUTOR_TYPE = LambdaType.of(new TypeToken<BiConsumer<Listener, Event>>(){}.getType());
+    private static final LambdaType<BiConsumer<Listener, Event>> EVENT_EXECUTOR_TYPE = LambdaType.of(new TypeToken<BiConsumer<Listener, Event>>() {
+    }.getType());
 
     private final Server server;
 
@@ -110,6 +114,10 @@ public class PluginManager {
                             }
                         } catch (Exception e) {
                             Server.getInstance().getLogger().critical("Could not load plugin", e);
+
+                            if (!e.getMessage().contains("main class not found")) {
+                                ExceptionHandler.handleSilently(e);
+                            }
                             return null;
                         }
                     }
@@ -173,41 +181,6 @@ public class PluginManager {
                             if (plugins.containsKey(name) || this.getPlugin(name) != null) {
                                 this.server.getLogger().error(this.server.getLanguage().translateString("nukkit.plugin.duplicateError", name));
                                 continue;
-                            }
-
-                            boolean compatible = false;
-
-                            for (String version : description.getCompatibleAPIs()) {
-
-                                try {
-                                    //Check the format: majorVersion.minorVersion.patch
-                                    if (!Pattern.matches("^[0-9]+\\.[0-9]+\\.[0-9]+$", version)) {
-                                        throw new IllegalArgumentException();
-                                    }
-                                } catch (NullPointerException | IllegalArgumentException e) {
-                                    this.server.getLogger().error(this.server.getLanguage().translateString("nukkit.plugin.loadError", new String[]{name, "Wrong API format"}));
-                                    continue;
-                                }
-
-                                String[] versionArray = version.split("\\.");
-                                String[] apiVersion = this.server.getApiVersion().split("\\.");
-
-                                //Completely different API version
-                                if (!Objects.equals(Integer.valueOf(versionArray[0]), Integer.valueOf(apiVersion[0]))) {
-                                    continue;
-                                }
-
-                                //If the plugin requires new API features, being backwards compatible
-                                if (Integer.parseInt(versionArray[1]) > Integer.parseInt(apiVersion[1])) {
-                                    continue;
-                                }
-
-                                compatible = true;
-                                break;
-                            }
-
-                            if (!compatible) {
-                                this.server.getLogger().error(this.server.getLanguage().translateString("nukkit.plugin.loadError", new String[]{name, "%nukkit.plugin.incompatibleAPI"}));
                             }
 
                             plugins.put(name, file);
@@ -611,6 +584,14 @@ public class PluginManager {
     public void registerEvent(Class<? extends Event> event, Listener listener, EventPriority priority, EventExecutor executor, Plugin plugin, boolean ignoreCancelled) throws PluginException {
         if (!plugin.isEnabled()) {
             throw new PluginException("Plugin attempted to register " + event + " while not enabled");
+        }
+
+        if (event == BatchPacketsEvent.class) {
+            server.callBatchPkEvent = true;
+        }
+
+        if (event == DataPacketSendEvent.class) {
+            server.callDataPkSendEvent = true;
         }
 
         try {

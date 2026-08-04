@@ -3,7 +3,9 @@ package cn.nukkit.block;
 import cn.nukkit.Player;
 import cn.nukkit.item.Item;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockStrippedBambooBlock extends BlockWoodStripped {
 
@@ -23,6 +25,16 @@ public class BlockStrippedBambooBlock extends BlockWoodStripped {
     @Override
     public int getId() {
         return STRIPPED_BAMBOO_BLOCK;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_20_0_23;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.STRIPPED_OAK_LOG;
     }
 
     @Override

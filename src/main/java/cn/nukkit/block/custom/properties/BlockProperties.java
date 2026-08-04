@@ -188,60 +188,60 @@ public class BlockProperties {
         RegisteredBlockProperty registry = requireRegisteredProperty(propertyName);
         return registry.getProperty().getValue(currentMeta, registry.getOffset());
     }
-    
+
     public Serializable getValue(long currentMeta, String propertyName) {
         RegisteredBlockProperty registry = requireRegisteredProperty(propertyName);
         return registry.getProperty().getValue(currentMeta, registry.getOffset());
     }
-    
+
     public Serializable getValue(BigInteger currentMeta, String propertyName) {
         RegisteredBlockProperty registry = requireRegisteredProperty(propertyName);
         return registry.getProperty().getValue(currentMeta, registry.getOffset());
     }
-    
+
     public <T> T getCheckedValue(int currentMeta, String propertyName, Class<T> clazz) {
         RegisteredBlockProperty registry = requireRegisteredProperty(propertyName);
         return clazz.cast(registry.getProperty().getValue(currentMeta, registry.getOffset()));
     }
-    
+
     public <T> T getCheckedValue(long currentMeta, String propertyName, Class<T> clazz) {
         RegisteredBlockProperty registry = requireRegisteredProperty(propertyName);
         return clazz.cast(registry.getProperty().getValue(currentMeta, registry.getOffset()));
     }
-    
+
     public <T> T getCheckedValue(BigInteger currentMeta, String propertyName, Class<T> clazz) {
         RegisteredBlockProperty registry = requireRegisteredProperty(propertyName);
         return clazz.cast(registry.getProperty().getValue(currentMeta, registry.getOffset()));
     }
-    
+
     @SuppressWarnings("unchecked")
     public <T> T getUncheckedValue(int currentMeta, String propertyName) {
         RegisteredBlockProperty registry = requireRegisteredProperty(propertyName);
         return (T) registry.getProperty().getValue(currentMeta, registry.getOffset());
     }
-    
+
     @SuppressWarnings("unchecked")
     public <T> T getUncheckedValue(long currentMeta, String propertyName) {
         RegisteredBlockProperty registry = requireRegisteredProperty(propertyName);
         return (T) registry.getProperty().getValue(currentMeta, registry.getOffset());
     }
-    
+
     @SuppressWarnings("unchecked")
     public <T> T getUncheckedValue(BigInteger currentMeta, String propertyName) {
         RegisteredBlockProperty registry = requireRegisteredProperty(propertyName);
         return (T) registry.getProperty().getValue(currentMeta, registry.getOffset());
     }
-    
+
     public int getIntValue(int currentMeta, String propertyName) {
         RegisteredBlockProperty registry = requireRegisteredProperty(propertyName);
         return registry.getProperty().getIntValue(currentMeta, registry.getOffset());
     }
-    
+
     public int getIntValue(long currentMeta, String propertyName) {
         RegisteredBlockProperty registry = requireRegisteredProperty(propertyName);
         return registry.getProperty().getIntValue(currentMeta, registry.getOffset());
     }
-    
+
     public int getIntValue(BigInteger currentMeta, String propertyName) {
         RegisteredBlockProperty registry = requireRegisteredProperty(propertyName);
         return registry.getProperty().getIntValue(currentMeta, registry.getOffset());
@@ -317,11 +317,11 @@ public class BlockProperties {
         BlockProperty blockProperty = getBlockProperty(propertyName);
         return blockProperty.isDefaultValue(value);
     }
-    
+
     public <T extends Serializable> boolean isDefaultValue(BlockProperty<T> property, T value) {
         return isDefaultValue(property.getName(), value);
     }
-    
+
     public boolean isDefaultIntValue(String propertyName, int value) {
         BlockProperty blockProperty = getBlockProperty(propertyName);
         return blockProperty.isDefaultIntValue(value);
@@ -330,7 +330,7 @@ public class BlockProperties {
     public <T extends Serializable> boolean isDefaultIntValue(BlockProperty<T> property, int value) {
         return isDefaultIntValue(property.getName(), value);
     }
-    
+
     public boolean isDefaultBooleanValue(String propertyName, boolean value) {
         BlockProperty blockProperty = getBlockProperty(propertyName);
         return blockProperty.isDefaultBooleanValue(value);

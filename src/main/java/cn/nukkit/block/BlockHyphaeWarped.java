@@ -33,7 +33,7 @@ public class BlockHyphaeWarped extends BlockStem {
     }
 
     public double getHardness() {
-        return 2;
+        return 0.3; // 2
     }
 
     @Override

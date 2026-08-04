@@ -65,7 +65,7 @@ public abstract class Noise {
         hash &= 15;
         double u = hash < 8 ? x : y;
         double v = hash < 4 ? y : ((hash == 12 || hash == 14) ? x :
-                z);
+                                   z);
 
         return ((hash & 1) == 0 ? u : -u) + ((hash & 2) == 0 ? v : -v);
     }

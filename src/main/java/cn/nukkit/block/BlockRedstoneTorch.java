@@ -1,6 +1,7 @@
 package cn.nukkit.block;
 
 import cn.nukkit.Player;
+import cn.nukkit.Server;
 import cn.nukkit.event.redstone.RedstoneUpdateEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Level;
@@ -34,7 +35,7 @@ public class BlockRedstoneTorch extends BlockTorch implements Faceable {
 
     @Override
     public int getLightLevel() {
-        return 7;
+        return Server.getInstance().suomiCraftPEMode() ? 7 : 0; // SCPE: Improve performance by disabling redstone torch block light updates
     }
 
     @Override
@@ -120,7 +121,8 @@ public class BlockRedstoneTorch extends BlockTorch implements Faceable {
         BlockFace face = getBlockFace().getOpposite();
         return this.level.isSidePowered(this.getSideVec(face), face);
     }
-     @Override
+
+    @Override
     public int tickRate() {
         return 2;
     }

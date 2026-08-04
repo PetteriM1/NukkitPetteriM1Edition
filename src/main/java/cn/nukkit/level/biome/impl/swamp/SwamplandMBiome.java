@@ -6,6 +6,11 @@ package cn.nukkit.level.biome.impl.swamp;
  */
 public class SwamplandMBiome extends SwampBiome {
 
+    public SwamplandMBiome() {
+        super();
+
+    }
+
     @Override
     public String getName() {
         return "Swampland M";

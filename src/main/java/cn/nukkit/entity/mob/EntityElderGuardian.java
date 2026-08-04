@@ -2,10 +2,15 @@ package cn.nukkit.entity.mob;
 
 import cn.nukkit.Player;
 import cn.nukkit.block.BlockSponge;
+import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
+import cn.nukkit.event.entity.EntityPotionEffectEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.network.protocol.LevelEventPacket;
+import cn.nukkit.potion.Effect;
 import cn.nukkit.utils.Utils;
 
 import java.util.ArrayList;
@@ -40,6 +45,16 @@ public class EntityElderGuardian extends EntitySwimmingMob {
         super.initEntity();
 
         this.setDataFlag(DATA_FLAGS, DATA_FLAG_ELDER, true);
+        this.setDamage(new int[]{0, 5, 8, 12});
+    }
+
+    @Override
+    public boolean targetOption(EntityCreature creature, double distance) {
+        return false;
+    }
+
+    @Override
+    public void attackEntity(Entity player) {
     }
 
     @Override
@@ -71,5 +86,30 @@ public class EntityElderGuardian extends EntitySwimmingMob {
     @Override
     public String getName() {
         return this.hasCustomName() ? this.getNameTag() : "Elder Guardian";
+    }
+
+    @Override
+    public boolean entityBaseTick(int tickDiff) {
+        if (!this.closed && this.ticksLived % 1200 == 0 && this.isAlive()) {
+            for (Player p : this.level.getPlayersList()) {
+                if (p.getGamemode() % 2 == 0 && p.distanceSquared(this) < 2500 && !p.hasEffect(Effect.MINING_FATIGUE)) { // 50 blocks
+                    p.addEffect(Effect.getEffect(Effect.MINING_FATIGUE).setAmplifier(2).setDuration(6000), EntityPotionEffectEvent.Cause.ELDER_GUARDIAN);
+
+                    // Send only to players who get the effect
+                    LevelEventPacket pk = new LevelEventPacket();
+                    pk.evid = LevelEventPacket.EVENT_GUARDIAN_CURSE;
+                    pk.x = (float) this.x;
+                    pk.y = (float) this.y;
+                    pk.z = (float) this.z;
+                    p.dataPacket(pk);
+                }
+            }
+        }
+        return super.entityBaseTick(tickDiff);
+    }
+
+    @Override
+    public boolean canDespawn() {
+        return false;
     }
 }

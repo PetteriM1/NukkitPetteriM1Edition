@@ -1,16 +1,11 @@
 package cn.nukkit.metrics;
 
 import cn.nukkit.Server;
-import cn.nukkit.utils.Config;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.Utils;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -18,135 +13,79 @@ public class NukkitMetrics {
 
     private static boolean metricsStarted = false;
 
-    private final Server server;
-
-    private boolean enabled;
-    private String serverUUID;
-    private boolean logFailedRequests;
-
     public NukkitMetrics(Server server) {
-        this.server = server;
-
         if (metricsStarted) {
             return;
         }
 
-        try {
-            this.loadConfig();
-        } catch (IOException ex) {
-            server.getLogger().logException(ex);
-        }
+        Metrics metrics = new Metrics("Nukkit", server.getServerUniqueId().toString(), true, server.getLogger());
 
-        if (enabled) {
-            Metrics metrics = new Metrics("Nukkit", serverUUID, logFailedRequests, server.getLogger());
+        metrics.addCustomChart(new Metrics.SingleLineChart("players", server::getOnlinePlayersCount));
+        metrics.addCustomChart(new Metrics.SimplePie("codename", () -> "PM1E"));
+        metrics.addCustomChart(new Metrics.SimplePie("minecraft_version", () -> ProtocolInfo.MINECRAFT_VERSION));
+        metrics.addCustomChart(new Metrics.SimplePie("nukkit_version", () -> "PM1E"));
+        metrics.addCustomChart(new Metrics.SimplePie("xbox_auth", () -> server.xboxAuth ? "Required" : "Not required"));
 
-            metrics.addCustomChart(new Metrics.SingleLineChart("players", server::getOnlinePlayersCount));
-            metrics.addCustomChart(new Metrics.SimplePie("codename", server::getCodename));
-            metrics.addCustomChart(new Metrics.SimplePie("minecraft_version", server::getVersion));
-            metrics.addCustomChart(new Metrics.SimplePie("nukkit_version", server::getNukkitVersion));
-            metrics.addCustomChart(new Metrics.SimplePie("xbox_auth", () -> server.xboxAuth ? "Required" : "Not required"));
+        metrics.addCustomChart(new Metrics.AdvancedPie("player_platform", () -> {
+            Map<String, Integer> valueMap = new HashMap<>();
 
-            metrics.addCustomChart(new Metrics.AdvancedPie("player_platform", () -> {
-                Map<String, Integer> valueMap = new HashMap<>();
-
-                server.getOnlinePlayers().forEach((uuid, player) -> {
-                    String deviceOS = Utils.getOS(player);
-                    if (!valueMap.containsKey(deviceOS)) {
-                        valueMap.put(deviceOS, 1);
-                    } else {
-                        valueMap.put(deviceOS, valueMap.get(deviceOS) + 1);
-                    }
-                });
-                return valueMap;
-            }));
-
-            metrics.addCustomChart(new Metrics.AdvancedPie("player_game_version", () -> {
-                Map<String, Integer> valueMap = new HashMap<>();
-
-                server.getOnlinePlayers().forEach((uuid, player) -> {
-                    String gameVersion = player.getLoginChainData().getGameVersion();
-                    if (!valueMap.containsKey(gameVersion)) {
-                        valueMap.put(gameVersion, 1);
-                    } else {
-                        valueMap.put(gameVersion, valueMap.get(gameVersion) + 1);
-                    }
-                });
-                return valueMap;
-            }));
-
-            // The following code can be attributed to the PaperMC project
-            // https://github.com/PaperMC/Paper/blob/master/Spigot-Server-Patches/0005-Paper-Metrics.patch#L614
-            metrics.addCustomChart(new Metrics.DrilldownPie("java_version", () -> {
-                Map<String, Map<String, Integer>> map = new HashMap<>();
-                String javaVersion = System.getProperty("java.version");
-                Map<String, Integer> entry = new HashMap<>();
-                entry.put(javaVersion, 1);
-
-                // http://openjdk.java.net/jeps/223
-                // Java decided to change their versioning scheme and in doing so modified the java.version system
-                // property to return $major[.$minor][.$secuity][-ea], as opposed to 1.$major.0_$identifier
-                // we can handle pre-9 by checking if the "major" is equal to "1", otherwise, 9+
-                String majorVersion = javaVersion.split("\\.")[0];
-                String release;
-
-                int indexOf = javaVersion.lastIndexOf('.');
-
-                if (majorVersion.equals("1")) {
-                    release = "Java " + javaVersion.substring(0, indexOf);
+            server.getOnlinePlayers().forEach((uuid, player) -> {
+                String deviceOS = Utils.getOS(player);
+                if (!valueMap.containsKey(deviceOS)) {
+                    valueMap.put(deviceOS, 1);
                 } else {
-                    // of course, it really wouldn't be all that simple if they didn't add a quirk, now would it
-                    // valid strings for the major may potentially include values such as -ea to deannotate a pre release
-                    Matcher versionMatcher = Pattern.compile("\\d+").matcher(majorVersion);
-                    if (versionMatcher.find()) {
-                        majorVersion = versionMatcher.group(0);
-                    }
-                    release = "Java " + majorVersion;
+                    valueMap.put(deviceOS, valueMap.get(deviceOS) + 1);
                 }
-                map.put(release, entry);
-                return map;
-            }));
+            });
+            return valueMap;
+        }));
 
-            metricsStarted = true;
-        }
-    }
+        metrics.addCustomChart(new Metrics.AdvancedPie("player_game_version", () -> {
+            Map<String, Integer> valueMap = new HashMap<>();
 
-    /**
-     * Loads the bStats configuration.
-     */
-    private void loadConfig() throws IOException {
-        File bStatsFolder = new File(server.getPluginPath(), "bStats");
+            server.getOnlinePlayers().forEach((uuid, player) -> {
+                String gameVersion = player.getLoginChainData().getGameVersion();
+                if (!valueMap.containsKey(gameVersion)) {
+                    valueMap.put(gameVersion, 1);
+                } else {
+                    valueMap.put(gameVersion, valueMap.get(gameVersion) + 1);
+                }
+            });
+            return valueMap;
+        }));
 
-        if (!bStatsFolder.exists() && !bStatsFolder.mkdirs()) {
-            server.getLogger().warning("Failed to create bStats metrics directory");
-            return;
-        }
+        // The following code can be attributed to the PaperMC project
+        // https://github.com/PaperMC/Paper/blob/master/Spigot-Server-Patches/0005-Paper-Metrics.patch#L614
+        metrics.addCustomChart(new Metrics.DrilldownPie("java_version", () -> {
+            Map<String, Map<String, Integer>> map = new HashMap<>();
+            String javaVersion = System.getProperty("java.version");
+            Map<String, Integer> entry = new HashMap<>();
+            entry.put(javaVersion, 1);
 
-        File configFile = new File(bStatsFolder, "config.yml");
-        if (!configFile.exists()) {
-            writeFile(configFile,
-                    "# bStats collects some data for plugin authors like how many servers are using their plugins.",
-                    "# To honor their work, you should not disable it.",
-                    "# This has nearly no effect on the server performance!",
-                    "# Check out https://bStats.org/ to learn more :)",
-                    "enabled: true",
-                    "serverUuid: \"" + UUID.randomUUID().toString() + "\"",
-                    "logFailedRequests: false");
-        }
+            // http://openjdk.java.net/jeps/223
+            // Java decided to change their versioning scheme and in doing so modified the java.version system
+            // property to return $major[.$minor][.$secuity][-ea], as opposed to 1.$major.0_$identifier
+            // we can handle pre-9 by checking if the "major" is equal to "1", otherwise, 9+
+            String majorVersion = javaVersion.split("\\.")[0];
+            String release;
 
-        Config config = new Config(configFile, Config.YAML);
+            int indexOf = javaVersion.lastIndexOf('.');
 
-        // Load configuration
-        this.enabled = config.getBoolean("enabled", true);
-        this.serverUUID = config.getString("serverUuid");
-        this.logFailedRequests = config.getBoolean("logFailedRequests", false);
-    }
-
-    private void writeFile(File file, String... lines) throws IOException {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
-            for (String line : lines) {
-                writer.write(line);
-                writer.newLine();
+            if (majorVersion.equals("1")) {
+                release = "Java " + javaVersion.substring(0, indexOf);
+            } else {
+                // of course, it really wouldn't be all that simple if they didn't add a quirk, now would it
+                // valid strings for the major may potentially include values such as -ea to deannotate a pre release
+                Matcher versionMatcher = Pattern.compile("\\d+").matcher(majorVersion);
+                if (versionMatcher.find()) {
+                    majorVersion = versionMatcher.group(0);
+                }
+                release = "Java " + majorVersion;
             }
-        }
+            map.put(release, entry);
+            return map;
+        }));
+
+        metricsStarted = true;
     }
 }

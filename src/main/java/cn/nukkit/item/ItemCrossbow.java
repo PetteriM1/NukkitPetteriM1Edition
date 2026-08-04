@@ -4,6 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.projectile.EntityArrow;
+import cn.nukkit.entity.projectile.EntityCrossbowFirework;
 import cn.nukkit.entity.projectile.EntityProjectile;
 import cn.nukkit.event.entity.EntityShootBowEvent;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
@@ -48,7 +49,7 @@ public class ItemCrossbow extends ItemBow {
         Item itemArrow = null;
         boolean offhand = false;
         Item offhandItem = player.getOffhandInventory().getItemFast(0);
-        if (offhandItem.getId() == ItemID.ARROW) {
+        if (offhandItem.getId() == ItemID.ARROW || offhandItem.getId() == ItemID.FIREWORKS) {
             itemArrow = offhandItem.clone();
             itemArrow.setCount(1);
             offhand = true;
@@ -110,18 +111,22 @@ public class ItemCrossbow extends ItemBow {
         if (arrow == null) {
             throw new IllegalArgumentException("null cannot be loaded into a crossbow!");
         }
-        if (arrow.getId() != Item.ARROW) {
+        if (arrow.getId() != Item.ARROW && arrow.getId() != Item.FIREWORKS) {
             throw new IllegalArgumentException(arrow + " cannot be loaded into a crossbow!");
         }
         if (arrow.getCount() != 1) {
             throw new IllegalArgumentException("Only one arrow per crossbow is supported!");
         }
         CompoundTag tag = this.getNamedTag() == null ? new CompoundTag() : this.getNamedTag();
+        boolean isFirework = arrow.getId() == Item.FIREWORKS;
         CompoundTag chargedItem = new CompoundTag("chargedItem")
                 .putByte("Count", arrow.getCount())
                 .putShort("Damage", arrow.getDamage())
-                .putString("Name", "minecraft:arrow");
+                .putString("Name", isFirework ? "minecraft:firework_rocket" : "minecraft:arrow");
         CompoundTag cTag;
+        if (isFirework && (cTag = arrow.getNamedTag()) != null) {
+            chargedItem.putCompound("tag", cTag);
+        }
         tag.putBoolean("Charged", true).putCompound("chargedItem", chargedItem);
         this.setCompoundTag(tag);
         return this;
@@ -139,6 +144,7 @@ public class ItemCrossbow extends ItemBow {
 
     /**
      * Launch the crossbow. Assumes that isLoaded() == true.
+     *
      * @param player player
      * @return launched successfully
      */
@@ -161,7 +167,15 @@ public class ItemCrossbow extends ItemBow {
                         .add(new FloatTag("", (player.yaw > 180 ? 360 : 0) - (float) player.yaw))
                         .add(new FloatTag("", (float) -player.pitch)));
         EntityProjectile arrow;
-        {
+        boolean isFirework = "minecraft:firework_rocket".equals(chargedItem.getString("Name"));
+        if (isFirework) {
+            arrow = new EntityCrossbowFirework(player.chunk, nbt, player);
+            Item firework = Item.get(Item.FIREWORKS, arrowData, 1);
+            if (chargedItem.contains("tag")) {
+                firework.setCompoundTag(chargedItem.getCompound("tag"));
+            }
+            ((EntityCrossbowFirework) arrow).setFirework(firework);
+        } else {
             arrow = (EntityArrow) Entity.createEntity(EntityArrow.NETWORK_ID, player.chunk, nbt, player, false, true);
             if (arrowData > 0) {
                 ((EntityArrow) arrow).setData(arrowData);
@@ -170,7 +184,7 @@ public class ItemCrossbow extends ItemBow {
                 arrow.piercing = 1;
             }
         }
-        EntityShootBowEvent entityShootBowEvent = new EntityShootBowEvent(player, this, arrow, 3.5);
+        EntityShootBowEvent entityShootBowEvent = new EntityShootBowEvent(player, this, arrow, isFirework ? 1 : 3.5);
         Server.getInstance().getPluginManager().callEvent(entityShootBowEvent);
         if (entityShootBowEvent.isCancelled()) {
             entityShootBowEvent.getProjectile().close();
@@ -186,7 +200,7 @@ public class ItemCrossbow extends ItemBow {
                     return false;
                 } else {
                     proj.spawnToAll();
-                    if (this.hasEnchantment(Enchantment.ID_CROSSBOW_MULTISHOT)) {
+                    if (!isFirework && this.hasEnchantment(Enchantment.ID_CROSSBOW_MULTISHOT)) {
                         CompoundTag nbt1 = new CompoundTag()
                                 .putList(new ListTag<DoubleTag>("Pos")
                                         .add(new DoubleTag("", player.x))
