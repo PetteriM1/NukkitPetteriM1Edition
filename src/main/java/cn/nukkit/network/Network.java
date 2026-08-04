@@ -1,6 +1,7 @@
 package cn.nukkit.network;
 
 import cn.nukkit.Nukkit;
+import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.network.protocol.*;
 import cn.nukkit.utils.BinaryStream;
@@ -9,6 +10,7 @@ import cn.nukkit.utils.VarInt;
 import io.netty.buffer.ByteBuf;
 import lombok.extern.log4j.Log4j2;
 
+import javax.annotation.Nullable;
 import java.io.ByteArrayInputStream;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -39,9 +41,15 @@ public class Network {
     private String name;
     private String subName;
 
+    private int maxPacketDecompressedSize = 4194304;
+
     public Network(Server server) {
         this.registerPackets();
         this.server = server;
+
+        if (server.doNotLimitSkinGeometry) {
+            this.maxPacketDecompressedSize = 6291456;
+        }
     }
 
     @Deprecated
@@ -129,8 +137,10 @@ public class Network {
         return server;
     }
 
-    public void processBatch(byte[] payload, Collection<DataPacket> packets, CompressionProvider compression) throws Exception {
-        byte[] data = compression.decompress(payload, 6291456);
+    public void processBatch(byte[] payload, Collection<DataPacket> packets, CompressionProvider compression, int raknetVer, @Nullable Player player) throws Exception {
+        int protocol = player == null ? Integer.MAX_VALUE : player.protocol;
+
+        byte[] data = compression.decompress(payload, this.maxPacketDecompressedSize);
 
         BinaryStream stream = new BinaryStream(data);
         int count = 0;
@@ -143,24 +153,43 @@ public class Network {
             byte[] buf = stream.getByteArray();
             ByteArrayInputStream bais = new ByteArrayInputStream(buf);
 
-            int packetId = ((int) VarInt.readUnsignedVarInt(bais) & 0x3ff);
+            int packetId;
+            switch (raknetVer) {
+                case 7:
+                    packetId = bais.read();
+                    break;
+                case 8: // V8 introduced split screen support, 2 more bytes appended
+                    packetId = bais.read();
+                    bais.skip(2);
+                    break;
+                default: // V10 - Zlib raw
+                    packetId = ((int) VarInt.readUnsignedVarInt(bais) & 0x3ff);
+                    break;
+
+            }
 
             // Use internal backwards compatible IDs until pid() is rewritten
             DataPacket pk = this.getPacket(packetId >= 300 ? packetId - 100 : packetId);
             if (pk == null) {
                 if (Nukkit.DEBUG > 1) {
-                    log.debug("Received unknown packet with ID: 0x{}", Integer.toHexString(packetId));
+                    log.debug("Received unknown packet with vanilla ID 0x{}", Integer.toHexString(packetId));
                 }
                 continue;
             }
 
             pk.setBuffer(buf, buf.length - bais.available());
+            pk.protocol = protocol;
 
             try {
-                pk.decode();
+                if (raknetVer > 8) {
+                    pk.decode();
+                } else { // version < 1.6
+                    pk.setBuffer(buf, 3);
+                    pk.decode();
+                }
 
                 if (Nukkit.DEBUG > 1 && packetId != ProtocolInfo.LOGIN_PACKET && pk.offset < pk.getRawBuffer().length) {
-                    log.debug(pk.getClass().getSimpleName() + " still has " + (pk.getRawBuffer().length - pk.offset) + " bytes to read!");
+                    log.debug(pk.getClass().getSimpleName() + " (" + protocol + ") still has " + (pk.getRawBuffer().length - pk.offset) + " bytes to read!");
                 }
             } catch (Exception e) {
                 throw new IllegalStateException("Unable to decode " + pk.getClass().getSimpleName(), e);
@@ -220,7 +249,6 @@ public class Network {
         this.registerPacket(ProtocolInfo.BOOK_EDIT_PACKET, BookEditPacket.class);
         this.registerPacket(ProtocolInfo.COMMAND_REQUEST_PACKET, CommandRequestPacket.class);
         this.registerPacket(ProtocolInfo.CONTAINER_CLOSE_PACKET, ContainerClosePacket.class);
-        this.registerPacket(ProtocolInfo.ENTITY_EVENT_PACKET, EntityEventPacket.class);
         this.registerPacket(ProtocolInfo.INTERACT_PACKET, InteractPacket.class);
         this.registerPacket(ProtocolInfo.INVENTORY_TRANSACTION_PACKET, InventoryTransactionPacket.class);
         this.registerPacket(ProtocolInfo.LOGIN_PACKET, LoginPacket.class);
@@ -228,6 +256,7 @@ public class Network {
         this.registerPacket(ProtocolInfo.MOB_EQUIPMENT_PACKET, MobEquipmentPacket.class);
         this.registerPacket(ProtocolInfo.MODAL_FORM_RESPONSE_PACKET, ModalFormResponsePacket.class);
         this.registerPacket(ProtocolInfo.PLAYER_ACTION_PACKET, PlayerActionPacket.class);
+        this.registerPacket(ProtocolInfo.PLAYER_INPUT_PACKET, PlayerInputPacket.class);
         this.registerPacket(ProtocolInfo.PLAYER_HOTBAR_PACKET, PlayerHotbarPacket.class);
         this.registerPacket(ProtocolInfo.REQUEST_CHUNK_RADIUS_PACKET, RequestChunkRadiusPacket.class);
         this.registerPacket(ProtocolInfo.RESOURCE_PACK_CLIENT_RESPONSE_PACKET, ResourcePackClientResponsePacket.class);
@@ -250,20 +279,32 @@ public class Network {
         this.registerPacket(ProtocolInfo.SET_DEFAULT_GAME_TYPE_PACKET, SetDefaultGameTypePacket.class);
         this.registerPacket(ProtocolInfo.SETTINGS_COMMAND_PACKET, SettingsCommandPacket.class);
 
-        // Unused but sent by the client
-        this.registerPacket(ProtocolInfo.SET_ENTITY_LINK_PACKET, SetEntityLinkPacket.class);
-        this.registerPacket(ProtocolInfo.SET_ENTITY_MOTION_PACKET, SetEntityMotionPacket.class);
+        // Used by PM1E only
         this.registerPacket(ProtocolInfo.LEVEL_SOUND_EVENT_PACKET, LevelSoundEventPacket.class);
+        this.registerPacket(ProtocolInfo.LEVEL_SOUND_EVENT_PACKET_V1, LevelSoundEventPacketV1.class);
+        this.registerPacket(ProtocolInfo.LEVEL_SOUND_EVENT_PACKET_V2, LevelSoundEventPacketV2.class);
         this.registerPacket(ProtocolInfo.REQUEST_ABILITY_PACKET, RequestAbilityPacket.class);
-        this.registerPacket(ProtocolInfo.NETWORK_STACK_LATENCY_PACKET, NetworkStackLatencyPacket.class);
-        this.registerPacket(ProtocolInfo.NPC_REQUEST_PACKET, NPCRequestPacket.class);
         this.registerPacket(ProtocolInfo.MOVE_ENTITY_ABSOLUTE_PACKET, MoveEntityAbsolutePacket.class);
-        this.registerPacket(ProtocolInfo.MOB_ARMOR_EQUIPMENT_PACKET, MobArmorEquipmentPacket.class);
-        this.registerPacket(ProtocolInfo.MAP_CREATE_LOCKED_COPY_PACKET, MapCreateLockedCopyPacket.class);
-        this.registerPacket(ProtocolInfo.GUI_DATA_PICK_ITEM_PACKET, GUIDataPickItemPacket.class);
-        this.registerPacket(ProtocolInfo.EMOTE_LIST_PACKET, EmoteListPacket.class);
-        this.registerPacket(ProtocolInfo.DISCONNECT_PACKET, DisconnectPacket.class);
-        this.registerPacket(ProtocolInfo.BOSS_EVENT_PACKET, BossEventPacket.class);
-        this.registerPacket(ProtocolInfo.ANVIL_DAMAGE_PACKET, AnvilDamagePacket.class);
+        this.registerPacket(ProtocolInfo.MOVE_PLAYER_PACKET, MovePlayerPacket.class);
+        this.registerPacket(ProtocolInfo.ADVENTURE_SETTINGS_PACKET, AdventureSettingsPacket.class);
+        this.registerPacket(ProtocolInfo.FILTER_TEXT_PACKET, FilterTextPacket.class);
+
+        // Unused but sent by the client
+        if (Nukkit.DEBUG > 1 || !Server.getInstance().suomiCraftPEMode()) {
+            this.registerPacket(ProtocolInfo.ENTITY_EVENT_PACKET, EntityEventPacket.class);
+            this.registerPacket(ProtocolInfo.SET_ENTITY_LINK_PACKET, SetEntityLinkPacket.class);
+            this.registerPacket(ProtocolInfo.SET_ENTITY_MOTION_PACKET, SetEntityMotionPacket.class);
+            this.registerPacket(ProtocolInfo.RIDER_JUMP_PACKET, RiderJumpPacket.class);
+            this.registerPacket(ProtocolInfo.NETWORK_STACK_LATENCY_PACKET, NetworkStackLatencyPacket.class);
+            this.registerPacket(ProtocolInfo.NPC_REQUEST_PACKET, NPCRequestPacket.class);
+            this.registerPacket(ProtocolInfo.MOB_ARMOR_EQUIPMENT_PACKET, MobArmorEquipmentPacket.class);
+            this.registerPacket(ProtocolInfo.MAP_CREATE_LOCKED_COPY_PACKET, MapCreateLockedCopyPacket.class);
+            this.registerPacket(ProtocolInfo.GUI_DATA_PICK_ITEM_PACKET, GUIDataPickItemPacket.class);
+            this.registerPacket(ProtocolInfo.EMOTE_LIST_PACKET, EmoteListPacket.class);
+            this.registerPacket(ProtocolInfo.DISCONNECT_PACKET, DisconnectPacket.class);
+            this.registerPacket(ProtocolInfo.BOSS_EVENT_PACKET, BossEventPacket.class);
+            this.registerPacket(ProtocolInfo.ANVIL_DAMAGE_PACKET, AnvilDamagePacket.class);
+            this.registerPacket(ProtocolInfo.ITEM_FRAME_DROP_ITEM_PACKET, ItemFrameDropItemPacket.class);
+        }
     }
 }

@@ -6,6 +6,7 @@ import cn.nukkit.Server;
 import cn.nukkit.nbt.stream.FastByteArrayOutputStream;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.ClientboundMapItemDataPacket;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.MainLogger;
 import cn.nukkit.utils.ThreadCache;
 
@@ -45,7 +46,7 @@ public class ItemMap extends Item {
         try {
             if (this.getMapId() == 0) {
                 if (Nukkit.DEBUG > 1) {
-                    Server.getInstance().getLogger().debug("Uninitialized map", new Throwable(""));
+                    Server.getInstance().getLogger().warning("Uninitialized map", new Throwable(""));
                 }
                 this.initItem();
             }
@@ -109,9 +110,16 @@ public class ItemMap extends Item {
         pk.offsetX = 0;
         pk.offsetZ = 0;
         pk.image = image;
-        pk.eids = new long[]{pk.mapId};
+        if (p.protocol >= ProtocolInfo.v1_19_50) {
+            pk.eids = new long[]{pk.mapId};
+        }
 
         p.dataPacket(pk);
+
+        // Hack: Fix client not rendering the map
+        if (p.protocol >= ProtocolInfo.v1_19_20 && p.protocol < ProtocolInfo.v1_19_50) {
+            Server.getInstance().getScheduler().scheduleDelayedTask(null, () -> p.dataPacket(pk), 20);
+        }
         return true;
     }
 

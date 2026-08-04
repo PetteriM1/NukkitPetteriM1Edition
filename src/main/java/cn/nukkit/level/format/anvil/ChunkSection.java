@@ -2,6 +2,7 @@ package cn.nukkit.level.format.anvil;
 
 import cn.nukkit.Server;
 import cn.nukkit.block.Block;
+import cn.nukkit.block.BlockID;
 import cn.nukkit.block.BlockLayer;
 import cn.nukkit.level.format.anvil.util.BlockStorage;
 import cn.nukkit.level.format.anvil.util.NibbleArray;
@@ -50,6 +51,7 @@ public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
         this.y = nbt.getByte("Y");
 
         byte[] blocks = nbt.getByteArray("Blocks");
+        byte[] blocks2 = nbt.getByteArray("Blocks2PM1E", 4096);
         NibbleArray data = new NibbleArray(nbt.getByteArray("Data"));
 
         storage = new BlockStorage();
@@ -61,7 +63,10 @@ public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
                     int index = getAnvilIndex(x, y, z);
                     // Set block data first so we can overwrite it when removing data values from air in setBlockId
                     storage.setBlockData(x, y, z, data.get(index));
-                    int b = blocks[index] & 0xff;
+                    int b = (blocks2[index] & 0xff) + 255;
+                    if (b == 255) {
+                        b = blocks[index] & 0xff;
+                    }
                     storage.setBlockId(x, y, z, b);
                 }
             }
@@ -263,13 +268,18 @@ public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
 
     @Override
     public byte[] getIdArray() {
+        return this.getIdArray(1);
+    }
+
+    @Override
+    public byte[] getIdArray(int ver) {
         synchronized (storage) {
             byte[] anvil = new byte[4096];
             for (int x = 0; x < 16; x++) {
                 for (int z = 0; z < 16; z++) {
                     for (int y = 0; y < 16; y++) {
                         int index = getAnvilIndex(x, y, z);
-                        anvil[index] = (byte) storage.getBlockId(x, y, z);
+                        anvil[index] = (byte) storage.getBlockIdFor(x, y, z, ver);
                     }
                 }
             }
@@ -349,9 +359,35 @@ public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
     }
 
     @Override
-    public void writeTo(BinaryStream stream) {
+    public byte[] getBytes(boolean obfuscated) {
+        byte[] ids = new byte[4096];
+        byte[] ids1;
+        byte[] ids2;
+        byte[] data;
         synchronized (storage) {
-            this.storage.writeTo(this.y, stream);
+            ids1 = storage.getBlockIds(1);
+            ids2 = storage.getBlockIds(2);
+            data = storage.getBlockData(true);
+        }
+        for (int i = 0; i < 4096; i++) {
+            int id = ids2[i] + 255;
+            if (id == 255) {
+                id = ids1[i];
+            } else {
+                id = BlockID.INFO_UPDATE;
+            }
+            ids[i] = (byte) id;
+        }
+        byte[] merged = new byte[4096 + data.length];
+        System.arraycopy(ids, 0, merged, 0, 4096);
+        System.arraycopy(data, 0, merged, 4096, data.length);
+        return merged;
+    }
+
+    @Override
+    public void writeTo(int protocol, BinaryStream stream, boolean obfuscated) {
+        synchronized (storage) {
+            this.storage.writeTo(protocol, this.y, stream, obfuscated);
         }
     }
 
@@ -389,7 +425,6 @@ public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
         return false;
     }
 
-    @Override
     public ChunkSection copy() {
         return new ChunkSection(
                 this.y,
@@ -402,11 +437,10 @@ public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
         );
     }
 
-    @Override
     public ChunkSection copyForChunkSending() {
         return new ChunkSection(
                 this.y,
-                this.storage.copy(),
+                this.storage.copyForChunkSending(),
                 null,
                 null,
                 null,

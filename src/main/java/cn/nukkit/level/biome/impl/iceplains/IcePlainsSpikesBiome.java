@@ -19,16 +19,6 @@ public class IcePlainsSpikesBiome extends IcePlainsBiome {
         this.addPopulator(iceSpikes);
     }
 
-    @Override
-    public int getSurfaceId(int x, int y, int z) {
-        return Block.SNOW_BLOCK << Block.DATA_BITS;
-    }
-
-    public String getName() {
-        return "Ice Plains Spikes";
-    }
-
-
     /**
      * @author DaPorkchop_
      * <p>
@@ -99,5 +89,14 @@ public class IcePlainsSpikesBiome extends IcePlainsBiome {
         public int getHighestWorkableBlock(int x, int z, FullChunk chunk) {
             return chunk.getHighestBlockAt(x & 0xF, z & 0xF) - 5;
         }
+    }
+
+    @Override
+    public int getSurfaceId(int x, int y, int z) {
+        return Block.SNOW_BLOCK << Block.DATA_BITS;
+    }
+
+    public String getName() {
+        return "Ice Plains Spikes";
     }
 }

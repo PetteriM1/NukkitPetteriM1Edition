@@ -10,6 +10,8 @@ import cn.nukkit.level.generator.Generator;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.utils.ChunkException;
+import cn.nukkit.utils.bugreport.ExceptionHandler;
+import it.unimi.dsi.fastutil.ints.IntSet;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
 
 import java.io.File;
@@ -30,6 +32,7 @@ public class Anvil extends BaseLevelProvider {
     public Anvil(Level level, String path) throws IOException {
         super(level, path);
     }
+    private int lastPosition = 0;
 
     @SuppressWarnings("unused")
     public static String getProviderName() {
@@ -95,7 +98,7 @@ public class Anvil extends BaseLevelProvider {
     }
 
     @Override
-    public void requestChunkTask(int x, int z) throws ChunkException {
+    public void requestChunkTask(IntSet protocols, int x, int z) throws ChunkException {
         Chunk chunk = (Chunk) this.getChunk(x, z, false);
         if (chunk == null) {
             throw new ChunkException("Invalid chunk set (" + x + ", " + z + ')');
@@ -103,10 +106,8 @@ public class Anvil extends BaseLevelProvider {
 
         long timestamp = chunk.getChanges();
 
-        level.asyncChunk(chunk.cloneForChunkSending(), timestamp, x, z);
+        level.asyncChunk(protocols, chunk.cloneForChunkSending(), timestamp, x, z);
     }
-
-    private int lastPosition = 0;
 
     @Override
     public void doGarbageCollection(long time) {
@@ -143,6 +144,7 @@ public class Anvil extends BaseLevelProvider {
             chunk = region.readChunk(chunkX - (regionX << 5), chunkZ - (regionZ << 5));
         } catch (IOException ex) {
             Server.getInstance().getLogger().error("Failed to read chunk " + chunkX + ", " + chunkZ, ex);
+            ExceptionHandler.handleSilently(ex);
         }
 
         if (chunk == null) {

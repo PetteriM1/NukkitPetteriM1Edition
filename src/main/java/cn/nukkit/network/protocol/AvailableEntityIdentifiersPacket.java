@@ -19,6 +19,6 @@ public class AvailableEntityIdentifiersPacket extends DataPacket {
     @Override
     public void encode() {
         this.reset();
-        this.put(EntityManager.get().createNetworkTag());
+        this.put(EntityManager.get().createNetworkTag(this.protocol));
     }
 }

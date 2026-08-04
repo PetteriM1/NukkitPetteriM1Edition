@@ -1,5 +1,6 @@
 package cn.nukkit;
 
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.TextFormat;
 
 import java.util.HashMap;
@@ -54,6 +55,17 @@ public class Achievement {
             put("overpowered", new Achievement("Overpowered", "buildBetterPickaxe"));
         }
     };
+    public final String message;
+    public final String[] requires;
+
+    /**
+     * @param message  achievement name displayed in achievement get message
+     * @param requires save IDs of achievements player must complete before this achievement can be completed
+     */
+    public Achievement(String message, String... requires) {
+        this.message = message;
+        this.requires = requires;
+    }
 
     /**
      * Broadcasts achievement get message if player does not have the achievement yet. Returns true if broadcast.
@@ -70,12 +82,17 @@ public class Achievement {
         } else {
             player.sendMessage(translation);
         }
+
+        if (player.protocol >= ProtocolInfo.v1_19_0_31) {
+            player.sendToast(TextFormat.YELLOW + "Achievement get!" + TextFormat.WHITE, achievements.get(achievementId).message);
+        }
         return true;
     }
 
     /**
      * Register an achievement
-     * @param name save id
+     *
+     * @param name        save id
      * @param achievement achievement
      * @return true if successful, false if save id is already in use
      */
@@ -86,18 +103,6 @@ public class Achievement {
 
         achievements.put(name, achievement);
         return true;
-    }
-
-    public final String message;
-    public final String[] requires;
-
-    /**
-     * @param message achievement name displayed in achievement get message
-     * @param requires save IDs of achievements player must complete before this achievement can be completed
-     */
-    public Achievement(String message, String... requires) {
-        this.message = message;
-        this.requires = requires;
     }
 
     public String getMessage() {
@@ -114,6 +119,10 @@ public class Achievement {
             Server.getInstance().broadcastMessage(translation);
         } else {
             player.sendMessage(translation);
+        }
+
+        if (player.protocol >= ProtocolInfo.v1_19_0_31) {
+            player.sendToast(TextFormat.YELLOW + "Achievement get!" + TextFormat.WHITE, this.message);
         }
     }
 }

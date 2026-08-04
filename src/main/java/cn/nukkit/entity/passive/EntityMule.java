@@ -1,6 +1,8 @@
 package cn.nukkit.entity.passive;
 
+import cn.nukkit.Player;
 import cn.nukkit.utils.Utils;
+import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
@@ -44,6 +46,18 @@ public class EntityMule extends EntityHorseBase {
     }
 
     @Override
+    public boolean targetOption(EntityCreature creature, double distance) {
+        boolean canTarget = super.targetOption(creature, distance);
+
+        if (canTarget && (creature instanceof Player)) {
+            Player player = (Player) creature;
+            return player.spawned && player.isAlive() && !player.closed &&
+                    this.isFeedItem(player.getInventory().getItemInHandFast()) && distance <= 49;
+        }
+        return false;
+    }
+
+    @Override
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
 
@@ -51,6 +65,10 @@ public class EntityMule extends EntityHorseBase {
             for (int i = 0; i < Utils.rand(0, 2); i++) {
                 drops.add(Item.get(Item.LEATHER, 0, 1));
             }
+        }
+
+        if (this.isSaddled()) {
+            drops.add(Item.get(Item.SADDLE, 0, 1));
         }
 
         return drops.toArray(new Item[0]);

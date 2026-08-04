@@ -40,7 +40,7 @@ public class BlockBeeNest extends BlockBeehive {
 
     @Override
     public double getResistance() {
-        return 0.3;
+        return 1.5;
     }
 
     @Override

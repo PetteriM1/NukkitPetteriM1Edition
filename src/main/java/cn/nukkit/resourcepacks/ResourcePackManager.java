@@ -24,7 +24,9 @@ public class ResourcePackManager {
     public ResourcePackManager(Set<ResourcePackLoader> loaders) {
         this.loaders = loaders;
 
-        this.reloadPacks();
+        if (!Server.getInstance().suomiCraftPEMode()) {
+            this.reloadPacks();
+        }
     }
 
     public ResourcePackManager(ResourcePackLoader... loaders) {

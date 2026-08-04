@@ -20,13 +20,13 @@ public class ListChunkManager implements ChunkManager {
 
     @Override
     public int getBlockIdAt(int x, int y, int z, BlockLayer layer) {
-        Optional<Block> optionalBlock = this.blocks.stream().filter(block -> block.getFloorX() == x && block.getFloorY() == y && block.getFloorZ() == z && block.getLayer() == layer).findAny();
+        Optional<Block> optionalBlock = this.blocks.stream().filter(block -> block.getX() == x && block.getY() == y && block.getZ() == z && block.getLayer() == layer).findAny();
         return optionalBlock.map(Block::getId).orElseGet(() -> this.parent.getBlockIdAt(x, y, z, layer));
     }
 
     @Override
     public void setBlockIdAt(int x, int y, int z, BlockLayer layer, int id) {
-        Optional<Block> optionalBlock = this.blocks.stream().filter(block -> block.getFloorX() == x && block.getFloorY() == y && block.getFloorZ() == z && block.getLayer() == layer).findAny();
+        Optional<Block> optionalBlock = this.blocks.stream().filter(block -> block.getX() == x && block.getY() == y && block.getZ() == z && block.getLayer() == layer).findAny();
         Block block = optionalBlock.orElse(Block.get(this.getBlockIdAt(x, y, z, layer), this.getBlockDataAt(x, y, z, layer), new Position(x, y, z), layer));
         this.blocks.remove(block);
         this.blocks.add(Block.get(this.getBlockIdAt(x, y, z, layer), this.getBlockDataAt(x, y, z, layer), new Position(x, y, z), layer));
@@ -34,25 +34,25 @@ public class ListChunkManager implements ChunkManager {
 
     @Override
     public void setBlockAt(int x, int y, int z, int id, int data) {
-        this.blocks.removeIf(block -> block.getFloorX() == x && block.getFloorY() == y && block.getFloorZ() == z);
+        this.blocks.removeIf(block -> block.getX() == x && block.getY() == y && block.getZ() == z);
         this.blocks.add(Block.get(id, data, new Position(x, y, z)));
     }
 
     @Override
     public void setBlockFullIdAt(int x, int y, int z, BlockLayer layer, int fullId) {
-        this.blocks.removeIf(block -> block.getFloorX() == x && block.getFloorY() == y && block.getFloorZ() == z && block.getLayer() == layer);
+        this.blocks.removeIf(block -> block.getX() == x && block.getY() == y && block.getZ() == z && block.getLayer() == layer);
         this.blocks.add(Block.get(fullId, null, x, y, z, layer));
     }
 
     @Override
     public int getBlockDataAt(int x, int y, int z, BlockLayer layer) {
-        Optional<Block> optionalBlock = this.blocks.stream().filter(block -> block.getFloorX() == x && block.getFloorY() == y && block.getFloorZ() == z && block.getLayer() == layer).findAny();
+        Optional<Block> optionalBlock = this.blocks.stream().filter(block -> block.getX() == x && block.getY() == y && block.getZ() == z && block.getLayer() == layer).findAny();
         return optionalBlock.map(Block::getDamage).orElseGet(() -> this.parent.getBlockDataAt(x, y, z, layer));
     }
 
     @Override
     public void setBlockDataAt(int x, int y, int z, BlockLayer layer, int data) {
-        Optional<Block> optionalBlock = this.blocks.stream().filter(block -> block.getFloorX() == x && block.getFloorY() == y && block.getFloorZ() == z && block.getLayer() == layer).findAny();
+        Optional<Block> optionalBlock = this.blocks.stream().filter(block -> block.getX() == x && block.getY() == y && block.getZ() == z && block.getLayer() == layer).findAny();
         Block block = optionalBlock.orElse(Block.get(this.getBlockIdAt(x, y, z, layer), this.getBlockDataAt(x, y, z, layer), new Position(x, y, z), layer));
         this.blocks.remove(block);
         block.setDamage(data);
@@ -66,7 +66,7 @@ public class ListChunkManager implements ChunkManager {
 
     @Override
     public boolean setBlockAtLayer(int x, int y, int z, BlockLayer layer, int id, int data) {
-        this.blocks.removeIf(block -> block.getFloorX() == x && block.getFloorY() == y && block.getFloorZ() == z && block.getLayer() == layer);
+        this.blocks.removeIf(block -> block.getX() == x && block.getY() == y && block.getZ() == z && block.getLayer() == layer);
         this.blocks.add(Block.get(id, data, new Position(x, y, z), layer));
         return true;
     }

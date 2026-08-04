@@ -1,5 +1,7 @@
 package cn.nukkit;
 
+import cn.nukkit.network.protocol.AdventureSettingsPacket;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.network.protocol.UpdateAbilitiesPacket;
 import cn.nukkit.network.protocol.UpdateAdventureSettingsPacket;
 import cn.nukkit.network.protocol.types.AbilityLayer;
@@ -30,6 +32,87 @@ public class AdventureSettings implements Cloneable {
         this.player = player;
     }
 
+    /**
+     * List of adventure settings
+     */
+    public enum Type {
+        WORLD_IMMUTABLE(AdventureSettingsPacket.WORLD_IMMUTABLE, null, false),
+        NO_PVM(AdventureSettingsPacket.NO_PVM, null, false),
+        NO_MVP(AdventureSettingsPacket.NO_MVP, PlayerAbility.INVULNERABLE, false),
+        SHOW_NAME_TAGS(AdventureSettingsPacket.SHOW_NAME_TAGS, null, false),
+        AUTO_JUMP(AdventureSettingsPacket.AUTO_JUMP, null, true),
+        ALLOW_FLIGHT(AdventureSettingsPacket.ALLOW_FLIGHT, PlayerAbility.MAY_FLY, false),
+        NO_CLIP(AdventureSettingsPacket.NO_CLIP, PlayerAbility.NO_CLIP, false),
+        WORLD_BUILDER(AdventureSettingsPacket.WORLD_BUILDER, PlayerAbility.WORLD_BUILDER, false),
+        FLYING(AdventureSettingsPacket.FLYING, PlayerAbility.FLYING, false),
+        MUTED(AdventureSettingsPacket.MUTED, PlayerAbility.MUTED, false),
+        MINE(AdventureSettingsPacket.MINE, PlayerAbility.MINE, true),
+        DOORS_AND_SWITCHED(AdventureSettingsPacket.DOORS_AND_SWITCHES, PlayerAbility.DOORS_AND_SWITCHES, true),
+        OPEN_CONTAINERS(AdventureSettingsPacket.OPEN_CONTAINERS, PlayerAbility.OPEN_CONTAINERS, true),
+        ATTACK_PLAYERS(AdventureSettingsPacket.ATTACK_PLAYERS, PlayerAbility.ATTACK_PLAYERS, true),
+        ATTACK_MOBS(AdventureSettingsPacket.ATTACK_MOBS, PlayerAbility.ATTACK_MOBS, true),
+        OPERATOR(AdventureSettingsPacket.OPERATOR, PlayerAbility.OPERATOR_COMMANDS, false),
+        TELEPORT(AdventureSettingsPacket.TELEPORT, PlayerAbility.TELEPORT, false),
+        BUILD(AdventureSettingsPacket.BUILD, PlayerAbility.BUILD, true),
+        PRIVILEGED_BUILDER(0, PlayerAbility.PRIVILEGED_BUILDER, false, ProtocolInfo.v1_19_70),
+
+        // For backwards compatibility
+        BUILD_AND_MINE(0, null, true),
+        DEFAULT_LEVEL_PERMISSIONS(AdventureSettingsPacket.DEFAULT_LEVEL_PERMISSIONS, null, false);
+
+        private final int id;
+        private final PlayerAbility ability;
+        private final boolean defaultValue;
+        private final int sinceProtocol;
+
+        Type(int id, PlayerAbility ability, boolean defaultValue) {
+            this(id, ability, defaultValue, 0);
+        }
+
+        Type(int id, PlayerAbility ability, boolean defaultValue, int sinceProtocol) {
+            this.id = id;
+            this.ability = ability;
+            this.defaultValue = defaultValue;
+            this.sinceProtocol = sinceProtocol;
+        }
+
+        /**
+         * Legacy: Get adventure setting ID if available
+         *
+         * @return adventure setting ID
+         */
+        public int getId() {
+            return this.id;
+        }
+
+        /**
+         * Get default value
+         *
+         * @return default value
+         */
+        public boolean getDefaultValue() {
+            return this.defaultValue;
+        }
+
+        /**
+         * Get player ability type
+         *
+         * @return player ability type
+         */
+        public PlayerAbility getAbility() {
+            return this.ability;
+        }
+
+        /**
+         * Check whether adventure setting is a valid player ability
+         *
+         * @return is a valid player ability
+         */
+        public boolean isAbility() {
+            return this.ability != null;
+        }
+    }
+
     public AdventureSettings clone(Player newPlayer) {
         try {
             AdventureSettings settings = (AdventureSettings) super.clone();
@@ -43,7 +126,7 @@ public class AdventureSettings implements Cloneable {
     /**
      * Set an adventure setting value
      *
-     * @param type adventure setting
+     * @param type  adventure setting
      * @param value new value
      * @return AdventureSettings
      */
@@ -72,139 +155,99 @@ public class AdventureSettings implements Cloneable {
 
     /**
      * Send adventure settings values to the player
+     *
      * @param reset reset in air ticks
      */
     void update(boolean reset) {
-        UpdateAbilitiesPacket packet = new UpdateAbilitiesPacket();
-        packet.setEntityId(player.getId());
-        packet.setCommandPermission(player.isOp() ? UpdateAbilitiesPacket.CommandPermission.OPERATOR : UpdateAbilitiesPacket.CommandPermission.NORMAL);
-        packet.setPlayerPermission(player.isOp() && !player.isSpectator() ? UpdateAbilitiesPacket.PlayerPermission.OPERATOR : UpdateAbilitiesPacket.PlayerPermission.MEMBER); // Spectator: fix operators being able to break blocks on spectator mode
+        if (player.protocol >= ProtocolInfo.v1_19_30_23) {
+            UpdateAbilitiesPacket packet = new UpdateAbilitiesPacket();
+            packet.setEntityId(player.getId());
+            packet.setCommandPermission(player.isOp() && player.showAdmin() ? UpdateAbilitiesPacket.CommandPermission.OPERATOR : UpdateAbilitiesPacket.CommandPermission.NORMAL);
+            packet.setPlayerPermission(player.isOp() && player.showAdmin() && !player.isSpectator() ? UpdateAbilitiesPacket.PlayerPermission.OPERATOR : UpdateAbilitiesPacket.PlayerPermission.MEMBER); // Spectator: fix operators being able to break blocks on spectator mode
 
-        AbilityLayer layer = new AbilityLayer();
-        layer.setLayerType(AbilityLayer.Type.BASE);
-        layer.getAbilitiesSet().addAll(PlayerAbility.VALUES);
+            AbilityLayer layer = new AbilityLayer();
+            layer.setLayerType(AbilityLayer.Type.BASE);
+            layer.getAbilitiesSet().addAll(PlayerAbility.VALUES);
 
-        for (Type type : Type.values()) {
-            if (type.isAbility() && this.get(type)) {
-                layer.getAbilityValues().add(type.getAbility());
+            if (player.protocol < ProtocolInfo.v1_19_70) {
+                layer.getAbilitiesSet().remove(PlayerAbility.PRIVILEGED_BUILDER);
             }
-        }
-
-        // Because we send speed
-        layer.getAbilityValues().add(PlayerAbility.WALK_SPEED);
-        layer.getAbilityValues().add(PlayerAbility.FLY_SPEED);
-        layer.getAbilityValues().add(PlayerAbility.VERTICAL_FLY_SPEED);
-
-        if (player.isCreative()) { // Make sure player can interact with creative menu
-            layer.getAbilityValues().add(PlayerAbility.INSTABUILD);
-        }
-
-        if (player.isOp()) {
-            layer.getAbilityValues().add(PlayerAbility.OPERATOR_COMMANDS);
-        }
-
-        layer.setWalkSpeed(player.getWalkSpeed());
-        layer.setFlySpeed(player.getFlySpeed());
-        layer.setVerticalFlySpeed(player.getVerticalFlySpeed());
-        packet.getAbilityLayers().add(layer);
-
-        if (player.isSpectator()) {
-            AbilityLayer spectator = new AbilityLayer();
-            spectator.setLayerType(AbilityLayer.Type.SPECTATOR);
-
-            spectator.getAbilitiesSet().addAll(PlayerAbility.VALUES);
-            spectator.getAbilitiesSet().remove(PlayerAbility.FLY_SPEED);
-            spectator.getAbilitiesSet().remove(PlayerAbility.WALK_SPEED);
-            spectator.getAbilitiesSet().remove(PlayerAbility.VERTICAL_FLY_SPEED);
 
             for (Type type : Type.values()) {
-                if (type.isAbility() && this.get(type)) {
-                    spectator.getAbilityValues().add(type.getAbility());
+                if (type.isAbility() && player.protocol >= type.sinceProtocol && this.get(type)) {
+                    layer.getAbilityValues().add(type.getAbility());
                 }
+            }
+
+            // Because we send speed
+            layer.getAbilityValues().add(PlayerAbility.WALK_SPEED);
+            layer.getAbilityValues().add(PlayerAbility.FLY_SPEED);
+            if (player.protocol >= ProtocolInfo.v1_21_60) {
+                layer.getAbilityValues().add(PlayerAbility.VERTICAL_FLY_SPEED);
+            }
+
+            if (player.isCreative()) { // Make sure player can interact with creative menu
+                layer.getAbilityValues().add(PlayerAbility.INSTABUILD);
             }
 
             if (player.isOp()) {
                 layer.getAbilityValues().add(PlayerAbility.OPERATOR_COMMANDS);
             }
 
-            packet.getAbilityLayers().add(spectator);
+            layer.setWalkSpeed(player.getWalkSpeed());
+            layer.setFlySpeed(player.getFlySpeed());
+            layer.setVerticalFlySpeed(player.getVerticalFlySpeed());
+            packet.getAbilityLayers().add(layer);
+
+            if (player.protocol >= ProtocolInfo.v1_19_80 && player.isSpectator()) {
+                AbilityLayer spectator = new AbilityLayer();
+                spectator.setLayerType(AbilityLayer.Type.SPECTATOR);
+
+                spectator.getAbilitiesSet().addAll(PlayerAbility.VALUES);
+                spectator.getAbilitiesSet().remove(PlayerAbility.FLY_SPEED);
+                spectator.getAbilitiesSet().remove(PlayerAbility.WALK_SPEED);
+                spectator.getAbilitiesSet().remove(PlayerAbility.VERTICAL_FLY_SPEED);
+
+                for (Type type : Type.values()) {
+                    if (type.isAbility() && player.protocol >= type.sinceProtocol && this.get(type)) {
+                        spectator.getAbilityValues().add(type.getAbility());
+                    }
+                }
+
+                if (player.isOp()) {
+                    layer.getAbilityValues().add(PlayerAbility.OPERATOR_COMMANDS);
+                }
+
+                packet.getAbilityLayers().add(spectator);
+            }
+
+            UpdateAdventureSettingsPacket adventurePacket = new UpdateAdventureSettingsPacket();
+            adventurePacket.setAutoJump(get(Type.AUTO_JUMP));
+            adventurePacket.setImmutableWorld(get(Type.WORLD_IMMUTABLE));
+            adventurePacket.setNoMvP(get(Type.NO_MVP));
+            adventurePacket.setNoPvM(get(Type.NO_PVM));
+            adventurePacket.setShowNameTags(get(Type.SHOW_NAME_TAGS));
+
+            player.dataPacket(packet);
+            player.dataPacket(adventurePacket);
+        } else {
+            AdventureSettingsPacket pk = new AdventureSettingsPacket();
+            for (Type t : Type.values()) {
+                if (t.getId() > 0) {
+                    pk.setFlag(t.getId(), get(t));
+                }
+            }
+
+            pk.commandPermission = player.isOp() && player.showAdmin() ? AdventureSettingsPacket.PERMISSION_OPERATOR : AdventureSettingsPacket.PERMISSION_NORMAL;
+            pk.playerPermission = player.isOp() && player.showAdmin() && !player.isSpectator() ? 2 : 1; // Spectator: fix operators being able to break blocks on spectator mode
+            pk.entityUniqueId = player.getId();
+
+            //Server.broadcastPacket(player.getViewers().values(), pk);
+            player.dataPacket(pk);
         }
-
-        UpdateAdventureSettingsPacket adventurePacket = new UpdateAdventureSettingsPacket();
-        adventurePacket.setAutoJump(get(Type.AUTO_JUMP));
-        adventurePacket.setImmutableWorld(get(Type.WORLD_IMMUTABLE));
-        adventurePacket.setNoMvP(get(Type.NO_MVP));
-        adventurePacket.setNoPvM(get(Type.NO_PVM));
-        adventurePacket.setShowNameTags(get(Type.SHOW_NAME_TAGS));
-
-        player.dataPacket(packet);
-        player.dataPacket(adventurePacket);
 
         if (reset) {
             player.resetInAirTicks();
-        }
-    }
-
-    /**
-     * List of adventure settings
-     */
-    public enum Type {
-        WORLD_IMMUTABLE(null, false),
-        NO_PVM(null, false),
-        NO_MVP(PlayerAbility.INVULNERABLE, false),
-        SHOW_NAME_TAGS(null, false),
-        AUTO_JUMP(null, true),
-        ALLOW_FLIGHT(PlayerAbility.MAY_FLY, false),
-        NO_CLIP(PlayerAbility.NO_CLIP, false),
-        WORLD_BUILDER(PlayerAbility.WORLD_BUILDER, false),
-        FLYING(PlayerAbility.FLYING, false),
-        MUTED(PlayerAbility.MUTED, false),
-        MINE(PlayerAbility.MINE, true),
-        DOORS_AND_SWITCHED(PlayerAbility.DOORS_AND_SWITCHES, true),
-        OPEN_CONTAINERS(PlayerAbility.OPEN_CONTAINERS, true),
-        ATTACK_PLAYERS(PlayerAbility.ATTACK_PLAYERS, true),
-        ATTACK_MOBS(PlayerAbility.ATTACK_MOBS, true),
-        OPERATOR(PlayerAbility.OPERATOR_COMMANDS, false),
-        TELEPORT(PlayerAbility.TELEPORT, false),
-        BUILD(PlayerAbility.BUILD, true),
-        PRIVILEGED_BUILDER(PlayerAbility.PRIVILEGED_BUILDER, false),
-
-        @Deprecated
-        DEFAULT_LEVEL_PERMISSIONS(null, false);
-
-        private final PlayerAbility ability;
-        private final boolean defaultValue;
-
-        Type(PlayerAbility ability, boolean defaultValue) {
-            this.ability = ability;
-            this.defaultValue = defaultValue;
-        }
-
-        /**
-         * Get default value
-         *
-         * @return default value
-         */
-        public boolean getDefaultValue() {
-            return this.defaultValue;
-        }
-
-        /**
-         * Get player ability type
-         *
-         * @return player ability type
-         */
-        public PlayerAbility getAbility() {
-            return this.ability;
-        }
-
-        /**
-         * Check whether adventure setting is a valid player ability
-         *
-         * @return is a valid player ability
-         */
-        public boolean isAbility() {
-            return this.ability != null;
         }
     }
 }

@@ -1,5 +1,7 @@
 package cn.nukkit.command.defaults;
 
+import cn.nukkit.Nukkit;
+import cn.nukkit.command.CommandMap;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.data.CommandParamType;
 import cn.nukkit.command.data.CommandParameter;
@@ -27,22 +29,21 @@ public class VersionCommand extends VanillaCommand {
         this.setPermission("nukkit.command.version");
         this.commandParameters.clear();
         this.commandParameters.put("default", new CommandParameter[]{
-                CommandParameter.newType("pluginName", true, CommandParamType.STRING)
+                new CommandParameter("pluginName", CommandParamType.STRING, true)
         });
     }
 
     @Override
     public boolean execute(CommandSender sender, String commandLabel, String[] args) {
-        if (!this.testPermission(sender)) {
+        /*if (!this.testPermission(sender)) {
             return true;
-        }
+        }*/
         if (args.length == 0 || !sender.hasPermission("nukkit.command.version.plugins")) {
-            sender.sendMessage(sender.getServer().getLanguage().translateString("nukkit.server.info.extended", sender.getServer().getName(),
-                    sender.getServer().getNukkitVersion(),
-                    sender.getServer().getCodename(),
-                    sender.getServer().getApiVersion(),
-                    sender.getServer().getVersion(),
-                    String.valueOf(ProtocolInfo.CURRENT_PROTOCOL)));
+            sender.sendMessage("§e###############################################\n§cNukkit §aPetteriM1 Edition\n§6Build: §b" + Nukkit.getBranch() + '/' + Nukkit.VERSION.substring(4) + " (" + Nukkit.BUILD_VERSION_NUMBER + ")\n§6Multiversion: §bUp to version " + ProtocolInfo.MINECRAFT_VERSION_NETWORK + "\n§dhttps://github.com/PetteriM1/NukkitPetteriM1Edition\n§e###############################################");
+
+            if (sender.isOp() && Nukkit.getBranch().equals(Nukkit.MAIN_BRANCH)) {
+                sender.getServer().updateNotification(sender, true);
+            }
         } else {
             StringBuilder pluginName = new StringBuilder();
             for (String arg : args) pluginName.append(arg).append(' ');
@@ -85,5 +86,10 @@ public class VersionCommand extends VanillaCommand {
             }
         }
         return true;
+    }
+
+    @Override
+    public boolean unregister(CommandMap commandMap) {
+        return false;
     }
 }

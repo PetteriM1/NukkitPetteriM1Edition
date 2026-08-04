@@ -44,8 +44,12 @@ public class SetTitlePacket extends DataPacket {
         this.putVarInt(fadeInTime);
         this.putVarInt(stayTime);
         this.putVarInt(fadeOutTime);
-        this.putString(this.xuid);
-        this.putString(this.platformOnlineId);
-        this.putString(this.filteredTitleText);
+        if (protocol >= ProtocolInfo.v1_17_10) {
+            this.putString(xuid);
+            this.putString(platformOnlineId);
+            if (protocol >= ProtocolInfo.v1_21_20) {
+                this.putString(filteredTitleText);
+            }
+        }
     }
 }

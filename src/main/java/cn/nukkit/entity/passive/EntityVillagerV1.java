@@ -58,6 +58,11 @@ public class EntityVillagerV1 extends EntityWalkingAnimal implements InventoryHo
     }
 
     @Override
+    public double getSpeed() {
+        return 1.1;
+    }
+
+    @Override
     public void initEntity() {
         this.setMaxHealth(10);
         super.initEntity();
@@ -186,5 +191,10 @@ public class EntityVillagerV1 extends EntityWalkingAnimal implements InventoryHo
     @Override
     public TradeInventory getInventory() {
         return this.inventory;
+    }
+
+    @Override
+    public boolean canDespawn() {
+        return false;
     }
 }

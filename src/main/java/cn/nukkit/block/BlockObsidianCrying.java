@@ -23,13 +23,14 @@ public class BlockObsidianCrying extends BlockSolid {
 
     @Override
     public double getHardness() {
-        return 35;
+        return 50; //35
     }
 
     @Override
     public double getResistance() {
         return 1200;
     }
+
     @Override
     public Item[] getDrops(Item item) {
         if (item.isPickaxe() && item.getTier() >= ItemTool.TIER_DIAMOND) {

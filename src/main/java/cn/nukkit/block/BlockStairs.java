@@ -14,7 +14,7 @@ import cn.nukkit.utils.Faceable;
  */
 public abstract class BlockStairs extends BlockSolidMeta implements Faceable {
 
-    private static final short[] FACES = {2, 1, 3, 0};
+    private static final short[] faces = {2, 1, 3, 0};
 
     protected BlockStairs(int meta) {
         super(meta);
@@ -22,20 +22,20 @@ public abstract class BlockStairs extends BlockSolidMeta implements Faceable {
 
     @Override
     public double getMinY() {
-        // TODO: this seems wrong
         return this.y + (this.getDamage() & 0x04) > 0 ? 0.5 : 0;
     }
 
     @Override
     public double getMaxY() {
-        // TODO: this seems wrong
+        if (true) { // don't sink
+            return this.y + 1;
+        }
         return this.y + (this.getDamage() & 0x04) > 0 ? 1 : 0.5;
     }
 
-
     @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        this.setDamage(FACES[player != null ? player.getDirection().getHorizontalIndex() : 0]);
+        this.setDamage(faces[player != null ? player.getDirection().getHorizontalIndex() : 0]);
         if ((fy > 0.5 && face != BlockFace.UP) || face == BlockFace.DOWN) {
             this.setDamage(this.getDamage() | 0x04); //Upside-down stairs
         }
@@ -47,7 +47,7 @@ public abstract class BlockStairs extends BlockSolidMeta implements Faceable {
     public Item[] getDrops(Item item) {
         if (item.isPickaxe()) {
             return new Item[]{
-                  toItem()
+                    toItem()
             };
         } else {
             return new Item[0];
@@ -61,6 +61,16 @@ public abstract class BlockStairs extends BlockSolidMeta implements Faceable {
 
     @Override
     public boolean collidesWithBB(AxisAlignedBB bb) {
+        if (true) { // don't sink
+            return bb.intersectsWith(new SimpleAxisAlignedBB(
+                    this.x,
+                    getMinY(),
+                    this.z,
+                    this.x + 1,
+                    getMaxY(),
+                    this.z + 1));
+        }
+
         int damage = this.getDamage();
         int side = damage & 0x03;
         double f = 0;

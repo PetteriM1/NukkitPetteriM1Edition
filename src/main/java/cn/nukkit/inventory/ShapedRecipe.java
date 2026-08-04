@@ -110,6 +110,16 @@ public class ShapedRecipe implements CraftingRecipe {
         this.networkId = ++CraftingManager.NEXT_NETWORK_ID;
     }
 
+    public static class Entry {
+        public final int x;
+        public final int y;
+
+        public Entry(int x, int y) {
+            this.x = x;
+            this.y = y;
+        }
+    }
+
     public int getWidth() {
         return this.shape[0].length();
     }
@@ -275,7 +285,7 @@ public class ShapedRecipe implements CraftingRecipe {
      * Returns whether the specified list of crafting grid inputs and outputs matches this recipe. Outputs DO NOT
      * include the primary result item.
      *
-     * @param inputList  list of items taken from the crafting grid
+     * @param inputList       list of items taken from the crafting grid
      * @param extraOutputList list of items put back into the crafting grid (secondary results)
      * @return bool
      */
@@ -324,15 +334,5 @@ public class ShapedRecipe implements CraftingRecipe {
 
     public int getNetworkId() {
         return this.networkId;
-    }
-
-    public static class Entry {
-        public final int x;
-        public final int y;
-
-        public Entry(int x, int y) {
-            this.x = x;
-            this.y = y;
-        }
     }
 }

@@ -6,7 +6,7 @@ package cn.nukkit.utils;
  * Created by Snake1999 on 2016/1/10.
  * Package cn.nukkit.utils in project Nukkit
  */
-public class BlockColor  {
+public class BlockColor {
 
     // https://minecraft.wiki/w/Map_item_format#Color_table
 
@@ -161,7 +161,6 @@ public class BlockColor  {
      * @param dyeColorMeta dye item meta value
      * @return BlockColor
      */
-    @Deprecated
     public static BlockColor getDyeColor(int dyeColorMeta) {
         return DyeColor.getByDyeData(dyeColorMeta).getColor();
     }

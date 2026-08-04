@@ -84,7 +84,6 @@ public class TaskHandler {
         this.cancelled = true;
     }
 
-    @Deprecated
     public void remove() {
         this.cancelled = true;
     }

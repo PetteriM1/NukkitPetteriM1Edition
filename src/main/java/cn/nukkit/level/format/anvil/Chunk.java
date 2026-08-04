@@ -29,16 +29,6 @@ public class Chunk extends BaseChunk {
     protected boolean terrainPopulated;
     protected boolean terrainGenerated;
 
-    @Override
-    public Chunk clone() {
-        return (Chunk) super.clone();
-    }
-
-    @Override
-    public Chunk cloneForChunkSending() {
-        return (Chunk) super.cloneForChunkSending();
-    }
-
     public Chunk(LevelProvider level) {
         this(level, null);
     }
@@ -103,8 +93,8 @@ public class Chunk extends BaseChunk {
             int[] biomeColors = nbt.getIntArray("BiomeColors");
             if (biomeColors != null && biomeColors.length == 256) {
                 BiomePalette palette = new BiomePalette(biomeColors);
-                for (int x = 0; x < 16; x++)    {
-                    for (int z = 0; z < 16; z++)    {
+                for (int x = 0; x < 16; x++) {
+                    for (int z = 0; z < 16; z++) {
                         this.biomes[(x << 4) | z] = (byte) (palette.get(x, z) >> 24);
                     }
                 }
@@ -167,6 +157,16 @@ public class Chunk extends BaseChunk {
         this.inhabitedTime = nbt.getLong("InhabitedTime");
         this.terrainPopulated = nbt.getBoolean("TerrainPopulated");
         this.terrainGenerated = nbt.getBoolean("TerrainGenerated");
+    }
+
+    @Override
+    public Chunk clone() {
+        return (Chunk) super.clone();
+    }
+
+    @Override
+    public Chunk cloneForChunkSending() {
+        return (Chunk) super.cloneForChunkSending();
     }
 
     @Override
@@ -295,7 +295,11 @@ public class Chunk extends BaseChunk {
             }
             CompoundTag s = new CompoundTag();
             s.putByte("Y", (section.getY()));
-            s.putByteArray("Blocks", section.getIdArray());
+            s.putByteArray("Blocks", section.getIdArray(1));
+            byte[] blocks2 = section.getIdArray(2);
+            if (!Utils.isByteArrayEmpty(blocks2)) {
+                s.putByteArray("Blocks2PM1E", blocks2);
+            }
             s.putByteArray("Data", section.getDataArray());
             s.putByteArray("BlockLight", section.getLightArray());
             s.putByteArray("SkyLight", section.getSkyLightArray());

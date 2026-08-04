@@ -32,7 +32,7 @@ public class BlockCarpet extends BlockFlowable {
 
     @Override
     public double getResistance() {
-        return 0.5;
+        return 2.5;
     }
 
     @Override

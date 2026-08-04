@@ -63,7 +63,7 @@ public class ProjectileDispenseBehavior extends DefaultDispenseBehavior {
     /**
      * You can add extra data of projectile here
      *
-     * @param nbt tag
+     * @param nbt  tag
      * @param item item
      */
     protected void correctNBT(CompoundTag nbt, Item item) {

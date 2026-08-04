@@ -12,7 +12,8 @@ public class FoodEffectiveInBow extends FoodEffective {
     @Override
     protected boolean onEatenBy(Player player) {
         super.onEatenBy(player);
-        player.getInventory().addItem(Item.get(Item.BOWL));; // TODO: set to same slot but don't have it replaced
+        player.getInventory().addItem(Item.get(Item.BOWL));
+        ; // TODO: set to same slot but don't have it replaced
         return true;
     }
 }

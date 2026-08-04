@@ -11,19 +11,18 @@ import java.util.Map;
 public class ImmutableCompoundTag extends CompoundTag {
 
     public static final CompoundTag EMPTY = new ImmutableCompoundTag(new CompoundTag());
-
-    public static CompoundTag of(CompoundTag tag) {
-        return new ImmutableCompoundTag(tag);
-    }
-
     private final CompoundTag delegate;
 
     private ImmutableCompoundTag(CompoundTag delegate) {
         this.delegate = delegate;
     }
 
+    public static CompoundTag of(CompoundTag tag) {
+        return new ImmutableCompoundTag(tag);
+    }
+
     @Override
-    public void load(NBTInputStream dis) throws IOException {
+    public void load(NBTInputStream dis, int nested) throws IOException {
         throw new UnsupportedOperationException();
     }
 
@@ -76,6 +75,7 @@ public class ImmutableCompoundTag extends CompoundTag {
     public CompoundTag putIntArray(String name, int[] value) {
         throw new UnsupportedOperationException();
     }
+
     @Override
 
     public CompoundTag putList(ListTag<? extends Tag> listTag) {
@@ -126,6 +126,7 @@ public class ImmutableCompoundTag extends CompoundTag {
     public int getInt(String name) {
         return this.delegate.getInt(name);
     }
+
     @Override
     public long getLong(String name) {
         return this.delegate.getLong(name);

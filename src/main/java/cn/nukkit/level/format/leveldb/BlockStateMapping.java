@@ -1,5 +1,6 @@
 package cn.nukkit.level.format.leveldb;
 
+import cn.nukkit.Server;
 import cn.nukkit.block.BlockID;
 import cn.nukkit.level.format.leveldb.structure.BlockStateSnapshot;
 import cn.nukkit.level.format.leveldb.updater.BlockStateUpdaterChunker;
@@ -88,10 +89,6 @@ public class BlockStateMapping {
         log.info("Latest block state updater version {}", context.getLatestVersion());
     }
 
-    public static BlockStateMapping get() {
-        return INSTANCE;
-    }
-
     private final Int2ObjectMap<BlockStateSnapshot> runtime2State = new Int2ObjectOpenHashMap<>();
     private final Object2ObjectMap<NbtMap, BlockStateSnapshot> paletteMap = new Object2ObjectOpenCustomHashMap<>(new Hash.Strategy<NbtMap>() {
         @Override
@@ -105,12 +102,9 @@ public class BlockStateMapping {
         }
     });
     private final int version;
-
     private LegacyStateMapper legacyMapper;
-
     private int defaultRuntimeId = -1;
     private BlockStateSnapshot defaultState;
-
     public BlockStateMapping(int version) {
         this(version, null);
     }
@@ -120,11 +114,15 @@ public class BlockStateMapping {
         this.legacyMapper = legacyMapper;
     }
 
+    public static BlockStateMapping get() {
+        return INSTANCE;
+    }
+
     public void registerState(int runtimeId, NbtMap state) {
         Preconditions.checkArgument(!this.runtime2State.containsKey(runtimeId),
-                "Mapping for runtimeId " + runtimeId + " is already created!");
+                version + ": Mapping for runtimeId " + runtimeId + " is already created!");
         Preconditions.checkArgument(!this.paletteMap.containsKey(state),
-                "Mapping for state is already created: " + state);
+                version + ": Mapping for state is already created: " + state);
 
         BlockStateSnapshot blockState = BlockStateSnapshot.builder()
                 .version(this.version)
@@ -229,7 +227,11 @@ public class BlockStateMapping {
 
     public BlockStateSnapshot getDefaultState() {
         if (this.defaultState == null) {
-            this.setDefaultBlock(BlockID.INFO_UPDATE, 0);
+            if (Server.getInstance().suomiCraftPEMode()) {
+                this.setDefaultBlock(BlockID.AIR, 0); // Until those doors are fixed
+            } else {
+                this.setDefaultBlock(BlockID.INFO_UPDATE, 0);
+            }
         }
         return this.defaultState;
     }

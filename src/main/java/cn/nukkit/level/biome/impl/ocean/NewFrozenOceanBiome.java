@@ -4,6 +4,8 @@ public class NewFrozenOceanBiome extends OceanBiome {
 
     public NewFrozenOceanBiome() {
         super();
+
+        //TODO: ice mountains
     }
 
     @Override

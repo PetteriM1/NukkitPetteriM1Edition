@@ -11,11 +11,11 @@ public class PlayerLocallyInitializedEvent extends PlayerEvent {
 
     private static final HandlerList handlers = new HandlerList();
 
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     public PlayerLocallyInitializedEvent(Player player) {
         this.player = player;
+    }
+
+    public static HandlerList getHandlers() {
+        return handlers;
     }
 }

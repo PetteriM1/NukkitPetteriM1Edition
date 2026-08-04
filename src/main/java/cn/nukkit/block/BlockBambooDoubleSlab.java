@@ -1,6 +1,8 @@
 package cn.nukkit.block;
 
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockBambooDoubleSlab extends BlockDoubleSlabWood {
 
@@ -20,6 +22,16 @@ public class BlockBambooDoubleSlab extends BlockDoubleSlabWood {
     @Override
     public int getId() {
         return BAMBOO_DOUBLE_SLAB;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_20_0_23;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.DOUBLE_WOOD_SLAB;
     }
 
     @Override

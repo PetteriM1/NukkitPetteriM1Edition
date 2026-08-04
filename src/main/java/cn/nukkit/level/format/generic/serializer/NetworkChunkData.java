@@ -8,6 +8,8 @@ import lombok.Data;
 @AllArgsConstructor
 public class NetworkChunkData {
 
+    private final int protocol;
     private int chunkSections;
+    private final boolean antiXray;
     private final DimensionData dimensionData;
 }

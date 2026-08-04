@@ -4,7 +4,7 @@ import cn.nukkit.block.properties.OxidizationLevel;
 import cn.nukkit.utils.BlockColor;
 
 public class BlockStairsCopperCutExposed extends BlockStairsCopperCut {
-    
+
     public BlockStairsCopperCutExposed() {
         this(0);
     }

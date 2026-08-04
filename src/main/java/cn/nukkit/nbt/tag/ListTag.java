@@ -5,10 +5,7 @@ import cn.nukkit.nbt.stream.NBTOutputStream;
 
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.StringJoiner;
+import java.util.*;
 
 public class ListTag<T extends Tag> extends Tag {
 
@@ -25,7 +22,7 @@ public class ListTag<T extends Tag> extends Tag {
     }
 
     @Override
-    void write(NBTOutputStream dos) throws IOException {
+    public void write(NBTOutputStream dos) throws IOException {
         if (!list.isEmpty()) type = list.get(0).getId();
         else type = 1;
 
@@ -36,14 +33,24 @@ public class ListTag<T extends Tag> extends Tag {
 
     @Override
     @SuppressWarnings("unchecked")
-    public void load(NBTInputStream dis) throws IOException {
+    public void load(NBTInputStream dis, int nested) throws IOException {
         type = dis.readByte();
         int size = dis.readInt();
 
-        list = new ArrayList<>(size);
+        if (this.type == TAG_End) {
+            this.list = new ArrayList<>();
+            return;
+        }
+
+        if (dis.isReadSafely() && size > 64) {
+            list = new ArrayList<>(64);
+        } else {
+            list = new ArrayList<>(size);
+        }
+
         for (int i = 0; i < size; i++) {
             Tag tag = Tag.newTag(type, null);
-            tag.load(dis);
+            tag.load(dis, nested + 1);
             tag.setName("");
             list.add((T) tag);
         }
@@ -58,7 +65,7 @@ public class ListTag<T extends Tag> extends Tag {
     public String toString() {
         StringJoiner joiner = new StringJoiner(",\n\t");
         list.forEach(tag -> joiner.add(tag.toString().replace("\n", "\n\t")));
-        return "ListTag '" + this.getName() + "' (" + list.size() + " entries of type " + Tag.getTagName(type) + ") {\n\t" + joiner.toString() + "\n}";
+        return "ListTag '" + this.getName() + "' (" + list.size() + " entries of type " + Tag.getTagName(type) + ") {\n\t" + joiner + "\n}";
     }
 
     public void print(String prefix, PrintStream out) {

@@ -1,5 +1,6 @@
 package cn.nukkit.level.biome.impl.iceplains;
 
+import cn.nukkit.Server;
 import cn.nukkit.block.BlockSapling;
 import cn.nukkit.level.biome.type.SnowyBiome;
 import cn.nukkit.level.generator.object.tree.ObjectTree;
@@ -14,7 +15,7 @@ public class IcePlainsBiome extends SnowyBiome {
     public IcePlainsBiome() {
         super();
 
-        PopulatorTree trees = new PopulatorTree(BlockSapling.SPRUCE + ObjectTree.SNOWY_TREE);
+        PopulatorTree trees = new PopulatorTree(BlockSapling.SPRUCE + (!Server.getInstance().getPropertyBoolean("wgenext.vanilla-overworld") ? ObjectTree.SNOWY_TREE : 0));
         trees.setRandomAmount(1);
         this.addPopulator(trees);
 

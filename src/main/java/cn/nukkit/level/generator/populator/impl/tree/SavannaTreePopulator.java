@@ -20,7 +20,8 @@ public class SavannaTreePopulator extends Populator {
         this(BlockSapling.ACACIA);
     }
 
-    public SavannaTreePopulator(int type) {}
+    public SavannaTreePopulator(int type) {
+    }
 
     public void setRandomAmount(int randomAmount) {
         this.randomAmount = randomAmount;

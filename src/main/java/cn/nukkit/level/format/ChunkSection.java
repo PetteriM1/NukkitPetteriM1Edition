@@ -72,6 +72,10 @@ public interface ChunkSection {
 
     byte[] getIdArray();
 
+    // get block IDs for chunk save
+    // ver 1 = id < 256, ver 2 = id < 512
+    byte[] getIdArray(int ver);
+
     byte[] getDataArray();
 
     byte[] getSkyLightArray();
@@ -80,11 +84,13 @@ public interface ChunkSection {
 
     boolean isEmpty();
 
-    void writeTo(BinaryStream stream);
+    // for < 1.13 chunk format
+    byte[] getBytes(boolean obfuscated);
+
+    // for >= 1.13 chunk format
+    void writeTo(int protocol, BinaryStream stream, boolean obfuscated);
 
     ChunkSection copy();
 
-    default ChunkSection copyForChunkSending() {
-        return copy();
-    }
+    ChunkSection copyForChunkSending();
 }

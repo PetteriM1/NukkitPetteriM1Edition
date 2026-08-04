@@ -2,7 +2,9 @@ package cn.nukkit.block;
 
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemID;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockDoorMangrove extends BlockDoorWood {
 
@@ -22,6 +24,16 @@ public class BlockDoorMangrove extends BlockDoorWood {
     @Override
     public int getId() {
         return MANGROVE_DOOR_BLOCK;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_19_0;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.DOOR_BLOCK;
     }
 
     @Override

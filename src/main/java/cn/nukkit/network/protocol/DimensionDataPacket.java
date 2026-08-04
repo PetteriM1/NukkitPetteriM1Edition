@@ -28,10 +28,23 @@ public class DimensionDataPacket extends DataPacket {
         this.putUnsignedVarInt(definitions.size());
         for (DimensionDefinition definition : definitions) {
             this.putString(definition.getId());
-            this.putVarInt(definition.getMaximumHeight());
-            this.putVarInt(definition.getMinimumHeight());
+            if (protocol >= ProtocolInfo.v1_26_50_27) {
+                this.putVarInt(definition.getMinimumHeight());
+                this.putVarInt(definition.getMaximumHeight() - definition.getMinimumHeight());
+            } else {
+                this.putVarInt(definition.getMaximumHeight());
+                this.putVarInt(definition.getMinimumHeight());
+            }
             this.putVarInt(definition.getGeneratorType());
-            this.putVarInt(definition.getDimensionType());
+            if (protocol >= ProtocolInfo.v1_26_20_26) {
+                this.putVarInt(definition.getDimensionType());
+                if (protocol >= ProtocolInfo.v1_26_40) {
+                    this.putUUID(definition.getPackId());
+                    if (protocol >= ProtocolInfo.v1_26_50_27) {
+                        this.putString(definition.getDefaultBiome());
+                    }
+                }
+            }
         }
     }
 }

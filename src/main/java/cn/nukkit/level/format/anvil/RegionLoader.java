@@ -77,7 +77,7 @@ public class RegionLoader extends BaseRegionLoader {
                 MainLogger.getLogger().error("Corrupted chunk detected (" + x + ", " + z + ") (" + this.levelProvider.getName() + "/r." + this.x + "." + this.z + ".mca)");
                 return null;
             }
-            } catch (EOFException e) {
+        } catch (EOFException e) {
             MainLogger.getLogger().error("World corruption occurred (" + x + ", " + z + ") (" + this.levelProvider.getName() + "/r." + this.x + "." + this.z + ".mca)");
             return null;
         }

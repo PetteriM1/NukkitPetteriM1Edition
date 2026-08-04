@@ -1,17 +1,25 @@
 package cn.nukkit.network.protocol;
 
+import cn.nukkit.block.custom.CustomBlockDefinition;
+import cn.nukkit.block.custom.CustomBlockManager;
+import cn.nukkit.item.RuntimeItemMapping;
+import cn.nukkit.item.RuntimeItems;
 import cn.nukkit.level.GameRules;
-import cn.nukkit.network.protocol.types.ExperimentData;
+import cn.nukkit.level.GlobalBlockPalette;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.nbt.tag.Tag;
+import cn.nukkit.network.protocol.types.ExperimentData;
 import cn.nukkit.utils.Binary;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.ToString;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.util.UUID;
-
-import java.util.List;
+import java.io.InputStream;
+import java.nio.ByteOrder;
+import java.util.*;
+import java.util.zip.GZIPInputStream;
 
 @ToString
 public class StartGamePacket extends DataPacket {
@@ -27,20 +35,35 @@ public class StartGamePacket extends DataPacket {
     private static final byte[] EMPTY_COMPOUND_TAG;
     private static final byte[] EMPTY_UUID;
 
+    private static final Map<String, byte[]> vanillaBlockProperties2192;
+
     static {
         try {
             EMPTY_COMPOUND_TAG = NBTIO.writeNetwork(new CompoundTag(""));
             EMPTY_UUID = Binary.writeUUID(new UUID(0, 0));
+
+            try (InputStream stream = RuntimeItemMapping.class.getClassLoader().getResourceAsStream("data_driven_blocks_2192.nbt")) {
+                CompoundTag nbt = NBTIO.read(new BufferedInputStream(new GZIPInputStream(stream)), ByteOrder.BIG_ENDIAN, false);
+                Map<String, Tag> tags = nbt.getTags();
+                vanillaBlockProperties2192 = new HashMap<>(tags.size(), 1f);
+                tags.forEach((k, v) -> {
+                    try {
+                        vanillaBlockProperties2192.put(k, NBTIO.writeNetwork(v));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+            } catch (Exception e) {
+                throw new AssertionError("Error while loading data_driven_blocks.nbt", e);
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
+    // PM1E only
+    public boolean forceNoServerAuthBlockBreaking;
+    public Collection<CustomBlockDefinition> blockDefinitions = CustomBlockManager.get().getBlockDefinitions();
     public long entityUniqueId;
     public long entityRuntimeId;
     public int playerGamemode;
@@ -83,11 +106,12 @@ public class StartGamePacket extends DataPacket {
     public boolean isFromWorldTemplate;
     public boolean isWorldTemplateOptionLocked;
     public boolean isOnlySpawningV1Villagers;
-    public String vanillaVersion = ProtocolInfo.MINECRAFT_VERSION_NETWORK;
+    public String vanillaVersion = "*";
     public String levelId = ""; // base64 string, usually the same as world folder name in vanilla
     public String worldName;
     public String premiumWorldTemplateId = "";
     public boolean isTrial;
+    public boolean isMovementServerAuthoritative;
     public boolean isInventoryServerAuthoritative;
     public long currentTick;
     public int enchantmentSeed;
@@ -100,6 +124,11 @@ public class StartGamePacket extends DataPacket {
     public boolean emoteChatMuted;
     public boolean hardcore;
     public final List<ExperimentData> experiments = new ObjectArrayList<>(1);
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
+    }
 
     @Override
     public void decode() {
@@ -116,23 +145,47 @@ public class StartGamePacket extends DataPacket {
         this.putLFloat(this.yaw);
         this.putLFloat(this.pitch);
         /* Level settings start */
-        this.putLLong(this.seed);
-        this.putLShort(0x00); // SpawnBiomeType - Default
-        this.putString("plains"); // UserDefinedBiomeName
+        if (protocol >= ProtocolInfo.v1_18_30) {
+            this.putLLong(this.seed);
+        } else {
+            this.putVarInt(this.seed);
+        }
+        /* Spawn settings start */
+        if (protocol >= 407) {
+            this.putLShort(0x00); // SpawnBiomeType - Default
+            this.putString(protocol >= ProtocolInfo.v1_16_100 ? "plains" : ""); // UserDefinedBiomeName
+        }
         this.putVarInt(this.dimension);
+        /* Spawn settings end */
         this.putVarInt(this.generator);
         this.putVarInt(this.worldGamemode);
-        this.putBoolean(this.hardcore);
+        if (protocol >= ProtocolInfo.v1_20_80) {
+            this.putBoolean(this.hardcore);
+        }
         this.putVarInt(this.difficulty);
-        this.putBlockVector3(this.spawnX, this.spawnY, this.spawnZ);
+        this.putBlockVector3(protocol, this.spawnX, this.spawnY, this.spawnZ);
         this.putBoolean(this.hasAchievementsDisabled);
-        this.putVarInt(this.editorWorldType);
-        this.putBoolean(false); // isCreatedInEditor
-        this.putBoolean(false); // isExportedFromEditor
+        if (protocol >= ProtocolInfo.v1_19_10) {
+            if (protocol >= ProtocolInfo.v1_21_100) { // This actually changed earlier but doesn't matter here
+                this.putVarInt(this.editorWorldType);
+            } else {
+                this.putBoolean(this.editorWorldType != 0);
+            }
+            if (protocol >= ProtocolInfo.v1_19_80) {
+                this.putBoolean(false); // isCreatedInEditor
+                this.putBoolean(false); // isExportedFromEditor
+            }
+        }
         this.putVarInt(this.dayCycleStopTime);
-        this.putVarInt(this.eduEditionOffer);
+        if (protocol >= ProtocolInfo.v1_26_40) {
+            this.putUnsignedVarInt(this.eduEditionOffer);
+        } else {
+            this.putVarInt(this.eduEditionOffer);
+        }
         this.putBoolean(this.hasEduFeaturesEnabled);
-        this.putString(""); // Education Edition Product ID
+        if (protocol >= 407) {
+            this.putString(""); // Education Edition Product ID
+        }
         this.putLFloat(this.rainLevel);
         this.putLFloat(this.lightningLevel);
         this.putBoolean(this.hasConfirmedPlatformLockedContent);
@@ -142,60 +195,157 @@ public class StartGamePacket extends DataPacket {
         this.putVarInt(this.platformBroadcastIntent);
         this.putBoolean(this.commandsEnabled);
         this.putBoolean(this.isTexturePacksRequired);
-        this.putGameRules(this.gameRules, true);
-        this.putExperiments(this.experiments);
+        this.putGameRules(protocol, gameRules, protocol < ProtocolInfo.v1_26_40);
+        if (protocol >= ProtocolInfo.v1_16_100) {
+            this.putExperiments(this.experiments);
+        }
         this.putBoolean(this.bonusChest);
         this.putBoolean(this.hasStartWithMapEnabled);
-        this.putVarInt(this.permissionLevel);
-        this.putLInt(this.serverChunkTickRange);
-        this.putBoolean(this.hasLockedBehaviorPack);
-        this.putBoolean(this.hasLockedResourcePack);
-        this.putBoolean(this.isFromLockedWorldTemplate);
-        this.putBoolean(this.isUsingMsaGamertagsOnly);
-        this.putBoolean(this.isFromWorldTemplate);
-        this.putBoolean(this.isWorldTemplateOptionLocked);
-        this.putBoolean(this.isOnlySpawningV1Villagers);
-        this.putBoolean(this.isDisablingPersonas);
-        this.putBoolean(this.isDisablingCustomSkins);
-        this.putBoolean(this.emoteChatMuted);
-        this.putString(ProtocolInfo.MINECRAFT_VERSION_NETWORK);
-        this.putLInt(16); // Limited world width
-        this.putLInt(16); // Limited world height
-        this.putBoolean(false); // Nether type
-        // EduSharedUriResource
-        this.putString(""); // buttonName
-        this.putString(""); // linkUri
-        this.putBoolean(false); // Experimental Gameplay
-        this.putByte(this.chatRestrictionLevel);
-        this.putBoolean(this.disablePlayerInteractions);
-        this.putVarInt(0); // ServerEditorConnectionPolicy
-        this.putBoolean(false); // AllowAnonymousBlockDropsInEditorWorlds
+        if (protocol >= ProtocolInfo.v1_26_40) {
+            this.putByte((byte) this.permissionLevel);
+        } else {
+            this.putVarInt(this.permissionLevel);
+        }
+        {
+            this.putLInt(this.serverChunkTickRange);
+            this.putBoolean(this.hasLockedBehaviorPack);
+            this.putBoolean(this.hasLockedResourcePack);
+            this.putBoolean(this.isFromLockedWorldTemplate);
+            {
+                this.putBoolean(this.isUsingMsaGamertagsOnly);
+                this.putBoolean(this.isFromWorldTemplate);
+                this.putBoolean(this.isWorldTemplateOptionLocked);
+                this.putBoolean(this.isOnlySpawningV1Villagers);
+                if (protocol >= ProtocolInfo.v1_19_20) {
+                    this.putBoolean(this.isDisablingPersonas);
+                    this.putBoolean(this.isDisablingCustomSkins);
+                    if (protocol >= ProtocolInfo.v1_19_60) {
+                        this.putBoolean(this.emoteChatMuted);
+                    }
+                }
+                this.putString(this.vanillaVersion);
+            }
+            if (protocol >= 407) {
+                this.putLInt(protocol >= ProtocolInfo.v1_16_100 ? 16 : 0); // Limited world width
+                this.putLInt(protocol >= ProtocolInfo.v1_16_100 ? 16 : 0); // Limited world height
+                this.putBoolean(false); // Nether type
+                if (protocol >= ProtocolInfo.v1_17_30) { // EduSharedUriResource
+                    this.putString(""); // buttonName
+                    this.putString(""); // linkUri
+                }
+                this.putBoolean(false); // Experimental Gameplay
+                if (protocol >= ProtocolInfo.v1_19_20) {
+                    this.putByte(this.chatRestrictionLevel);
+                    this.putBoolean(this.disablePlayerInteractions);
+                    if (protocol >= ProtocolInfo.v1_21_0 && protocol < ProtocolInfo.v1_26_0) {
+                        this.putString(""); // ServerId
+                        this.putString(""); // WorldId
+                        this.putString(""); // ScenarioId
+                        if (protocol >= ProtocolInfo.v1_21_90) {
+                            this.putString(""); // OwnerId
+                        }
+                    }
+                }
+                if (protocol >= ProtocolInfo.v1_26_30) {
+                    this.putVarInt(0); // ServerEditorConnectionPolicy
+                    this.putBoolean(false); // AllowAnonymousBlockDropsInEditorWorlds
+                }
+            }
+        }
         /* Level settings end */
         this.putString(this.levelId);
         this.putString(this.worldName);
         this.putString(this.premiumWorldTemplateId);
         this.putBoolean(this.isTrial);
-        this.putVarInt(0); // RewindHistorySize
-        this.putBoolean(true); // isServerAuthoritativeBlockBreaking
+        {
+            if (protocol >= ProtocolInfo.v1_16_100) {
+                if (protocol >= ProtocolInfo.v1_16_210) {
+                    if (protocol < ProtocolInfo.v1_21_90) {
+                        this.putVarInt(this.isMovementServerAuthoritative ? 1 : 0); // 2 - rewind
+                    }
+                    this.putVarInt(0); // RewindHistorySize
+                    this.putBoolean(!this.forceNoServerAuthBlockBreaking && protocol >= ProtocolInfo.v1_17_0); // isServerAuthoritativeBlockBreaking
+                } else {
+                    this.putVarInt(this.isMovementServerAuthoritative ? 1 : 0); // 2 - rewind
+                }
+            } else {
+                this.putBoolean(this.isMovementServerAuthoritative);
+            }
+        }
         this.putLLong(this.currentTick);
         this.putVarInt(this.enchantmentSeed);
-        this.putUnsignedVarInt(0); // No custom blocks
-        this.putString(this.multiplayerCorrelationId);
-        this.putBoolean(false); // isInventoryServerAuthoritative
-        this.putString(""); // serverEngine
-        this.put(EMPTY_COMPOUND_TAG); // playerPropertyData
-        this.putLLong(0); // blockRegistryChecksum
-        this.put(EMPTY_UUID); // worldTemplateId
-        this.putBoolean(this.clientSideGenerationEnabled);
-        this.putBoolean(false); // blockIdsAreHashed
-        this.putBoolean(true); // isServerAuthSounds
-        this.putBoolean(false); // LoggingChat
-        this.putBoolean(false); // no server join info
-        /* ServerTelemetryData start */
-        this.putString("");
-        this.putString("");
-        this.putString("");
-        this.putString("");
-        /* ServerTelemetryData end */
+        {
+            if (protocol >= ProtocolInfo.v1_26_50_27) {
+                int total = vanillaBlockProperties2192.size() + this.blockDefinitions.size();
+                this.putUnsignedVarInt(total);
+                for (Map.Entry<String, byte[]> data : vanillaBlockProperties2192.entrySet()) {
+                    this.putString(data.getKey());
+                    this.put(data.getValue());
+                }
+                if (!this.blockDefinitions.isEmpty()) {
+                    for (CustomBlockDefinition definition : this.blockDefinitions) {
+                        this.putString(definition.getIdentifier());
+                        this.putNbtTag(definition.getNetworkData());
+                    }
+                }
+            } else if (protocol >= ProtocolInfo.v1_16_100) {
+                if (!this.blockDefinitions.isEmpty()) {
+                    this.putUnsignedVarInt(this.blockDefinitions.size());
+                    for (CustomBlockDefinition definition : this.blockDefinitions) {
+                        this.putString(definition.getIdentifier());
+                        this.putNbtTag(definition.getNetworkData());
+                    }
+                } else {
+                    this.putUnsignedVarInt(0); // No custom blocks
+                }
+            } else {
+                this.put(GlobalBlockPalette.getCompiledTable(this.protocol));
+            }
+            if (protocol < ProtocolInfo.v1_21_60) {
+                this.put(RuntimeItems.getMapping(protocol).getItemPalette());
+            }
+            this.putString(this.multiplayerCorrelationId);
+            if (protocol >= 407) {
+                this.putBoolean(false); // isInventoryServerAuthoritative
+                if (protocol >= ProtocolInfo.v1_16_230_50) {
+                    this.putString(""); // serverEngine
+                    if (protocol >= ProtocolInfo.v1_18_0_20) {
+                        if (protocol < ProtocolInfo.v1_19_0_29) {
+                            this.putLLong(0); // blockRegistryChecksum
+                        } else {
+                            this.put(EMPTY_COMPOUND_TAG); // playerPropertyData
+                            this.putLLong(0); // blockRegistryChecksum
+                            this.put(EMPTY_UUID); // worldTemplateId
+                            if (protocol >= ProtocolInfo.v1_19_20) {
+                                this.putBoolean(this.clientSideGenerationEnabled);
+                                if (protocol >= ProtocolInfo.v1_19_80) {
+                                    this.putBoolean(false); // blockIdsAreHashed
+                                    if (protocol >= ProtocolInfo.v1_20_0_23) {
+                                        if (protocol >= ProtocolInfo.v1_21_100 && protocol < ProtocolInfo.v1_21_130_28) {
+                                            this.putBoolean(false); // mTickDeathSystemsEnabled
+                                        }
+                                        /* NetworkPermissions start */
+                                        this.putBoolean(true); // isServerAuthSounds
+                                        /* NetworkPermissions end */
+                                        if (protocol >= ProtocolInfo.v1_26_30 && protocol < ProtocolInfo.v1_26_40) {
+                                            this.putBoolean(false); // LoggingChat
+                                        }
+                                        if (protocol >= ProtocolInfo.v1_26_0) {
+                                            this.putBoolean(false); // no server join info
+                                            /* ServerTelemetryData start */
+                                            this.putString("");
+                                            this.putString("");
+                                            this.putString("");
+                                            this.putString("");
+                                            /* ServerTelemetryData end */
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }

@@ -20,6 +20,12 @@ public class RequestAbilityPacket extends DataPacket {
     private boolean boolValue;
     private float floatValue;
 
+    public enum AbilityType {
+        NONE,
+        BOOLEAN,
+        FLOAT
+    }
+
     @Override
     public void decode() {
         this.setAbility(ABILITIES[this.getVarInt()]);
@@ -36,11 +42,5 @@ public class RequestAbilityPacket extends DataPacket {
     @Override
     public byte pid() {
         return NETWORK_ID;
-    }
-
-    public enum AbilityType {
-        NONE,
-        BOOLEAN,
-        FLOAT
     }
 }

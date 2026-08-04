@@ -26,6 +26,15 @@ public class ItemComponentPacket extends DataPacket {
         }
     }
 
+    @AllArgsConstructor
+    public static class ItemDefinition {
+        private final String getIdentifier;
+        private final int getRuntimeId;
+        private final boolean isComponentBased;
+        private final int getVersion;
+        private final CompoundTag getNetworkData;
+    }
+
     @Override
     public byte pid() {
         return NETWORK_ID;
@@ -42,9 +51,11 @@ public class ItemComponentPacket extends DataPacket {
         this.putUnsignedVarInt(this.itemDefinitions.size());
         for (ItemDefinition definition : this.itemDefinitions) {
             this.putString(definition.getIdentifier);
-            this.putLShort(definition.getRuntimeId);
-            this.putBoolean(definition.isComponentBased);
-            this.putVarInt(definition.getVersion);
+            if (protocol >= ProtocolInfo.v1_21_60) {
+                this.putLShort(definition.getRuntimeId);
+                this.putBoolean(definition.isComponentBased);
+                this.putVarInt(definition.getVersion);
+            }
 
             if (definition.getNetworkData != null) {
                 try {
@@ -56,14 +67,5 @@ public class ItemComponentPacket extends DataPacket {
                 this.put(EMPTY_COMPOUND_TAG);
             }
         }
-    }
-
-    @AllArgsConstructor
-    public static class ItemDefinition {
-        private final String getIdentifier;
-        private final int getRuntimeId;
-        private final boolean isComponentBased;
-        private final int getVersion;
-        private final CompoundTag getNetworkData;
     }
 }

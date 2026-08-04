@@ -44,6 +44,56 @@ public final class ChainValidationResult {
         this.parsedPayload = null;
     }
 
+    @ToString
+    public static final class IdentityClaims {
+
+        public final IdentityData extraData;
+        public final String identityPublicKey;
+        private PublicKey parsedIdentityPublicKey;
+
+        private IdentityClaims(IdentityData extraData, String identityPublicKey) {
+            this.extraData = extraData;
+            this.identityPublicKey = identityPublicKey;
+        }
+
+        public PublicKey parsedIdentityPublicKey() throws NoSuchAlgorithmException, InvalidKeySpecException {
+            if (parsedIdentityPublicKey == null) {
+                parsedIdentityPublicKey = EncryptionUtils.parseKey(identityPublicKey);
+            }
+            return parsedIdentityPublicKey;
+        }
+    }
+
+    @ToString
+    public static final class IdentityData {
+
+        public final String displayName;
+        /**
+         * Identity UUID, derived from the XUID when online, or from the username when offline.
+         *
+         * @deprecated v818: Use {@link #minecraftId} instead.
+         */
+        @Nullable
+        public final UUID identity;
+        public final String xuid;
+        public final @Nullable String titleId;
+        /**
+         * The player's Minecraft PlayFab ID
+         *
+         * @since v818
+         */
+        @Nullable
+        public final String minecraftId;
+
+        private IdentityData(String displayName, UUID identity, String xuid, @Nullable String titleId, @Nullable String minecraftId) {
+            this.displayName = displayName;
+            this.identity = identity;
+            this.xuid = xuid;
+            this.titleId = titleId;
+            this.minecraftId = minecraftId;
+        }
+    }
+
     public boolean signed() {
         return signed;
     }
@@ -102,53 +152,5 @@ public final class ChainValidationResult {
                 new IdentityData(displayName, identity, xuid, null, minecraftId),
                 identityPublicKey
         );
-    }
-
-    @ToString
-    public static final class IdentityClaims {
-
-        public final IdentityData extraData;
-        public final String identityPublicKey;
-        private PublicKey parsedIdentityPublicKey;
-
-        private IdentityClaims(IdentityData extraData, String identityPublicKey) {
-            this.extraData = extraData;
-            this.identityPublicKey = identityPublicKey;
-        }
-
-        public PublicKey parsedIdentityPublicKey() throws NoSuchAlgorithmException, InvalidKeySpecException {
-            if (parsedIdentityPublicKey == null) {
-                parsedIdentityPublicKey = EncryptionUtils.parseKey(identityPublicKey);
-            }
-            return parsedIdentityPublicKey;
-        }
-    }
-
-    @ToString
-    public static final class IdentityData {
-
-        public final String displayName;
-        /**
-         * Identity UUID, derived from the XUID when online, or from the username when offline.
-         * @deprecated v818: Use {@link #minecraftId} instead.
-         */
-        @Nullable
-        public final UUID identity;
-        public final String xuid;
-        public final @Nullable String titleId;
-        /**
-         * The player's Minecraft PlayFab ID
-         * @since v818
-         */
-        @Nullable
-        public final String minecraftId;
-
-        private IdentityData(String displayName, UUID identity, String xuid, @Nullable String titleId, @Nullable String minecraftId) {
-            this.displayName = displayName;
-            this.identity = identity;
-            this.xuid = xuid;
-            this.titleId = titleId;
-            this.minecraftId = minecraftId;
-        }
     }
 }

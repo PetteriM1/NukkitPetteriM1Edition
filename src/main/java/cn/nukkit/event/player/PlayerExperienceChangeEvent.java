@@ -7,22 +7,20 @@ import cn.nukkit.event.HandlerList;
 public class PlayerExperienceChangeEvent extends PlayerEvent implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
-
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private final int oldExp;
     private final int oldExpLevel;
     private int newExp;
     private int newExpLevel;
-
     public PlayerExperienceChangeEvent(Player player, int oldExp, int oldLevel, int newExp, int newLevel) {
         this.player = player;
         this.oldExp = oldExp;
         this.oldExpLevel = oldLevel;
         this.newExp = newExp;
         this.newExpLevel = newLevel;
+    }
+
+    public static HandlerList getHandlers() {
+        return handlers;
     }
 
     public int getOldExperience() {

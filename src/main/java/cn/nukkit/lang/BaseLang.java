@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * @author  MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class BaseLang {
@@ -20,7 +20,7 @@ public class BaseLang {
 
     protected final String langName;
 
-    protected Map<String, String> lang = new HashMap<>();
+    protected Map<String, String> lang;
     protected Map<String, String> fallbackLang = new HashMap<>();
 
     public BaseLang(String lang) {
@@ -37,13 +37,17 @@ public class BaseLang {
 
         if (path == null) {
             path = "lang/";
-            this.lang = this.loadLang(this.getClass().getClassLoader().getResourceAsStream(path + this.langName + "/lang.ini"));
-            if (useFallback) this.fallbackLang = this.loadLang(this.getClass().getClassLoader().getResourceAsStream(path + fallback + "/lang.ini"));
+            this.lang = loadLang(this.getClass().getClassLoader().getResourceAsStream(path + this.langName + "/lang.ini"));
+            if (useFallback)
+                this.fallbackLang = loadLang(this.getClass().getClassLoader().getResourceAsStream(path + fallback + "/lang.ini"));
         } else {
-            this.lang = this.loadLang(path + this.langName + "/lang.ini");
-            if (useFallback) this.fallbackLang = this.loadLang(path + fallback + "/lang.ini");
+            this.lang = loadLang(path + this.langName + "/lang.ini");
+            if (useFallback) this.fallbackLang = loadLang(path + fallback + "/lang.ini");
         }
-        if (this.fallbackLang == null) this.fallbackLang = this.lang;
+
+        if (this.fallbackLang == null) {
+            this.fallbackLang = this.lang;
+        }
     }
 
     public Map<String, String> getLangMap() {
@@ -62,7 +66,7 @@ public class BaseLang {
         return langName;
     }
 
-    protected Map<String, String> loadLang(String path) {
+    protected static Map<String, String> loadLang(String path) {
         try {
             String content = Utils.readFile(path);
             Map<String, String> d = new HashMap<>();
@@ -78,7 +82,7 @@ public class BaseLang {
                 String key = t[0];
                 StringBuilder value = new StringBuilder();
                 for (int i = 1; i < t.length - 1; i++) {
-                    value.append(t[i]).append("=");
+                    value.append(t[i]).append('=');
                 }
                 value.append(t[t.length - 1]);
                 if (value.length() == 0) {
@@ -93,7 +97,7 @@ public class BaseLang {
         }
     }
 
-    protected Map<String, String> loadLang(InputStream stream) {
+    protected static Map<String, String> loadLang(InputStream stream) {
         try {
             String content = Utils.readFile(stream);
             Map<String, String> d = new HashMap<>();
@@ -109,7 +113,7 @@ public class BaseLang {
                 String key = t[0];
                 StringBuilder value = new StringBuilder();
                 for (int i = 1; i < t.length - 1; i++) {
-                    value.append(t[i]).append("=");
+                    value.append(t[i]).append('=');
                 }
                 value.append(t[t.length - 1]);
                 if (value.length() == 0) {
@@ -154,7 +158,7 @@ public class BaseLang {
         String baseText = this.get(str);
         baseText = this.parseTranslation((baseText != null && (onlyPrefix == null || str.indexOf(onlyPrefix) == 0)) ? baseText : str, onlyPrefix);
         for (int i = 0; i < params.length; i++) {
-            baseText = baseText.replace("{%" + i + "}", this.parseTranslation(String.valueOf(params[i])));
+            baseText = baseText.replace("{%" + i + '}', this.parseTranslation(String.valueOf(params[i])));
         }
 
         return baseText;
@@ -166,7 +170,7 @@ public class BaseLang {
             baseText = this.internalGet(c.getText());
             baseText = this.parseTranslation(baseText != null ? baseText : c.getText());
             for (int i = 0; i < ((TranslationContainer) c).getParameters().length; i++) {
-                baseText = baseText.replace("{%" + i + "}", this.parseTranslation(((TranslationContainer) c).getParameters()[i]));
+                baseText = baseText.replace("{%" + i + '}', this.parseTranslation(((TranslationContainer) c).getParameters()[i]));
             }
         }
         return baseText;

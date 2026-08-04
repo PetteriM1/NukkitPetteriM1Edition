@@ -34,7 +34,7 @@ public interface IPlayer extends ServerOperator, Metadatable {
      * @return 这个玩家的名称。<br>The name of this player.
      */
     String getName();
-    
+
     UUID getUniqueId();
 
     /**

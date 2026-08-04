@@ -41,7 +41,7 @@ public class FakeBlockUIComponent extends PlayerUIComponent {
         super.onOpen(who);
         ContainerOpenPacket pk = new ContainerOpenPacket();
         pk.windowId = who.getWindowId(this);
-        pk.type = type.getNetworkType();
+        pk.type = this.type.getNetworkType();
         InventoryHolder holder = this.getHolder();
         if (holder != null) {
             pk.x = (int) ((Vector3) holder).getX();

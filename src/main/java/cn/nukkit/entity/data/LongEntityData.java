@@ -10,6 +10,11 @@ public class LongEntityData extends EntityData<Long> {
 
     public long data;
 
+    /**
+     * dataVersions is used for multiversion compatible entity data flags
+     */
+    public long[] dataVersions;
+
     public LongEntityData(int id, long data) {
         super(id);
         this.data = data;

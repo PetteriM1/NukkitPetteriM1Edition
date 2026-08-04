@@ -3,25 +3,26 @@ package cn.nukkit.item;
 import cn.nukkit.Player;
 import cn.nukkit.event.entity.EntityPotionEffectEvent;
 import cn.nukkit.math.Vector3;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.potion.Effect;
 
 /**
  * @author Kaooot
  */
 public class ItemHoneyBottle extends ItemEdible {
-    
+
     public ItemHoneyBottle() {
         this(0, 1);
     }
-    
+
     public ItemHoneyBottle(Integer meta) {
         this(meta, 1);
     }
-    
+
     public ItemHoneyBottle(Integer meta, int count) {
         super(HONEY_BOTTLE, meta, count, "Honey Bottle");
     }
-    
+
     @Override
     public int getMaxStackSize() {
         return 16;
@@ -42,6 +43,11 @@ public class ItemHoneyBottle extends ItemEdible {
             }
         }
         return true;
+    }
+
+    @Override
+    public boolean isSupportedOn(int protocol) {
+        return protocol >= ProtocolInfo.v1_14_0;
     }
 
     @Override

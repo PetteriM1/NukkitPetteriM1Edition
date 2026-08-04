@@ -22,6 +22,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Implements the main logic of all nether vines.
+ *
  * @author joserobjr
  */
 public abstract class BlockVinesNether extends BlockTransparentMeta {
@@ -37,6 +38,7 @@ public abstract class BlockVinesNether extends BlockTransparentMeta {
     /**
      * The direction that the vine will grow, vertical direction is expected but future implementations
      * may also add horizontal directions.
+     *
      * @return Normally, up or down.
      */
     public abstract BlockFace getGrowthDirection();
@@ -48,12 +50,14 @@ public abstract class BlockVinesNether extends BlockTransparentMeta {
 
     /**
      * Changes the age of this block.
+     *
      * @param vineAge The new age
      */
     public abstract void setVineAge(int vineAge);
 
     /**
      * The maximum accepted age of this block.
+     *
      * @return Positive, inclusive value.
      */
     public abstract int getMaxVineAge();
@@ -118,6 +122,7 @@ public abstract class BlockVinesNether extends BlockTransparentMeta {
 
     /**
      * Grow a single vine if possible. Calls {@link BlockGrowEvent} passing the positioned new state and the source block.
+     *
      * @return If the vine grew successfully.
      */
     public boolean grow() {
@@ -150,6 +155,7 @@ public abstract class BlockVinesNether extends BlockTransparentMeta {
      * Grow a random amount of vines.
      * Calls {@link BlockGrowEvent} passing the positioned new state and the source block for each new vine being added
      * to the world, if one of the events gets cancelled the growth gets interrupted.
+     *
      * @return How many vines grew
      */
     public int growMultiple() {
@@ -195,21 +201,23 @@ public abstract class BlockVinesNether extends BlockTransparentMeta {
 
     /**
      * Attempt to get the age of the root or the head of the vine.
+     *
      * @param base True to get the age of the base (oldest block), false to get the age of the head (newest block)
      * @return Empty if the target could not be reached. The age of the target if it was found.
      */
     @Nonnull
     public OptionalInt findVineAge(boolean base) {
         return findVineBlock(base)
-                .map(vine-> OptionalInt.of(vine.getVineAge()))
+                .map(vine -> OptionalInt.of(vine.getVineAge()))
                 .orElse(OptionalInt.empty());
     }
 
     /**
      * Attempt to find the root or the head of the vine transversing the growth direction for up to 256 blocks.
+     *
      * @param base True to find the base (oldest block), false to find the head (newest block)
      * @return Empty if the target could not be reached or the block there isn't an instance of {@link BlockVinesNether}.
-     *          The positioned block of the target if it was found.
+     * The positioned block of the target if it was found.
      */
     @Nonnull
     public Optional<BlockVinesNether> findVineBlock(boolean base) {
@@ -221,6 +229,7 @@ public abstract class BlockVinesNether extends BlockTransparentMeta {
 
     /**
      * Attempt to find the root or the head of the vine transversing the growth direction for up to 256 blocks.
+     *
      * @param base True to find the base (oldest block), false to find the head (newest block)
      * @return Empty if the target could not be reached. The position of the target if it was found.
      */
@@ -294,12 +303,12 @@ public abstract class BlockVinesNether extends BlockTransparentMeta {
 
         int enchantmentLevel;
         if (item.isShears() || (enchantmentLevel = item.getEnchantmentLevel(Enchantment.ID_FORTUNE_DIGGING)) >= 3) {
-            return new Item[]{ toItem() };
+            return new Item[]{toItem()};
         }
 
         int chance = 3 + enchantmentLevel * 2;
         if (ThreadLocalRandom.current().nextInt(9) < chance) {
-            return new Item[]{ toItem() };
+            return new Item[]{toItem()};
         }
 
         return new Item[0];
@@ -350,27 +359,27 @@ public abstract class BlockVinesNether extends BlockTransparentMeta {
 
     @Override
     public double getMinX() {
-        return x+ (4/16.0);
+        return x + (4 / 16.0);
     }
 
     @Override
     public double getMinZ() {
-        return z+ (4/16.0);
+        return z + (4 / 16.0);
     }
 
     @Override
     public double getMaxX() {
-        return x+ (12/16.0);
+        return x + (12 / 16.0);
     }
 
     @Override
     public double getMaxZ() {
-        return z+ (12/16.0);
+        return z + (12 / 16.0);
     }
 
     @Override
     public double getMaxY() {
-        return y+ (15/16.0);
+        return y + (15 / 16.0);
     }
 
     @Override
@@ -397,6 +406,7 @@ public abstract class BlockVinesNether extends BlockTransparentMeta {
     public boolean canSilkTouch() {
         return true;
     }
+
     @Override
     public BlockVinesNether clone() {
         return (BlockVinesNether) super.clone();

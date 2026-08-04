@@ -20,6 +20,7 @@ public class BlockEntityCauldron extends BlockEntitySpawnable {
     public static final int POTION_TYPE_NORMAL = 0;
     public static final int POTION_TYPE_SPLASH = 1;
     public static final int POTION_TYPE_LINGERING = 2;
+    public static final int POTION_TYPE_LAVA = 0xF19B;
 
     public BlockEntityCauldron(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
@@ -33,7 +34,7 @@ public class BlockEntityCauldron extends BlockEntitySpawnable {
         }
         potionId = namedTag.getShort("PotionId");
 
-        int potionType = (potionId & 0xFFFF) == 0xFFFF? POTION_TYPE_EMPTY : POTION_TYPE_NORMAL;
+        int potionType = (potionId & 0xFFFF) == 0xFFFF ? POTION_TYPE_EMPTY : POTION_TYPE_NORMAL;
         if (namedTag.getBoolean("SplashPotion")) {
             potionType = POTION_TYPE_SPLASH;
             namedTag.remove("SplashPotion");
@@ -109,13 +110,13 @@ public class BlockEntityCauldron extends BlockEntitySpawnable {
             Collection<Player> pl = level.getChunkPlayers(getChunkX(), getChunkZ()).values();
             for (Player p : pl) {
                 UpdateBlockPacket air = new UpdateBlockPacket();
-                air.blockRuntimeId = GlobalBlockPalette.getOrCreateRuntimeId(0);
+                air.blockRuntimeId = GlobalBlockPalette.getOrCreateRuntimeId(p.protocol, 0);
                 air.flags = UpdateBlockPacket.FLAG_ALL_PRIORITY;
                 air.x = (int) x;
                 air.y = (int) y;
                 air.z = (int) z;
                 UpdateBlockPacket self = (UpdateBlockPacket) air.clone();
-                self.blockRuntimeId = GlobalBlockPalette.getOrCreateRuntimeId(block.getId(), block.getDamage());
+                self.blockRuntimeId = GlobalBlockPalette.getOrCreateRuntimeId(p.protocol, block.getId(), block.getDamage());
                 p.dataPacket(air);
                 p.dataPacket(self);
             }

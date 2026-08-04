@@ -95,7 +95,7 @@ public class BlockBanner extends BlockTransparentMeta implements Faceable {
         }
         return false;
     }
-    
+
     @Override
     public int onUpdate(int type) {
         if (type == Level.BLOCK_UPDATE_NORMAL) {

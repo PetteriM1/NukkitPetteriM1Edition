@@ -11,10 +11,14 @@ import cn.nukkit.event.entity.EntityInventoryChangeEvent;
 import cn.nukkit.event.player.PlayerItemHeldEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
+import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.*;
 import cn.nukkit.network.protocol.types.ContainerIds;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 
 import java.util.Collection;
+import java.util.zip.Deflater;
 
 /**
  * @author MagicDroidX
@@ -22,11 +26,14 @@ import java.util.Collection;
  */
 public class PlayerInventory extends BaseInventory {
 
-    protected int itemInHandIndex;
+    protected int itemInHandIndex = 0;
+
+    public final IntOpenHashSet needSendSlot = new IntOpenHashSet();
 
     public PlayerInventory(EntityHumanType player) {
         super(player, InventoryType.PLAYER);
     }
+    private static Int2ObjectOpenHashMap<BatchPacket> creativeContentCache;
 
     @Override
     public int getSize() {
@@ -66,7 +73,7 @@ public class PlayerInventory extends BaseInventory {
             }
 
             if (player.fishing != null) {
-                if (!(this.getItem(slot).equals(player.fishing.rod))) {
+                if (!(this.getItemFast(slot).equals(player.fishing.rod))) {
                     player.stopFishing(false);
                 }
             }
@@ -80,12 +87,10 @@ public class PlayerInventory extends BaseInventory {
         return slot >= 0 && slot < this.getHotbarSize();
     }
 
-    @Deprecated
     public int getHotbarSlotIndex(int index) {
         return index;
     }
 
-    @Deprecated
     public void setHotbarSlotIndex(int index, int slot) {
     }
 
@@ -131,7 +136,6 @@ public class PlayerInventory extends BaseInventory {
         return this.setItem(this.itemInHandIndex, item);
     }
 
-    @Deprecated
     public int getHeldItemSlot() {
         return this.itemInHandIndex;
     }
@@ -153,6 +157,18 @@ public class PlayerInventory extends BaseInventory {
     public void sendHeldItem(Player... players) {
         Item item = this.getItemInHandFast();
 
+        Item clean = null;
+        boolean reduceTraffic = Server.getInstance().reduceTraffic;
+        if (reduceTraffic) {
+            clean = Item.get(item.getId(), item.getDamage(), 1);
+
+            CompoundTag oldTag = item.getNamedTag();
+
+            if (oldTag != null) {
+                clean.setNamedTag(CompoundTag.sanitize(oldTag));
+            }
+        }
+
         for (Player player : players) {
             if (player.equals(this.getHolder())) {
                 this.sendSlot(this.itemInHandIndex, player);
@@ -164,11 +180,27 @@ public class PlayerInventory extends BaseInventory {
                 player.dataPacket(pk);
             } else {
                 MobEquipmentPacket pk = new MobEquipmentPacket();
-                pk.item = item;
+                pk.item = reduceTraffic ? clean : item;
                 pk.inventorySlot = pk.hotbarSlot = this.itemInHandIndex;
                 pk.eid = this.getHolder().getId();
                 player.dataPacket(pk);
             }
+        }
+    }
+
+    public void sendHeldItemIfNotAir(Player player) { // Note: If ever changed or removed, remember to update SynapseAPI
+        if (!this.getHolder().equals(player)) {
+            throw new IllegalArgumentException("sendHeldItemIfNotAir: invalid player, expected the inventory holder");
+        }
+
+        Item item = this.getItemInHandFast();
+
+        if (item.getId() != 0) {
+            InventorySlotPacket pk = new InventorySlotPacket();
+            pk.slot = this.itemInHandIndex;
+            pk.item = item.clone();
+            pk.inventoryId = ContainerIds.INVENTORY;
+            player.dataPacket(pk);
         }
     }
 
@@ -286,7 +318,7 @@ public class PlayerInventory extends BaseInventory {
             item = ev.getNewItem();
         }
 
-        Item old = this.getItem(index);
+        Item old = Server.getInstance().suomiCraftPEMode() ? null : this.getItem(index);
         this.slots.put(index, item.clone());
         this.onSlotChange(index, old, send);
         return true;
@@ -372,6 +404,16 @@ public class PlayerInventory extends BaseInventory {
                 pk.slots = armor;
                 player.dataPacket(pk);
             }
+        }
+    }
+
+    public void sendArmorContentsIfNotAr(Player player) {
+        Item[] armor = this.getArmorContents();
+        if (armor[0].getId() != 0 || armor[1].getId() != 0 || armor[2].getId() != 0 || armor[3].getId() != 0) {
+            MobArmorEquipmentPacket pk = new MobArmorEquipmentPacket();
+            pk.eid = this.getHolder().getId();
+            pk.slots = armor;
+            player.dataPacket(pk);
         }
     }
 
@@ -492,11 +534,38 @@ public class PlayerInventory extends BaseInventory {
         }
         Player p = (Player) this.getHolder();
 
-        CreativeContentPacket pk = new CreativeContentPacket();
-        if (!p.isSpectator()) {
-            pk.creativeItems = Item.getCreativeItemsAndGroups();
+        if (p.protocol < 407) {
+            InventoryContentPacket pk = new InventoryContentPacket();
+            pk.inventoryId = ContainerIds.CREATIVE;
+            if (!p.isSpectator()) { // Fill it for all gamemodes except spectator
+                pk.slots = Item.getCreativeItems(p.protocol).toArray(new Item[0]);
+            }
+            p.dataPacket(pk);
+        } else {
+            if (p.getServer().suomiCraftPEMode() && !p.isSpectator()) {
+                if (creativeContentCache == null) {
+                    creativeContentCache = new Int2ObjectOpenHashMap<>();
+                }
+
+                BatchPacket pk = creativeContentCache.get(p.protocol);
+                if (pk == null) {
+                    CreativeContentPacket contentPacket = new CreativeContentPacket();
+                    contentPacket.protocol = p.protocol;
+                    contentPacket.creativeItems = Item.getCreativeItemsAndGroups();
+                    contentPacket.tryEncode();
+                    pk = contentPacket.compress(Deflater.BEST_COMPRESSION);
+                    creativeContentCache.put(p.protocol, pk);
+                }
+                p.dataPacket(pk);
+                return;
+            }
+
+            CreativeContentPacket pk = new CreativeContentPacket();
+            if (!p.isSpectator()) {
+                pk.creativeItems = Item.getCreativeItemsAndGroups();
+            }
+            p.dataPacket(pk);
         }
-        p.dataPacket(pk);
     }
 
     @Override
@@ -530,6 +599,17 @@ public class PlayerInventory extends BaseInventory {
         // Player can never stop viewing their own inventory
         if (who != holder) {
             super.onClose(who);
+        }
+    }
+
+    public void sendQueuedSlots() {
+        if (this.holder instanceof Player) {
+            if (!((Player) this.holder).closed) {
+                for (int slot : this.needSendSlot) {
+                    this.sendSlot(slot, (Player) this.holder);
+                }
+            }
+            this.needSendSlot.clear();
         }
     }
 }

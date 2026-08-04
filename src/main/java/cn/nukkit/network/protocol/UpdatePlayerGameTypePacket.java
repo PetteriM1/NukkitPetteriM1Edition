@@ -11,6 +11,22 @@ public class UpdatePlayerGameTypePacket extends DataPacket {
     public long entityId;
     public int tick;
 
+    public enum GameType {
+        SURVIVAL,
+        CREATIVE,
+        ADVENTURE,
+        SURVIVAL_VIEWER,
+        CREATIVE_VIEWER,
+        DEFAULT,
+        WORLD_DEFAULT;
+
+        private static final GameType[] VALUES = values();
+
+        public static GameType from(int id) {
+            return VALUES[id];
+        }
+    }
+
     @Override
     public byte pid() {
         return NETWORK_ID;
@@ -25,23 +41,9 @@ public class UpdatePlayerGameTypePacket extends DataPacket {
     public void encode() {
         this.reset();
         this.putVarInt(this.gameType.ordinal());
-        this.putVarLong(this.entityId);
-        this.putUnsignedVarInt(this.tick);
-    }
-
-    public enum GameType {
-        SURVIVAL,
-        CREATIVE,
-        ADVENTURE,
-        SURVIVAL_VIEWER,
-        CREATIVE_VIEWER,
-        DEFAULT,
-        WORLD_DEFAULT;
-
-        private static final GameType[] VALUES = values();
-
-        public static GameType from(int id) {
-            return VALUES[id];
+        this.putVarLong(entityId);
+        if (protocol >= ProtocolInfo.v1_20_80) {
+            this.putUnsignedVarInt(this.tick);
         }
     }
 }

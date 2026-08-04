@@ -9,7 +9,9 @@ import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.inventory.CampfireInventory;
 import cn.nukkit.inventory.CampfireRecipe;
 import cn.nukkit.inventory.ContainerInventory;
-import cn.nukkit.item.*;
+import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemID;
+import cn.nukkit.item.ItemTool;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
@@ -49,12 +51,12 @@ public class BlockCampfire extends BlockTransparentMeta implements Faceable {
 
     @Override
     public double getResistance() {
-        return 2;
+        return 10;
     }
 
     @Override
     public double getHardness() {
-        return 2;
+        return 1.5; //2
     }
 
     @Override
@@ -64,7 +66,7 @@ public class BlockCampfire extends BlockTransparentMeta implements Faceable {
 
     @Override
     public Item[] getDrops(Item item) {
-        return new Item[] {Item.get(ItemID.COAL, 0, 1 + ThreadLocalRandom.current().nextInt(1))};
+        return new Item[]{Item.get(ItemID.COAL, 0, 1 + ThreadLocalRandom.current().nextInt(1))};
     }
 
     @Override
@@ -208,7 +210,7 @@ public class BlockCampfire extends BlockTransparentMeta implements Faceable {
     }
 
     public void setExtinguished(boolean extinguished) {
-        this.setDamage((this.getDamage() & 0x3) | (extinguished? 0x4 : 0x0));
+        this.setDamage((this.getDamage() & 0x3) | (extinguished ? 0x4 : 0x0));
     }
 
     @Override

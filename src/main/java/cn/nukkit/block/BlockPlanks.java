@@ -23,6 +23,14 @@ public class BlockPlanks extends BlockSolidMeta {
     public BlockPlanks(int meta) {
         super(meta % 6);
     }
+    private static final String[] names = {
+            "Oak Planks",
+            "Spruce Planks",
+            "Birch Planks",
+            "Jungle Planks",
+            "Acacia Planks",
+            "Dark Oak Planks",
+    };
 
     @Override
     public int getId() {
@@ -49,18 +57,9 @@ public class BlockPlanks extends BlockSolidMeta {
         return 20;
     }
 
-    private static final String[] NAMES = {
-            "Oak Planks",
-            "Spruce Planks",
-            "Birch Planks",
-            "Jungle Planks",
-            "Acacia Planks",
-            "Dark Oak Planks",
-    };
-
     @Override
     public String getName() {
-        return NAMES[this.getDamage() & 0x07];
+        return names[this.getDamage() & 0x07];
     }
 
     @Override

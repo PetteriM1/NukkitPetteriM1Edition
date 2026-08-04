@@ -62,7 +62,9 @@ public class AnimateEntityPacket extends DataPacket {
         this.putString(this.nextState);
         this.putString(this.stopExpression);
 
-        this.putLInt(this.stopExpressionVersion);
+        if (protocol >= ProtocolInfo.v1_17_30) {
+            this.putLInt(this.stopExpressionVersion);
+        }
 
         this.putString(this.controller);
         this.putLFloat(this.blendOutTime);

@@ -5,7 +5,9 @@ import cn.nukkit.block.properties.OxidizationLevel;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemTool;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockCopperDoor extends BlockDoor implements Oxidizable, Waxable {
 
@@ -126,6 +128,16 @@ public class BlockCopperDoor extends BlockDoor implements Oxidizable, Waxable {
             default:
                 return this.getId();
         }
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_21_0;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.IRON_DOOR_BLOCK;
     }
 
     @Override

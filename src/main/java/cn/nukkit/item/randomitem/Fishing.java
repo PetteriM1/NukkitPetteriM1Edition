@@ -16,18 +16,18 @@ public final class Fishing {
     public static final Selector ROOT_FISHING = putSelector(new Selector(ROOT));
 
     public static final Selector FISHES = putSelector(new Selector(ROOT_FISHING), 0.85F);
-    public static final Selector TREASURES = putSelector(new Selector(ROOT_FISHING), 0.05F);
-    public static final Selector JUNKS = putSelector(new Selector(ROOT_FISHING), 0.1F);
     public static final Selector FISH = putSelector(new ConstantItemSelector(Item.RAW_FISH, FISHES), 0.6F);
     public static final Selector SALMON = putSelector(new ConstantItemSelector(Item.RAW_SALMON, FISHES), 0.25F);
     public static final Selector CLOWNFISH = putSelector(new ConstantItemSelector(Item.CLOWNFISH, FISHES), 0.02F);
     public static final Selector PUFFERFISH = putSelector(new ConstantItemSelector(Item.PUFFERFISH, FISHES), 0.13F);
+    public static final Selector TREASURES = putSelector(new Selector(ROOT_FISHING), 0.05F);
     public static final Selector TREASURE_BOW = putSelector(new ConstantItemSelector(Item.BOW, TREASURES), 0.1667F);
-    public static final Selector TREASURE_ENCHANTED_BOOK = putSelector(new ConstantItemSelector(Item.ENCHANTED_BOOK, TREASURES),  0.1667F);
+    public static final Selector TREASURE_ENCHANTED_BOOK = putSelector(new ConstantItemSelector(Item.ENCHANTED_BOOK, TREASURES), 0.1667F);
     public static final Selector TREASURE_FISHING_ROD = putSelector(new ConstantItemSelector(Item.FISHING_ROD, TREASURES), 0.1667F);
     public static final Selector TREASURE_NAME_TAG = putSelector(new ConstantItemSelector(Item.NAME_TAG, TREASURES), 0.1667F);
     public static final Selector TREASURE_SADDLE = putSelector(new ConstantItemSelector(Item.SADDLE, TREASURES), 0.1667F);
     public static final Selector TREASURE_NAUTILUS_SHELL = putSelector(new ConstantItemSelector(Item.NAUTILUS_SHELL, TREASURES), 0.1667F);
+    public static final Selector JUNKS = putSelector(new Selector(ROOT_FISHING), 0.1F);
     public static final Selector JUNK_BOWL = putSelector(new ConstantItemSelector(Item.BOWL, JUNKS), 0.12F);
     public static final Selector JUNK_FISHING_ROD = putSelector(new ConstantItemSelector(Item.FISHING_ROD, JUNKS), 0.024F);
     public static final Selector JUNK_LEATHER = putSelector(new ConstantItemSelector(Item.LEATHER, JUNKS), 0.12F);

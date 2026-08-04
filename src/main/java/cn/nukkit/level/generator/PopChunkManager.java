@@ -2,6 +2,7 @@ package cn.nukkit.level.generator;
 
 import cn.nukkit.level.DimensionData;
 import cn.nukkit.level.format.generic.BaseFullChunk;
+
 import java.util.Arrays;
 import java.util.function.Supplier;
 

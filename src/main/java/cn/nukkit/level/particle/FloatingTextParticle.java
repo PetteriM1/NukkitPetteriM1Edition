@@ -2,6 +2,7 @@ package cn.nukkit.level.particle;
 
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.data.EntityMetadata;
+import cn.nukkit.entity.item.EntityArmorStand;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Location;
 import cn.nukkit.math.Vector3;
@@ -17,7 +18,7 @@ import java.util.ArrayList;
 public class FloatingTextParticle extends Particle {
 
     protected final Level level;
-    protected long entityId = -1;
+    protected final long entityId = Entity.entityCount++;
     protected boolean invisible = false;
     protected String title;
     protected String text;
@@ -131,14 +132,8 @@ public class FloatingTextParticle extends Particle {
     }
 
     @Override
-    public DataPacket[] encode() {
+    public DataPacket[] mvEncode(int protocol) {
         ArrayList<DataPacket> packets = new ArrayList<>();
-
-        if (this.entityId == -1) {
-            this.entityId = Entity.entityCount++;
-        } else {
-            packets.add(getRemovePacket());
-        }
 
         if (!this.invisible) {
             packets.add(getAddPacket());
@@ -149,7 +144,7 @@ public class FloatingTextParticle extends Particle {
 
     private AddEntityPacket getAddPacket() {
         AddEntityPacket pk = new AddEntityPacket();
-        pk.id = "minecraft:armor_stand";
+        pk.type = EntityArmorStand.NETWORK_ID;
         pk.entityUniqueId = this.entityId;
         pk.entityRuntimeId = this.entityId;
         pk.x = (float) this.x;

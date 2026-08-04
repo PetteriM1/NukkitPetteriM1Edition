@@ -20,4 +20,9 @@ public class EntityZombieVillagerV1 extends EntityZombie {
     public String getName() {
         return this.hasCustomName() ? this.getNameTag() : "Zombie Villager";
     }
+
+    @Override
+    public boolean canDespawn() {
+        return false;
+    }
 }

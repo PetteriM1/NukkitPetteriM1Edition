@@ -21,8 +21,10 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.DoubleTag;
 import cn.nukkit.nbt.tag.FloatTag;
 import cn.nukkit.nbt.tag.ListTag;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
 import cn.nukkit.utils.Faceable;
+import cn.nukkit.utils.material.BlockType;
 import it.unimi.dsi.fastutil.ints.IntObjectPair;
 
 import java.util.concurrent.ThreadLocalRandom;
@@ -80,7 +82,6 @@ public class BlockPointedDripstone extends BlockSolidMeta implements BlockProper
         } else if (!down.isSolid()) {
             return false;
         }
-
 
         Block tip = null;
         if (up instanceof BlockPointedDripstone && hanging) {
@@ -194,7 +195,7 @@ public class BlockPointedDripstone extends BlockSolidMeta implements BlockProper
     private void buildBaseToTipColumn(int height, boolean merge, Consumer<DripstoneThickness> callback) {
         if (height >= 3) {
             callback.accept(DripstoneThickness.BASE);
-            for(int i = 0; i < height - 3; ++i) {
+            for (int i = 0; i < height - 3; ++i) {
                 callback.accept(DripstoneThickness.MIDDLE);
             }
         }
@@ -283,5 +284,15 @@ public class BlockPointedDripstone extends BlockSolidMeta implements BlockProper
     @Override
     public WaterloggingType getWaterloggingType() {
         return WaterloggingType.WHEN_PLACED_IN_WATER;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_17_0;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.STONE;
     }
 }

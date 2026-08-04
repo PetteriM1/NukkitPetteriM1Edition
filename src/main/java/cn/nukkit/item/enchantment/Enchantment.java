@@ -79,6 +79,54 @@ public abstract class Enchantment implements Cloneable {
     public static final int ID_DENSITY = 39;
     public static final int ID_BREACH = 40;
     public static final int ID_LUNGE = 41;
+    public final int id;
+    private final Rarity rarity;
+    public EnchantmentType type;
+    protected int level = 1;
+    protected final String name;
+    protected Enchantment(int id, String name, Rarity rarity, EnchantmentType type) {
+        this.id = id;
+        this.rarity = rarity;
+        this.type = type;
+
+        this.name = name;
+    }
+    public static final String[] words = {"the", "elder", "scrolls", "klaatu", "berata", "niktu", "xyzzy", "bless", "curse", "light", "darkness", "fire", "air", "earth", "water", "hot", "dry", "cold", "wet", "ignite", "snuff", "embiggen", "twist", "shorten", "stretch", "fiddle", "destroy", "imbue", "galvanize", "enchant", "free", "limited", "range", "of", "towards", "inside", "sphere", "cube", "self", "other", "ball", "mental", "physical", "grow", "shrink", "demon", "elemental", "spirit", "animal", "creature", "beast", "humanoid", "undead", "fresh", "stale"};
+
+    private static class UnknownEnchantment extends Enchantment {
+
+        protected UnknownEnchantment(int id) {
+            super(id, "unknown", Rarity.VERY_RARE, EnchantmentType.ALL);
+        }
+    }
+
+    public enum Rarity {
+        COMMON(10),
+        UNCOMMON(5),
+        RARE(2),
+        VERY_RARE(1);
+
+        private final int weight;
+
+        Rarity(int weight) {
+            this.weight = weight;
+        }
+
+        public int getWeight() {
+            return this.weight;
+        }
+
+        public static Rarity fromWeight(int weight) {
+            if (weight < 2) {
+                return VERY_RARE;
+            } else if (weight < 5) {
+                return RARE;
+            } else if (weight < 10) {
+                return UNCOMMON;
+            }
+            return COMMON;
+        }
+    }
 
     public static void init() {
         enchantments[ID_PROTECTION_ALL] = new EnchantmentProtectionAll();
@@ -153,22 +201,6 @@ public abstract class Enchantment implements Cloneable {
         return list.toArray(new Enchantment[0]);
     }
 
-    public final int id;
-    private final Rarity rarity;
-    public EnchantmentType type;
-
-    protected int level = 1;
-
-    protected final String name;
-
-    protected Enchantment(int id, String name, Rarity rarity, EnchantmentType type) {
-        this.id = id;
-        this.rarity = rarity;
-        this.type = type;
-
-        this.name = name;
-    }
-
     public int getLevel() {
         return level;
     }
@@ -198,9 +230,6 @@ public abstract class Enchantment implements Cloneable {
         return this.rarity;
     }
 
-    /**
-     * @deprecated use {@link Rarity#getWeight()} instead
-     */
     @Deprecated
     public int getWeight() {
         return this.rarity.getWeight();
@@ -279,8 +308,6 @@ public abstract class Enchantment implements Cloneable {
         }
     }
 
-    public static final String[] words = {"the", "elder", "scrolls", "klaatu", "berata", "niktu", "xyzzy", "bless", "curse", "light", "darkness", "fire", "air", "earth", "water", "hot", "dry", "cold", "wet", "ignite", "snuff", "embiggen", "twist", "shorten", "stretch", "fiddle", "destroy", "imbue", "galvanize", "enchant", "free", "limited", "range", "of", "towards", "inside", "sphere", "cube", "self", "other", "ball", "mental", "physical", "grow", "shrink", "demon", "elemental", "spirit", "animal", "creature", "beast", "humanoid", "undead", "fresh", "stale"};
-
     public static String getRandomName() {
         HashSet<String> set = new HashSet<>();
         while (set.size() < ThreadLocalRandom.current().nextInt(3, 6)) {
@@ -289,40 +316,5 @@ public abstract class Enchantment implements Cloneable {
 
         String[] words = set.toArray(new String[0]);
         return String.join(" ", words);
-    }
-
-    private static class UnknownEnchantment extends Enchantment {
-
-        protected UnknownEnchantment(int id) {
-            super(id, "unknown", Rarity.VERY_RARE, EnchantmentType.ALL);
-        }
-    }
-
-    public enum Rarity {
-        COMMON(10),
-        UNCOMMON(5),
-        RARE(2),
-        VERY_RARE(1);
-
-        private final int weight;
-
-        Rarity(int weight) {
-            this.weight = weight;
-        }
-
-        public int getWeight() {
-            return this.weight;
-        }
-
-        public static Rarity fromWeight(int weight) {
-            if (weight < 2) {
-                return VERY_RARE;
-            } else if (weight < 5) {
-                return RARE;
-            } else if (weight < 10) {
-                return UNCOMMON;
-            }
-            return COMMON;
-        }
     }
 }

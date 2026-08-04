@@ -55,7 +55,7 @@ public class BlockComposter extends BlockTransparentMeta implements ItemID {
 
     @Override
     public double getResistance() {
-        return 0.6;
+        return 3;
     }
 
     @Override
@@ -154,7 +154,7 @@ public class BlockComposter extends BlockTransparentMeta implements ItemID {
             if (item != null) {
                 this.level.dropItem(add(0.5, 0.85, 0.5), event.getDrop());
             }
-            this.level.addSound(add(0.5 , 0.5, 0.5), Sound.BLOCK_COMPOSTER_EMPTY);
+            this.level.addSound(add(0.5, 0.5, 0.5), Sound.BLOCK_COMPOSTER_EMPTY);
             return event.getDrop();
         }
         return null;

@@ -3,7 +3,9 @@ package cn.nukkit.block;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemTool;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockSlabTuffPolished extends BlockSlab {
 
@@ -28,6 +30,19 @@ public class BlockSlabTuffPolished extends BlockSlab {
     @Override
     public double getHardness() {
         return 1.5;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_21_0;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        if (protocol < ProtocolInfo.v1_17_0) {
+            return BlockTypes.STONE_SLAB;
+        }
+        return BlockTypes.POLISHED_DEEPSLATE_SLAB;
     }
 
     @Override

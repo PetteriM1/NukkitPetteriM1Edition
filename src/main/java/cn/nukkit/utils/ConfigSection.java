@@ -19,7 +19,7 @@ public class ConfigSection extends LinkedHashMap<String, Object> {
     /**
      * Constructor of ConfigSection that contains initial key/value data
      *
-     * @param key key
+     * @param key   key
      * @param value value
      */
     public ConfigSection(String key, Object value) {
@@ -91,7 +91,7 @@ public class ConfigSection extends LinkedHashMap<String, Object> {
     /**
      * Get object by key. If section does not contain value, return default value
      *
-     * @param key key
+     * @param key          key
      * @param defaultValue default value
      * @return object by key or default value
      */
@@ -112,7 +112,7 @@ public class ConfigSection extends LinkedHashMap<String, Object> {
     /**
      * Store value into config section
      *
-     * @param key key
+     * @param key   key
      * @param value value
      */
     public void set(String key, Object value) {
@@ -663,7 +663,7 @@ public class ConfigSection extends LinkedHashMap<String, Object> {
     /**
      * Check existence of config section element
      *
-     * @param key key
+     * @param key        key
      * @param ignoreCase ignore case
      * @return existence of config section element
      */

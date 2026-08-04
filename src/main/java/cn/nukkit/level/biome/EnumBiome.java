@@ -140,7 +140,6 @@ public enum EnumBiome {
      * @param id biome id
      * @return biome
      */
-    @Deprecated
     public static Biome getBiome(int id) {
         return Biome.getBiome(id);
     }
@@ -151,7 +150,6 @@ public enum EnumBiome {
      * @param name biome name
      * @return biome
      */
-    @Deprecated
     public static Biome getBiome(String name) {
         return Biome.getBiome(name);
     }

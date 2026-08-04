@@ -1,5 +1,7 @@
 package cn.nukkit.item;
 
+import cn.nukkit.network.protocol.ProtocolInfo;
+
 public class ItemWindCharge extends ProjectileItem {
 
     public ItemWindCharge() {
@@ -12,6 +14,11 @@ public class ItemWindCharge extends ProjectileItem {
 
     public ItemWindCharge(Integer meta, int count) {
         super(WIND_CHARGE, meta, count, "Wind Charge");
+    }
+
+    @Override
+    public boolean isSupportedOn(int protocol) {
+        return protocol >= ProtocolInfo.v1_21_0;
     }
 
     @Override
