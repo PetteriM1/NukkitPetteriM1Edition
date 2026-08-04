@@ -46,7 +46,7 @@ public class DefaultGamemodeCommand extends VanillaCommand {
 
             SetDefaultGameTypePacket gameTypePacket = new SetDefaultGameTypePacket();
             gameTypePacket.gamemode = sender.getServer().getDefaultGamemode();
-            Server.broadcastPacket(sender.getServer().getOnlinePlayers().values(), gameTypePacket);
+            Server.broadcastPacket(sender.getServer().getOnlinePlayersList(), gameTypePacket);
         } else {
             sender.sendMessage(new TranslationContainer(TextFormat.RED + "%commands.gamemode.fail.invalid", args[0]));
         }

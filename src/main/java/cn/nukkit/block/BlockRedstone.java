@@ -1,6 +1,7 @@
 package cn.nukkit.block;
 
 import cn.nukkit.Player;
+import cn.nukkit.Server;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.math.BlockFace;
@@ -88,6 +89,6 @@ public class BlockRedstone extends BlockSolid {
 
     @Override
     public boolean canBePushed() {
-        return false; // TODO: remove when crash issue fixed
+        return Server.getInstance().unsafeRedstone; // TODO: remove when crash issue fixed
     }
 }

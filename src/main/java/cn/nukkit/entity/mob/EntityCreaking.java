@@ -1,5 +1,6 @@
 package cn.nukkit.entity.mob;
 
+import cn.nukkit.entity.Entity;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 
@@ -35,5 +36,10 @@ public class EntityCreaking extends EntityWalkingMob {
     @Override
     public int getKillExperience() {
         return 0;
+    }
+
+    @Override
+    public void attackEntity(Entity player) {
+
     }
 }

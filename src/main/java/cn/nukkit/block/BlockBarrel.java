@@ -3,6 +3,8 @@ package cn.nukkit.block;
 import cn.nukkit.Player;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntityBarrel;
+import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.mob.EntityPiglin;
 import cn.nukkit.inventory.ContainerInventory;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
@@ -97,6 +99,12 @@ public class BlockBarrel extends BlockSolidMeta implements Faceable {
 
         player.addWindow(barrel.getInventory());
 
+        for (Entity e : this.getChunk().getEntities().values()) {
+            if (e instanceof EntityPiglin) {
+                ((EntityPiglin) e).setAngry(600);
+            }
+        }
+
         return true;
     }
 
@@ -145,7 +153,7 @@ public class BlockBarrel extends BlockSolidMeta implements Faceable {
     }
 
     public void setOpen(boolean open) {
-        this.setDamage((this.getDamage() & 0x7) | (open? 0x8 : 0x0));
+        this.setDamage((this.getDamage() & 0x7) | (open ? 0x8 : 0x0));
     }
 
     @Override
@@ -162,6 +170,21 @@ public class BlockBarrel extends BlockSolidMeta implements Faceable {
         }
 
         return super.getComparatorInputOverride();
+    }
+
+    @Override
+    public boolean onBreak(Item item, Player player) {
+        boolean broken = this.onBreak(item);
+
+        if (broken && player != null) {
+            for (Entity e : this.getChunk().getEntities().values()) {
+                if (e instanceof EntityPiglin) {
+                    ((EntityPiglin) e).setAngry(600);
+                }
+            }
+        }
+
+        return broken;
     }
 
     @Override

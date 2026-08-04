@@ -10,21 +10,21 @@ import cn.nukkit.event.HandlerList;
 public class BlockFromToEvent extends BlockEvent implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
-
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private Block to;
 
     /**
      * Event called on block changed from one type to another. E.g Redstone.
+     *
      * @param block Block that is being replaced.
-     * @param to The replacement Block
+     * @param to    The replacement Block
      */
     public BlockFromToEvent(Block block, Block to) {
         super(block);
         this.to = to;
+    }
+
+    public static HandlerList getHandlers() {
+        return handlers;
     }
 
     public Block getFrom() {

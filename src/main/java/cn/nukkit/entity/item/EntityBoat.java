@@ -20,6 +20,7 @@ import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.*;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AnimatePacket;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.network.protocol.SetEntityLinkPacket;
 
 import java.util.ArrayList;
@@ -174,7 +175,9 @@ public class EntityBoat extends EntityVehicle implements EntityControllable {
         Location from = new Location(lastX, lastY, lastZ, lastYaw, lastPitch, level);
         Location to = new Location(this.x, this.y, this.z, this.yaw, this.pitch, level);
 
-        this.getServer().getPluginManager().callEvent(new VehicleUpdateEvent(this));
+        if (!this.getServer().suomiCraftPEMode()) {
+            this.getServer().getPluginManager().callEvent(new VehicleUpdateEvent(this));
+        }
 
         if (!from.equals(to)) {
             this.getServer().getPluginManager().callEvent(new VehicleMoveEvent(this, from, to));
@@ -300,7 +303,12 @@ public class EntityBoat extends EntityVehicle implements EntityControllable {
             entity.setDataProperty(new ByteEntityData(DATA_RIDER_ROTATION_LOCKED, 1), !(entity instanceof Player));
             if (entity instanceof Player) {
                 entity.setDataProperty(new FloatEntityData(DATA_RIDER_MAX_ROTATION, 90), false);
-                entity.setDataProperty(new FloatEntityData(DATA_RIDER_ROTATION_OFFSET, -90), false);
+                if (((Player) entity).protocol < ProtocolInfo.v1_21_130_28) {
+                    entity.setDataProperty(new FloatEntityData(DATA_RIDER_MIN_ROTATION, 1), false);
+                }
+                if (((Player) entity).protocol >= ProtocolInfo.v1_16_210) {
+                    entity.setDataProperty(new FloatEntityData(DATA_RIDER_ROTATION_OFFSET, -90), false);
+                }
                 entity.sendData(((Player) entity));
             }
         }
@@ -319,7 +327,11 @@ public class EntityBoat extends EntityVehicle implements EntityControllable {
 
         if (r) {
             updatePassengers();
-            entity.setDataProperty(new ByteEntityData(DATA_RIDER_ROTATION_LOCKED, 0), true);
+            if (entity instanceof Player) {
+                entity.setDataPropertyAndSendOnlyToSelf(new ByteEntityData(DATA_RIDER_ROTATION_LOCKED, 0));
+            } else {
+                entity.setDataProperty(new ByteEntityData(DATA_RIDER_ROTATION_LOCKED, 0), true);
+            }
         }
         return r;
     }
@@ -436,6 +448,20 @@ public class EntityBoat extends EntityVehicle implements EntityControllable {
         this.dataProperties.putInt(DATA_VARIANT, variant);
     }
 
+    @Override
+    public boolean goToNewChunk(FullChunk chunk) {
+        if (chunk.getEntities().size() > 200) {
+            if (!this.isClosed() && this.isAlive()) {
+                if (this.level.getGameRules().getBoolean(GameRule.DO_ENTITY_DROPS)) {
+                    this.dropItem();
+                }
+            }
+            this.close();
+            return false;
+        }
+        return true;
+    }
+
     public void onInput(double x, double y, double z, double yaw) {
         this.setPositionAndRotation(this.temporalVector.setComponents(x, y - this.getBaseOffset(), z), yaw % 360, 0);
     }
@@ -473,7 +499,7 @@ public class EntityBoat extends EntityVehicle implements EntityControllable {
         if (down) acceleration -= 0.005F;
 
         double yaw = getYaw() - 90;
-        setMotion(getMotion().add(Math.sin((-yaw * 0.017453292F)) * acceleration, 0, Math.cos((yaw * 0.017453292F)) * acceleration));
+        setMotion(getMotion().add(FastMathLite.sin((-yaw * 0.017453292F)) * acceleration, 0, FastMathLite.cos((yaw * 0.017453292F)) * acceleration));
 
         onPaddle(left ? AnimatePacket.Action.ROW_LEFT : AnimatePacket.Action.ROW_RIGHT, (float) (left ? -this.deltaRotation : this.deltaRotation));
     }

@@ -5,6 +5,7 @@ import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockID;
+import cn.nukkit.block.custom.CustomBlockManager;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.inventory.Fuel;
 import cn.nukkit.item.RuntimeItemMapping.RuntimeEntry;
@@ -25,6 +26,7 @@ import cn.nukkit.utils.material.MaterialType;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import lombok.Data;
 
 import java.io.IOException;
@@ -53,6 +55,8 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
 
     private PersistentItemDataContainer persistentContainer;
 
+    private static final Int2ObjectOpenHashMap<String> ITEM_NAMES = new Int2ObjectOpenHashMap<>();
+
     public Item(int id) {
         this(id, 0, 1, UNKNOWN_STR);
     }
@@ -73,7 +77,111 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
             this.hasMeta = false;
         }
         this.count = count;
-        this.name = name;
+        //this.name = name;
+
+        if (name != null) {
+            int nameKey = (((short) this.id) << 16) | (((this instanceof ItemDurable ? 0 : this.meta) & 0x7fff) << 1);
+            if (!ITEM_NAMES.containsKey(nameKey)) {
+                ITEM_NAMES.put(nameKey, name);
+            }
+        }
+    }
+    private static final CreativeItems CREATIVE_ITEMS = new CreativeItems();
+    private static boolean initialized;
+    private static List<ItemDefinition> toBeAdded;
+    private static final Pattern INTEGER_PATTERN = Pattern.compile("^[-1-9]\\d*$");
+
+    public static class CreativeItems {
+
+        private final List<CreativeItemGroup> groups = new ArrayList<>();
+        private final Map<Item, CreativeItemGroup> contents = new LinkedHashMap<>();
+
+        public void clear() {
+            groups.clear();
+            contents.clear();
+        }
+
+        public void add(Item item) {
+            add(item, ItemDefinition.CreativeCategory.ITEMS, ""); // TODO: vanilla items back to correct categories & groups
+        }
+
+        public void add(Item item, CreativeItemGroup group) {
+            if (group == null) {
+                throw new IllegalArgumentException("group == null");
+            }
+
+            contents.put(item, group);
+        }
+
+        public void add(Item item, ItemDefinition.CreativeCategory category, String group) {
+            CreativeItemGroup creativeGroup = null;
+
+            for (CreativeItemGroup existing : groups) {
+                if (existing.category == category && existing.name.equals(group)) {
+                    creativeGroup = existing;
+                    break;
+                }
+            }
+
+            if (creativeGroup == null) {
+                creativeGroup = new CreativeItemGroup(groups.size(), category, group, item);
+                groups.add(creativeGroup);
+            }
+
+            contents.put(item, creativeGroup);
+        }
+
+        public void addGroup(CreativeItemGroup creativeGroup) {
+            groups.add(creativeGroup);
+        }
+
+        public Collection<Item> getItems() {
+            return contents.keySet();
+        }
+
+        public Collection<Item> getItems(int protocol) {
+            if (protocol != ProtocolInfo.CURRENT_PROTOCOL) {
+                ArrayList<Item> list = new ArrayList<>();
+                for (Item i : contents.keySet()) {
+                    if (i.isSupportedOn(protocol)) {
+                        list.add(i);
+                    }
+                }
+                return list;
+            }
+            return contents.keySet();
+        }
+
+        // TODO: For updates versions check Item & Icon compatibility, re-id groups
+
+        public List<CreativeItemGroup> getGroups() {
+            return groups;
+        }
+
+        public Map<Item, CreativeItemGroup> getContents() {
+            return getContents(ProtocolInfo.CURRENT_PROTOCOL);
+        }
+
+        public Map<Item, CreativeItemGroup> getContents(int protocol) {
+            if (protocol != ProtocolInfo.CURRENT_PROTOCOL) {
+                Map<Item, CreativeItemGroup> map = new LinkedHashMap<>();
+                for (Map.Entry<Item, CreativeItemGroup> e : contents.entrySet()) {
+                    if (e.getKey().isSupportedOn(protocol)) {
+                        map.put(e.getKey(), e.getValue());
+                    }
+                }
+                return map;
+            }
+            return contents;
+        }
+    }
+
+    @Data
+    public static class CreativeItemGroup {
+        private final int groupId;
+        private final ItemDefinition.CreativeCategory category;
+        private final String name;
+        private final Item icon;
     }
 
     public boolean hasMeta() {
@@ -100,11 +208,6 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         clearCreativeItems();
     }
 
-    private static final CreativeItems CREATIVE_ITEMS = new CreativeItems();
-
-    private static boolean initialized;
-    private static List<ItemDefinition> toBeAdded;
-
     public static void addCustomCreativeItem(ItemDefinition definition) {
         if (initialized) {
             throw new IllegalStateException();
@@ -124,6 +227,28 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         }
         initialized = true;
 
+        registerCreativeItems(v1_21_130_28);
+
+        // Custom items are registered before initCreativeItems, but we need groups ready before adding them here
+        if (toBeAdded != null) {
+            for (ItemDefinition definition : toBeAdded) {
+                try {
+                    Item item = definition.getImplementation().getConstructor(Integer.class, int.class).newInstance(0, 1);
+                    if (!(item instanceof CustomItem)) {
+                        throw new IllegalStateException("Implementation of " + definition.getIdentifier() + " does not implement CustomItem");
+                    }
+
+                    CREATIVE_ITEMS.add(item, definition.getCreativeCategory(), definition.getCreativeGroup() == null ? "" : definition.getCreativeGroup());
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            toBeAdded = null;
+        }
+    }
+
+    private static void registerCreativeItems(int protocol) {
         JsonObject root = Utils.loadJsonResource("creative_items.json").getAsJsonObject();
 
         JsonArray itemsArray = root.getAsJsonArray("items");
@@ -131,7 +256,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
             throw new IllegalStateException("Empty items");
         }
 
-        RuntimeItemMapping mapping = RuntimeItems.getMapping();
+        RuntimeItemMapping mapping = RuntimeItems.getMapping(protocol);
 
         JsonArray groupsArray = root.getAsJsonArray("groups");
         if (groupsArray.isEmpty()) {
@@ -143,7 +268,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         for (JsonElement obj : groupsArray.asList()) {
             JsonObject groupRoot = obj.getAsJsonObject();
 
-            Item icon = mapping.parseCreativeItem(groupRoot.get("icon").getAsJsonObject(), true);
+            Item icon = mapping.parseCreativeItem(groupRoot.get("icon").getAsJsonObject(), true, protocol);
             if (icon == null) {
                 icon = Item.get(AIR);
             }
@@ -158,7 +283,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
 
         for (JsonElement element : itemsArray) {
             JsonObject creativeItem = element.getAsJsonObject();
-            Item item = mapping.parseCreativeItem(creativeItem, true);
+            Item item = mapping.parseCreativeItem(creativeItem, true, protocol);
 
             // Add only implemented items
             if (item != null && !item.getName().equals(UNKNOWN_STR)) {
@@ -166,28 +291,10 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
                 CREATIVE_ITEMS.add(item, creativeGroup);
             }
         }
-
-        // Custom items are registered before initCreativeItems, but we need groups ready before adding them here
-        if (toBeAdded != null) {
-            for (ItemDefinition definition : toBeAdded) {
-                try {
-                    Item item = definition.getImplementation().getConstructor(Integer.class, int.class).newInstance(0, 1);
-                    if (!(item instanceof CustomItem)) {
-                        throw new IllegalStateException("Implementation of " + definition.getIdentifier() + " does not implement CustomItem");
-                    }
-
-                    Item.CREATIVE_ITEMS.add(item, definition.getCreativeCategory(), definition.getCreativeGroup() == null ? "" : definition.getCreativeGroup());
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-            toBeAdded = null;
-        }
     }
 
     public static void clearCreativeItems() {
-        Item.CREATIVE_ITEMS.clear();
+        CREATIVE_ITEMS.clear();
     }
 
     public static CreativeItems getCreativeItemsAndGroups() {
@@ -195,19 +302,23 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
     }
 
     public static ArrayList<Item> getCreativeItems() {
-        return new ArrayList<>(Item.CREATIVE_ITEMS.getItems());
+        return new ArrayList<>(CREATIVE_ITEMS.getItems());
+    }
+
+    public static ArrayList<Item> getCreativeItems(int protocol) {
+        return new ArrayList<>(CREATIVE_ITEMS.getItems(protocol));
     }
 
     public static void addCreativeItem(Item item) {
-        Item.CREATIVE_ITEMS.add(item.clone());
+        CREATIVE_ITEMS.add(item.clone());
     }
 
     public static void removeCreativeItem(Item item) {
-        Item.CREATIVE_ITEMS.getContents().remove(item);
+        CREATIVE_ITEMS.getContents().remove(item);
     }
 
     public static boolean isCreativeItem(Item item) {
-        for (Item aCreative : Item.CREATIVE_ITEMS.getItems()) {
+        for (Item aCreative : CREATIVE_ITEMS.getItems()) { // No copy
             if (item.equals(aCreative, !item.isTool())) {
                 return true;
             }
@@ -217,13 +328,13 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
 
     @Deprecated
     public static Item getCreativeItem(int index) {
-        List<Item> items = getCreativeItems();
+        ArrayList<Item> items = getCreativeItems();
         return (index >= 0 && index < items.size()) ? items.get(index) : null;
     }
 
     @Deprecated
     public static int getCreativeItemIndex(Item item) {
-        List<Item> items = getCreativeItems();
+        ArrayList<Item> items = getCreativeItems();
         for (int i = 0; i < items.size(); i++) {
             if (item.equals(items.get(i), !item.isTool())) {
                 return i;
@@ -265,7 +376,11 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
             Class<?> c;
             if (id < 0) {
                 int blockId = 255 - id;
-                c = Block.list[blockId];
+                if (blockId >= CustomBlockManager.LOWEST_CUSTOM_BLOCK_ID) {
+                    c = CustomBlockManager.get().getClassType(blockId);
+                } else {
+                    c = Block.list[blockId];
+                }
             } else {
                 c = list[id];
             }
@@ -298,7 +413,11 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
             Class<?> c;
             if (id < 0) {
                 int blockId = 255 - id;
-                c = Block.list[blockId];
+                if (blockId >= CustomBlockManager.LOWEST_CUSTOM_BLOCK_ID) {
+                    c = CustomBlockManager.get().getClassType(blockId);
+                } else {
+                    c = Block.list[blockId];
+                }
             } else {
                 c = list[id];
             }
@@ -329,8 +448,6 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
             return item.initItem();
         }
     }
-
-    private static final Pattern INTEGER_PATTERN = Pattern.compile("^[-1-9]\\d*$");
 
     public static Item fromString(String str) {
         String[] b = str.trim().replace(' ', '_').replace("minecraft:", "").split(":");
@@ -413,7 +530,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
     }
 
     public boolean hasCustomBlockData() {
-        if (!this.hasCompoundTag()) {
+        if (Server.getInstance().suomiCraftPEMode() || !this.hasCompoundTag()) {
             return false;
         }
 
@@ -769,7 +886,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
     }
 
     public String getName() {
-        return this.hasCustomName() ? this.getCustomName() : this.name;
+        return this.hasCustomName() ? this.getCustomName() : ITEM_NAMES.get((((short) this.id) << 16) | (((this instanceof ItemDurable ? 0 : this.meta) & 0x7fff) << 1)); // this.name
     }
 
     final public boolean canBePlaced() {
@@ -918,6 +1035,10 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
             return false;
         }
 
+        if (Server.getInstance().ignoreUnbreakableItems) {
+            return false;
+        }
+
         Tag tag = this.getNamedTagEntry("Unbreakable");
         return tag instanceof ByteTag && ((ByteTag) tag).data > 0;
     }
@@ -948,7 +1069,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
 
     @Override
     public String toString() {
-        String out = "Item " + this.name + " (" + this.id + ':' + (!this.hasMeta ? "?" : this.meta) + ")x" + this.count;
+        String out = "Item " + ITEM_NAMES.get((((short) this.id) << 16) | (((this instanceof ItemDurable ? 0 : this.meta) & 0x7fff) << 1)) + " (" + this.id + ':' + (!this.hasMeta ? "?" : this.meta) + ")x" + this.count;
         CompoundTag tag;
         if (Nukkit.DEBUG > 1 && (tag = this.getNamedTag()) != null) {
             out += '\n' + tag.toString();
@@ -964,7 +1085,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
      * Called when a player uses the item on air, for example throwing a projectile.
      * Returns whether the item was changed, for example count decrease or durability change.
      *
-     * @param player player
+     * @param player          player
      * @param directionVector direction
      * @return item changed
      */
@@ -1063,19 +1184,44 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
     }
 
     public final RuntimeEntry getRuntimeEntry() {
-        return RuntimeItems.getMapping().toRuntime(this.getId(), this.getDamage());
+        Server.mvw("Item#getRuntimeEntry()");
+        return this.getRuntimeEntry(CURRENT_PROTOCOL);
+    }
+
+    public final RuntimeEntry getRuntimeEntry(int protocolId) {
+        return RuntimeItems.getMapping(protocolId).toRuntime(this.getId(), this.getDamage());
     }
 
     public final int getNetworkId() {
-        return this.getRuntimeEntry().getRuntimeId();
+        Server.mvw("Item#getNetworkId()");
+        return this.getNetworkId(CURRENT_PROTOCOL);
+    }
+
+    public final int getNetworkId(int protocolId) {
+        if (protocolId < v1_16_100) {
+            return getId();
+        }
+        return this.getRuntimeEntry(protocolId).getRuntimeId();
     }
 
     /**
      * This code runs when the item is initialized and can be overridden to for example check the item for missing nbt
+     *
      * @return current item
      */
     public Item initItem() {
         return this;
+    }
+
+    /**
+     * Check whether the item is supported on certain protocol version.
+     * Unsupported items will display as update game blocks for players on those versions.
+     *
+     * @param protocol protocol version
+     * @return item is supported on that version
+     */
+    public boolean isSupportedOn(int protocol) {
+        return (this.id >= 0 && this.id <= 255) || RuntimeItems.getMapping(protocol).isSupported(this.getId(), this.getDamage());
     }
 
     public PersistentItemDataContainer getPersistentDataContainer() {
@@ -1113,70 +1259,5 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
      */
     public boolean allowOffhand() {
         return this.id == AIR;
-    }
-
-    public static class CreativeItems {
-
-        private final List<CreativeItemGroup> groups = new ArrayList<>();
-        private final Map<Item, CreativeItemGroup> contents = new LinkedHashMap<>();
-
-        public void clear() {
-            groups.clear();
-            contents.clear();
-        }
-
-        public void add(Item item) {
-            add(item, ItemDefinition.CreativeCategory.ITEMS, ""); // TODO: vanilla items back to correct categories & groups
-        }
-
-        public void add(Item item, CreativeItemGroup group) {
-            if (group == null) {
-                throw new IllegalArgumentException("group == null");
-            }
-
-            contents.put(item, group);
-        }
-
-        public void add(Item item, ItemDefinition.CreativeCategory category, String group) {
-            CreativeItemGroup creativeGroup = null;
-
-            for (CreativeItemGroup existing : groups) {
-                if (existing.category == category && existing.name.equals(group)) {
-                    creativeGroup = existing;
-                    break;
-                }
-            }
-
-            if (creativeGroup == null) {
-                creativeGroup = new CreativeItemGroup(groups.size(), category, group, item);
-                groups.add(creativeGroup);
-            }
-
-            contents.put(item, creativeGroup);
-        }
-
-        public void addGroup(CreativeItemGroup creativeGroup) {
-            groups.add(creativeGroup);
-        }
-
-        public Collection<Item> getItems() {
-            return contents.keySet();
-        }
-
-        public List<CreativeItemGroup> getGroups() {
-            return groups;
-        }
-
-        public Map<Item, CreativeItemGroup> getContents() {
-            return contents;
-        }
-    }
-
-    @Data
-    public static class CreativeItemGroup {
-        private final int groupId;
-        private final ItemDefinition.CreativeCategory category;
-        private final String name;
-        private final Item icon;
     }
 }

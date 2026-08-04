@@ -1,5 +1,6 @@
 package cn.nukkit.block;
 
+import cn.nukkit.Server;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
@@ -80,6 +81,17 @@ public class BlockWall extends BlockTransparentMeta {
 
     @Override
     protected AxisAlignedBB recalculateBoundingBox() {
+        if (Thread.currentThread() != Server.getInstance().getPrimaryThread()) {
+            return new SimpleAxisAlignedBB(
+                    this.x + 1,
+                    this.y,
+                    this.z + 1,
+                    this.x + 1,
+                    this.y + 1.5,
+                    this.z + 1
+            ); // Hack: Fix asynchronous calls (mob AI) causing issues by trying to load chunks
+        }
+
         boolean north = this.canConnect(this.getSide(BlockFace.NORTH));
         boolean south = this.canConnect(this.getSide(BlockFace.SOUTH));
         boolean west = this.canConnect(this.getSide(BlockFace.WEST));

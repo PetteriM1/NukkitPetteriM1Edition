@@ -1,8 +1,10 @@
 package cn.nukkit.network.protocol;
 
+import com.google.common.collect.Sets;
 import com.google.common.primitives.Ints;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author MagicDroidX &amp; iNevet
@@ -10,15 +12,124 @@ import java.util.List;
  */
 public interface ProtocolInfo {
 
-    /**
-     * Actual Minecraft protocol version
-     */
-    @SuppressWarnings("UnnecessaryBoxing")
-    int CURRENT_PROTOCOL = Integer.valueOf("1001"); // DO NOT REMOVE BOXING
+    int v1_2_0 = 137;
+    int v1_2_5_11 = 140;
+    int v1_2_5 = 141;
+    int v1_2_6 = 150;
+    int v1_2_7 = 160;
+    int v1_2_10 = 201;
+    int v1_2_13 = 223;
+    int v1_2_13_11 = 224;
+    int v1_4_0 = 261;
+    int v1_5_0 = 274;
+    int v1_6_0_5 = 281;
+    int v1_6_0 = 282;
+    int v1_7_0 = 291;
+    int v1_8_0 = 313;
+    int v1_9_0 = 332;
+    int v1_10_0 = 340;
+    int v1_11_0 = 354;
+    int v1_12_0 = 361;
+    int v1_13_0 = 388;
+    int v1_14_0 = 389;
+    int v1_14_60 = 390;
+    int v1_16_0 = 407;
+    int v1_16_20 = 408;
+    int v1_16_100_0 = 409;
+    int v1_16_100_51 = 410;
+    int v1_16_100_52 = 411;
+    int v1_16_100 = 419;
+    int v1_16_200_51 = 420;
+    int v1_16_200 = 422;
+    int v1_16_210_50 = 423;
+    int v1_16_210_53 = 424;
+    int v1_16_210 = 428;
+    int v1_16_220 = 431;
+    int v1_16_230_50 = 433;
+    int v1_16_230 = 434;
+    int v1_16_230_54 = 435;
+    int v1_17_0 = 440;
+    int v1_17_10 = 448;
+    int v1_17_20_20 = 453;
+    int v1_17_30 = 465;
+    int v1_17_40 = 471;
+    int v1_18_0_20 = 474;
+    int v1_18_0 = 475;
+    int v1_18_0_22 = 476;
+    int v1_18_10_26 = 485;
+    int v1_18_10 = 486;
+    int v1_18_30 = 503;
+    int v1_19_0_29 = 524;
+    int v1_19_0_31 = 526;
+    int v1_19_0 = 527;
+    int v1_19_10 = 534;
+    int v1_19_20 = 544;
+    int v1_19_21 = 545;
+    int v1_19_30_23 = 553;
+    int v1_19_30 = 554;
+    int v1_19_40 = 557;
+    int v1_19_50_20 = 558;
+    int v1_19_50 = 560;
+    int v1_19_60 = 567;
+    int v1_19_63 = 568;
+    int v1_19_70_24 = 574;
+    int v1_19_70 = 575;
+    int v1_19_80 = 582;
+    int v1_20_0_23 = 588;
+    int v1_20_0 = 589;
+    int v1_20_10_21 = 593;
+    int v1_20_10 = 594;
+    int v1_20_30 = 618;
+    int v1_20_40 = 622;
+    int v1_20_50 = 630;
+    int v1_20_60 = 649;
+    int v1_20_70 = 662;
+    int v1_20_80 = 671;
+    int v1_21_0 = 685;
+    int v1_21_2 = 686;
+    int v1_21_20 = 712;
+    int v1_21_30 = 729;
+    int v1_21_40 = 748;
+    int v1_21_50_28 = 765;
+    int v1_21_50 = 766;
+    int v1_21_60 = 776;
+    int v1_21_70_24 = 785;
+    int v1_21_70 = 786;
+    int v1_21_80 = 800;
+    int v1_21_90 = 818;
+    int v1_21_93 = 819;
+    int v1_21_100 = 827;
+    int v1_21_110 = 843;
+    int v1_21_111 = 844;
+    int v1_21_120 = 859;
+    int v1_21_124 = 860;
+    int v1_21_130_28 = 897;
+    int v1_21_130 = 898;
+    int v1_26_0 = 924;
+    int v1_26_10 = 944;
+    int v1_26_20_26 = 974;
+    int v1_26_20 = 975;
+    int v1_26_30 = 1001;
+    int v1_26_40 = 2168;
+    int v1_26_44placeholderNot45release = 2169;
 
-    List<Integer> SUPPORTED_PROTOCOLS = Ints.asList(CURRENT_PROTOCOL);
+    int CURRENT_PROTOCOL = DataPacket.CONST(v1_26_44placeholderNot45release);
 
-    String MINECRAFT_VERSION_NETWORK = "1.26.30";
+    List<Integer> SUPPORTED_PROTOCOLS = Ints.asList(
+            v1_13_0, v1_14_0, v1_14_60, v1_16_0, v1_16_20, v1_16_100_0, v1_16_100_51, v1_16_100_52, v1_16_100,
+            v1_16_200_51, v1_16_200, v1_16_210_50, v1_16_210_53, v1_16_210, v1_16_220, v1_16_230_50, v1_16_230,
+            v1_16_230_54, v1_17_0, v1_17_10, v1_17_20_20, v1_17_30, v1_17_40, v1_18_0_20, v1_18_0, v1_18_0_22,
+            v1_18_10_26, v1_18_10, v1_18_30, v1_19_0_29, v1_19_0_31, v1_19_0, v1_19_10, v1_19_20, v1_19_21,
+            v1_19_30_23, v1_19_30, v1_19_40, v1_19_50_20, v1_19_50, v1_19_60, v1_19_63, v1_19_70_24, v1_19_70,
+            v1_19_80, v1_20_0_23, v1_20_0, v1_20_10_21, v1_20_10, v1_20_30, v1_20_40, v1_20_50, v1_20_60,
+            v1_20_70, v1_20_80, v1_21_0, v1_21_2, v1_21_20, v1_21_30, v1_21_40, v1_21_50_28, v1_21_50, v1_21_60,
+            v1_21_70_24, v1_21_70, v1_21_80, v1_21_90, v1_21_93, v1_21_100, v1_21_110, v1_21_111, v1_21_120, v1_21_124,
+            v1_21_130_28, v1_21_130, v1_26_0, v1_26_10, v1_26_20_26, v1_26_20, v1_26_30, v1_26_40, v1_26_44placeholderNot45release
+    );
+
+    Set<Integer> ENABLED_PROTOCOLS = Sets.newHashSet(SUPPORTED_PROTOCOLS);
+
+    String MINECRAFT_VERSION_NETWORK = "1.26.45";
     String MINECRAFT_VERSION = 'v' + MINECRAFT_VERSION_NETWORK;
 
     byte BATCH_PACKET = (byte) 0xff;
@@ -238,6 +349,7 @@ public interface ProtocolInfo {
     byte __INTERNAL__CONTAINER_REGISTRY_CLEANUP_PACKET = (byte) 217;
     byte __INTERNAL__MOVEMENT_EFFECT_PACKET = (byte) 218;
     byte __INTERNAL__SET_MOVEMENT_AUTHORITY_PACKET = (byte) 219;
+    byte __INTERNAL__CAMERA_AIM_ASSIST_PRESETS_PACKET = (byte) 220;
     byte __INTERNAL__CAMERA_AIM_ASSIST_INSTRUCTION_PACKET = (byte) 221;
     byte __INTERNAL__MOVEMENT_PREDICTION_SYNC_PACKET = (byte) 222;
     byte __INTERNAL__UPDATE_CLIENT_OPTIONS_PACKET = (byte) 223;

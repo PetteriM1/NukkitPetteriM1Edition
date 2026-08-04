@@ -55,7 +55,7 @@ public interface FullChunk extends Cloneable {
     }
 
     boolean setBlock(int x, int y, int z, int blockId);
-    
+
     boolean setBlock(int x, int y, int z, int blockId, int meta);
 
     boolean setBlockAtLayer(int x, int y, int z, BlockLayer layer, int id);
@@ -124,11 +124,15 @@ public interface FullChunk extends Cloneable {
         return this.getBiomeId(x, z);
     }
 
-    default void setBiomeId(int x, int y, int z, int biomeId)  {
+    @Deprecated
+    default void setBiomeIdAndColor(int x, int z, int idAndColor) {
+    }
+
+    default void setBiomeId(int x, int y, int z, int biomeId) {
         this.setBiomeId(x, y, z, (byte) biomeId);
     }
 
-    default void setBiomeId(int x, int z, int biomeId)  {
+    default void setBiomeId(int x, int z, int biomeId) {
         setBiomeId(x, z, (byte) biomeId);
     }
 
@@ -140,6 +144,15 @@ public interface FullChunk extends Cloneable {
 
     default void setBiome(int x, int z, cn.nukkit.level.biome.Biome biome) {
         setBiomeId(x, z, biome.getId());
+    }
+
+    @Deprecated
+    default int getBiomeColor(int x, int z) {
+        return 0;
+    }
+
+    @Deprecated
+    default void setBiomeColor(int x, int z, int r, int g, int b) {
     }
 
     boolean isLightPopulated();
@@ -191,6 +204,11 @@ public interface FullChunk extends Cloneable {
     byte[] getBiomeIdArray();
 
     void setBiomeIdArray(byte[] biomeIdArray);
+
+    @Deprecated
+    default int[] getBiomeColorArray() {
+        return new int[0];
+    }
 
     byte[] getHeightMapArray();
 

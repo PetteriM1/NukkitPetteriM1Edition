@@ -1,5 +1,7 @@
 package cn.nukkit.item;
 
+import cn.nukkit.network.protocol.ProtocolInfo;
+
 public class ItemTurtleShell extends ItemArmor {
 
     public ItemTurtleShell() {
@@ -32,5 +34,10 @@ public class ItemTurtleShell extends ItemArmor {
     @Override
     public int getMaxDurability() {
         return 276;
+    }
+
+    @Override
+    public boolean isSupportedOn(int protocol) {
+        return protocol >= ProtocolInfo.v1_5_0;
     }
 }

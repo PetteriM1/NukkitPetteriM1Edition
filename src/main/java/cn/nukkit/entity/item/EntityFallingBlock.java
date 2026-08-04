@@ -1,5 +1,6 @@
 package cn.nukkit.entity.item;
 
+import cn.nukkit.Player;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockID;
 import cn.nukkit.block.BlockLiquid;
@@ -18,6 +19,7 @@ import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.network.protocol.AddEntityPacket;
 import cn.nukkit.network.protocol.LevelEventPacket;
 
 /**
@@ -26,6 +28,12 @@ import cn.nukkit.network.protocol.LevelEventPacket;
 public class EntityFallingBlock extends Entity {
 
     public static final int NETWORK_ID = 66;
+    protected int blockId;
+    protected int damage;
+
+    public EntityFallingBlock(FullChunk chunk, CompoundTag nbt) {
+        super(chunk, nbt);
+    }
 
     @Override
     public float getWidth() {
@@ -62,13 +70,6 @@ public class EntityFallingBlock extends Entity {
         return blockId == BlockID.ANVIL;
     }
 
-    protected int blockId;
-    protected int damage;
-
-    public EntityFallingBlock(FullChunk chunk, CompoundTag nbt) {
-        super(chunk, nbt);
-    }
-
     @Override
     protected void initEntity() {
         super.initEntity();
@@ -92,8 +93,31 @@ public class EntityFallingBlock extends Entity {
         }
 
         this.fireProof = true;
+    }
 
-        this.setDataProperty(new IntEntityData(DATA_VARIANT, GlobalBlockPalette.getOrCreateRuntimeId(this.blockId, this.damage)));
+    @Override // Multiversion: display correct block
+    public void spawnTo(Player player) {
+        if (!this.hasSpawned.containsKey(player.getLoaderId())) {
+            Boolean hasChunk = player.usedChunks.get(this.chunk.getIndex());
+            if (hasChunk != null && hasChunk) {
+                AddEntityPacket addEntity = new AddEntityPacket();
+                addEntity.type = this.getNetworkId();
+                addEntity.entityUniqueId = this.id;
+                addEntity.entityRuntimeId = this.id;
+                addEntity.yaw = (float) this.yaw;
+                addEntity.headYaw = (float) this.yaw;
+                addEntity.pitch = (float) this.pitch;
+                addEntity.x = (float) this.x;
+                addEntity.y = (float) this.y;
+                addEntity.z = (float) this.z;
+                addEntity.speedX = (float) this.motionX;
+                addEntity.speedY = (float) this.motionY;
+                addEntity.speedZ = (float) this.motionZ;
+                addEntity.metadata = this.dataProperties.clone().put(new IntEntityData(DATA_VARIANT, player.protocol > 201 ? GlobalBlockPalette.getOrCreateRuntimeId(player.protocol, this.blockId, this.damage) : this.blockId));
+                player.dataPacket(addEntity);
+                this.hasSpawned.put(player.getLoaderId(), player);
+            }
+        }
     }
 
     public boolean canCollideWith(Entity entity) {
@@ -133,14 +157,12 @@ public class EntityFallingBlock extends Entity {
 
             if (onGround && !closed) {
                 close();
-
                 Block floorBlock = level.getBlock(this.add(0, 0.0001, 0));
                 if (this.getBlock() == Block.SNOW_LAYER && floorBlock.getId() == Block.SNOW_LAYER && (floorBlock.getDamage() & 0x7) != 0x7) {
                     int mergedHeight = (floorBlock.getDamage() & 0x7) + 1 + (this.getDamage() & 0x7) + 1;
                     if (mergedHeight > 8) {
                         EntityBlockChangeEvent event = new EntityBlockChangeEvent(this, floorBlock, Block.get(Block.SNOW_LAYER, 0x7));
                         this.server.getPluginManager().callEvent(event);
-
                         if (!event.isCancelled()) {
                             this.level.setBlock(floorBlock, event.getTo(), true);
 
@@ -149,7 +171,6 @@ public class EntityFallingBlock extends Entity {
                             if (aboveBlock.getId() == Block.AIR) {
                                 EntityBlockChangeEvent event2 = new EntityBlockChangeEvent(this, aboveBlock, Block.get(Block.SNOW_LAYER, mergedHeight - 9)); // -8-1
                                 this.server.getPluginManager().callEvent(event2);
-
                                 if (!event2.isCancelled()) {
                                     this.level.setBlock(abovePos, event2.getTo(), true);
                                 }
@@ -158,7 +179,6 @@ public class EntityFallingBlock extends Entity {
                     } else {
                         EntityBlockChangeEvent event = new EntityBlockChangeEvent(this, floorBlock, Block.get(Block.SNOW_LAYER, mergedHeight - 1));
                         this.server.getPluginManager().callEvent(event);
-
                         if (!event.isCancelled()) {
                             this.level.setBlock(floorBlock, event.getTo(), true);
                         }
@@ -170,7 +190,6 @@ public class EntityFallingBlock extends Entity {
                 } else if (floorBlock.canBeReplaced()) {
                     EntityBlockChangeEvent event = new EntityBlockChangeEvent(this, floorBlock, Block.get(blockId, damage));
                     server.getPluginManager().callEvent(event);
-
                     if (!event.isCancelled()) {
                         int blockId = event.getTo().getId();
                         if (blockId != Item.POINTED_DRIPSTONE) {

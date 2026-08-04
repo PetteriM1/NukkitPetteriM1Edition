@@ -5,7 +5,6 @@ import lombok.ToString;
 /**
  * @author Nukkit Project Team
  */
-@Deprecated
 @ToString
 public class AdventureSettingsPacket extends DataPacket {
 
@@ -49,6 +48,7 @@ public class AdventureSettingsPacket extends DataPacket {
     public long customFlags;
 
     public long commandPermission = PERMISSION_NORMAL;
+
     /**
      * PERMISSION_CUSTOM = 3, PERMISSION_OPERATOR = 2, PERMISSION_MEMBER = 1, PERMISSION_VISITOR = 0
      */

@@ -1,6 +1,8 @@
 package cn.nukkit.level.format.generic;
 
 import cn.nukkit.Server;
+import cn.nukkit.block.Block;
+import cn.nukkit.block.BlockLayer;
 import cn.nukkit.level.DimensionData;
 import cn.nukkit.level.DimensionEnum;
 import cn.nukkit.level.Level;
@@ -33,6 +35,9 @@ import java.util.regex.Pattern;
 
 public class Anvil2LevelDBConverter {
 
+    // TODO: Running the converter on multiple threads causes issues with adding and removing entities and block entities on the Level
+    private static final int EXECUTORS_COUNT = 1;
+
     private final Level sourceLevel;
     private final Level targetLevel;
     private final ExecutorService executor;
@@ -58,10 +63,28 @@ public class Anvil2LevelDBConverter {
         this.targetLevel.setAutoSave(false);
         this.targetLevel.isBeingConverted = true;
 
-        // DO NOT INCREASE THREAD COUNT
-        this.executor = Executors.newFixedThreadPool(1, new ThreadFactoryBuilder()
+        this.executor = Executors.newFixedThreadPool(EXECUTORS_COUNT, new ThreadFactoryBuilder()
                 .setNameFormat("Converted Thread " + sourceLevel.getFolderName() + " - %s")
                 .build());
+    }
+
+    @ToString
+    @RequiredArgsConstructor
+    private static class RegionPosition {
+        private static final Pattern PATTERN = Pattern.compile("^r\\.(-?[0-9]+)\\.(-?[0-9]+)\\.mca$");
+
+        private final int x;
+        private final int z;
+
+        static RegionPosition fromPath(Path regionPath) {
+            Matcher matcher = PATTERN.matcher(regionPath.getFileName().toString());
+            if (!matcher.matches()) {
+                return null;
+            }
+            int x = Integer.parseInt(matcher.group(1));
+            int z = Integer.parseInt(matcher.group(2));
+            return new RegionPosition(x, z);
+        }
     }
 
     public CompletableFuture<Void> convert() {
@@ -108,7 +131,7 @@ public class Anvil2LevelDBConverter {
         AtomicInteger chunksConverted = new AtomicInteger();
         AtomicInteger chunksConvertedPerSecond = new AtomicInteger();
 
-        TaskHandler tickFuture = server.getScheduler().scheduleRepeatingTask(null, () ->
+        TaskHandler tickFuture = server.getScheduler().scheduleRepeatingTask(() ->
                 chunksConvertedPerSecond.set(0), 20);
 
         IntConsumer callback = chunksCount -> {
@@ -137,7 +160,7 @@ public class Anvil2LevelDBConverter {
             } else {
                 this.convertFinished();
             }
-        }, task -> server.getScheduler().scheduleTask(null, task));
+        }, server.getScheduler()::scheduleTask);
     }
 
     private void convertFinished() {
@@ -200,6 +223,13 @@ public class Anvil2LevelDBConverter {
                 for (int blockZ = 0; blockZ < 16; blockZ++) {
                     int fullId = oldChunk.getFullBlock(blockX, blockY, blockZ);
                     newChunk.setFullBlockId(blockX, blockY, blockZ, fullId);
+
+                    // Convert fake waterlogged blocks
+                    int id = fullId >> Block.DATA_BITS;
+                    if (id == Block.SEAGRASS || id == Block.BLOCK_KELP || id == Block.BUBBLE_COLUMN) {
+                        newChunk.setFullBlockId(blockX, blockY, blockZ, BlockLayer.WATERLOGGED, Block.STILL_WATER << Block.DATA_BITS);
+                    }
+
                     newChunk.setBlockLight(blockX, blockY, blockZ, oldChunk.getBlockSkyLight(blockX, blockY, blockZ));
                 }
             }
@@ -216,24 +246,5 @@ public class Anvil2LevelDBConverter {
 
     protected static int getRegionIndexZ(int chunkZ) {
         return chunkZ >> 5;
-    }
-
-    @ToString
-    @RequiredArgsConstructor
-    private static class RegionPosition {
-        private static final Pattern PATTERN = Pattern.compile("^r\\.(-?[0-9]+)\\.(-?[0-9]+)\\.mca$");
-
-        private final int x;
-        private final int z;
-
-        static RegionPosition fromPath(Path regionPath) {
-            Matcher matcher = PATTERN.matcher(regionPath.getFileName().toString());
-            if (!matcher.matches()) {
-                return null;
-            }
-            int x = Integer.parseInt(matcher.group(1));
-            int z = Integer.parseInt(matcher.group(2));
-            return new RegionPosition(x, z);
-        }
     }
 }

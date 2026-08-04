@@ -24,16 +24,21 @@ public abstract class BlockProperty<T extends Serializable> implements Serializa
     }
 
     public abstract int getMetaForValue(T value);
+
     public abstract T getValueForMeta(int meta);
+
     public abstract int getIntValueForMeta(int meta);
 
     public abstract Serializable getPersistenceValueForMeta(int meta);
+
     public abstract int getMetaForPersistenceValue(String persistenceValue);
 
     public abstract Class<T> getValueClass();
 
     public abstract boolean isDefaultValue(T value);
+
     public abstract T getDefaultValue();
+
     public abstract BlockProperty<T> exportingToItems(boolean exportedToItem);
 
     public int setValue(int currentMeta, int bitOffset, T newValue) {
@@ -197,11 +202,11 @@ public abstract class BlockProperty<T extends Serializable> implements Serializa
 
 
     private int computeRightMask(int bitOffset) {
-        return bitOffset == 0? 0 : -1 >>> (32 - bitOffset);
+        return bitOffset == 0 ? 0 : -1 >>> (32 - bitOffset);
     }
 
     private long computeBigRightMask(int bitOffset) {
-        return bitOffset == 0L? 0L : -1L >>> (64 - bitOffset);
+        return bitOffset == 0L ? 0L : -1L >>> (64 - bitOffset);
     }
 
     private BigInteger computeHugeRightMask(int bitOffset) {
@@ -323,7 +328,7 @@ public abstract class BlockProperty<T extends Serializable> implements Serializa
 
     @Override
     public String toString() {
-        return getClass().getSimpleName()+"{" +
+        return getClass().getSimpleName() + "{" +
                 "name='" + name + '\'' +
                 ", bitSize=" + bitSize +
                 ", exportedToItem=" + exportedToItem +

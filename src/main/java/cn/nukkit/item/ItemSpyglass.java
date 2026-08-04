@@ -1,5 +1,7 @@
 package cn.nukkit.item;
 
+import cn.nukkit.network.protocol.ProtocolInfo;
+
 /**
  * @author LT_Name
  */
@@ -20,5 +22,10 @@ public class ItemSpyglass extends Item {
     @Override
     public int getMaxStackSize() {
         return 1;
+    }
+
+    @Override
+    public boolean isSupportedOn(int protocol) {
+        return protocol >= ProtocolInfo.v1_17_0;
     }
 }

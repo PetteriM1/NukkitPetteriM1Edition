@@ -42,7 +42,7 @@ public class BlockNetherSprouts extends BlockRoots {
     @Override
     public Item[] getDrops(Item item) {
         if (item.isShears()) {
-            return new Item[]{ toItem() };
+            return new Item[]{toItem()};
         }
         return new Item[0];
     }

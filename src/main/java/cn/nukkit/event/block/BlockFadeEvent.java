@@ -10,11 +10,6 @@ import cn.nukkit.event.HandlerList;
 public class BlockFadeEvent extends BlockEvent implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
-
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private final Block newState;
 
     /**
@@ -22,12 +17,17 @@ public class BlockFadeEvent extends BlockEvent implements Cancellable {
      * - Snow melts because of block light.
      * - Ice melts because of block light.
      * - Glowing redstone ore turns to normal redstone ore.
-     * @param block Block that has faded/melted.
+     *
+     * @param block    Block that has faded/melted.
      * @param newState New state of the block.
      */
     public BlockFadeEvent(Block block, Block newState) {
         super(block);
         this.newState = newState;
+    }
+
+    public static HandlerList getHandlers() {
+        return handlers;
     }
 
     public Block getNewState() {

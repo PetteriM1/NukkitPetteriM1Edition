@@ -1,5 +1,6 @@
 package cn.nukkit.nbt.tag;
 
+import cn.nukkit.Server;
 import cn.nukkit.nbt.stream.NBTInputStream;
 import cn.nukkit.nbt.stream.NBTOutputStream;
 
@@ -20,13 +21,13 @@ public class StringTag extends Tag {
     }
 
     @Override
-    void write(NBTOutputStream dos) throws IOException {
+    public void write(NBTOutputStream dos) throws IOException {
         dos.writeUTF(data);
     }
 
     @Override
-    public void load(NBTInputStream dis) throws IOException {
-        data = dis.readUTF();
+    public void load(NBTInputStream dis, int nested) throws IOException {
+        data = dis.readUTF(Server.getInstance().suomiCraftPEMode() ? 65535 : -1);
     }
 
     @Override

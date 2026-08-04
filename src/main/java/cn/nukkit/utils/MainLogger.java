@@ -11,7 +11,6 @@ import lombok.extern.log4j.Log4j2;
  * @author MagicDroidX
  * Nukkit
  */
-//We need to keep this class for backwards compatibility
 @Log4j2
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class MainLogger extends Thread implements Logger {

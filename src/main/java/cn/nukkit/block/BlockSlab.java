@@ -50,12 +50,12 @@ public abstract class BlockSlab extends BlockTransparentMeta {
 
     @Override
     public String getName() {
-        return (this.hasTopBit()? "Upper " : "") + this.getSlabName() + " Slab";
+        return (this.hasTopBit() ? "Upper " : "") + this.getSlabName() + " Slab";
     }
 
     @Override
     public double getHardness() {
-        return 2;
+        return 2; //3
     }
 
     @Override

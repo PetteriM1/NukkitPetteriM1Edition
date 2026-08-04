@@ -136,7 +136,7 @@ public class BlockBell extends BlockTransparentMeta implements Faceable {
 
     @Override
     public boolean onActivate(Item item, Player player) {
-        return this.ring(player, player != null? BellRingEvent.RingCause.HUMAN_INTERACTION : BellRingEvent.RingCause.UNKNOWN);
+        return this.ring(player, player != null ? BellRingEvent.RingCause.HUMAN_INTERACTION : BellRingEvent.RingCause.UNKNOWN);
     }
 
     public boolean ring(Entity causeEntity, BellRingEvent.RingCause cause) {
@@ -155,8 +155,8 @@ public class BlockBell extends BlockTransparentMeta implements Faceable {
                 if (causeEntity instanceof EntityItem) {
                     Position blockMid = this.add(0.5, 0.5, 0.5);
                     Vector3 vector = causeEntity.subtract(blockMid).normalize();
-                    int x = vector.x < 0? -1 : vector.x > 0? 1 : 0;
-                    int z = vector.z < 0? -1 : vector.z > 0? 1 : 0;
+                    int x = vector.x < 0 ? -1 : vector.x > 0 ? 1 : 0;
+                    int z = vector.z < 0 ? -1 : vector.z > 0 ? 1 : 0;
                     if (x != 0 && z != 0) {
                         if (Math.abs(vector.x) < Math.abs(vector.z)) {
                             x = 0;
@@ -360,7 +360,7 @@ public class BlockBell extends BlockTransparentMeta implements Faceable {
     }
 
     public void setToggled(boolean toggled) {
-        this.setDamage(this.getDamage() & (DATA_MASK ^ 0b010000) | (toggled? 0b010000 : 0b000000));
+        this.setDamage(this.getDamage() & (DATA_MASK ^ 0b010000) | (toggled ? 0b010000 : 0b000000));
     }
 
     @Override
@@ -385,7 +385,7 @@ public class BlockBell extends BlockTransparentMeta implements Faceable {
 
     @Override
     public double getHardness() {
-        return 5;
+        return 1; //5
     }
 
     @Override

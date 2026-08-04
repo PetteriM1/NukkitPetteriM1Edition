@@ -21,7 +21,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * @author Adam Matthew [larryTheCoder]
- *
+ * <p>
  * Nukkit Project.
  */
 public class EntityMinecartTNT extends EntityMinecartAbstract implements EntityExplosive {

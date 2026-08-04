@@ -243,13 +243,13 @@ public abstract class EntityHumanType extends EntityCreature implements Inventor
 
 
     protected double calculateEnchantmentProtectionFactor(Item item, EntityDamageEvent source) {
-        double epf  = 0;
+        double epf = 0;
 
         for (Enchantment ench : item.getEnchantments()) {
-            epf  += ench.getProtectionFactor(source);
+            epf += ench.getProtectionFactor(source);
         }
 
-        return epf ;
+        return epf;
     }
 
     @Override

@@ -359,6 +359,33 @@ public class EntityArmorStand extends Entity implements InventoryHolder, EntityI
     }
 
     @Override
+    public boolean goToNewChunk(FullChunk chunk) {
+        if (chunk.getEntities().size() > 200) {
+            if (!this.isClosed() && this.isAlive()) {
+                boolean drop = this.level.getGameRules().getBoolean(GameRule.DO_ENTITY_DROPS);
+                if (drop) {
+                    this.level.dropItem(this, Item.get(Item.ARMOR_STAND));
+                }
+                if (this.equipmentInventory != null) {
+                    if (drop) {
+                        this.equipmentInventory.getContents().values().forEach(items -> this.level.dropItem(this, items));
+                    }
+                    this.equipmentInventory.clearAll();
+                }
+                if (this.armorInventory != null) {
+                    if (drop) {
+                        this.armorInventory.getContents().values().forEach(items -> this.level.dropItem(this, items));
+                    }
+                    this.armorInventory.clearAll();
+                }
+            }
+            this.close();
+            return false;
+        }
+        return true;
+    }
+
+    @Override
     public void setNameTag(String name) {
         this.nameTag = name;
         if (this.namedTag.contains("CustomNameVisible") || this.namedTag.contains("CustomNameAlwaysVisible")) { // Hack: Vanilla: Disable client side name tag while keeping custom name in nbt

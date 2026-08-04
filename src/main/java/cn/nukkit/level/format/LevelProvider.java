@@ -4,8 +4,10 @@ import cn.nukkit.level.GameRules;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.format.generic.BaseFullChunk;
 import cn.nukkit.math.Vector3;
+import it.unimi.dsi.fastutil.ints.IntSet;
 
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * @author MagicDroidX
@@ -13,7 +15,7 @@ import java.util.Map;
  */
 public interface LevelProvider {
 
-    void requestChunkTask(int X, int Z);
+    void requestChunkTask(IntSet protocols, int X, int Z);
 
     String getPath();
 
@@ -32,6 +34,11 @@ public interface LevelProvider {
     BaseFullChunk getEmptyChunk(int x, int z);
 
     void saveChunks();
+
+    default CompletableFuture<Void> saveChunksFuture() {
+        this.saveChunks();
+        return CompletableFuture.completedFuture(null);
+    }
 
     void saveChunk(int X, int Z);
 

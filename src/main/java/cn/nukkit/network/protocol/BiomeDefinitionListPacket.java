@@ -1,8 +1,11 @@
 package cn.nukkit.network.protocol;
 
+import cn.nukkit.Nukkit;
 import cn.nukkit.utils.Utils;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.google.common.io.ByteStreams;
 import com.google.common.reflect.TypeToken;
+import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
@@ -17,78 +20,53 @@ import lombok.Value;
 
 import java.awt.*;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.*;
 import java.util.List;
 import java.util.zip.Deflater;
 
-@ToString
+@ToString(exclude = "tag")
 public class BiomeDefinitionListPacket extends DataPacket {
 
     public static final byte NETWORK_ID = ProtocolInfo.BIOME_DEFINITION_LIST_PACKET;
 
-    private static final BatchPacket CACHED_PACKET;
+    private static final BatchPacket CACHED_PACKET_843;
+    private static final BatchPacket CACHED_PACKET_827;
+    private static final BatchPacket CACHED_PACKET_800;
+    private static BatchPacket CACHED_PACKET_554; // 554 data and supports Snappy compression
+    private static BatchPacket CACHED_PACKET_486;
+    private static BatchPacket CACHED_PACKET_407; // 361 data but Zlib raw compressed
+    private static BatchPacket CACHED_PACKET_361;
 
+    private byte[] tag;
     private LinkedHashMap<String, BiomeDefinitionData> biomeDefinitions;
 
     static {
-        try {
-            BiomeDefinitionListPacket pk = new BiomeDefinitionListPacket();
-            pk.biomeDefinitions = new GsonBuilder().registerTypeAdapter(Color.class, new ColorTypeAdapter()).create().fromJson(Utils.loadJsonResource("stripped_biome_definitions.json"), new TypeToken<LinkedHashMap<String, BiomeDefinitionData>>() {
-            }.getType());
-            pk.tryEncode();
-            CACHED_PACKET = pk.compress(Deflater.BEST_COMPRESSION);
-        } catch (Exception e) {
-            throw new AssertionError("Error whilst loading biome definitions", e);
-        }
+        // Preload definitions for all recent versions for now
+        Gson gson = new GsonBuilder().registerTypeAdapter(Color.class, new ColorTypeAdapter()).create();
+        Type type = new TypeToken<LinkedHashMap<String, BiomeDefinitionData>>() {
+        }.getType();
+
+        LinkedHashMap<String, BiomeDefinitionData> definitions800 = gson.fromJson(Utils.loadJsonResource("stripped_biome_definitions.json"), type);
+
+        BiomeDefinitionListPacket pk800 = new BiomeDefinitionListPacket();
+        pk800.protocol = ProtocolInfo.v1_21_80;
+        pk800.biomeDefinitions = definitions800;
+        pk800.tryEncode();
+        CACHED_PACKET_800 = pk800.compress(Deflater.BEST_COMPRESSION);
+
+        BiomeDefinitionListPacket pk827 = new BiomeDefinitionListPacket();
+        pk827.protocol = ProtocolInfo.v1_21_100;
+        pk827.biomeDefinitions = definitions800;
+        pk827.tryEncode();
+        CACHED_PACKET_827 = pk827.compress(Deflater.BEST_COMPRESSION);
+
+        BiomeDefinitionListPacket pk843 = new BiomeDefinitionListPacket();
+        pk843.protocol = ProtocolInfo.v1_21_110;
+        pk843.biomeDefinitions = definitions800;
+        pk843.tryEncode();
+        CACHED_PACKET_843 = pk843.compress(Deflater.BEST_COMPRESSION);
     }
-
-    public static BatchPacket getCachedPacket() {
-        return CACHED_PACKET;
-    }
-
-    @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
-    @Override
-    public void decode() {
-        this.decodeUnsupported();
-    }
-
-    @Override
-    public void encode() {
-        if (this.biomeDefinitions == null) {
-            throw new RuntimeException("biomeDefinitions == null, use getCachedPacket!");
-        }
-
-        this.reset();
-        SequencedHashSet<String> strings = new SequencedHashSet<>();
-
-        this.putUnsignedVarInt(this.biomeDefinitions.size());
-        for (Map.Entry<String, BiomeDefinitionData> entry : this.biomeDefinitions.entrySet()) {
-            String name = "minecraft:" + entry.getKey(); // TODO: Update mappings
-            this.putLShort(strings.addAndGetIndex(name));
-
-            BiomeDefinitionData definition = entry.getValue();
-            this.putLShort(-1); // Vanilla biomes don't contain ID field
-            this.putLFloat(definition.getTemperature());
-            this.putLFloat(definition.getDownfall());
-            this.putLFloat(0); // mFoliageSnow - 0 for old behavior
-            this.putLFloat(definition.getDepth());
-            this.putLFloat(definition.getScale());
-            this.putLInt(definition.getMapWaterColor().getRGB());
-            this.putBoolean(definition.isRain());
-            this.putBoolean(false); // Optional Tags
-            this.putBoolean(false); // Optional ChunkGenData
-        }
-
-        this.putUnsignedVarInt(strings.size());
-        for (String str : strings) {
-            this.putString(str);
-        }
-    }
-
 
     @Value
     private static class BiomeDefinitionData {
@@ -122,7 +100,7 @@ public class BiomeDefinitionListPacket extends DataPacket {
     }
 
     @SuppressWarnings({"NullableProblems", "SuspiciousMethodCalls"})
-    private static class SequencedHashSet<E> implements java.util.List<E> {
+    private static class SequencedHashSet<E> implements List<E> {
 
         private final Object2IntMap<E> map = new Object2IntLinkedOpenHashMap<>();
         private final Int2ObjectMap<E> inverse = new Int2ObjectLinkedOpenHashMap<>();
@@ -284,15 +262,161 @@ public class BiomeDefinitionListPacket extends DataPacket {
             in.beginObject();
             while (in.hasNext()) {
                 switch (in.nextName()) {
-                    case "r": r = in.nextInt(); break;
-                    case "g": g = in.nextInt(); break;
-                    case "b": b = in.nextInt(); break;
-                    case "a": a = in.nextInt(); break;
-                    default: in.skipValue(); break;
+                    case "r":
+                        r = in.nextInt();
+                        break;
+                    case "g":
+                        g = in.nextInt();
+                        break;
+                    case "b":
+                        b = in.nextInt();
+                        break;
+                    case "a":
+                        a = in.nextInt();
+                        break;
+                    default:
+                        in.skipValue();
+                        break;
                 }
             }
             in.endObject();
             return new Color(r, g, b, a);
+        }
+    }
+
+    public static BatchPacket getCachedPacket(int protocol) {
+        if (protocol < ProtocolInfo.v1_12_0) {
+            throw new UnsupportedOperationException("Unsupported protocol");
+        }
+
+        if (protocol >= ProtocolInfo.v1_21_110) {
+            return CACHED_PACKET_843;
+        } else if (protocol >= ProtocolInfo.v1_21_100) {
+            return CACHED_PACKET_827;
+        } else if (protocol >= ProtocolInfo.v1_21_80) {
+            return CACHED_PACKET_800;
+        } else if (protocol >= ProtocolInfo.v1_19_30_23) {
+            if (CACHED_PACKET_554 == null) {
+                BiomeDefinitionListPacket pk554 = new BiomeDefinitionListPacket();
+                pk554.protocol = ProtocolInfo.v1_19_30_23;
+                try {
+                    pk554.tag = ByteStreams.toByteArray(Objects.requireNonNull(Nukkit.class.getClassLoader().getResourceAsStream("biome_definitions_554.dat")));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                pk554.tryEncode();
+                CACHED_PACKET_554 = pk554.compress(Deflater.BEST_COMPRESSION);
+            }
+            return CACHED_PACKET_554;
+        } else if (protocol >= ProtocolInfo.v1_18_10) {
+            if (CACHED_PACKET_486 == null) {
+                BiomeDefinitionListPacket pk486 = new BiomeDefinitionListPacket();
+                pk486.protocol = ProtocolInfo.v1_18_10;
+                try {
+                    pk486.tag = ByteStreams.toByteArray(Objects.requireNonNull(Nukkit.class.getClassLoader().getResourceAsStream("biome_definitions_486.dat")));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                pk486.tryEncode();
+                CACHED_PACKET_486 = pk486.compress(Deflater.BEST_COMPRESSION);
+            }
+            return CACHED_PACKET_486;
+        } else if (protocol >= ProtocolInfo.v1_16_0) {
+            if (CACHED_PACKET_407 == null) {
+                BiomeDefinitionListPacket pk407 = new BiomeDefinitionListPacket();
+                pk407.protocol = ProtocolInfo.v1_16_0;
+                try {
+                    pk407.tag = ByteStreams.toByteArray(Objects.requireNonNull(Nukkit.class.getClassLoader().getResourceAsStream("biome_definitions_361.dat")));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                pk407.tryEncode();
+                CACHED_PACKET_407 = pk407.compress(Deflater.BEST_COMPRESSION);
+            }
+            return CACHED_PACKET_407;
+        } else {
+            if (CACHED_PACKET_361 == null) {
+                BiomeDefinitionListPacket pk361 = new BiomeDefinitionListPacket();
+                pk361.protocol = ProtocolInfo.v1_12_0;
+                try {
+                    pk361.tag = ByteStreams.toByteArray(Objects.requireNonNull(Nukkit.class.getClassLoader().getResourceAsStream("biome_definitions_361.dat")));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                pk361.tryEncode();
+                CACHED_PACKET_361 = pk361.compress(Deflater.BEST_COMPRESSION);
+            }
+            return CACHED_PACKET_361;
+        }
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
+    }
+
+    @Override
+    public void decode() {
+        this.decodeUnsupported();
+    }
+
+    @Override
+    public void encode() {
+        if (protocol < ProtocolInfo.v1_21_80 && this.tag == null) {
+            throw new RuntimeException("tag == null, use getCachedPacket!");
+        }
+
+        if (protocol >= ProtocolInfo.v1_21_80 && this.biomeDefinitions == null) {
+            throw new RuntimeException("biomeDefinitions == null, use getCachedPacket!");
+        }
+
+        this.reset();
+
+        if (protocol >= ProtocolInfo.v1_21_80) {
+            SequencedHashSet<String> strings = new SequencedHashSet<>();
+
+            this.putUnsignedVarInt(this.biomeDefinitions.size());
+            for (Map.Entry<String, BiomeDefinitionData> entry : this.biomeDefinitions.entrySet()) {
+                String name = entry.getKey();
+
+                // Vanilla biomes must have "minecraft" prefix since 1.21.100
+                if (protocol >= ProtocolInfo.v1_21_100) {
+                    name = "minecraft:" + name;
+                }
+
+                this.putLShort(strings.addAndGetIndex(name));
+
+                BiomeDefinitionData definition = entry.getValue();
+                if (protocol >= ProtocolInfo.v1_21_100) {
+                    this.putLShort(-1); // Vanilla biomes don't contain ID field
+                } else {
+                    this.putBoolean(false); // Optional ID
+                }
+
+                this.putLFloat(definition.getTemperature());
+                this.putLFloat(definition.getDownfall());
+                if (protocol >= ProtocolInfo.v1_21_110) {
+                    this.putLFloat(0); // mFoliageSnow - 0 for old behavior
+                } else {
+                    this.putLFloat(definition.getRedSporeDensity());
+                    this.putLFloat(definition.getBlueSporeDensity());
+                    this.putLFloat(definition.getAshDensity());
+                    this.putLFloat(definition.getWhiteAshDensity());
+                }
+                this.putLFloat(definition.getDepth());
+                this.putLFloat(definition.getScale());
+                this.putLInt(definition.getMapWaterColor().getRGB());
+                this.putBoolean(definition.isRain());
+                this.putBoolean(false); // Optional Tags
+                this.putBoolean(false); // Optional ChunkGenData
+            }
+
+            this.putUnsignedVarInt(strings.size());
+            for (String str : strings) {
+                this.putString(str);
+            }
+        } else {
+            this.put(this.tag);
         }
     }
 }

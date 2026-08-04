@@ -4,6 +4,8 @@ import cn.nukkit.Player;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockMangroveLog extends BlockWood {
 
@@ -23,6 +25,16 @@ public class BlockMangroveLog extends BlockWood {
     @Override
     public int getId() {
         return MANGROVE_LOG;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_17_0;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.LOG;
     }
 
     @Override

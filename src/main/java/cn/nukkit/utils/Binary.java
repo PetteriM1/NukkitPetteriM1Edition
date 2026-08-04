@@ -1,11 +1,13 @@
 package cn.nukkit.utils;
 
+import cn.nukkit.Server;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.data.*;
 import cn.nukkit.math.BlockVector3;
 import cn.nukkit.math.NukkitMath;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import it.unimi.dsi.fastutil.io.FastByteArrayInputStream;
 
 import java.io.IOException;
@@ -103,16 +105,77 @@ public class Binary {
     }
 
     public static byte[] writeMetadata(EntityMetadata metadata) {
+        Server.mvw("Binary#writeMetadata(EntityMetadata)");
+        return writeMetadata(ProtocolInfo.CURRENT_PROTOCOL, metadata);
+    }
+
+    public static byte[] writeMetadata(int protocol, EntityMetadata metadata) {
         BinaryStream stream = new BinaryStream();
         Map<Integer, EntityData> map = metadata.getMap();
+
+        boolean crawlingAsSwimming = false;
+
+        if (protocol < ProtocolInfo.v1_21_0) {
+            map.remove(Entity.DATA_VISIBLE_MOB_EFFECTS);
+
+            if (protocol < ProtocolInfo.v1_20_10_21) { // v1_20_10, not v1_20_30 because we use experiments
+                // Display crawling using swimming flag
+                EntityData<?> flags2 = map.get(Entity.DATA_FLAGS_EXTENDED);
+                if (flags2 != null) {
+                    if ((((LongEntityData) flags2).data & (1L << (Entity.DATA_FLAG_CRAWLING % 64))) > 0) {
+                        crawlingAsSwimming = true;
+                    }
+                }
+
+                if (protocol < ProtocolInfo.v1_16_210) {
+                    map.remove(Entity.DATA_RIDER_ROTATION_OFFSET);
+                }
+            }
+        }
 
         stream.putUnsignedVarInt(map.size());
         for (Map.Entry<Integer, EntityData> entry : map.entrySet()) {
             EntityData d = entry.getValue();
             int id = entry.getKey();
+            boolean forceEmptyData = false;
 
+            /*
+             * HACK: Multiversion entity data
+             */
+            if (protocol < ProtocolInfo.v1_19_40) {
+                if (id >= 120) {
+                    id++;
+                }
+                if (protocol < ProtocolInfo.v1_16_210) {
+                    if (id >= 60) id = id - 1; // 1.16.210 --> 1.16.0
+                    if (id == 121) id = 119; // DATA_BUOYANCY_DATA
+
+                    if (protocol == ProtocolInfo.v1_11_0) {
+                        if (id >= 40) id = id + 1;
+                    } else if (protocol <= ProtocolInfo.v1_2_10) {
+                        if (id >= 29) id = id + 1;
+                        if (id > 76) { // Replace DATA_MAX_STRENGTH and up
+                            // TODO: Improve this and actually remove the values
+                            forceEmptyData = true;
+                        }
+                    }
+                }
+            }
+
+            if (forceEmptyData) {
+                stream.putUnsignedVarInt(Entity.DATA_STRENGTH);
+                if (protocol >= ProtocolInfo.v1_26_40) {
+                    stream.putUnsignedVarInt(Entity.DATA_TYPE_INT);
+                }
+                stream.putUnsignedVarInt(Entity.DATA_TYPE_INT);
+                stream.putVarInt(0);
+                continue;
+            }
 
             stream.putUnsignedVarInt(id);
+            if (protocol >= ProtocolInfo.v1_26_40) {
+                stream.putUnsignedVarInt(d.getType());
+            }
             stream.putUnsignedVarInt(d.getType());
 
             switch (d.getType()) {
@@ -123,7 +186,12 @@ public class Binary {
                     stream.putLShort(((ShortEntityData) d).getData());
                     break;
                 case Entity.DATA_TYPE_INT:
-                    stream.putVarInt(((IntEntityData) d).getData());
+                    if (id == Entity.DATA_VARIANT &&
+                            ((protocol < ProtocolInfo.v1_19_0_29 && ((IntEntityData) d).getData() == 6) || (protocol < ProtocolInfo.v1_20_0_23 && ((IntEntityData) d).getData() == 7) || (protocol < ProtocolInfo.v1_21_50_28 && ((IntEntityData) d).getData() >= 8))) {
+                        stream.putVarInt(0); // Hack: Remove new boat variants for old version to prevent invisible boats and crashes
+                    } else {
+                        stream.putVarInt(((IntEntityData) d).getData());
+                    }
                     break;
                 case Entity.DATA_TYPE_FLOAT:
                     stream.putLFloat(((FloatEntityData) d).getData());
@@ -135,10 +203,14 @@ public class Binary {
                     break;
                 case Entity.DATA_TYPE_NBT:
                     NBTEntityData slot = (NBTEntityData) d;
-                    try {
-                        stream.put(NBTIO.write(slot.getData(), ByteOrder.LITTLE_ENDIAN, true));
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
+                    if (protocol < ProtocolInfo.v1_12_0) {
+                        stream.putSlot(protocol, slot.item);
+                    } else {
+                        try {
+                            stream.put(NBTIO.write(slot.getData(), ByteOrder.LITTLE_ENDIAN, true));
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
                     }
                     break;
                 case Entity.DATA_TYPE_POS:
@@ -148,6 +220,41 @@ public class Binary {
                     stream.putVarInt(pos.z);
                     break;
                 case Entity.DATA_TYPE_LONG:
+                    /*
+                     * HACK: Multiversion entity data flags
+                     */
+                    if (protocol < ProtocolInfo.v1_19_50) {
+                        if (id == Entity.DATA_FLAGS) {
+                            long[] dataVersions = ((LongEntityData) d).dataVersions;
+                            if (dataVersions != null && dataVersions.length == 3) {
+                                if (protocol < ProtocolInfo.v1_7_0) {
+                                    if (protocol < ProtocolInfo.v1_2_13) {
+                                        stream.putVarLong(dataVersions[2]);
+                                        break;
+                                    }
+                                    stream.putVarLong(dataVersions[1]);
+                                    break;
+                                }
+                                stream.putVarLong(dataVersions[0]);
+                                break;
+                            } else if (Server.getInstance().minimumProtocol != ProtocolInfo.CURRENT_PROTOCOL) {
+                                Server.getInstance().getLogger().debug("Invalid LongEntityData dataVersions for DATA_FLAGS, reverting to non-multiversion compatible flags: expected 3, got " + (dataVersions == null ? 0 : dataVersions.length));
+                            }
+                        } else if (id == Entity.DATA_FLAGS_EXTENDED) {
+                            long[] dataVersions = ((LongEntityData) d).dataVersions;
+                            if (dataVersions != null && dataVersions.length == 1) {
+                                stream.putVarLong(dataVersions[0]);
+                                break;
+                            } else if (Server.getInstance().minimumProtocol != ProtocolInfo.CURRENT_PROTOCOL) {
+                                Server.getInstance().getLogger().debug("Invalid LongEntityData dataVersions for DATA_FLAGS_EXTENDED, reverting to non-multiversion compatible flags: expected 1, got " + (dataVersions == null ? 0 : dataVersions.length));
+                            }
+                        }
+                    } else if (id == Entity.DATA_FLAGS && crawlingAsSwimming && // 1.19.50 - 1.20.10 only for now, need to check shifted flag numbers (dataVersions)
+                            (((LongEntityData) d).getData() & (1L << Entity.DATA_FLAG_SWIMMING)) <= 0) { // not already swimming
+                        stream.putVarLong(((LongEntityData) d).getData() ^ (1L << Entity.DATA_FLAG_SWIMMING));
+                        break;
+                    }
+
                     stream.putVarLong(((LongEntityData) d).getData());
                     break;
                 case Entity.DATA_TYPE_VECTOR3F:
@@ -187,15 +294,19 @@ public class Binary {
                     value = new StringEntityData(key, stream.getString());
                     break;
                 case Entity.DATA_TYPE_NBT:
-                    int offset = stream.getOffset();
-                    FastByteArrayInputStream fbais = new FastByteArrayInputStream(stream.get());
                     try {
-                        CompoundTag tag = NBTIO.read(fbais, ByteOrder.LITTLE_ENDIAN, true);
-                        value = new NBTEntityData(key, tag);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
+                        int offset = stream.getOffset();
+                        FastByteArrayInputStream fbais = new FastByteArrayInputStream(stream.get());
+                        try {
+                            CompoundTag tag = NBTIO.readSafely(fbais, ByteOrder.LITTLE_ENDIAN, true);
+                            value = new NBTEntityData(key, tag);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        stream.setOffset(offset + (int) fbais.position());
+                    } catch (Exception ex) {
+                        Server.getInstance().getLogger().debug("Read DATA_TYPE_NBT pre 1.12?", ex);
                     }
-                    stream.setOffset(offset + (int) fbais.position());
                     break;
                 case Entity.DATA_TYPE_POS:
                     BlockVector3 v3 = stream.getSignedBlockPosition();

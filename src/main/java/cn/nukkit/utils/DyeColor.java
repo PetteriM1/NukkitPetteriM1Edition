@@ -45,6 +45,16 @@ public enum DyeColor {
         this.dyeName = dyeName;
     }
 
+    static {
+        BY_DYE_DATA = values();
+        BY_WOOL_DATA = values();
+
+        for (DyeColor color : values()) {
+            BY_WOOL_DATA[color.woolColorMeta & 0x0f] = color;
+            BY_DYE_DATA[color.dyeColorMeta & 0x0f] = color;
+        }
+    }
+
     /**
      * Get as BlockColor
      *
@@ -92,16 +102,6 @@ public enum DyeColor {
      */
     public String getDyeName() {
         return this.dyeName;
-    }
-
-    static {
-        BY_DYE_DATA = values();
-        BY_WOOL_DATA = values();
-
-        for (DyeColor color : values()) {
-            BY_WOOL_DATA[color.woolColorMeta & 0x0f] = color;
-            BY_DYE_DATA[color.dyeColorMeta & 0x0f] = color;
-        }
     }
 
     /**

@@ -52,7 +52,7 @@ public class BlockDropper extends BlockSolidMeta implements Faceable {
     public int getToolType() {
         return ItemTool.TYPE_PICKAXE;
     }
-    
+
     @Override
     public boolean canBeActivated() {
         return true;

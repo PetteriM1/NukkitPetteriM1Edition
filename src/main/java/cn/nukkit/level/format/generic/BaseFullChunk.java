@@ -1,6 +1,7 @@
 package cn.nukkit.level.format.generic;
 
 import cn.nukkit.Player;
+import cn.nukkit.Server;
 import cn.nukkit.block.BlockID;
 import cn.nukkit.block.BlockLayer;
 import cn.nukkit.blockentity.BlockEntity;
@@ -18,6 +19,7 @@ import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.nbt.tag.NumberTag;
 import cn.nukkit.nbt.tag.Tag;
 import cn.nukkit.network.protocol.BatchPacket;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
@@ -65,7 +67,7 @@ public abstract class BaseFullChunk implements FullChunk, ChunkManager {
 
     protected boolean isInit;
 
-    protected BatchPacket chunkPacket;
+    private Map<Integer, BatchPacket> chunkPackets;
 
     @Override
     public BaseFullChunk clone() {
@@ -106,19 +108,29 @@ public abstract class BaseFullChunk implements FullChunk, ChunkManager {
         chunk.NBTentities = null;
         chunk.NBTtiles = null;
         chunk.extraData = null;
-        chunk.heightMap = null;
+
+        if (Server.getInstance().minimumProtocol >= ProtocolInfo.v1_12_0) {
+            chunk.heightMap = null;
+        }
+
         return chunk;
     }
 
-    public void setChunkPacket(BatchPacket packet) {
+    public void setChunkPacket(int protocol, BatchPacket packet) {
         if (packet != null) {
             packet.trim();
-            this.chunkPacket = packet;
+            if (chunkPackets == null) {
+                chunkPackets = new Int2ObjectOpenHashMap<>();
+            }
+            this.chunkPackets.put(protocol, packet);
         }
     }
 
-    public BatchPacket getChunkPacket() {
-        BatchPacket pk = this.chunkPacket;
+    public BatchPacket getChunkPacket(int protocol) {
+        if (chunkPackets == null) {
+            return null;
+        }
+        BatchPacket pk = chunkPackets.get(protocol);
         if (pk != null) {
             pk.trim();
         }
@@ -310,7 +322,6 @@ public abstract class BaseFullChunk implements FullChunk, ChunkManager {
             }
         }
 
-        // TODO: This needs a proper fix
         int minY = 0;
         int maxY = 127; // Don't go out of bounds when nether chunk is unloading
         LevelProvider providerTemp = this.provider;
@@ -341,6 +352,9 @@ public abstract class BaseFullChunk implements FullChunk, ChunkManager {
     public void addEntity(Entity entity) {
         if (this.entities == null) {
             this.entities = new Long2ObjectOpenHashMap<>();
+        }
+        if (entity.getServer().suomiCraftPEMode() && !entity.goToNewChunk(this)) {
+            return;
         }
         this.entities.put(entity.getId(), entity);
         if (!(entity instanceof Player) && this.isInit) {
@@ -420,7 +434,7 @@ public abstract class BaseFullChunk implements FullChunk, ChunkManager {
 
     @Override
     public BlockEntity getTile(int x, int y, int z) {
-        if (this.tileList == null || this.getProvider() == null)  {
+        if (this.tileList == null || this.getProvider() == null) {
             return null;
         }
         int capY = y - this.getProvider().getLevel().getMinBlockY();
@@ -542,7 +556,7 @@ public abstract class BaseFullChunk implements FullChunk, ChunkManager {
     @Override
     public void setChanged() {
         this.changes++;
-        this.chunkPacket = null;
+        chunkPackets = null;
     }
 
     @Override
@@ -653,10 +667,14 @@ public abstract class BaseFullChunk implements FullChunk, ChunkManager {
     }
 
     public boolean compress() {
-        if (this.chunkPacket != null) {
-            this.chunkPacket.trim();
-            return true;
+        if (chunkPackets == null) {
+            return false;
         }
-        return false;
+        for (BatchPacket pk : chunkPackets.values()) {
+            if (pk != null) {
+                pk.trim();
+            }
+        }
+        return !chunkPackets.isEmpty();
     }
 }

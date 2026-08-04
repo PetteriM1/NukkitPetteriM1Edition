@@ -152,7 +152,7 @@ public class BlockLava extends BlockLiquid {
     public BlockLiquid getBlock(int meta) {
         return (BlockLiquid) Block.get(LAVA, meta);
     }
-    
+
     @Override
     public int tickRate() {
         if (this.level.getDimension() == Level.DIMENSION_NETHER) {
@@ -170,7 +170,7 @@ public class BlockLava extends BlockLiquid {
     }
 
     @Override
-    protected void checkForHarden() { 
+    protected void checkForHarden() {
         Block colliding = null;
         for (int side = 1; side < 6; ++side) { //don't check downwards side
             Block blockSide = this.getSide(BlockFace.fromIndex(side));

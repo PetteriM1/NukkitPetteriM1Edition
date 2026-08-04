@@ -41,10 +41,6 @@ public class DebugShape {
         this.id = id;
     }
 
-    public Type getType() {
-        return null;
-    }
-
     public enum Type {
         LINE,
         BOX,
@@ -52,5 +48,9 @@ public class DebugShape {
         CIRCLE,
         TEXT,
         ARROW
+    }
+
+    public Type getType() {
+        return null;
     }
 }

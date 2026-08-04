@@ -25,6 +25,8 @@ import cn.nukkit.utils.MinecartType;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
+
 public class EntityMinecartHopper extends EntityMinecartAbstract implements InventoryHolder {
 
     public static final int NETWORK_ID = 96;
@@ -139,6 +141,10 @@ public class EntityMinecartHopper extends EntityMinecartAbstract implements Inve
         boolean hasUpdate = super.entityBaseTick(tickDiff);
 
         if (!this.closed && this.isAlive()) {
+            if (this.server.suomiCraftPEMode() && noPlayersInTickingRange()) {
+                return true;
+            }
+
             if (this.isOnTransferCooldown()) {
                 this.transferCooldown--;
                 return true;
@@ -149,7 +155,9 @@ public class EntityMinecartHopper extends EntityMinecartAbstract implements Inve
             }
 
             boolean changed;
-            BlockEntity blockEntity = this.level.getBlockEntity(this.chunk, this.up());
+            BlockEntity blockEntity = server.suomiCraftPEMode() ?
+                    this.level.getBlockEntityIfLoaded(this.chunk, this.up()) :
+                    this.level.getBlockEntity(this.chunk, this.up());
             Block block = null;
             if (blockEntity instanceof BlockEntityContainer || (block = this.level.getBlock(this.chunk, this.getFloorX(), this.getFloorY() + 1, this.getFloorZ(), false)) instanceof BlockComposter) {
                 changed = pullItems(blockEntity, block);
@@ -196,6 +204,7 @@ public class EntityMinecartHopper extends EntityMinecartAbstract implements Inve
                 itemToAdd.count = 1;
 
                 if (!this.inventory.canAddItem(itemToAdd)) {
+                    this.optimizeTick();
                     return false;
                 }
 
@@ -203,6 +212,7 @@ public class EntityMinecartHopper extends EntityMinecartAbstract implements Inve
                 this.server.getPluginManager().callEvent(ev);
 
                 if (ev.isCancelled()) {
+                    this.optimizeTick();
                     return false;
                 }
 
@@ -225,6 +235,7 @@ public class EntityMinecartHopper extends EntityMinecartAbstract implements Inve
                     itemToAdd.count = 1;
 
                     if (!this.inventory.canAddItem(itemToAdd)) {
+                        this.optimizeTick();
                         continue;
                     }
 
@@ -250,20 +261,24 @@ public class EntityMinecartHopper extends EntityMinecartAbstract implements Inve
         } else if (block instanceof BlockComposter) {
             BlockComposter composter = (BlockComposter) block;
             if (!composter.isFull()) {
+                this.optimizeTick();
                 return false;
             }
             Item item = composter.empty();
             if (item == null || item.isNull()) {
+                this.optimizeTick();
                 return false;
             }
             Item itemToAdd = item.clone();
             itemToAdd.setCount(1);
             if (!this.inventory.canAddItem(itemToAdd)) {
+                this.optimizeTick();
                 return false;
             }
             InventoryMoveItemEvent ev = new InventoryMoveItemEvent(null, this.inventory, this, item, InventoryMoveItemEvent.Action.PICKUP);
             this.server.getPluginManager().callEvent(ev);
             if (ev.isCancelled()) {
+                this.optimizeTick();
                 return false;
             }
             Item[] items = inventory.addItem(itemToAdd);
@@ -273,14 +288,18 @@ public class EntityMinecartHopper extends EntityMinecartAbstract implements Inve
     }
 
     private boolean pickupItems(AxisAlignedBB pickupArea) {
-        if (this.inventory.isFull()) {
+        if (this.chunk == null || this.inventory.isFull()) {
             return false;
         }
 
         boolean pickedUpItem = false;
 
-        for (Entity entity : this.level.getCollidingEntities(pickupArea)) {
-            if (entity.isClosed() || !(entity instanceof EntityItem)) {
+        for (Entity entity : new ArrayList<>(this.chunk.getEntities().values())) {
+            if (entity.isClosed() || !(entity instanceof EntityItem) || !((EntityItem) entity).isAllowNonPlayerPickup()) {
+                continue;
+            }
+
+            if (!entity.boundingBox.intersectsWith(pickupArea)) {
                 continue;
             }
 
@@ -294,6 +313,7 @@ public class EntityMinecartHopper extends EntityMinecartAbstract implements Inve
             int originalCount = item.getCount();
 
             if (!this.inventory.canAddItem(item)) {
+                this.optimizeTick();
                 continue;
             }
 
@@ -319,6 +339,21 @@ public class EntityMinecartHopper extends EntityMinecartAbstract implements Inve
         }
 
         return pickedUpItem;
+    }
+
+    private void optimizeTick() {
+        if (server.suomiCraftPEMode()) {
+            this.transferCooldown = 4; // Performance: Only loop inventory contents every other tick when none of the items couldn't be added
+        }
+    }
+
+    private boolean noPlayersInTickingRange() {
+        for (Player player : this.level.getPlayersList()) {
+            if (player.distanceSquared(this) < 6400) { // 80 blocks
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package cn.nukkit.plugin;
 
+import cn.nukkit.Server;
 import cn.nukkit.permission.Permission;
 import cn.nukkit.utils.PluginException;
 import org.yaml.snakeyaml.DumperOptions;
@@ -40,7 +41,7 @@ import java.util.regex.Pattern;
  * When using plugin.yml file to define your plugin, it's REQUIRED to fill these items:
  * {@code name},{@code main},{@code version} and {@code api}.You are supposed to fill these items to make sure
  * your plugin can be normally loaded by Nukkit.<br>
- *
+ * <p>
  * 接下来对所有的字段做一些说明，<b>加粗</b>的字段表示必需，<i>斜体</i>表示可选：（来自
  * <a href="http://www.cnblogs.com/xtypr/p/nukkit_plugin_start_from_0_about_config.html">粉鞋大妈的博客文章</a>）<br>
  * Here are some instructions for there items, <b>bold</b> means required, <i>italic</i> means optional: (From
@@ -143,7 +144,12 @@ public class PluginDescription {
             this.api = (List<String>) api;
         } else {
             List<String> list = new ArrayList<>();
-            list.add((String) api);
+            if (api == null) {
+                Server.getInstance().getLogger().warning(this.name + " didn't specify API version in plugin.yml"); // We don't check it but it should still be there
+                list.add("1.0.0");
+            } else {
+                list.add((String) api);
+            }
             this.api = list;
         }
 
@@ -241,7 +247,7 @@ public class PluginDescription {
      * <p>
      * 插件的信息前缀在记录器记录信息时，会作为信息头衔使用。如果没有定义记录器，会使用插件的名字作为信息头衔。<br>
      * When a PluginLogger logs, the message title is used as the prefix of message. If prefix is undefined,
-     * the plugin name will be used instead. 
+     * the plugin name will be used instead.
      *
      * @return 这个插件的作信息前缀。如果没定义，返回{@code null}。<br>
      * The message title of this plugin, or{@code null} if undefined.
@@ -275,7 +281,7 @@ public class PluginDescription {
      * When the required dependency plugin does not exists, Nukkit won't load this plugin, but will tell the
      * user that this dependency is required.</li>
      * </ul>
-     * 
+     * <p>
      * 举个例子，如果A插件依赖于B插件，在没有安装B插件而安装A插件的情况下，Nukkit会阻止A插件的加载。
      * 只有在安装B插件前安装了它所依赖的A插件，Nukkit才会允许加载B插件。<br>
      * For example, there is a Plugin A which relies on Plugin B. If you installed A without installing B,

@@ -21,7 +21,7 @@ public class BlockIcePacked extends BlockIce {
 
     @Override
     public double getHardness() {
-        return 0.5;
+        return 0.1; //0.5
     }
 
     @Override

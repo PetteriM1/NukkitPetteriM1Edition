@@ -10,7 +10,7 @@ public interface BlockContainer {
         return 0;
     }
 
-    default int getRuntimeId() {
-        return GlobalBlockPalette.getOrCreateRuntimeId(this.getNukkitId(), this.getNukkitDamage());
+    default int getRuntimeId(int protocol) {
+        return GlobalBlockPalette.getOrCreateRuntimeId(protocol, this.getNukkitId(), this.getNukkitDamage());
     }
 }

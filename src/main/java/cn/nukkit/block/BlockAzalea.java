@@ -10,6 +10,8 @@ import cn.nukkit.level.generator.object.tree.ObjectAzaleaTree;
 import cn.nukkit.level.particle.BoneMealParticle;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.NukkitRandom;
+import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.utils.material.BlockType;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -94,6 +96,16 @@ public class BlockAzalea extends BlockTransparent {
     @Override
     public Item[] getDrops(Item item) {
         return new Item[0];
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_17_0;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.GRASS;
     }
 
     @Override

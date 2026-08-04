@@ -115,7 +115,7 @@ public class BlockSeagrass extends BlockFlowable {
     @Override
     public Item[] getDrops(Item item) {
         if (item.isShears()) {
-            return new Item[] { toItem() };
+            return new Item[]{toItem()};
         } else {
             return new Item[0];
         }

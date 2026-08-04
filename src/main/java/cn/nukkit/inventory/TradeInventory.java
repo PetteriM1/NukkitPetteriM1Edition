@@ -27,8 +27,9 @@ public class TradeInventory extends BaseInventory {
         pk.tradeTier = this.getHolder().getTradeTier();
         pk.player = who.getId();
         try {
-            pk.offers = NBTIO.write(this.getHolder().getOffers(),ByteOrder.LITTLE_ENDIAN, true);
-        } catch (IOException ignored) {}
+            pk.offers = NBTIO.write(this.getHolder().getOffers(), ByteOrder.LITTLE_ENDIAN, true);
+        } catch (IOException ignored) {
+        }
 
         who.dataPacket(pk);
     }

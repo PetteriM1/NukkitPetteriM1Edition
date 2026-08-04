@@ -19,7 +19,8 @@ public class SwampTreePopulator extends Populator {
         this(BlockSapling.OAK);
     }
 
-    public SwampTreePopulator(int type) {}
+    public SwampTreePopulator(int type) {
+    }
 
     public void setRandomAmount(int randomAmount) {
         this.randomAmount = randomAmount;

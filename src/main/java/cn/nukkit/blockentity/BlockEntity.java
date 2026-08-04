@@ -118,7 +118,6 @@ public abstract class BlockEntity extends Position {
     }
 
     protected void initBlockEntity() {
-
     }
 
     public static BlockEntity createBlockEntity(String type, FullChunk chunk, CompoundTag nbt, Object... args) {
@@ -148,7 +147,8 @@ public abstract class BlockEntity extends Position {
                         blockEntity = (BlockEntity) constructor.newInstance(objects);
 
                     }
-                } catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                }
             }
         } else {
             Server.getInstance().getLogger().warning("Tried to create block entity that doesn't exists: " + type);
@@ -199,13 +199,15 @@ public abstract class BlockEntity extends Position {
 
     @Override
     public Block getLevelBlock() {
-        if (this.isValid()) return this.level.getBlock(this.chunk, this.getFloorX(), this.getFloorY(), this.getFloorZ(), BlockLayer.NORMAL, true);
+        if (this.isValid())
+            return this.level.getBlock(this.chunk, this.getFloorX(), this.getFloorY(), this.getFloorZ(), BlockLayer.NORMAL, true);
         else throw new LevelException("Undefined Level reference");
     }
 
     @Override
     public Block getLevelBlock(BlockLayer layer) {
-        if (this.isValid()) return this.level.getBlock(this.chunk, this.getFloorX(), this.getFloorY(), this.getFloorZ(), layer, true);
+        if (this.isValid())
+            return this.level.getBlock(this.chunk, this.getFloorX(), this.getFloorY(), this.getFloorZ(), layer, true);
         else throw new LevelException("Undefined Level reference");
     }
 
@@ -236,7 +238,6 @@ public abstract class BlockEntity extends Position {
     }
 
     public void onBreak() {
-
     }
 
     public void setDirty() {
