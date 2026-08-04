@@ -20,12 +20,6 @@ public class ContainerSetDataPacket extends DataPacket {
     public static final int PROPERTY_BREWING_STAND_BREW_TIME = 0;
     public static final int PROPERTY_BREWING_STAND_FUEL_AMOUNT = 1;
     public static final int PROPERTY_BREWING_STAND_FUEL_TOTAL = 2;
-
-    @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
     public int windowId;
     public int property;
     public int value;
@@ -41,5 +35,10 @@ public class ContainerSetDataPacket extends DataPacket {
         this.putByte((byte) this.windowId);
         this.putVarInt(this.property);
         this.putVarInt(this.value);
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

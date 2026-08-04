@@ -13,13 +13,13 @@ public class BlockCrimsonWallSign extends BlockWallSign {
     }
 
     @Override
-    public String getName() {
-        return "Crimson WallSign";
+    public int getId() {
+        return CRIMSON_WALL_SIGN;
     }
 
     @Override
-    public int getId() {
-        return CRIMSON_WALL_SIGN;
+    public String getName() {
+        return "Crimson WallSign";
     }
 
     @Override

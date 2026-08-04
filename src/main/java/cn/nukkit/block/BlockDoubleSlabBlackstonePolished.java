@@ -14,33 +14,8 @@ public class BlockDoubleSlabBlackstonePolished extends BlockDoubleSlabBase {
     }
 
     @Override
-    public int getId() {
-        return POLISHED_BLACKSTONE_DOUBLE_SLAB;
-    }
-
-    @Override
-    public int getSingleSlabId() {
-        return POLISHED_BLACKSTONE_SLAB;
-    }
-
-    @Override
-    public int getItemDamage() {
-        return 0;
-    }
-
-    @Override
-    public String getSlabName() {
-        return "Polished Blackstone";
-    }
-
-    @Override
-    public boolean canHarvestWithHand() {
-        return false;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
+    public BlockColor getColor() {
+        return BlockColor.BLACK_BLOCK_COLOR;
     }
 
     @Override
@@ -49,12 +24,37 @@ public class BlockDoubleSlabBlackstonePolished extends BlockDoubleSlabBase {
     }
 
     @Override
+    public int getId() {
+        return POLISHED_BLACKSTONE_DOUBLE_SLAB;
+    }
+
+    @Override
+    public int getItemDamage() {
+        return 0;
+    }
+
+    @Override
     public double getResistance() {
         return 6.0;
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.BLACK_BLOCK_COLOR;
+    public int getSingleSlabId() {
+        return POLISHED_BLACKSTONE_SLAB;
+    }
+
+    @Override
+    public String getSlabName() {
+        return "Polished Blackstone";
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
+    }
+
+    @Override
+    public boolean canHarvestWithHand() {
+        return false;
     }
 }

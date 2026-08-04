@@ -40,18 +40,13 @@ public class BlockFire extends BlockFlowable {
     }
 
     @Override
+    public BlockColor getColor() {
+        return BlockColor.AIR_BLOCK_COLOR;
+    }
+
+    @Override
     public int getId() {
         return FIRE;
-    }
-
-    @Override
-    public boolean hasEntityCollision() {
-        return true;
-    }
-
-    @Override
-    public String getName() {
-        return "Fire Block";
     }
 
     @Override
@@ -60,13 +55,90 @@ public class BlockFire extends BlockFlowable {
     }
 
     @Override
-    public boolean isBreakable(Item item) {
-        return false;
+    public String getName() {
+        return "Fire Block";
+    }
+
+    @Override
+    public boolean breakWhenPushed() {
+        return true;
     }
 
     @Override
     public boolean canBeReplaced() {
         return true;
+    }
+
+    public boolean canNeighborBurn() {
+        for (BlockFace face : BlockFace.values()) {
+            if (this.getSide(face).getBurnChance() > 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static int getChanceOfNeighborsEncouragingFire(Block block) {
+        if (block.getId() != AIR) {
+            return 0;
+        } else {
+            int chance = 0;
+            chance = Math.max(chance, block.getSideIfLoaded(BlockFace.EAST).getBurnChance());
+            chance = Math.max(chance, block.getSideIfLoaded(BlockFace.WEST).getBurnChance());
+            chance = Math.max(chance, block.getSideIfLoaded(BlockFace.DOWN).getBurnChance());
+            chance = Math.max(chance, block.getSideIfLoaded(BlockFace.UP).getBurnChance());
+            chance = Math.max(chance, block.getSideIfLoaded(BlockFace.SOUTH).getBurnChance());
+            chance = Math.max(chance, block.getSideIfLoaded(BlockFace.NORTH).getBurnChance());
+            return chance;
+        }
+    }
+
+    @Override
+    public Item[] getDrops(Item item) {
+        return new Item[0];
+    }
+
+    @Override
+    public boolean hasEntityCollision() {
+        return true;
+    }
+
+    public boolean isBlockTopFacingSurfaceSolid(Block block) {
+        if (block != null) {
+            if (block instanceof BlockStairs && (block.getDamage() & 4) == 4) {
+                return true;
+            } else if (block instanceof BlockSlab && (this.getDamage() & 0x08) > 0) {
+                return true;
+            } else if (block instanceof BlockSnowLayer && (block.getDamage() & 7) == 7) {
+                return true;
+            } else if (block instanceof BlockGlass) {
+                return false;
+            } else if (block instanceof BlockHopper || block instanceof BlockBeacon) {
+                return false;
+            } else if (block instanceof BlockShulkerBox || block instanceof BlockChest || block instanceof BlockEnderChest) {
+                return false;
+            } else if (block instanceof BlockAnvil || block instanceof BlockEnchantingTable || block instanceof BlockBrewingStand) {
+                return false;
+            } else if (block instanceof BlockCampfire) {
+                return false;
+            } else if (block instanceof BlockCactus) {
+                return false;
+            } else if (block instanceof BlockDaylightDetector) {
+                return false;
+            } else if (block instanceof BlockIce) {
+                return false;
+            } else if (block instanceof BlockCake) {
+                return false;
+            } else return block.isSolid();
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean isBreakable(Item item) {
+        return false;
     }
 
     @Override
@@ -104,16 +176,11 @@ public class BlockFire extends BlockFlowable {
     }
 
     @Override
-    public Item[] getDrops(Item item) {
-        return new Item[0];
-    }
-
-    @Override
     public int onUpdate(int type) {
         if (type == Level.BLOCK_UPDATE_NORMAL || type == Level.BLOCK_UPDATE_RANDOM) {
             if (!this.isBlockTopFacingSurfaceSolid(this.down()) && !this.canNeighborBurn()) {
                 this.getLevel().setBlock(this, Block.get(BlockID.AIR), true);
-            } else if (this.level.gameRules.getBoolean(GameRule.DO_FIRE_TICK) && !level.isUpdateScheduled(this, this)) {
+            } else if (!Server.getInstance().suomiCraftPEMode() && this.level.gameRules.getBoolean(GameRule.DO_FIRE_TICK) && !level.isUpdateScheduled(this, this)) {
                 level.scheduleUpdate(this, tickRate());
             }
 
@@ -131,6 +198,12 @@ public class BlockFire extends BlockFlowable {
             ) {
 
                 this.getLevel().setBlock(this, Block.get(BlockID.AIR), true);
+            }
+
+            if (Server.getInstance().suomiCraftPEMode()) {
+                if (forever) return 0;
+                this.getLevel().setBlock(this, Block.get(BlockID.AIR), true);
+                return 0;
             }
 
             if (!this.isBlockTopFacingSurfaceSolid(down) && !this.canNeighborBurn()) {
@@ -220,6 +293,21 @@ public class BlockFire extends BlockFlowable {
         return 0;
     }
 
+    @Override
+    protected AxisAlignedBB recalculateCollisionBoundingBox() {
+        return this;
+    }
+
+    @Override
+    public int tickRate() {
+        return 30;
+    }
+
+    @Override
+    public Item toItem() {
+        return new ItemBlock(Block.get(BlockID.AIR));
+    }
+
     private void tryToCatchBlockOnFire(Block block, int bound, int damage) {
         int burnAbility = block.getBurnAbility();
         if (burnAbility == 0) {
@@ -256,87 +344,5 @@ public class BlockFire extends BlockFlowable {
                 ((BlockTNT) block).prime();
             }
         }
-    }
-
-    private static int getChanceOfNeighborsEncouragingFire(Block block) {
-        if (block.getId() != AIR) {
-            return 0;
-        } else {
-            int chance = 0;
-            chance = Math.max(chance, block.getSideIfLoaded(BlockFace.EAST).getBurnChance());
-            chance = Math.max(chance, block.getSideIfLoaded(BlockFace.WEST).getBurnChance());
-            chance = Math.max(chance, block.getSideIfLoaded(BlockFace.DOWN).getBurnChance());
-            chance = Math.max(chance, block.getSideIfLoaded(BlockFace.UP).getBurnChance());
-            chance = Math.max(chance, block.getSideIfLoaded(BlockFace.SOUTH).getBurnChance());
-            chance = Math.max(chance, block.getSideIfLoaded(BlockFace.NORTH).getBurnChance());
-            return chance;
-        }
-    }
-
-    public boolean canNeighborBurn() {
-        for (BlockFace face : BlockFace.values()) {
-            if (this.getSide(face).getBurnChance() > 0) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public boolean isBlockTopFacingSurfaceSolid(Block block) {
-        if (block != null) {
-            if (block instanceof BlockStairs && (block.getDamage() & 4) == 4) {
-                return true;
-            } else if (block instanceof BlockSlab && (this.getDamage() & 0x08) > 0) {
-                return true;
-            } else if (block instanceof BlockSnowLayer && (block.getDamage() & 7) == 7) {
-                return true;
-            } else if (block instanceof BlockGlass) {
-                return false;
-            } else if (block instanceof BlockHopper || block instanceof BlockBeacon) {
-                return false;
-            } else if (block instanceof BlockShulkerBox || block instanceof BlockChest || block instanceof BlockEnderChest) {
-                return false;
-            } else if (block instanceof BlockAnvil || block instanceof BlockEnchantingTable || block instanceof BlockBrewingStand) {
-                return false;
-            } else if (block instanceof BlockCampfire) {
-                return false;
-            } else if (block instanceof BlockCactus) {
-                return false;
-            } else if (block instanceof BlockDaylightDetector) {
-                return false;
-            } else if (block instanceof BlockIce) {
-                return false;
-            } else if (block instanceof BlockCake) {
-                return false;
-            } else return block.isSolid();
-        }
-
-        return false;
-    }
-
-    @Override
-    public int tickRate() {
-        return 30;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.AIR_BLOCK_COLOR;
-    }
-
-    @Override
-    protected AxisAlignedBB recalculateCollisionBoundingBox() {
-        return this;
-    }
-
-    @Override
-    public Item toItem() {
-        return new ItemBlock(Block.get(BlockID.AIR));
-    }
-
-    @Override
-    public boolean breakWhenPushed() {
-        return true;
     }
 }

@@ -14,11 +14,24 @@ public class DropItemAction extends InventoryAction {
     }
 
     /**
+     * Drops the target item in front of the player.
+     */
+    public boolean execute(Player source) {
+        return source.dropItem(this.targetItem);
+    }
+
+    /**
      * Verifies that the source item of a drop-item action must be air. This is not strictly necessary, just a sanity
      * check.
      */
     public boolean isValid(Player source) {
         return this.sourceItem.isNull();
+    }
+
+    public void onExecuteFail(Player source) {
+    }
+
+    public void onExecuteSuccess(Player source) {
     }
 
     @Override
@@ -29,18 +42,5 @@ public class DropItemAction extends InventoryAction {
             source.stopAction();
         }
         return !ev.isCancelled();
-    }
-
-    /**
-     * Drops the target item in front of the player.
-     */
-    public boolean execute(Player source) {
-        return source.dropItem(this.targetItem);
-    }
-
-    public void onExecuteSuccess(Player source) {
-    }
-
-    public void onExecuteFail(Player source) {
     }
 }

@@ -14,8 +14,13 @@ public class BlockStairsBlackstone extends BlockStairs {
     }
 
     @Override
-    public String getName() {
-        return "Blackstone Stairs";
+    public BlockColor getColor() {
+        return BlockColor.BLACK_BLOCK_COLOR;
+    }
+
+    @Override
+    public double getHardness() {
+        return 1.5;
     }
 
     @Override
@@ -24,8 +29,8 @@ public class BlockStairsBlackstone extends BlockStairs {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.BLACK_BLOCK_COLOR;
+    public String getName() {
+        return "Blackstone Stairs";
     }
 
     @Override
@@ -36,11 +41,6 @@ public class BlockStairsBlackstone extends BlockStairs {
     @Override
     public int getToolType() {
         return ItemTool.TYPE_PICKAXE;
-    }
-
-    @Override
-    public double getHardness() {
-        return 1.5;
     }
 
     @Override

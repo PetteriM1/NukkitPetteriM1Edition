@@ -73,78 +73,6 @@ public class Potion implements Cloneable {
     public static final int INFESTED = 46;
 
     protected static Potion[] potions;
-
-    public static void init() {
-        potions = new Potion[256];
-
-        potions[Potion.WATER] = new Potion(Potion.WATER);
-        potions[Potion.MUNDANE] = new Potion(Potion.MUNDANE);
-        potions[Potion.MUNDANE_II] = new Potion(Potion.MUNDANE_II, 2);
-        potions[Potion.THICK] = new Potion(Potion.THICK);
-        potions[Potion.AWKWARD] = new Potion(Potion.AWKWARD);
-        potions[Potion.NIGHT_VISION] = new Potion(Potion.NIGHT_VISION, 1, 180);
-        potions[Potion.NIGHT_VISION_LONG] = new Potion(Potion.NIGHT_VISION_LONG, 1, 480);
-        potions[Potion.INVISIBLE] = new Potion(Potion.INVISIBLE, 1, 180);
-        potions[Potion.INVISIBLE_LONG] = new Potion(Potion.INVISIBLE_LONG, 1, 480);
-        potions[Potion.LEAPING] = new Potion(Potion.LEAPING, 1, 180);
-        potions[Potion.LEAPING_LONG] = new Potion(Potion.LEAPING_LONG, 1, 480);
-        potions[Potion.LEAPING_II] = new Potion(Potion.LEAPING_II, 2, 90);
-        potions[Potion.FIRE_RESISTANCE] = new Potion(Potion.FIRE_RESISTANCE, 1, 180);
-        potions[Potion.FIRE_RESISTANCE_LONG] = new Potion(Potion.FIRE_RESISTANCE_LONG, 1, 480);
-        potions[Potion.SPEED] = new Potion(Potion.SPEED, 1, 180);
-        potions[Potion.SPEED_LONG] = new Potion(Potion.SPEED_LONG, 1, 480);
-        potions[Potion.SPEED_II] = new Potion(Potion.SPEED_II, 2, 90);
-        potions[Potion.SLOWNESS] = new Potion(Potion.SLOWNESS, 1, 90);
-        potions[Potion.SLOWNESS_LONG] = new Potion(Potion.SLOWNESS_LONG, 1, 240);
-        potions[Potion.WATER_BREATHING] = new Potion(Potion.WATER_BREATHING, 1, 180);
-        potions[Potion.WATER_BREATHING_LONG] = new Potion(Potion.WATER_BREATHING_LONG, 1, 480);
-        potions[Potion.INSTANT_HEALTH] = new Potion(Potion.INSTANT_HEALTH);
-        potions[Potion.INSTANT_HEALTH_II] = new Potion(Potion.INSTANT_HEALTH_II, 2);
-        potions[Potion.HARMING] = new Potion(Potion.HARMING);
-        potions[Potion.HARMING_II] = new Potion(Potion.HARMING_II, 2);
-        potions[Potion.POISON] = new Potion(Potion.POISON, 1, 45);
-        potions[Potion.POISON_LONG] = new Potion(Potion.POISON_LONG, 1, 120);
-        potions[Potion.POISON_II] = new Potion(Potion.POISON_II, 2, 22);
-        potions[Potion.REGENERATION] = new Potion(Potion.REGENERATION, 1, 45);
-        potions[Potion.REGENERATION_LONG] = new Potion(Potion.REGENERATION_LONG, 1, 120);
-        potions[Potion.REGENERATION_II] = new Potion(Potion.REGENERATION_II, 2, 22);
-        potions[Potion.STRENGTH] = new Potion(Potion.STRENGTH, 1, 180);
-        potions[Potion.STRENGTH_LONG] = new Potion(Potion.STRENGTH_LONG, 1, 480);
-        potions[Potion.STRENGTH_II] = new Potion(Potion.STRENGTH_II, 2, 90);
-        potions[Potion.WEAKNESS] = new Potion(Potion.WEAKNESS, 1, 90);
-        potions[Potion.WEAKNESS_LONG] = new Potion(Potion.WEAKNESS_LONG, 1, 240);
-        potions[Potion.WITHER_II] = new Potion(Potion.WITHER_II, 2, 40);
-        potions[Potion.TURTLE_MASTER] = new Potion(Potion.TURTLE_MASTER, 1, 20);
-        potions[Potion.TURTLE_MASTER_LONG] = new Potion(Potion.TURTLE_MASTER_LONG, 1, 40);
-        potions[Potion.TURTLE_MASTER_II] = new Potion(Potion.TURTLE_MASTER_II, 2, 20);
-        potions[Potion.SLOW_FALLING] = new Potion(Potion.SLOW_FALLING, 1, 90);
-        potions[Potion.SLOW_FALLING_LONG] = new Potion(Potion.SLOW_FALLING_LONG, 1, 240);
-        potions[Potion.SLOWNESS_IV] = new Potion(Potion.SLOWNESS, 4, 20);
-        potions[Potion.WIND_CHARGED] = new Potion(Potion.WIND_CHARGED, 1, 180);
-        potions[Potion.WEAVING] = new Potion(Potion.WEAVING, 1, 180);
-        potions[Potion.OOZING] = new Potion(Potion.OOZING, 1, 180);
-        potions[Potion.INFESTED] = new Potion(Potion.INFESTED, 1, 180);
-    }
-
-    @Nullable
-    public static Potion getPotion(int id) {
-        if (id >= 0 && id < potions.length && potions[id] != null) {
-            return potions[id].clone();
-        } else {
-            return null;
-        }
-    }
-
-    @Nullable
-    public static Potion getPotionByName(String name) {
-        try {
-            byte id = Potion.class.getField(name.toUpperCase(Locale.ROOT)).getByte(null);
-            return getPotion(id);
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
     @Getter
     protected final int id;
     @Getter
@@ -152,15 +80,12 @@ public class Potion implements Cloneable {
     @Getter
     protected final int duration;
     protected boolean splash;
-
     public Potion(int id) {
         this(id, 1);
     }
-
     public Potion(int id, int level) {
         this(id, level, false);
     }
-
     public Potion(int id, int level, boolean splash) {
         this(id, level, 0, splash);
     }
@@ -176,6 +101,11 @@ public class Potion implements Cloneable {
         this.splash = splash;
     }
 
+    public Potion setSplash(boolean splash) {
+        this.splash = splash;
+        return this;
+    }
+
     /**
      * @deprecated use getEffects()
      */
@@ -184,13 +114,12 @@ public class Potion implements Cloneable {
         return getEffect(this.getId(), this.isSplash());
     }
 
-    public boolean isSplash() {
-        return splash;
+    public Effect[] getEffects() {
+        return getEffects(this.getId(), this.isSplash());
     }
 
-    public Potion setSplash(boolean splash) {
-        this.splash = splash;
-        return this;
+    public boolean isSplash() {
+        return splash;
     }
 
     public void applyPotion(Entity entity) {
@@ -256,30 +185,13 @@ public class Potion implements Cloneable {
         }
     }
 
-    public Effect[] getEffects() {
-        return getEffects(this.getId(), this.isSplash());
-    }
-
-    public static Effect[] getEffects(int potionType, boolean isSplash) {
-        switch (potionType) {
-            case TURTLE_MASTER:
-            case TURTLE_MASTER_II:
-            case TURTLE_MASTER_LONG:
-                Effect slowness = Effect.getEffect(Effect.SLOWNESS);
-                slowness.setAmplifier(potionType == TURTLE_MASTER_II ? 5 : 3);
-                slowness.setDuration(potionType == TURTLE_MASTER_II ? 400 : 800);
-                Effect resistance = Effect.getEffect(Effect.RESISTANCE);
-                resistance.setAmplifier(potionType == TURTLE_MASTER_II ? 3 : 2);
-                resistance.setDuration(potionType == TURTLE_MASTER_II ? 400 : 800);
-                return new Effect[]{slowness, resistance};
+    @Deprecated
+    public static int getApplySeconds(int potionType, boolean isSplash) {
+        Potion potion = getPotion(potionType);
+        if (potion != null) {
+            return potion.getDuration();
         }
-
-        Effect effect = getEffect(potionType, isSplash);
-        if (effect == null) {
-            return new Effect[0];
-        }
-
-        return new Effect[]{effect};
+        return 0;
     }
 
     @Nullable
@@ -366,6 +278,10 @@ public class Potion implements Cloneable {
             case INFESTED:
                 effect = Effect.getEffect(Effect.INFESTED);
                 break;
+            case SLOW_FALLING:
+            case SLOW_FALLING_LONG:
+                effect = Effect.getEffect(Effect.SLOW_FALLING);
+                break;
         }
 
         if (effect == null) {
@@ -375,7 +291,7 @@ public class Potion implements Cloneable {
         Potion potion = getPotion(potionType);
         if (potion != null) {
             if (potion.getLevel() > 1) {
-                effect.setAmplifier(1);
+                effect.setAmplifier(potion.getLevel() - 1);
             }
 
             if (potion.getDuration() > 0) {
@@ -386,6 +302,28 @@ public class Potion implements Cloneable {
         return effect;
     }
 
+    public static Effect[] getEffects(int potionType, boolean isSplash) {
+        switch (potionType) {
+            case TURTLE_MASTER:
+            case TURTLE_MASTER_II:
+            case TURTLE_MASTER_LONG:
+                Effect slowness = Effect.getEffect(Effect.SLOWNESS);
+                slowness.setAmplifier(potionType == TURTLE_MASTER_II ? 5 : 3);
+                slowness.setDuration(potionType == TURTLE_MASTER_II ? 400 : 800);
+                Effect resistance = Effect.getEffect(Effect.RESISTANCE);
+                resistance.setAmplifier(potionType == TURTLE_MASTER_II ? 3 : 2);
+                resistance.setDuration(potionType == TURTLE_MASTER_II ? 400 : 800);
+                return new Effect[]{slowness, resistance};
+        }
+
+        Effect effect = getEffect(potionType, isSplash);
+        if (effect == null) {
+            return new Effect[0];
+        }
+
+        return new Effect[]{effect};
+    }
+
     @Deprecated
     public static int getLevel(int potionType) {
         Potion potion = getPotion(potionType);
@@ -393,6 +331,77 @@ public class Potion implements Cloneable {
             return potion.getLevel();
         }
         return 1;
+    }
+
+    @Nullable
+    public static Potion getPotion(int id) {
+        if (id >= 0 && id < potions.length && potions[id] != null) {
+            return potions[id].clone();
+        } else {
+            return null;
+        }
+    }
+
+    @Nullable
+    public static Potion getPotionByName(String name) {
+        try {
+            byte id = Potion.class.getField(name.toUpperCase(Locale.ROOT)).getByte(null);
+            return getPotion(id);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public static void init() {
+        potions = new Potion[256];
+
+        potions[Potion.WATER] = new Potion(Potion.WATER);
+        potions[Potion.MUNDANE] = new Potion(Potion.MUNDANE);
+        potions[Potion.MUNDANE_II] = new Potion(Potion.MUNDANE_II, 2);
+        potions[Potion.THICK] = new Potion(Potion.THICK);
+        potions[Potion.AWKWARD] = new Potion(Potion.AWKWARD);
+        potions[Potion.NIGHT_VISION] = new Potion(Potion.NIGHT_VISION, 1, 180);
+        potions[Potion.NIGHT_VISION_LONG] = new Potion(Potion.NIGHT_VISION_LONG, 1, 480);
+        potions[Potion.INVISIBLE] = new Potion(Potion.INVISIBLE, 1, 180);
+        potions[Potion.INVISIBLE_LONG] = new Potion(Potion.INVISIBLE_LONG, 1, 480);
+        potions[Potion.LEAPING] = new Potion(Potion.LEAPING, 1, 180);
+        potions[Potion.LEAPING_LONG] = new Potion(Potion.LEAPING_LONG, 1, 480);
+        potions[Potion.LEAPING_II] = new Potion(Potion.LEAPING_II, 2, 90);
+        potions[Potion.FIRE_RESISTANCE] = new Potion(Potion.FIRE_RESISTANCE, 1, 180);
+        potions[Potion.FIRE_RESISTANCE_LONG] = new Potion(Potion.FIRE_RESISTANCE_LONG, 1, 480);
+        potions[Potion.SPEED] = new Potion(Potion.SPEED, 1, 180);
+        potions[Potion.SPEED_LONG] = new Potion(Potion.SPEED_LONG, 1, 480);
+        potions[Potion.SPEED_II] = new Potion(Potion.SPEED_II, 2, 90);
+        potions[Potion.SLOWNESS] = new Potion(Potion.SLOWNESS, 1, 90);
+        potions[Potion.SLOWNESS_LONG] = new Potion(Potion.SLOWNESS_LONG, 1, 240);
+        potions[Potion.WATER_BREATHING] = new Potion(Potion.WATER_BREATHING, 1, 180);
+        potions[Potion.WATER_BREATHING_LONG] = new Potion(Potion.WATER_BREATHING_LONG, 1, 480);
+        potions[Potion.INSTANT_HEALTH] = new Potion(Potion.INSTANT_HEALTH);
+        potions[Potion.INSTANT_HEALTH_II] = new Potion(Potion.INSTANT_HEALTH_II, 2);
+        potions[Potion.HARMING] = new Potion(Potion.HARMING);
+        potions[Potion.HARMING_II] = new Potion(Potion.HARMING_II, 2);
+        potions[Potion.POISON] = new Potion(Potion.POISON, 1, 45);
+        potions[Potion.POISON_LONG] = new Potion(Potion.POISON_LONG, 1, 120);
+        potions[Potion.POISON_II] = new Potion(Potion.POISON_II, 2, 22);
+        potions[Potion.REGENERATION] = new Potion(Potion.REGENERATION, 1, 45);
+        potions[Potion.REGENERATION_LONG] = new Potion(Potion.REGENERATION_LONG, 1, 120);
+        potions[Potion.REGENERATION_II] = new Potion(Potion.REGENERATION_II, 2, 22);
+        potions[Potion.STRENGTH] = new Potion(Potion.STRENGTH, 1, 180);
+        potions[Potion.STRENGTH_LONG] = new Potion(Potion.STRENGTH_LONG, 1, 480);
+        potions[Potion.STRENGTH_II] = new Potion(Potion.STRENGTH_II, 2, 90);
+        potions[Potion.WEAKNESS] = new Potion(Potion.WEAKNESS, 1, 90);
+        potions[Potion.WEAKNESS_LONG] = new Potion(Potion.WEAKNESS_LONG, 1, 240);
+        potions[Potion.WITHER_II] = new Potion(Potion.WITHER_II, 2, 40);
+        potions[Potion.TURTLE_MASTER] = new Potion(Potion.TURTLE_MASTER, 1, 20);
+        potions[Potion.TURTLE_MASTER_LONG] = new Potion(Potion.TURTLE_MASTER_LONG, 1, 40);
+        potions[Potion.TURTLE_MASTER_II] = new Potion(Potion.TURTLE_MASTER_II, 2, 20);
+        potions[Potion.SLOW_FALLING] = new Potion(Potion.SLOW_FALLING, 1, 90);
+        potions[Potion.SLOW_FALLING_LONG] = new Potion(Potion.SLOW_FALLING_LONG, 1, 240);
+        potions[Potion.SLOWNESS_IV] = new Potion(Potion.SLOWNESS_IV, 4, 20);
+        potions[Potion.WIND_CHARGED] = new Potion(Potion.WIND_CHARGED, 1, 180);
+        potions[Potion.WEAVING] = new Potion(Potion.WEAVING, 1, 180);
+        potions[Potion.OOZING] = new Potion(Potion.OOZING, 1, 180);
+        potions[Potion.INFESTED] = new Potion(Potion.INFESTED, 1, 180);
     }
 
     @Deprecated
@@ -406,14 +415,5 @@ public class Potion implements Cloneable {
             default:
                 return false;
         }
-    }
-
-    @Deprecated
-    public static int getApplySeconds(int potionType, boolean isSplash) {
-        Potion potion = getPotion(potionType);
-        if (potion != null) {
-            return potion.getDuration();
-        }
-        return 0;
     }
 }

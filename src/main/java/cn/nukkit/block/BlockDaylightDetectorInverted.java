@@ -3,7 +3,6 @@ package cn.nukkit.block;
 import cn.nukkit.Player;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
-import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
 
 /**
@@ -23,6 +22,16 @@ public class BlockDaylightDetectorInverted extends BlockDaylightDetector {
     }
 
     @Override
+    public boolean isPowerSource() {
+        return true;
+    }
+
+    @Override
+    public int getWeakPower(BlockFace face) {
+        return this.level.isAnimalSpawningAllowedByTime() ? 0 : 15;
+    }
+
+    @Override
     public boolean onActivate(Item item, Player player) {
         this.getLevel().setBlock(this, Block.get(DAYLIGHT_DETECTOR));
         return true;
@@ -31,16 +40,5 @@ public class BlockDaylightDetectorInverted extends BlockDaylightDetector {
     @Override
     public Item toItem() {
         return new ItemBlock(Block.get(DAYLIGHT_DETECTOR), 0);
-    }
-
-    @Override
-    public boolean isPowerSource() {
-        return true;
-    }
-
-    @Override
-    public int getWeakPower(BlockFace face) {
-        int time = level.getTime() % Level.TIME_FULL;
-        return time < 13184 || time > 22800 ? 0 : 15;
     }
 }

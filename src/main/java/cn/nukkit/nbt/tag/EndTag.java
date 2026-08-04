@@ -12,21 +12,8 @@ public class EndTag extends Tag {
     }
 
     @Override
-    public void load(NBTInputStream dis) throws IOException {
-    }
-
-    @Override
-    void write(NBTOutputStream dos) throws IOException {
-    }
-
-    @Override
     public byte getId() {
         return TAG_End;
-    }
-
-    @Override
-    public String toString() {
-        return "EndTag";
     }
 
     @Override
@@ -35,7 +22,20 @@ public class EndTag extends Tag {
     }
 
     @Override
+    public void load(NBTInputStream dis) throws IOException {
+    }
+
+    @Override
     public Object parseValue() {
         return null;
+    }
+
+    @Override
+    public String toString() {
+        return "EndTag";
+    }
+
+    @Override
+    public void write(NBTOutputStream dos) throws IOException {
     }
 }

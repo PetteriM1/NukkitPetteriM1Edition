@@ -17,12 +17,6 @@ public class EnchantInventory extends FakeBlockUIComponent {
         super(playerUI, InventoryType.ENCHANT_TABLE, 14, position);
     }
 
-    @Override
-    public void onOpen(Player who) {
-        super.onOpen(who);
-        who.craftingType = Player.ENCHANT_WINDOW_ID;
-    }
-
     public Item getInputSlot() {
         return this.getItem(0);
     }
@@ -33,5 +27,11 @@ public class EnchantInventory extends FakeBlockUIComponent {
 
     public Item getReagentSlot() {
         return this.getItem(1);
+    }
+
+    @Override
+    public void onOpen(Player who) {
+        super.onOpen(who);
+        who.craftingType = Player.ENCHANT_WINDOW_ID;
     }
 }

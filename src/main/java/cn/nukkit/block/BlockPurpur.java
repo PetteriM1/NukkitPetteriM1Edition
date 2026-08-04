@@ -12,7 +12,7 @@ public class BlockPurpur extends BlockSolidMeta {
     public static final int PURPUR_NORMAL = 0;
     public static final int PURPUR_PILLAR = 2;
 
-    private static final short[] FACES = {
+    private static final short[] faces = {
             0,
             0,
             0b1000,
@@ -29,7 +29,7 @@ public class BlockPurpur extends BlockSolidMeta {
         super(meta);
     }
 
-    private static final String[] NAMES = {
+    private static final String[] names = {
             "Purpur Block",
             "",
             "Purpur Pillar",
@@ -37,8 +37,13 @@ public class BlockPurpur extends BlockSolidMeta {
     };
 
     @Override
-    public String getName() {
-        return NAMES[this.getDamage() & 0x03];
+    public BlockColor getColor() {
+        return BlockColor.MAGENTA_BLOCK_COLOR;
+    }
+
+    @Override
+    public double getHardness() {
+        return 1.5;
     }
 
     @Override
@@ -47,8 +52,8 @@ public class BlockPurpur extends BlockSolidMeta {
     }
 
     @Override
-    public double getHardness() {
-        return 1.5;
+    public String getName() {
+        return names[this.getDamage() & 0x03];
     }
 
     @Override
@@ -59,16 +64,6 @@ public class BlockPurpur extends BlockSolidMeta {
     @Override
     public int getToolType() {
         return ItemTool.TYPE_PICKAXE;
-    }
-
-    @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        if (this.getDamage() != PURPUR_NORMAL) {
-            this.setDamage(((this.getDamage() & 0x03) | FACES[face.getIndex()]));
-        }
-        this.getLevel().setBlock(block, this, true, true);
-
-        return true;
     }
 
     @Override
@@ -83,12 +78,17 @@ public class BlockPurpur extends BlockSolidMeta {
     }
 
     @Override
-    public Item toItem() {
-        return new ItemBlock(Block.get(Block.PURPUR_BLOCK), this.getDamage() & 0x03, 1);
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        if (this.getDamage() != PURPUR_NORMAL) {
+            this.setDamage(((this.getDamage() & 0x03) | faces[face.getIndex()]));
+        }
+        this.getLevel().setBlock(block, this, true, true);
+
+        return true;
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.MAGENTA_BLOCK_COLOR;
+    public Item toItem() {
+        return new ItemBlock(Block.get(Block.PURPUR_BLOCK), this.getDamage() & 0x03, 1);
     }
 }

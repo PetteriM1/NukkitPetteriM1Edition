@@ -7,7 +7,7 @@ import cn.nukkit.utils.BlockColor;
  * Created on 2015/12/2 by xtypr.
  * Package cn.nukkit.block in project Nukkit .
  */
-public class BlockDoubleSlabWood extends BlockDoubleSlabBase  {
+public class BlockDoubleSlabWood extends BlockDoubleSlabBase {
 
     private static final String[] NAMES = {
             "Oak",
@@ -29,41 +29,6 @@ public class BlockDoubleSlabWood extends BlockDoubleSlabBase  {
     }
 
     @Override
-    public int getId() {
-        return DOUBLE_WOOD_SLAB;
-    }
-
-    @Override
-    public int getSingleSlabId() {
-        return WOOD_SLAB;
-    }
-
-    @Override
-    public double getHardness() {
-        return 2;
-    }
-
-    @Override
-    public double getResistance() {
-        return 15;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_AXE;
-    }
-
-    @Override
-    public String getSlabName() {
-        return NAMES[this.getDamage() & 0x07];
-    }
-
-    @Override
-    public int getItemDamage() {
-        return this.getDamage() & 0x07;
-    }
-
-    @Override
     public BlockColor getColor() {
         switch (this.getDamage() & 0x07) {
             default:
@@ -80,5 +45,40 @@ public class BlockDoubleSlabWood extends BlockDoubleSlabBase  {
             case 5: //DARK OAK
                 return BlockColor.BROWN_BLOCK_COLOR;
         }
+    }
+
+    @Override
+    public double getHardness() {
+        return 2;
+    }
+
+    @Override
+    public int getId() {
+        return DOUBLE_WOOD_SLAB;
+    }
+
+    @Override
+    public int getItemDamage() {
+        return this.getDamage() & 0x07;
+    }
+
+    @Override
+    public double getResistance() {
+        return 15;
+    }
+
+    @Override
+    public int getSingleSlabId() {
+        return WOOD_SLAB;
+    }
+
+    @Override
+    public String getSlabName() {
+        return NAMES[this.getDamage() & 0x07];
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_AXE;
     }
 }

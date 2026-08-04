@@ -19,6 +19,16 @@ public class BlockTrapdoorIron extends BlockTrapdoor {
     }
 
     @Override
+    public BlockColor getColor() {
+        return BlockColor.IRON_BLOCK_COLOR;
+    }
+
+    @Override
+    public double getHardness() {
+        return 5;
+    }
+
+    @Override
     public int getId() {
         return IRON_TRAPDOOR;
     }
@@ -26,11 +36,6 @@ public class BlockTrapdoorIron extends BlockTrapdoor {
     @Override
     public String getName() {
         return "Iron Trapdoor";
-    }
-
-    @Override
-    public double getHardness() {
-        return 5;
     }
 
     @Override
@@ -44,17 +49,12 @@ public class BlockTrapdoorIron extends BlockTrapdoor {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.IRON_BLOCK_COLOR;
-    }
-
-    @Override
-    public boolean onActivate(Item item, Player player) {
+    public boolean canHarvestWithHand() {
         return false;
     }
 
     @Override
-    public boolean canHarvestWithHand() {
+    public boolean onActivate(Item item, Player player) {
         return false;
     }
 }

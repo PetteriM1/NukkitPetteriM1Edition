@@ -17,6 +17,14 @@ public class LazilyInitializedMaterialTag implements MaterialTag {
         this.tag = tag;
     }
 
+    @Override
+    public Set<MaterialType> getMaterials() {
+        if (this.materials == null) {
+            this.init();
+        }
+        return this.materials;
+    }
+
     private void init() {
         Set<String> definitions = MaterialTags.getVanillaDefinitions(tag);
         if (definitions == null) {
@@ -36,13 +44,5 @@ public class LazilyInitializedMaterialTag implements MaterialTag {
         }
 
         this.materials = Collections.unmodifiableSet(materials);
-    }
-
-    @Override
-    public Set<MaterialType> getMaterials() {
-        if (this.materials == null) {
-            this.init();
-        }
-        return this.materials;
     }
 }

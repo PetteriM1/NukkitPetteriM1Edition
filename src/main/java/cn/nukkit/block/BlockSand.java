@@ -26,13 +26,31 @@ public class BlockSand extends BlockFallableMeta {
     }
 
     @Override
-    public int getId() {
-        return SAND;
+    public BlockColor getColor() {
+        if (this.getDamage() == 0x01) {
+            return BlockColor.ORANGE_BLOCK_COLOR;
+        }
+
+        return BlockColor.SAND_BLOCK_COLOR;
     }
 
     @Override
     public double getHardness() {
         return 0.5;
+    }
+
+    @Override
+    public int getId() {
+        return SAND;
+    }
+
+    @Override
+    public String getName() {
+        if (this.getDamage() == 0x01) {
+            return "Red Sand";
+        }
+
+        return "Sand";
     }
 
     @Override
@@ -46,21 +64,8 @@ public class BlockSand extends BlockFallableMeta {
     }
 
     @Override
-    public String getName() {
-        if (this.getDamage() == 0x01) {
-            return "Red Sand";
-        }
-
-        return "Sand";
-    }
-
-    @Override
-    public BlockColor getColor() {
-        if (this.getDamage() == 0x01) {
-            return BlockColor.ORANGE_BLOCK_COLOR;
-        }
-
-        return BlockColor.SAND_BLOCK_COLOR;
+    public boolean canBeActivated() {
+        return true;
     }
 
     @Override
@@ -80,10 +85,5 @@ public class BlockSand extends BlockFallableMeta {
         }
 
         return false;
-    }
-
-    @Override
-    public boolean canBeActivated() {
-        return true;
     }
 }

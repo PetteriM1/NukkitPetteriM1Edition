@@ -9,6 +9,16 @@ public class BlockNetheriteBlock extends BlockSolid {
     }
 
     @Override
+    public BlockColor getColor() {
+        return BlockColor.BLACK_BLOCK_COLOR;
+    }
+
+    @Override
+    public double getHardness() {
+        return 50; //35
+    }
+
+    @Override
     public int getId() {
         return NETHERITE_BLOCK;
     }
@@ -19,23 +29,13 @@ public class BlockNetheriteBlock extends BlockSolid {
     }
 
     @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
-    }
-
-    @Override
-    public double getHardness() {
-        return 35;
-    }
-
-    @Override
     public double getResistance() {
         return 6000;
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.BLACK_BLOCK_COLOR;
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
     }
 
     @Override

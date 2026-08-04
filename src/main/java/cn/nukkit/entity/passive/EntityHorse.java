@@ -1,5 +1,7 @@
 package cn.nukkit.entity.passive;
 
+import cn.nukkit.Player;
+import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.data.IntEntityData;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
@@ -23,16 +25,20 @@ public class EntityHorse extends EntityHorseBase {
     }
 
     @Override
-    public int getNetworkId() {
-        return NETWORK_ID;
-    }
+    public Item[] getDrops() {
+        List<Item> drops = new ArrayList<>();
 
-    @Override
-    public float getWidth() {
-        if (this.isBaby()) {
-            return 0.6982f;
+        if (!this.isBaby()) {
+            for (int i = 0; i < Utils.rand(0, 2); i++) {
+                drops.add(Item.get(Item.LEATHER, 0, 1));
+            }
         }
-        return 1.3965f;
+
+        if (this.isSaddled()) {
+            drops.add(Item.get(Item.SADDLE, 0, 1));
+        }
+
+        return drops.toArray(new Item[0]);
     }
 
     @Override
@@ -41,6 +47,28 @@ public class EntityHorse extends EntityHorseBase {
             return 0.8f;
         }
         return 1.6f;
+    }
+
+    @Override
+    public double getHorseJumpSpeed() {
+        return 0.07;
+    }
+
+    @Override
+    public int getNetworkId() {
+        return NETWORK_ID;
+    }
+
+    private static int getRandomVariant() {
+        return VARIANTS[Utils.rand(0, VARIANTS.length - 1)];
+    }
+
+    @Override
+    public float getWidth() {
+        if (this.isBaby()) {
+            return 0.6982f;
+        }
+        return 1.3965f;
     }
 
     @Override
@@ -65,19 +93,14 @@ public class EntityHorse extends EntityHorseBase {
     }
 
     @Override
-    public Item[] getDrops() {
-        List<Item> drops = new ArrayList<>();
+    public boolean targetOption(EntityCreature creature, double distance) {
+        boolean canTarget = super.targetOption(creature, distance);
 
-        if (!this.isBaby()) {
-            for (int i = 0; i < Utils.rand(0, 2); i++) {
-                drops.add(Item.get(Item.LEATHER, 0, 1));
-            }
+        if (canTarget && (creature instanceof Player)) {
+            Player player = (Player) creature;
+            return player.spawned && player.isAlive() && !player.closed &&
+                    this.isFeedItem(player.getInventory().getItemInHandFast()) && distance <= 49;
         }
-
-        return drops.toArray(new Item[0]);
-    }
-
-    private static int getRandomVariant() {
-        return VARIANTS[Utils.rand(0, VARIANTS.length - 1)];
+        return false;
     }
 }

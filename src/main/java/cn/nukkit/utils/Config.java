@@ -3,6 +3,7 @@ package cn.nukkit.utils;
 import cn.nukkit.Nukkit;
 import cn.nukkit.Server;
 import cn.nukkit.scheduler.FileWriteTask;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -17,6 +18,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 /**
@@ -32,8 +36,8 @@ public class Config {
     public static final int CNF = Config.PROPERTIES; // .cnf
     public static final int JSON = 1; // .js, .json
     public static final int YAML = 2; // .yml, .yaml
-    //public static final int EXPORT = 3; // .export, .xport
-    //public static final int SERIALIZED = 4; // .sl
+    public static final int EXPORT = 3; // .export, .xport
+    public static final int SERIALIZED = 4; // .sl
     public static final int ENUM = 5; // .txt, .list, .enum
     public static final int ENUMERATION = Config.ENUM;
 
@@ -43,9 +47,11 @@ public class Config {
     private int type = Config.DETECT;
 
     /**
-     * List of supported config file formats and their types
+     * List of supported config file formats
      */
     public static final Map<String, Integer> format = new TreeMap<>();
+
+    private static final ExecutorService ORDERED_ASYNC_WRITER;
 
     static {
         format.put("properties", Config.PROPERTIES);
@@ -56,11 +62,18 @@ public class Config {
         format.put("json", Config.JSON);
         format.put("yml", Config.YAML);
         format.put("yaml", Config.YAML);
-        //format.put("sl", Config.SERIALIZED);
-        //format.put("serialize", Config.SERIALIZED);
+        format.put("sl", Config.SERIALIZED);
+        format.put("serialize", Config.SERIALIZED);
         format.put("txt", Config.ENUM);
         format.put("list", Config.ENUM);
         format.put("enum", Config.ENUM);
+
+        ThreadFactoryBuilder builder = new ThreadFactoryBuilder();
+        builder.setNameFormat("Ordered async Config writer");
+        builder.setUncaughtExceptionHandler((thread, ex) -> {
+            Server.getInstance().getLogger().error("Exception in " + thread.getName(), ex);
+        });
+        ORDERED_ASYNC_WRITER = Executors.newSingleThreadExecutor(builder.build());
     }
 
     /**
@@ -97,7 +110,6 @@ public class Config {
         this(file.toString(), type, new ConfigSection());
     }
 
-    @Deprecated
     public Config(String file, int type, LinkedHashMap<String, Object> defaultMap) {
         this.load(file, type, new ConfigSection(defaultMap));
     }
@@ -110,19 +122,233 @@ public class Config {
         this.load(file.toString(), type, defaultMap);
     }
 
-    @Deprecated
     public Config(File file, int type, LinkedHashMap<String, Object> defaultMap) {
         this(file.toString(), type, new ConfigSection(defaultMap));
     }
+    private static final Pattern PROP_LINE_PATTERN = Pattern.compile("[a-zA-Z0-9\\-_.]*+=+[^\\r\\n]*");
+
+    private static class LinkedHashMapTypeToken extends TypeToken<LinkedHashMap<String, Object>> {
+    }
+
+    public void setAll(LinkedHashMap<String, Object> map) {
+        this.config = new ConfigSection(map);
+    }
+
+    public void setAll(ConfigSection section) {
+        this.config = section;
+    }
+
+    public Map<String, Object> getAll() {
+        return this.config.getAllMap();
+    }
+
+    public Set<String> getKeys() {
+        if (this.correct) return config.getKeys();
+        return new HashSet<>();
+    }
 
     /**
-     * Reload config from disk
+     * Get root (main) config section of the Config
+     *
+     * @return root config section of the Config
      */
-    public void reload() {
-        this.config.clear();
-        this.correct = false;
-        if (this.file == null) throw new IllegalStateException("Failed to reload Config. File object is undefined.");
-        this.load(this.file.toString(), this.type);
+    public ConfigSection getRootSection() {
+        return config;
+    }
+
+    public ConfigSection getSections() {
+        return this.correct ? this.config.getSections() : new ConfigSection();
+    }
+
+    /**
+     * Check if the config is valid
+     *
+     * @return valid
+     */
+    public boolean isCorrect() {
+        return this.correct;
+    }
+
+    /**
+     * Check if the config is valid
+     *
+     * @return valid
+     */
+    public boolean check() {
+        return this.correct;
+    }
+
+    public boolean exists(String key) {
+        return config.exists(key);
+    }
+
+    public boolean exists(String key, boolean ignoreCase) {
+        return config.exists(key, ignoreCase);
+    }
+
+    private ConfigSection fillDefaults(ConfigSection defaultMap, ConfigSection data) {
+        for (String key : defaultMap.keySet()) {
+            if (!data.containsKey(key)) {
+                data.put(key, defaultMap.get(key));
+            }
+        }
+        return data;
+    }
+
+    /**
+     * Get a value in the config
+     *
+     * @param key key
+     * @return value
+     */
+    public Object get(String key) {
+        return this.get(key, null);
+    }
+
+    public <T> T get(String key, T defaultValue) {
+        return this.correct ? this.config.get(key, defaultValue) : defaultValue;
+    }
+
+    public boolean getBoolean(String key) {
+        return this.getBoolean(key, false);
+    }
+
+    public boolean getBoolean(String key, boolean defaultValue) {
+        return this.correct ? this.config.getBoolean(key, defaultValue) : defaultValue;
+    }
+
+    public List<Boolean> getBooleanList(String key) {
+        return config.getBooleanList(key);
+    }
+
+    public List<Byte> getByteList(String key) {
+        return config.getByteList(key);
+    }
+
+    public List<Character> getCharacterList(String key) {
+        return config.getCharacterList(key);
+    }
+
+    public double getDouble(String key) {
+        return this.getDouble(key, 0);
+    }
+
+    public double getDouble(String key, double defaultValue) {
+        return this.correct ? this.config.getDouble(key, defaultValue) : defaultValue;
+    }
+
+    public List<Double> getDoubleList(String key) {
+        return config.getDoubleList(key);
+    }
+
+    public List<Float> getFloatList(String key) {
+        return config.getFloatList(key);
+    }
+
+    public int getInt(String key) {
+        return this.getInt(key, 0);
+    }
+
+    public int getInt(String key, int defaultValue) {
+        return this.correct ? this.config.getInt(key, defaultValue) : defaultValue;
+    }
+
+    public List<Integer> getIntegerList(String key) {
+        return config.getIntegerList(key);
+    }
+
+    public Set<String> getKeys(boolean child) {
+        if (this.correct) return config.getKeys(child);
+        return new HashSet<>();
+    }
+
+    public List getList(String key) {
+        return this.getList(key, null);
+    }
+
+    public List getList(String key, List defaultList) {
+        return this.correct ? this.config.getList(key, defaultList) : defaultList;
+    }
+
+    public long getLong(String key) {
+        return this.getLong(key, 0);
+    }
+
+    public long getLong(String key, long defaultValue) {
+        return this.correct ? this.config.getLong(key, defaultValue) : defaultValue;
+    }
+
+    public List<Long> getLongList(String key) {
+        return config.getLongList(key);
+    }
+
+    public List<Map> getMapList(String key) {
+        return config.getMapList(key);
+    }
+
+    public Object getNested(String key) {
+        return get(key);
+    }
+
+    public <T> T getNested(String key, T defaultValue) {
+        return get(key, defaultValue);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T getNestedAs(String key, Class<T> type) {
+        return (T) get(key);
+    }
+
+    public ConfigSection getSection(String key) {
+        return this.correct ? this.config.getSection(key) : new ConfigSection();
+    }
+
+    public ConfigSection getSections(String key) {
+        return this.correct ? this.config.getSections(key) : new ConfigSection();
+    }
+
+    public List<Short> getShortList(String key) {
+        return config.getShortList(key);
+    }
+
+    public String getString(String key) {
+        return this.getString(key, "");
+    }
+
+    public String getString(String key, String defaultValue) {
+        return this.correct ? this.config.getString(key, defaultValue) : defaultValue;
+    }
+
+    public List<String> getStringList(String key) {
+        return config.getStringList(key);
+    }
+
+    public boolean isBoolean(String key) {
+        return config.isBoolean(key);
+    }
+
+    public boolean isDouble(String key) {
+        return config.isDouble(key);
+    }
+
+    public boolean isInt(String key) {
+        return config.isInt(key);
+    }
+
+    public boolean isList(String key) {
+        return config.isList(key);
+    }
+
+    public boolean isLong(String key) {
+        return config.isLong(key);
+    }
+
+    public boolean isSection(String key) {
+        return config.isSection(key);
+    }
+
+    public boolean isString(String key) {
+        return config.isString(key);
     }
 
     /**
@@ -149,8 +375,8 @@ public class Config {
     /**
      * Try to load a config file with a given type and default content
      *
-     * @param file file path
-     * @param type file type
+     * @param file       file path
+     * @param type       file type
      * @param defaultMap default content
      * @return loaded
      */
@@ -163,7 +389,7 @@ public class Config {
                 this.file.getParentFile().mkdirs();
                 this.file.createNewFile();
             } catch (IOException e) {
-                MainLogger.getLogger().error("Could not create Config " + this.file.toString(), e);
+                MainLogger.getLogger().error("Could not create Config " + this.file, e);
             }
             this.config = defaultMap;
             this.save();
@@ -240,28 +466,96 @@ public class Config {
         return this;
     }
 
-    /**
-     * Check if the config is valid
-     *
-     * @return valid
-     */
-    public boolean check() {
-        return this.correct;
+    @SuppressWarnings("unchecked")
+    private void parseContent(String content) {
+        switch (this.type) {
+            case Config.PROPERTIES:
+                this.parseProperties(content);
+                break;
+            case Config.JSON:
+                GsonBuilder builder = new GsonBuilder();
+                Gson gson = builder.create();
+                this.config = new ConfigSection(gson.fromJson(content, new LinkedHashMapTypeToken()));
+                break;
+            case Config.YAML:
+                DumperOptions dumperOptions = new DumperOptions();
+                dumperOptions.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+                LoaderOptions loaderOptions = new LoaderOptions();
+                loaderOptions.setCodePointLimit(104857600); // Allow over 3mb config files
+                Yaml yaml = new Yaml(new Constructor(loaderOptions), new Representer(dumperOptions), dumperOptions, loaderOptions, new Resolver());
+                this.config = new ConfigSection(yaml.loadAs(content, LinkedHashMap.class));
+                break;
+            case Config.ENUM:
+                this.parseList(content);
+                break;
+            default:
+                this.correct = false;
+        }
+    }
+
+    private void parseList(String content) {
+        content = content.replace("\r\n", "\n");
+        for (String v : content.split("\n")) {
+            if (v.trim().isEmpty()) {
+                continue;
+            }
+            config.put(v, true);
+        }
+    }
+
+    private void parseProperties(String content) {
+        for (final String line : content.split("\n")) {
+            if (PROP_LINE_PATTERN.matcher(line).matches()) {
+                final int splitIndex = line.indexOf('=');
+                if (splitIndex == -1) {
+                    continue;
+                }
+                final String key = line.substring(0, splitIndex);
+                final String value = line.substring(splitIndex + 1);
+                if (Nukkit.DEBUG > 1 && this.config.containsKey(key)) {
+                    MainLogger.getLogger().debug("[Config] Repeated property " + key + " in file " + this.file.toString());
+                }
+                switch (value.toLowerCase(Locale.ROOT)) {
+                    case "on":
+                    case "true":
+                    case "yes":
+                        this.config.put(key, true);
+                        break;
+                    case "off":
+                    case "false":
+                    case "no":
+                        this.config.put(key, false);
+                        break;
+                    default:
+                        this.config.put(key, value);
+                        break;
+                }
+            }
+        }
     }
 
     /**
-     * Check if the config is valid
-     *
-     * @return valid
+     * Reload config from disk
      */
-    public boolean isCorrect() {
-        return this.correct;
+    public void reload() {
+        this.config.clear();
+        this.correct = false;
+        if (this.file == null) throw new IllegalStateException("Failed to reload Config. File object is undefined.");
+        this.load(this.file.toString(), this.type);
+    }
+
+    public void remove(String key) {
+        config.remove(key);
+    }
+
+    public void removeNested(String key) {
+        remove(key);
     }
 
     /**
      * Save configuration into provided file. Internal file object will be set to new file.
      *
-     * @param file file
+     * @param file  file
      * @param async async
      * @return save success
      */
@@ -297,9 +591,17 @@ public class Config {
      * @return saved
      */
     public boolean save(Boolean async) { // Note: do not change to 'boolean' or plugins will break
-        if (this.file == null) throw new IllegalStateException("Failed to save Config. File object is undefined.");
+        return save(async, false);
+    }
+
+    public boolean save(boolean fullyAsync, boolean orderedAsync) {
+        if (this.file == null) {
+            throw new IllegalStateException("Failed to save Config. File object is undefined.");
+        }
+
         if (this.correct) {
-            StringBuilder content = new StringBuilder();
+            final StringBuilder content;
+
             switch (this.type) {
                 case Config.PROPERTIES:
                     content = new StringBuilder(this.writeProperties());
@@ -316,14 +618,26 @@ public class Config {
                     content = new StringBuilder(yaml.dump(this.config));
                     break;
                 case Config.ENUM:
+                    content = new StringBuilder();
                     for (Object o : this.config.entrySet()) {
                         Map.Entry entry = (Map.Entry) o;
                         content.append(entry.getKey()).append("\r\n");
                     }
                     break;
+                default:
+                    return false;
             }
-            if (async) {
-                Server.getInstance().getScheduler().scheduleAsyncTask(null, new FileWriteTask(this.file, content.toString()));
+
+            if (fullyAsync) {
+                Server.getInstance().getScheduler().scheduleAsyncTask(new FileWriteTask(this.file, content));
+            } else if (orderedAsync) {
+                ORDERED_ASYNC_WRITER.execute(() -> {
+                    try {
+                        Utils.writeFile(this.file, content.toString());
+                    } catch (IOException e) {
+                        Server.getInstance().getLogger().logException(e);
+                    }
+                });
             } else {
                 try {
                     Utils.writeFile(this.file, content.toString());
@@ -340,186 +654,11 @@ public class Config {
     /**
      * Set a value in the config
      *
-     * @param key key
+     * @param key   key
      * @param value value
      */
     public void set(final String key, Object value) {
         this.config.set(key, value);
-    }
-
-    /**
-     * Get a value in the config
-     *
-     * @param key key
-     * @return value
-     */
-    public Object get(String key) {
-        return this.get(key, null);
-    }
-
-    public <T> T get(String key, T defaultValue) {
-        return this.correct ? this.config.get(key, defaultValue) : defaultValue;
-    }
-
-    public ConfigSection getSection(String key) {
-        return this.correct ? this.config.getSection(key) : new ConfigSection();
-    }
-
-    public boolean isSection(String key) {
-        return config.isSection(key);
-    }
-
-    public ConfigSection getSections(String key) {
-        return this.correct ? this.config.getSections(key) : new ConfigSection();
-    }
-
-    public ConfigSection getSections() {
-        return this.correct ? this.config.getSections() : new ConfigSection();
-    }
-
-    public int getInt(String key) {
-        return this.getInt(key, 0);
-    }
-
-    public int getInt(String key, int defaultValue) {
-        return this.correct ? this.config.getInt(key, defaultValue) : defaultValue;
-    }
-
-    public boolean isInt(String key) {
-        return config.isInt(key);
-    }
-
-    public long getLong(String key) {
-        return this.getLong(key, 0);
-    }
-
-    public long getLong(String key, long defaultValue) {
-        return this.correct ? this.config.getLong(key, defaultValue) : defaultValue;
-    }
-
-    public boolean isLong(String key) {
-        return config.isLong(key);
-    }
-
-    public double getDouble(String key) {
-        return this.getDouble(key, 0);
-    }
-
-    public double getDouble(String key, double defaultValue) {
-        return this.correct ? this.config.getDouble(key, defaultValue) : defaultValue;
-    }
-
-    public boolean isDouble(String key) {
-        return config.isDouble(key);
-    }
-
-    public String getString(String key) {
-        return this.getString(key, "");
-    }
-
-    public String getString(String key, String defaultValue) {
-        return this.correct ? this.config.getString(key, defaultValue) : defaultValue;
-    }
-
-    public boolean isString(String key) {
-        return config.isString(key);
-    }
-
-    public boolean getBoolean(String key) {
-        return this.getBoolean(key, false);
-    }
-
-    public boolean getBoolean(String key, boolean defaultValue) {
-        return this.correct ? this.config.getBoolean(key, defaultValue) : defaultValue;
-    }
-
-    public boolean isBoolean(String key) {
-        return config.isBoolean(key);
-    }
-
-    public List getList(String key) {
-        return this.getList(key, null);
-    }
-
-    public List getList(String key, List defaultList) {
-        return this.correct ? this.config.getList(key, defaultList) : defaultList;
-    }
-
-    public boolean isList(String key) {
-        return config.isList(key);
-    }
-
-    public List<String> getStringList(String key) {
-        return config.getStringList(key);
-    }
-
-    public List<Integer> getIntegerList(String key) {
-        return config.getIntegerList(key);
-    }
-
-    public List<Boolean> getBooleanList(String key) {
-        return config.getBooleanList(key);
-    }
-
-    public List<Double> getDoubleList(String key) {
-        return config.getDoubleList(key);
-    }
-
-    public List<Float> getFloatList(String key) {
-        return config.getFloatList(key);
-    }
-
-    public List<Long> getLongList(String key) {
-        return config.getLongList(key);
-    }
-
-    public List<Byte> getByteList(String key) {
-        return config.getByteList(key);
-    }
-
-    public List<Character> getCharacterList(String key) {
-        return config.getCharacterList(key);
-    }
-
-    public List<Short> getShortList(String key) {
-        return config.getShortList(key);
-    }
-
-    public List<Map> getMapList(String key) {
-        return config.getMapList(key);
-    }
-
-    public void setAll(LinkedHashMap<String, Object> map) {
-        this.config = new ConfigSection(map);
-    }
-
-    public void setAll(ConfigSection section) {
-        this.config = section;
-    }
-
-    public boolean exists(String key) {
-        return config.exists(key);
-    }
-
-    public boolean exists(String key, boolean ignoreCase) {
-        return config.exists(key, ignoreCase);
-    }
-
-    public void remove(String key) {
-        config.remove(key);
-    }
-
-    public Map<String, Object> getAll() {
-        return this.config.getAllMap();
-    }
-
-    /**
-     * Get root (main) config section of the Config
-     *
-     * @return root config section of the Config
-     */
-    public ConfigSection getRootSection() {
-        return config;
     }
 
     public int setDefault(LinkedHashMap<String, Object> map) {
@@ -532,23 +671,12 @@ public class Config {
         return this.config.size() - size;
     }
 
-
-    private ConfigSection fillDefaults(ConfigSection defaultMap, ConfigSection data) {
-        for (String key : defaultMap.keySet()) {
-            if (!data.containsKey(key)) {
-                data.put(key, defaultMap.get(key));
-            }
-        }
-        return data;
-    }
-
-    private void parseList(String content) {
-        content = content.replace("\r\n", "\n");
-        for (String v : content.split("\n")) {
-            if (v.trim().isEmpty()) {
-                continue;
-            }
-            config.put(v, true);
+    public static void shutdownWriter() {
+        try {
+            ORDERED_ASYNC_WRITER.shutdown();
+            ORDERED_ASYNC_WRITER.awaitTermination(1, TimeUnit.DAYS);
+        } catch (InterruptedException e) {
+            Server.getInstance().getLogger().error("Error while shutting down Ordered async Config writer", e);
         }
     }
 
@@ -564,112 +692,5 @@ public class Config {
             content.append(k).append('=').append(v).append("\r\n");
         }
         return content.toString();
-    }
-
-    private static final Pattern PROP_LINE_PATTERN = Pattern.compile("[a-zA-Z0-9\\-_.]*+=+[^\\r\\n]*");
-
-    private void parseProperties(String content) {
-        for (final String line : content.split("\n")) {
-            if (PROP_LINE_PATTERN.matcher(line).matches()) {
-                final int splitIndex = line.indexOf('=');
-                if (splitIndex == -1) {
-                    continue;
-                }
-                final String key = line.substring(0, splitIndex);
-                final String value = line.substring(splitIndex + 1);
-                if (Nukkit.DEBUG > 1 && this.config.containsKey(key)) {
-                    MainLogger.getLogger().debug("[Config] Repeated property " + key + " in file " + this.file.toString());
-                }
-                switch (value.toLowerCase(Locale.ROOT)) {
-                    case "on":
-                    case "true":
-                    case "yes":
-                        this.config.put(key, true);
-                        break;
-                    case "off":
-                    case "false":
-                    case "no":
-                        this.config.put(key, false);
-                        break;
-                    default:
-                        this.config.put(key, value);
-                        break;
-                }
-            }
-        }
-    }
-
-    /**
-     * @deprecated use {@link #get(String)} instead
-     */
-    @Deprecated
-    public Object getNested(String key) {
-        return get(key);
-    }
-
-    /**
-     * @deprecated use {@link #get(String, Object)} instead
-     */
-    @Deprecated
-    public <T> T getNested(String key, T defaultValue) {
-        return get(key, defaultValue);
-    }
-
-    /**
-     * @deprecated use {@link #get(String)} instead
-     */
-    @Deprecated
-    @SuppressWarnings("unchecked")
-    public <T> T getNestedAs(String key, Class<T> type) {
-        return (T) get(key);
-    }
-
-    /**
-     * @deprecated use {@link #remove(String)} instead
-     */
-    @Deprecated
-    public void removeNested(String key) {
-        remove(key);
-    }
-
-    @SuppressWarnings("unchecked")
-    private void parseContent(String content) {
-        switch (this.type) {
-            case Config.PROPERTIES:
-                this.parseProperties(content);
-                break;
-            case Config.JSON:
-                GsonBuilder builder = new GsonBuilder();
-                Gson gson = builder.create();
-                this.config = new ConfigSection(gson.fromJson(content, new LinkedHashMapTypeToken()));
-                break;
-            case Config.YAML:
-                DumperOptions dumperOptions = new DumperOptions();
-                dumperOptions.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-                LoaderOptions loaderOptions = new LoaderOptions();
-                loaderOptions.setCodePointLimit(104857600); // Allow over 3mb config files
-                Yaml yaml = new Yaml(new Constructor(loaderOptions), new Representer(dumperOptions), dumperOptions, loaderOptions, new Resolver());
-                this.config = new ConfigSection(yaml.loadAs(content, LinkedHashMap.class));
-                break;
-            // case Config.SERIALIZED
-            case Config.ENUM:
-                this.parseList(content);
-                break;
-            default:
-                this.correct = false;
-        }
-    }
-
-    public Set<String> getKeys() {
-        if (this.correct) return config.getKeys();
-        return new HashSet<>();
-    }
-
-    public Set<String> getKeys(boolean child) {
-        if (this.correct) return config.getKeys(child);
-        return new HashSet<>();
-    }
-
-    private static class LinkedHashMapTypeToken extends TypeToken<LinkedHashMap<String, Object>> {
     }
 }

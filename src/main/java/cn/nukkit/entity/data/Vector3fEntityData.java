@@ -27,11 +27,6 @@ public class Vector3fEntityData extends EntityData<Vector3f> {
     }
 
     @Override
-    public Vector3f getData() {
-        return new Vector3f(x, y, z);
-    }
-
-    @Override
     public void setData(Vector3f data) {
         if (data != null) {
             this.x = data.x;
@@ -40,6 +35,11 @@ public class Vector3fEntityData extends EntityData<Vector3f> {
         } else if (Nukkit.DEBUG > 1) {
             Server.getInstance().getLogger().warning("Vector3fEntityData setData called with null. This was allowed but does not reset the value.", new Throwable(""));
         }
+    }
+
+    @Override
+    public Vector3f getData() {
+        return new Vector3f(x, y, z);
     }
 
     @Override

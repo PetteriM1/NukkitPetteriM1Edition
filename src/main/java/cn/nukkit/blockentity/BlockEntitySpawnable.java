@@ -19,17 +19,26 @@ public abstract class BlockEntitySpawnable extends BlockEntity {
         super(chunk, nbt);
     }
 
-    @Override
-    protected void initBlockEntity() {
-        super.initBlockEntity();
-
-        this.spawnToAll();
-    }
-
     public abstract CompoundTag getSpawnCompound();
 
     public BlockEntityDataPacket createSpawnPacket() {
         CompoundTag tag = this.getSpawnCompound();
+        BlockEntityDataPacket pk = new BlockEntityDataPacket();
+        pk.x = (int) this.x;
+        pk.y = (int) this.y;
+        pk.z = (int) this.z;
+
+        try {
+            pk.namedTag = NBTIO.write(tag, ByteOrder.LITTLE_ENDIAN, true);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return pk;
+    }
+
+    protected BlockEntityDataPacket createSpawnPacket(int protocol) {
+        CompoundTag tag = this.getSpawnCompound(protocol);
 
         BlockEntityDataPacket pk = new BlockEntityDataPacket();
         pk.x = (int) this.x;
@@ -43,6 +52,17 @@ public abstract class BlockEntitySpawnable extends BlockEntity {
         }
 
         return pk;
+    }
+
+    public CompoundTag getSpawnCompound(int protocol) {
+        return this.getSpawnCompound();
+    }
+
+    @Override
+    protected void initBlockEntity() {
+        super.initBlockEntity();
+
+        this.spawnToAll();
     }
 
     public void spawnTo(Player player) {
@@ -67,7 +87,7 @@ public abstract class BlockEntitySpawnable extends BlockEntity {
      * Called when a player updates a block entity's NBT data
      * for example when writing on a sign.
      *
-     * @param nbt tag
+     * @param nbt    tag
      * @param player player
      * @return bool indication of success, will respawn the tile to the player if false.
      */

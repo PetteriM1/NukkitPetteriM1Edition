@@ -18,34 +18,6 @@ import java.util.UUID;
 public interface IPlayer extends ServerOperator, Metadatable {
 
     /**
-     * Returns if this player is online.
-     *
-     * @return 这个玩家是否在线。<br>If this player is online.
-     */
-    boolean isOnline();
-
-    /**
-     * Returns the name of this player.
-     * <p>
-     * 如果是在线的玩家，这个函数只会返回登录名字。如果要返回显示的名字，参见{@link cn.nukkit.Player#getDisplayName}<br>
-     * Notice that this will only return its login name. If you need its display name, turn to
-     * {@link cn.nukkit.Player#getDisplayName}
-     *
-     * @return 这个玩家的名称。<br>The name of this player.
-     */
-    String getName();
-    
-    UUID getUniqueId();
-
-    /**
-     * Returns if this player is banned.
-     *
-     * @return 这个玩家的名称。<br>The name of this player.
-     * @see #setBanned
-     */
-    boolean isBanned();
-
-    /**
      * Sets this player to be banned or to be pardoned.
      *
      * @param value 如果为{@code true}，封禁这个玩家。如果为{@code false}，解封这个玩家。<br>
@@ -53,14 +25,6 @@ public interface IPlayer extends ServerOperator, Metadatable {
      * @see #isBanned
      */
     void setBanned(boolean value);
-
-    /**
-     * Returns if this player is pardoned by whitelist.
-     *
-     * @return 这个玩家是否已加入白名单。<br>If this player is pardoned by whitelist.
-     * @see cn.nukkit.Server#isWhitelisted
-     */
-    boolean isWhitelisted();
 
     /**
      * Adds this player to the white list, or removes it from the whitelist.
@@ -72,6 +36,31 @@ public interface IPlayer extends ServerOperator, Metadatable {
      * @see cn.nukkit.Server#removeWhitelist
      */
     void setWhitelisted(boolean value);
+
+    /**
+     * Returns the time this player first played in this server.
+     *
+     * @return Unix时间（以秒为单位。<br>Unix time in seconds.
+     */
+    Long getFirstPlayed();
+
+    /**
+     * Returns the time this player last joined in this server.
+     *
+     * @return Unix时间（以秒为单位。<br>Unix time in seconds.
+     */
+    Long getLastPlayed();
+
+    /**
+     * Returns the name of this player.
+     * <p>
+     * 如果是在线的玩家，这个函数只会返回登录名字。如果要返回显示的名字，参见{@link cn.nukkit.Player#getDisplayName}<br>
+     * Notice that this will only return its login name. If you need its display name, turn to
+     * {@link cn.nukkit.Player#getDisplayName}
+     *
+     * @return 这个玩家的名称。<br>The name of this player.
+     */
+    String getName();
 
     /**
      * Returns a {@code Player} object for this interface.
@@ -88,19 +77,30 @@ public interface IPlayer extends ServerOperator, Metadatable {
      */
     Server getServer();
 
-    /**
-     * Returns the time this player first played in this server.
-     *
-     * @return Unix时间（以秒为单位。<br>Unix time in seconds.
-     */
-    Long getFirstPlayed();
+    UUID getUniqueId();
 
     /**
-     * Returns the time this player last joined in this server.
+     * Returns if this player is banned.
      *
-     * @return Unix时间（以秒为单位。<br>Unix time in seconds.
+     * @return 这个玩家的名称。<br>The name of this player.
+     * @see #setBanned
      */
-    Long getLastPlayed();
+    boolean isBanned();
+
+    /**
+     * Returns if this player is online.
+     *
+     * @return 这个玩家是否在线。<br>If this player is online.
+     */
+    boolean isOnline();
+
+    /**
+     * Returns if this player is pardoned by whitelist.
+     *
+     * @return 这个玩家是否已加入白名单。<br>If this player is pardoned by whitelist.
+     * @see cn.nukkit.Server#isWhitelisted
+     */
+    boolean isWhitelisted();
 
     /**
      * Returns if this player has played in this server before.

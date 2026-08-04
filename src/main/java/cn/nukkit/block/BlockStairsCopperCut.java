@@ -5,13 +5,18 @@ import cn.nukkit.block.properties.OxidizationLevel;
 import java.util.Locale;
 
 public class BlockStairsCopperCut extends BlockStairsCopperBase {
-    
+
     public BlockStairsCopperCut() {
         this(0);
     }
-    
+
     public BlockStairsCopperCut(int meta) {
         super(meta);
+    }
+
+    @Override
+    public int getId() {
+        return CUT_COPPER_STAIRS;
     }
 
     @Override
@@ -30,10 +35,9 @@ public class BlockStairsCopperCut extends BlockStairsCopperBase {
     }
 
     @Override
-    public int getId() {
-        return CUT_COPPER_STAIRS;
+    public OxidizationLevel getOxidizationLevel() {
+        return OxidizationLevel.UNAFFECTED;
     }
-
 
     @Override
     protected int getCopperId(boolean waxed, OxidizationLevel oxidizationLevel) {
@@ -52,10 +56,5 @@ public class BlockStairsCopperCut extends BlockStairsCopperBase {
             default:
                 return this.getId();
         }
-    }
-
-    @Override
-    public OxidizationLevel getOxidizationLevel() {
-        return OxidizationLevel.UNAFFECTED;
     }
 }

@@ -18,45 +18,46 @@ public class ListChunkManager implements ChunkManager {
         this.blocks = new ArrayList<>();
     }
 
-    @Override
-    public int getBlockIdAt(int x, int y, int z, BlockLayer layer) {
-        Optional<Block> optionalBlock = this.blocks.stream().filter(block -> block.getFloorX() == x && block.getFloorY() == y && block.getFloorZ() == z && block.getLayer() == layer).findAny();
-        return optionalBlock.map(Block::getId).orElseGet(() -> this.parent.getBlockIdAt(x, y, z, layer));
+    public List<Block> getBlocks() {
+        return this.blocks;
     }
 
     @Override
-    public void setBlockIdAt(int x, int y, int z, BlockLayer layer, int id) {
-        Optional<Block> optionalBlock = this.blocks.stream().filter(block -> block.getFloorX() == x && block.getFloorY() == y && block.getFloorZ() == z && block.getLayer() == layer).findAny();
-        Block block = optionalBlock.orElse(Block.get(this.getBlockIdAt(x, y, z, layer), this.getBlockDataAt(x, y, z, layer), new Position(x, y, z), layer));
-        this.blocks.remove(block);
-        this.blocks.add(Block.get(this.getBlockIdAt(x, y, z, layer), this.getBlockDataAt(x, y, z, layer), new Position(x, y, z), layer));
+    public int getMaxBlockY() {
+        return parent instanceof Level ? parent.getMaxBlockY() : 255;
     }
 
     @Override
-    public void setBlockAt(int x, int y, int z, int id, int data) {
-        this.blocks.removeIf(block -> block.getFloorX() == x && block.getFloorY() == y && block.getFloorZ() == z);
-        this.blocks.add(Block.get(id, data, new Position(x, y, z)));
+    public int getMinBlockY() {
+        return parent instanceof Level ? parent.getMinBlockY() : 0;
     }
 
     @Override
-    public void setBlockFullIdAt(int x, int y, int z, BlockLayer layer, int fullId) {
-        this.blocks.removeIf(block -> block.getFloorX() == x && block.getFloorY() == y && block.getFloorZ() == z && block.getLayer() == layer);
-        this.blocks.add(Block.get(fullId, null, x, y, z, layer));
+    public long getSeed() {
+        return this.parent.getSeed();
     }
 
     @Override
     public int getBlockDataAt(int x, int y, int z, BlockLayer layer) {
-        Optional<Block> optionalBlock = this.blocks.stream().filter(block -> block.getFloorX() == x && block.getFloorY() == y && block.getFloorZ() == z && block.getLayer() == layer).findAny();
+        Optional<Block> optionalBlock = this.blocks.stream().filter(block -> block.getX() == x && block.getY() == y && block.getZ() == z && block.getLayer() == layer).findAny();
         return optionalBlock.map(Block::getDamage).orElseGet(() -> this.parent.getBlockDataAt(x, y, z, layer));
     }
 
     @Override
-    public void setBlockDataAt(int x, int y, int z, BlockLayer layer, int data) {
-        Optional<Block> optionalBlock = this.blocks.stream().filter(block -> block.getFloorX() == x && block.getFloorY() == y && block.getFloorZ() == z && block.getLayer() == layer).findAny();
-        Block block = optionalBlock.orElse(Block.get(this.getBlockIdAt(x, y, z, layer), this.getBlockDataAt(x, y, z, layer), new Position(x, y, z), layer));
-        this.blocks.remove(block);
-        block.setDamage(data);
-        this.blocks.add(block);
+    public int getBlockIdAt(int x, int y, int z, BlockLayer layer) {
+        Optional<Block> optionalBlock = this.blocks.stream().filter(block -> block.getX() == x && block.getY() == y && block.getZ() == z && block.getLayer() == layer).findAny();
+        return optionalBlock.map(Block::getId).orElseGet(() -> this.parent.getBlockIdAt(x, y, z, layer));
+    }
+
+    @Override
+    public BaseFullChunk getChunk(int chunkX, int chunkZ) {
+        return this.parent.getChunk(chunkX, chunkZ);
+    }
+
+    @Override
+    public void setBlockAt(int x, int y, int z, int id, int data) {
+        this.blocks.removeIf(block -> block.getX() == x && block.getY() == y && block.getZ() == z);
+        this.blocks.add(Block.get(id, data, new Position(x, y, z)));
     }
 
     @Override
@@ -66,14 +67,32 @@ public class ListChunkManager implements ChunkManager {
 
     @Override
     public boolean setBlockAtLayer(int x, int y, int z, BlockLayer layer, int id, int data) {
-        this.blocks.removeIf(block -> block.getFloorX() == x && block.getFloorY() == y && block.getFloorZ() == z && block.getLayer() == layer);
+        this.blocks.removeIf(block -> block.getX() == x && block.getY() == y && block.getZ() == z && block.getLayer() == layer);
         this.blocks.add(Block.get(id, data, new Position(x, y, z), layer));
         return true;
     }
 
     @Override
-    public BaseFullChunk getChunk(int chunkX, int chunkZ) {
-        return this.parent.getChunk(chunkX, chunkZ);
+    public void setBlockDataAt(int x, int y, int z, BlockLayer layer, int data) {
+        Optional<Block> optionalBlock = this.blocks.stream().filter(block -> block.getX() == x && block.getY() == y && block.getZ() == z && block.getLayer() == layer).findAny();
+        Block block = optionalBlock.orElse(Block.get(this.getBlockIdAt(x, y, z, layer), this.getBlockDataAt(x, y, z, layer), new Position(x, y, z), layer));
+        this.blocks.remove(block);
+        block.setDamage(data);
+        this.blocks.add(block);
+    }
+
+    @Override
+    public void setBlockFullIdAt(int x, int y, int z, BlockLayer layer, int fullId) {
+        this.blocks.removeIf(block -> block.getX() == x && block.getY() == y && block.getZ() == z && block.getLayer() == layer);
+        this.blocks.add(Block.get(fullId, null, x, y, z, layer));
+    }
+
+    @Override
+    public void setBlockIdAt(int x, int y, int z, BlockLayer layer, int id) {
+        Optional<Block> optionalBlock = this.blocks.stream().filter(block -> block.getX() == x && block.getY() == y && block.getZ() == z && block.getLayer() == layer).findAny();
+        Block block = optionalBlock.orElse(Block.get(this.getBlockIdAt(x, y, z, layer), this.getBlockDataAt(x, y, z, layer), new Position(x, y, z), layer));
+        this.blocks.remove(block);
+        this.blocks.add(Block.get(this.getBlockIdAt(x, y, z, layer), this.getBlockDataAt(x, y, z, layer), new Position(x, y, z), layer));
     }
 
     @Override
@@ -84,24 +103,5 @@ public class ListChunkManager implements ChunkManager {
     @Override
     public void setChunk(int chunkX, int chunkZ, BaseFullChunk chunk) {
         this.parent.setChunk(chunkX, chunkZ, chunk);
-    }
-
-    @Override
-    public long getSeed() {
-        return this.parent.getSeed();
-    }
-
-    public List<Block> getBlocks() {
-        return this.blocks;
-    }
-
-    @Override
-    public int getMinBlockY() {
-        return parent instanceof Level ? parent.getMinBlockY() : 0;
-    }
-
-    @Override
-    public int getMaxBlockY() {
-        return parent instanceof Level ? parent.getMaxBlockY() : 255;
     }
 }

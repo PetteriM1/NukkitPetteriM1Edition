@@ -31,6 +31,36 @@ public class EntityPotion extends EntityProjectile {
     }
 
     @Override
+    protected float getDrag() {
+        return 0.01f;
+    }
+
+    @Override
+    protected float getGravity() {
+        return 0.05f;
+    }
+
+    @Override
+    public float getHeight() {
+        return 0.25f;
+    }
+
+    @Override
+    public float getLength() {
+        return 0.25f;
+    }
+
+    @Override
+    public int getNetworkId() {
+        return NETWORK_ID;
+    }
+
+    @Override
+    public float getWidth() {
+        return 0.25f;
+    }
+
+    @Override
     protected void initEntity() {
         super.initEntity();
 
@@ -54,33 +84,28 @@ public class EntityPotion extends EntityProjectile {
     }
 
     @Override
-    public int getNetworkId() {
-        return NETWORK_ID;
+    public void onCollideWithEntity(Entity entity) {
+        this.splash(entity);
+        this.close();
     }
 
     @Override
-    public float getWidth() {
-        return 0.25f;
-    }
+    public boolean onUpdate(int currentTick) {
+        boolean update = super.onUpdate(currentTick);
 
-    @Override
-    public float getLength() {
-        return 0.25f;
-    }
+        if (this.closed) {
+            return false;
+        }
 
-    @Override
-    public float getHeight() {
-        return 0.25f;
-    }
+        if (this.isCollided) {
+            this.splash(null);
+        }
 
-    @Override
-    protected float getGravity() {
-        return 0.05f;
-    }
-
-    @Override
-    protected float getDrag() {
-        return 0.01f;
+        if (this.age > 1200 || this.isCollided) {
+            this.close();
+            return false;
+        }
+        return update;
     }
 
     protected void splash(Entity collidedWith) {
@@ -135,30 +160,5 @@ public class EntityPotion extends EntityProjectile {
                 potion.applyPotion(anEntity, d);
             }
         }
-    }
-
-    @Override
-    public void onCollideWithEntity(Entity entity) {
-        this.splash(entity);
-        this.close();
-    }
-
-    @Override
-    public boolean onUpdate(int currentTick) {
-        boolean update = super.onUpdate(currentTick);
-
-        if (this.closed) {
-            return false;
-        }
-
-        if (this.isCollided) {
-            this.splash(null);
-        }
-
-        if (this.age > 1200 || this.isCollided) {
-            this.close();
-            return false;
-        }
-        return update;
     }
 }

@@ -19,6 +19,22 @@ public class GrindstoneInventory extends FakeBlockUIComponent {
         super(playerUI, InventoryType.GRINDSTONE, 16, position);
     }
 
+    public void setEquipment(Item equipment) {
+        setItem(EQUIPMENT, equipment);
+    }
+
+    public void setIngredient(Item ingredient) {
+        setItem(INGREDIENT, ingredient);
+    }
+
+    public Item getEquipment() {
+        return getItem(EQUIPMENT);
+    }
+
+    public Item getIngredient() {
+        return getItem(INGREDIENT);
+    }
+
     public Item getResult() {
         Item eq = getEquipment();
         if (!(eq instanceof ItemDurable)) {
@@ -39,22 +55,6 @@ public class GrindstoneInventory extends FakeBlockUIComponent {
             eq.setDamage(Math.max(eq.getMaxDurability() - ((eq.getMaxDurability() - eq.getDamage()) + (iq.getMaxDurability() - iq.getDamage()) + NukkitMath.floorDouble(eq.getMaxDurability() * 0.05)) + 1, 0));
         }
         return eq;
-    }
-
-    public Item getEquipment() {
-        return getItem(EQUIPMENT);
-    }
-
-    public void setEquipment(Item equipment) {
-        setItem(EQUIPMENT, equipment);
-    }
-
-    public Item getIngredient() {
-        return getItem(INGREDIENT);
-    }
-
-    public void setIngredient(Item ingredient) {
-        setItem(INGREDIENT, ingredient);
     }
 
     @Override

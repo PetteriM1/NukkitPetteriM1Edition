@@ -11,11 +11,6 @@ import cn.nukkit.math.Vector3;
  */
 public class EntityMotionEvent extends EntityEvent implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
-
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private final Vector3 motion;
 
     public EntityMotionEvent(Entity entity, Vector3 motion) {
@@ -23,12 +18,16 @@ public class EntityMotionEvent extends EntityEvent implements Cancellable {
         this.motion = motion;
     }
 
-    @Deprecated
-    public Vector3 getVector() {
-        return this.motion;
+    public static HandlerList getHandlers() {
+        return handlers;
     }
 
     public Vector3 getMotion() {
+        return this.motion;
+    }
+
+    @Deprecated
+    public Vector3 getVector() {
         return this.motion;
     }
 }

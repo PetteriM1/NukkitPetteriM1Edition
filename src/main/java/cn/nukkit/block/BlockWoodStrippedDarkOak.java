@@ -13,8 +13,8 @@ public class BlockWoodStrippedDarkOak extends BlockWoodStripped {
     }
 
     @Override
-    public String getName() {
-        return "Stripped Dark Oak Log";
+    public BlockColor getColor() {
+        return BlockColor.BROWN_BLOCK_COLOR;
     }
 
     @Override
@@ -23,7 +23,7 @@ public class BlockWoodStrippedDarkOak extends BlockWoodStripped {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.BROWN_BLOCK_COLOR;
+    public String getName() {
+        return "Stripped Dark Oak Log";
     }
 }

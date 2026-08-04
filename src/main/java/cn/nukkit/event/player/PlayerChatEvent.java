@@ -12,13 +12,7 @@ import java.util.Set;
 
 public class PlayerChatEvent extends PlayerMessageEvent implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
-
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     protected String format;
-
     protected Set<CommandSender> recipients = new HashSet<>();
 
     public PlayerChatEvent(Player player, String message) {
@@ -42,6 +36,10 @@ public class PlayerChatEvent extends PlayerMessageEvent implements Cancellable {
         }
     }
 
+    public void setFormat(String format) {
+        this.format = format;
+    }
+
     /**
      * Changes the player that is sending the message
      *
@@ -51,19 +49,19 @@ public class PlayerChatEvent extends PlayerMessageEvent implements Cancellable {
         this.player = player;
     }
 
+    public void setRecipients(Set<CommandSender> recipients) {
+        this.recipients = recipients;
+    }
+
     public String getFormat() {
         return this.format;
     }
 
-    public void setFormat(String format) {
-        this.format = format;
+    public static HandlerList getHandlers() {
+        return handlers;
     }
 
     public Set<CommandSender> getRecipients() {
         return this.recipients;
-    }
-
-    public void setRecipients(Set<CommandSender> recipients) {
-        this.recipients = recipients;
     }
 }

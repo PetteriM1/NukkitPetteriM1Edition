@@ -6,6 +6,8 @@ import cn.nukkit.item.ItemBlock;
 import cn.nukkit.level.ListChunkManager;
 import cn.nukkit.level.generator.object.tree.ObjectMangroveTree;
 import cn.nukkit.math.NukkitRandom;
+import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockMangrovePropagule extends BlockSapling {
 
@@ -23,18 +25,18 @@ public class BlockMangrovePropagule extends BlockSapling {
     }
 
     @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_19_0;
+    }
+
+    @Override
     public String getName() {
         return "Mangrove Propagule";
     }
 
     @Override
-    public Item[] getDrops(Item item) {
-        return new Item[0];
-    }
-
-    @Override
-    public Item toItem() {
-        return new ItemBlock(Block.get(this.getId(), 0), 0);
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.FLOW_INTO_BLOCK;
     }
 
     @Override
@@ -43,8 +45,13 @@ public class BlockMangrovePropagule extends BlockSapling {
     }
 
     @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.FLOW_INTO_BLOCK;
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.SAPLING;
+    }
+
+    @Override
+    public Item[] getDrops(Item item) {
+        return new Item[0];
     }
 
     @Override
@@ -64,5 +71,10 @@ public class BlockMangrovePropagule extends BlockSapling {
             this.level.setBlock(block, block);
         }
         return true;
+    }
+
+    @Override
+    public Item toItem() {
+        return new ItemBlock(Block.get(this.getId(), 0), 0);
     }
 }

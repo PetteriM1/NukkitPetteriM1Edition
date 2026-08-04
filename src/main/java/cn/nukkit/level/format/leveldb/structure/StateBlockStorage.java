@@ -1,22 +1,29 @@
 package cn.nukkit.level.format.leveldb.structure;
 
 import cn.nukkit.Nukkit;
+import cn.nukkit.Server;
 import cn.nukkit.block.Block;
+import cn.nukkit.block.BlockID;
+import cn.nukkit.level.GlobalBlockPalette;
+import cn.nukkit.level.Level;
 import cn.nukkit.level.format.leveldb.BlockStateMapping;
 import cn.nukkit.level.util.BitArray;
 import cn.nukkit.level.util.BitArrayVersion;
+import cn.nukkit.level.util.PalettedBlockStorage;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BinaryStream;
 import cn.nukkit.utils.MainLogger;
-import org.cloudburstmc.nbt.NBTInputStream;
-import org.cloudburstmc.nbt.NBTOutputStream;
-import org.cloudburstmc.nbt.NbtMap;
-import org.cloudburstmc.nbt.NbtUtils;
+import cn.nukkit.utils.bugreport.ExceptionHandler;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufOutputStream;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.cloudburstmc.nbt.NBTInputStream;
+import org.cloudburstmc.nbt.NBTOutputStream;
+import org.cloudburstmc.nbt.NbtMap;
+import org.cloudburstmc.nbt.NbtUtils;
 
 import java.io.IOException;
 import java.util.List;
@@ -45,6 +52,72 @@ public class StateBlockStorage {
         this.bitArray = bitArray;
     }
 
+    public byte[] getBlockData() {
+        // TODO: possible to iterate over XZY 0-16
+        Server.getInstance().getLogger().warning("Unsupported method getBlockData()! LevelDB provider is 1.13+", new Throwable(""));
+        return new byte[0];
+    }
+
+    public byte[] getBlockIds() {
+        // TODO: possible to iterate over XZY 0-16
+        Server.getInstance().getLogger().warning("Unsupported method getBlockIds()! LevelDB provider is 1.13+", new Throwable(""));
+        return new byte[0];
+    }
+
+    public boolean isEmpty() {
+        if (this.palette.size() == 1) {
+            return true;
+        }
+        for (int word : this.bitArray.getWords()) {
+            if (Integer.toUnsignedLong(word) != 0L) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public StateBlockStorage copy() {
+        return new StateBlockStorage(this.bitArray.copy(), new ObjectArrayList<>(this.palette));
+    }
+
+    public int getAndSetFullBlock(int x, int y, int z, int value) {
+        return getAndSetFullBlock(ChunkBuilder.getSectionIndex(x, y, z), value);
+    }
+
+    private int getAndSetFullBlock(int index, int value) {
+        BlockStateSnapshot state = this.getBlockState(index);
+        int newBlock = value >> Block.DATA_BITS;
+        int newData = value & Block.DATA_MASK;
+        this.setBlockStateUnsafe(index, BlockStateMapping.get().getState(newBlock, newData));
+        return (state.getLegacyId() << Block.DATA_BITS) | state.getLegacyData();
+    }
+
+    public int getBlockData(int x, int y, int z) {
+        return this.getBlockState(x, y, z).getLegacyData();
+    }
+
+    public int getBlockId(int x, int y, int z) {
+        return this.getBlockState(x, y, z).getLegacyId();
+    }
+
+    public BlockStateSnapshot getBlockState(int x, int y, int z) {
+        int index = ChunkBuilder.getSectionIndex(x, y, z);
+        return this.stateFor(this.bitArray.get(index));
+    }
+
+    public BlockStateSnapshot getBlockState(int index) {
+        return this.stateFor(this.bitArray.get(index));
+    }
+
+    public int getFullBlock(int x, int y, int z) {
+        return getFullBlock(ChunkBuilder.getSectionIndex(x, y, z));
+    }
+
+    private int getFullBlock(int index) {
+        BlockStateSnapshot state = this.getBlockState(index);
+        return (state.getLegacyId() << Block.DATA_BITS) | state.getLegacyData();
+    }
+
     private int getPaletteHeader(BitArrayVersion version, boolean runtime) {
         return (version.getId() << 1) | (runtime ? 1 : 0);
     }
@@ -53,26 +126,30 @@ public class StateBlockStorage {
         return BitArrayVersion.get(header >> 1, true);
     }
 
-    public void writeToStorage(ByteBuf buffer) {
-        int paletteSize = this.palette.size();
-        BitArrayVersion version = paletteSize <= 1 ? BitArrayVersion.V0 : this.bitArray.getVersion();
-        buffer.writeByte(getPaletteHeader(version, false));
-
-        if (version != BitArrayVersion.V0) {
-            for (int word : this.bitArray.getWords()) {
-                buffer.writeIntLE(word);
-            }
-            buffer.writeIntLE(paletteSize);
+    private int idFor(BlockStateSnapshot state) {
+        int index = this.palette.indexOf(state);
+        if (index != -1) {
+            return index;
         }
 
-        try (ByteBufOutputStream stream = new ByteBufOutputStream(buffer);
-             NBTOutputStream nbtOutputStream = NbtUtils.createWriterLE(stream)) {
-            for (BlockStateSnapshot state : this.palette) {
-                nbtOutputStream.writeTag(state.getVanillaState());
+        index = this.palette.size();
+        BitArrayVersion version = this.bitArray.getVersion();
+        if (index > version.getMaxEntryValue()) {
+            BitArrayVersion next = version.next();
+            if (next != null) {
+                this.onResize(next);
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
+        this.palette.add(state);
+        return index;
+    }
+
+    private void onResize(BitArrayVersion version) {
+        BitArray newBitArray = version.createPalette();
+        for (int i = 0; i < SECTION_SIZE; i++) {
+            newBitArray.set(i, this.bitArray.get(i));
+        }
+        this.bitArray = newBitArray;
     }
 
     public void readFromStorage(ByteBuf buffer, ChunkBuilder chunkBuilder) {
@@ -111,12 +188,13 @@ public class StateBlockStorage {
                         NbtMap updatedState = BlockStateMapping.get().updateVanillaState(state);
                         blockState = BlockStateMapping.get().getUpdatedOrCustom(state, updatedState);
                         if (!blockState.isCustom()) {
-                            if (Nukkit.DEBUG > 1) log.info("[{}] Updated unmapped block state: {} => {}", chunkBuilder.debugString(), state, blockState.getVanillaState());
+                            if (Nukkit.DEBUG > 1)
+                                log.info("[{}] Updated unmapped block state: {} => {}", chunkBuilder.debugString(), state, blockState.getVanillaState());
                             chunkBuilder.dirty();
                         }
 
                         if (Nukkit.DEBUG > 1 && blockState.getRuntimeId() == BlockStateMapping.get().getDefaultRuntimeId()) {
-                            log.info("[{}] Chunk contains unknown block {}  => {}", chunkBuilder.debugString(), state, updatedState);
+                            log.info("[{}] Chunk contains unknown block {} => {}", chunkBuilder.debugString(), state, updatedState);
                         }
                     }
 
@@ -126,11 +204,22 @@ public class StateBlockStorage {
                     this.palette.add(blockState);
                 } catch (Exception e) {
                     MainLogger.getLogger().error("[" + chunkBuilder.debugString() + "] Unable to deserialize chunk block state", e);
+                    ExceptionHandler.handleSilently(e);
                 }
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void setBlockData(int x, int y, int z, int data) {
+        int index = ChunkBuilder.getSectionIndex(x, y, z);
+        this.setBlockStateUnsafe(index, BlockStateMapping.get().getState(this.getBlockId(x, y, z), data));
+    }
+
+    public void setBlockId(int x, int y, int z, int id) {
+        int index = ChunkBuilder.getSectionIndex(x, y, z);
+        this.setBlockStateUnsafe(index, BlockStateMapping.get().getState(id, 0));
     }
 
     public void setBlockState(int index, NbtMap state) {
@@ -150,56 +239,8 @@ public class StateBlockStorage {
         }
     }
 
-    public BlockStateSnapshot getBlockState(int x, int y, int z) {
-        int index = ChunkBuilder.getSectionIndex(x, y, z);
-        return this.stateFor(this.bitArray.get(index));
-    }
-
-    public BlockStateSnapshot getBlockState(int index) {
-        return this.stateFor(this.bitArray.get(index));
-    }
-
-    public int getBlockData(int x, int y, int z) {
-        return this.getBlockState(x, y, z).getLegacyData();
-    }
-
-    public int getBlockId(int x, int y, int z) {
-        return this.getBlockState(x, y, z).getLegacyId();
-    }
-
-    public void setBlockId(int x, int y, int z, int id) {
-        int index = ChunkBuilder.getSectionIndex(x, y, z);
-        this.setBlockStateUnsafe(index, BlockStateMapping.get().getState(id, 0));
-    }
-
-    public void setBlockData(int x, int y, int z, int data) {
-        int index = ChunkBuilder.getSectionIndex(x, y, z);
-        this.setBlockStateUnsafe(index, BlockStateMapping.get().getState(this.getBlockId(x, y, z), data));
-    }
-
-    public int getFullBlock(int x, int y, int z) {
-        return getFullBlock(ChunkBuilder.getSectionIndex(x, y, z));
-    }
-
     public void setFullBlock(int x, int y, int z, int value) {
         this.setFullBlock(ChunkBuilder.getSectionIndex(x, y, z), value);
-    }
-
-    public int getAndSetFullBlock(int x, int y, int z, int value) {
-        return getAndSetFullBlock(ChunkBuilder.getSectionIndex(x, y, z), value);
-    }
-
-    private int getAndSetFullBlock(int index, int value) {
-        BlockStateSnapshot state = this.getBlockState(index);
-        int newBlock = value >> Block.DATA_BITS;
-        int newData = value & Block.DATA_MASK;
-        this.setBlockStateUnsafe(index, BlockStateMapping.get().getState(newBlock, newData));
-        return (state.getLegacyId() << Block.DATA_BITS) | state.getLegacyData();
-    }
-
-    private int getFullBlock(int index) {
-        BlockStateSnapshot state = this.getBlockState(index);
-        return (state.getLegacyId() << Block.DATA_BITS) | state.getLegacyData();
     }
 
     public void setFullBlock(int index, int value) {
@@ -208,8 +249,25 @@ public class StateBlockStorage {
         this.setBlockStateUnsafe(index, BlockStateMapping.get().getState(block, data));
     }
 
-    public void writeTo(BinaryStream stream) {
-        BitArray bitArray = this.bitArray;
+    private BlockStateSnapshot stateFor(int index) {
+        return this.palette.get(index);
+    }
+
+    public void writeTo(int protocol, BinaryStream stream, boolean obfuscated) {
+        // If palette size is 1, it will have one state, no obfuscation needed
+        if (obfuscated && this.palette.size() > 1) {
+            this.writeToObfuscated(stream, protocol);
+            return;
+        }
+
+        boolean legacy = protocol < ProtocolInfo.v1_18_0;
+
+        BitArray bitArray;
+        if (legacy && this.bitArray.getVersion() == BitArrayVersion.V0) {
+            bitArray = BitArrayVersion.V1.createPalette(SECTION_SIZE);
+        } else {
+            bitArray = this.bitArray;
+        }
 
         stream.putByte((byte) this.getPaletteHeader(bitArray.getVersion(), true));
         if (bitArray.getVersion() != BitArrayVersion.V0) {
@@ -219,54 +277,49 @@ public class StateBlockStorage {
             stream.putVarInt(this.palette.size());
         }
 
+        boolean mappingProtocol = protocol == Level.getChunkProtocol(BlockStateMapping.get().getVersion());
+
         for (BlockStateSnapshot state : this.palette) {
-            stream.putVarInt(state.getRuntimeIdNetworkProtocol());
+            if (mappingProtocol) {
+                stream.putVarInt(state.getRuntimeId());
+            } else {
+                stream.putVarInt(GlobalBlockPalette.getOrCreateRuntimeId(protocol, state.getLegacyId(protocol), state.getLegacyData(protocol)));
+            }
         }
     }
 
-    private void onResize(BitArrayVersion version) {
-        BitArray newBitArray = version.createPalette();
+    private void writeToObfuscated(BinaryStream stream, int protocol) {
+        PalettedBlockStorage storage = PalettedBlockStorage.createFromBlockPalette(this.bitArray.getVersion(), protocol);
         for (int i = 0; i < SECTION_SIZE; i++) {
-            newBitArray.set(i, this.bitArray.get(i));
-        }
-        this.bitArray = newBitArray;
-    }
-
-    private int idFor(BlockStateSnapshot state) {
-        int index = this.palette.indexOf(state);
-        if (index != -1) {
-            return index;
-        }
-
-        index = this.palette.size();
-        BitArrayVersion version = this.bitArray.getVersion();
-        if (index > version.getMaxEntryValue()) {
-            BitArrayVersion next = version.next();
-            if (next != null) {
-                this.onResize(next);
+            BlockStateSnapshot state = this.getBlockState(i);
+            int id = state.getLegacyId(protocol);
+            if (Level.xrayableBlocks[id]) {
+                id = (id == BlockID.ANCIENT_DEBRIS || id == BlockID.NETHER_GOLD_ORE) ? BlockID.NETHERRACK : id > 650 ? BlockID.DEEPSLATE : BlockID.STONE;
             }
+            storage.setBlock(i, GlobalBlockPalette.getOrCreateRuntimeId(protocol, id, state.getLegacyData(protocol)));
         }
-        this.palette.add(state);
-        return index;
+        storage.writeTo(stream);
     }
 
-    private BlockStateSnapshot stateFor(int index) {
-        return this.palette.get(index);
-    }
+    public void writeToStorage(ByteBuf buffer) {
+        int paletteSize = this.palette.size();
+        BitArrayVersion version = paletteSize <= 1 ? BitArrayVersion.V0 : this.bitArray.getVersion();
+        buffer.writeByte(getPaletteHeader(version, false));
 
-    public boolean isEmpty() {
-        if (this.palette.size() == 1) {
-            return true;
-        }
-        for (int word : this.bitArray.getWords()) {
-            if (Integer.toUnsignedLong(word) != 0L) {
-                return false;
+        if (version != BitArrayVersion.V0) {
+            for (int word : this.bitArray.getWords()) {
+                buffer.writeIntLE(word);
             }
+            buffer.writeIntLE(paletteSize);
         }
-        return true;
-    }
 
-    public StateBlockStorage copy() {
-        return new StateBlockStorage(this.bitArray.copy(), new ObjectArrayList<>(this.palette));
+        try (ByteBufOutputStream stream = new ByteBufOutputStream(buffer);
+             NBTOutputStream nbtOutputStream = NbtUtils.createWriterLE(stream)) {
+            for (BlockStateSnapshot state : this.palette) {
+                nbtOutputStream.writeTag(state.getVanillaState());
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

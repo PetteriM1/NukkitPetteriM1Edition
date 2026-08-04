@@ -15,6 +15,23 @@ public class PersistentDataContainerBlockWrapper implements PersistentDataContai
     }
 
     @Override
+    public void setStorage(CompoundTag storage) {
+        this.blockEntity.namedTag.putCompound(STORAGE_TAG, storage);
+        this.storage = storage;
+    }
+
+    private CompoundTag getInternalStorage() {
+        if (this.storage != null) {
+            return this.storage;
+        }
+
+        if (this.blockEntity.namedTag.contains(STORAGE_TAG)) {
+            return this.storage = this.blockEntity.namedTag.getCompound(STORAGE_TAG);
+        }
+        return null;
+    }
+
+    @Override
     public CompoundTag getReadStorage() {
         CompoundTag storage = this.getInternalStorage();
         if (storage == null) {
@@ -31,23 +48,6 @@ public class PersistentDataContainerBlockWrapper implements PersistentDataContai
             this.setStorage(storage);
         }
         return storage;
-    }
-
-    private CompoundTag getInternalStorage() {
-        if (this.storage != null) {
-            return this.storage;
-        }
-
-        if (this.blockEntity.namedTag.contains(STORAGE_TAG)) {
-            return this.storage = this.blockEntity.namedTag.getCompound(STORAGE_TAG);
-        }
-        return null;
-    }
-
-    @Override
-    public void setStorage(CompoundTag storage) {
-        this.blockEntity.namedTag.putCompound(STORAGE_TAG, storage);
-        this.storage = storage;
     }
 
     @Override

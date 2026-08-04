@@ -44,66 +44,6 @@ public final class ChainValidationResult {
         this.parsedPayload = null;
     }
 
-    public boolean signed() {
-        return signed;
-    }
-
-    public Map<String, Object> rawIdentityClaims() {
-        if (parsedPayload == null) {
-            return jwtContext.getJwtClaims().getClaimsMap();
-        } else {
-            return new HashMap<>(parsedPayload);
-        }
-    }
-
-    public IdentityClaims identityClaims() throws IllegalStateException {
-        if (identityClaims == null) {
-            if (parsedPayload == null) {
-                identityClaims = createClaims();
-            } else {
-                identityClaims = createLegacyClaims();
-            }
-        }
-        return identityClaims;
-    }
-
-    private IdentityClaims createLegacyClaims() {
-        String identityPublicKey = childAsType(parsedPayload, "identityPublicKey", String.class);
-        Map<?, ?> extraData = childAsType(parsedPayload, "extraData", Map.class);
-
-        String displayName = childAsType(extraData, "displayName", String.class);
-        String identityString = childAsType(extraData, "identity", String.class);
-        String xuid = childAsType(extraData, "XUID", String.class);
-        Object titleId = extraData.get("titleId");
-
-        UUID identity;
-        try {
-            identity = UUID.fromString(identityString);
-        } catch (Exception exception) {
-            throw new IllegalStateException("identity node is an invalid UUID");
-        }
-
-        return new IdentityClaims(
-                new IdentityData(displayName, identity, xuid, (String) titleId, null),
-                identityPublicKey
-        );
-    }
-
-    private IdentityClaims createClaims() {
-        JwtClaims claims = jwtContext.getJwtClaims();
-
-        String identityPublicKey = claims.getClaimValueAsString("cpk");
-        String displayName = claims.getClaimValueAsString("xname");
-        String xuid = claims.getClaimValueAsString("xid");
-        String minecraftId = claims.getClaimValueAsString("mid");
-        UUID identity = UUID.nameUUIDFromBytes(("pocket-auth-1-xuid:" + xuid).getBytes(StandardCharsets.UTF_8));
-
-        return new IdentityClaims(
-                new IdentityData(displayName, identity, xuid, null, minecraftId),
-                identityPublicKey
-        );
-    }
-
     @ToString
     public static final class IdentityClaims {
 
@@ -130,6 +70,7 @@ public final class ChainValidationResult {
         public final String displayName;
         /**
          * Identity UUID, derived from the XUID when online, or from the username when offline.
+         *
          * @deprecated v818: Use {@link #minecraftId} instead.
          */
         @Nullable
@@ -138,6 +79,7 @@ public final class ChainValidationResult {
         public final @Nullable String titleId;
         /**
          * The player's Minecraft PlayFab ID
+         *
          * @since v818
          */
         @Nullable
@@ -150,5 +92,65 @@ public final class ChainValidationResult {
             this.titleId = titleId;
             this.minecraftId = minecraftId;
         }
+    }
+
+    private IdentityClaims createClaims() {
+        JwtClaims claims = jwtContext.getJwtClaims();
+
+        String identityPublicKey = claims.getClaimValueAsString("cpk");
+        String displayName = claims.getClaimValueAsString("xname");
+        String xuid = claims.getClaimValueAsString("xid");
+        String minecraftId = claims.getClaimValueAsString("mid");
+        UUID identity = UUID.nameUUIDFromBytes(("pocket-auth-1-xuid:" + xuid).getBytes(StandardCharsets.UTF_8));
+
+        return new IdentityClaims(
+                new IdentityData(displayName, identity, xuid, null, minecraftId),
+                identityPublicKey
+        );
+    }
+
+    private IdentityClaims createLegacyClaims() {
+        String identityPublicKey = childAsType(parsedPayload, "identityPublicKey", String.class);
+        Map<?, ?> extraData = childAsType(parsedPayload, "extraData", Map.class);
+
+        String displayName = childAsType(extraData, "displayName", String.class);
+        String identityString = childAsType(extraData, "identity", String.class);
+        String xuid = childAsType(extraData, "XUID", String.class);
+        Object titleId = extraData.get("titleId");
+
+        UUID identity;
+        try {
+            identity = UUID.fromString(identityString);
+        } catch (Exception exception) {
+            throw new IllegalStateException("identity node is an invalid UUID");
+        }
+
+        return new IdentityClaims(
+                new IdentityData(displayName, identity, xuid, (String) titleId, null),
+                identityPublicKey
+        );
+    }
+
+    public IdentityClaims identityClaims() throws IllegalStateException {
+        if (identityClaims == null) {
+            if (parsedPayload == null) {
+                identityClaims = createClaims();
+            } else {
+                identityClaims = createLegacyClaims();
+            }
+        }
+        return identityClaims;
+    }
+
+    public Map<String, Object> rawIdentityClaims() {
+        if (parsedPayload == null) {
+            return jwtContext.getJwtClaims().getClaimsMap();
+        } else {
+            return new HashMap<>(parsedPayload);
+        }
+    }
+
+    public boolean signed() {
+        return signed;
     }
 }

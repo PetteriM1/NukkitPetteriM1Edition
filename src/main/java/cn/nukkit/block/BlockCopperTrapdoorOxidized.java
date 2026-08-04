@@ -14,8 +14,8 @@ public class BlockCopperTrapdoorOxidized extends BlockCopperTrapdoor {
     }
 
     @Override
-    public String getName() {
-        return "Oxidized Copper Trapdoor";
+    public BlockColor getColor() {
+        return BlockColor.WARPED_NYLIUM_BLOCK_COLOR;
     }
 
     @Override
@@ -24,8 +24,8 @@ public class BlockCopperTrapdoorOxidized extends BlockCopperTrapdoor {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.WARPED_NYLIUM_BLOCK_COLOR;
+    public String getName() {
+        return "Oxidized Copper Trapdoor";
     }
 
     @Override

@@ -19,6 +19,15 @@ public class BlockPodzol extends BlockDirt {
     }
 
     @Override
+    public void setDamage(int meta) {
+    }
+
+    @Override
+    public int getFullId() {
+        return getId() << DATA_BITS;
+    }
+
+    @Override
     public int getId() {
         return PODZOL;
     }
@@ -47,14 +56,5 @@ public class BlockPodzol extends BlockDirt {
             }
         }
         return false;
-    }
-
-    @Override
-    public int getFullId() {
-        return getId() << DATA_BITS;
-    }
-
-    @Override
-    public void setDamage(int meta) {
     }
 }

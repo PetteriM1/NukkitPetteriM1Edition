@@ -26,13 +26,8 @@ public class BlockSnowLayer extends BlockFallableMeta {
     }
 
     @Override
-    public String getName() {
-        return "Top Snow";
-    }
-
-    @Override
-    public int getId() {
-        return SNOW_LAYER;
+    public BlockColor getColor() {
+        return BlockColor.SNOW_BLOCK_COLOR;
     }
 
     @Override
@@ -41,13 +36,54 @@ public class BlockSnowLayer extends BlockFallableMeta {
     }
 
     @Override
+    public int getId() {
+        return SNOW_LAYER;
+    }
+
+    @Override
+    public double getMaxY() {
+        int height = this.getDamage() & 0x7;
+        return height < 3 ? this.y : height == 7 ? this.y + 1 : this.y + 0.5;
+    }
+
+    @Override
+    public String getName() {
+        return "Top Snow";
+    }
+
+    @Override
     public double getResistance() {
-        return 0.5;
+        return 2.5;
     }
 
     @Override
     public int getToolType() {
         return ItemTool.TYPE_SHOVEL;
+    }
+
+    @Override
+    public boolean isSolid() {
+        return (this.getDamage() & 0x7) == 0x7;
+    }
+
+    @Override
+    public boolean isTransparent() {
+        return (this.getDamage() & 0x7) != 0x7;
+    }
+
+    @Override
+    public boolean breakWhenPushed() {
+        return true;
+    }
+
+    @Override
+    public boolean canBeActivated() {
+        return true;
+    }
+
+    @Override
+    public boolean canBeFlowedInto() {
+        return true;
     }
 
     @Override
@@ -60,19 +96,43 @@ public class BlockSnowLayer extends BlockFallableMeta {
         return (this.getDamage() & 0x7) < 3;
     }
 
-    @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        if (this.canSurvive()) {
-            this.getLevel().setBlock(block, this, true);
-
-            return true;
-        }
-        return false;
-    }
-
     private boolean canSurvive() {
         Block below = this.down();
         return below.getId() != ICE && below.getId() != PACKED_ICE && below.getId() != ICE_FROSTED && (below.isSolid() || (this.getDamage() & 0x7) == 0x7);
+    }
+
+    @Override
+    public Item[] getDrops(Item item) {
+        if (item.isShovel()) {
+            Item drop = item.hasEnchantment(Enchantment.ID_SILK_TOUCH) ? this.toItem() : Item.get(Item.SNOWBALL);
+            int height = this.getDamage() & 0x7;
+            drop.setCount(height < 3 ? 1 : height < 5 ? 2 : height == 7 ? 4 : 3);
+            return new Item[]{drop};
+        } else {
+            return new Item[0];
+        }
+    }
+
+    @Override
+    public boolean onActivate(Item item, Player player) {
+        if (item.isShovel() && (player == null || (player.gamemode & 0x2) == 0)) {
+            item.useOn(this);
+            this.level.useBreakOn(this, item.clone().clearNamedTag(), null, true);
+            return true;
+        } else if (item.getId() == SNOW_LAYER && (player == null || (player.gamemode & 0x2) == 0)) {
+            if ((this.getDamage() & 0x7) != 0x7) {
+                this.setDamage(this.getDamage() + 1);
+                this.level.setBlock(this, this, true);
+
+                if (player != null && (player.gamemode & 0x1) == 0) {
+                    item.count--;
+                }
+                return true;
+            } else {
+                this.level.setBlock(this, this, true);
+            }
+        }
+        return false;
     }
 
     @Override
@@ -102,77 +162,17 @@ public class BlockSnowLayer extends BlockFallableMeta {
     }
 
     @Override
-    public Item toItem() {
-        return new ItemBlock(Block.get(this.getId(), 0), 0);
-    }
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        if (this.canSurvive()) {
+            this.getLevel().setBlock(block, this, true);
 
-    @Override
-    public Item[] getDrops(Item item) {
-        if (item.isShovel()) {
-            Item drop = item.hasEnchantment(Enchantment.ID_SILK_TOUCH) ? this.toItem() : Item.get(Item.SNOWBALL);
-            int height = this.getDamage() & 0x7;
-            drop.setCount(height < 3 ? 1 : height < 5 ? 2 : height == 7 ? 4 : 3);
-            return new Item[]{drop};
-        } else {
-            return new Item[0];
-        }
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.SNOW_BLOCK_COLOR;
-    }
-
-    @Override
-    public boolean isTransparent() {
-        return (this.getDamage() & 0x7) != 0x7;
-    }
-
-    @Override
-    public boolean canBeFlowedInto() {
-        return true;
-    }
-
-    @Override
-    public boolean isSolid() {
-        return (this.getDamage() & 0x7) == 0x7;
-    }
-
-    @Override
-    public double getMaxY() {
-        int height = this.getDamage() & 0x7;
-        return height < 3 ? this.y : height == 7 ? this.y + 1 : this.y + 0.5;
-    }
-
-    @Override
-    public boolean canBeActivated() {
-        return true;
-    }
-
-    @Override
-    public boolean onActivate(Item item, Player player) {
-        if (item.isShovel() && (player == null || (player.gamemode & 0x2) == 0)) {
-            item.useOn(this);
-            this.level.useBreakOn(this, item.clone().clearNamedTag(), null, true);
             return true;
-        } else if (item.getId() == SNOW_LAYER && (player == null || (player.gamemode & 0x2) == 0)) {
-            if ((this.getDamage() & 0x7) != 0x7) {
-                this.setDamage(this.getDamage() + 1);
-                this.level.setBlock(this ,this, true);
-
-                if (player != null && (player.gamemode & 0x1) == 0) {
-                    item.count--;
-                }
-                return true;
-            } else {
-                this.level.setBlock(this ,this, true);
-            }
         }
         return false;
     }
 
     @Override
-    public boolean breakWhenPushed() {
-        return true;
+    public Item toItem() {
+        return new ItemBlock(Block.get(this.getId(), 0), 0);
     }
 }

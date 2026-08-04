@@ -13,18 +13,8 @@ public class BlockWarpedStairs extends BlockStairsWood {
     }
 
     @Override
-    public int getId() {
-        return WARPED_STAIRS;
-    }
-
-    @Override
-    public String getName() {
-        return "Warped Stairs";
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.CYAN_BLOCK_COLOR;
+    public int getBurnAbility() {
+        return 0;
     }
 
     @Override
@@ -33,7 +23,17 @@ public class BlockWarpedStairs extends BlockStairsWood {
     }
 
     @Override
-    public int getBurnAbility() {
-        return 0;
+    public BlockColor getColor() {
+        return BlockColor.CYAN_BLOCK_COLOR;
+    }
+
+    @Override
+    public int getId() {
+        return WARPED_STAIRS;
+    }
+
+    @Override
+    public String getName() {
+        return "Warped Stairs";
     }
 }

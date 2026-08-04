@@ -13,6 +13,7 @@ import cn.nukkit.item.ItemBlock;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.network.protocol.ProtocolInfo;
 
 import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
@@ -29,6 +30,79 @@ public class BlockEntityCampfire extends BlockEntitySpawnable implements Invento
     }
 
     @Override
+    public CampfireInventory getInventory() {
+        return inventory;
+    }
+
+    @Override
+    public String getName() {
+        return "Campfire";
+    }
+
+    @Override
+    public int getSize() {
+        return 4;
+    }
+
+    @Override
+    public CompoundTag getSpawnCompound() {
+        return this.getSpawnCompound(ProtocolInfo.CURRENT_PROTOCOL);
+    }
+
+    @Override
+    public boolean isBlockEntityValid() {
+        int id = level.getBlockIdAt(chunk, (int) x, (int) y, (int) z);
+        return id == BlockID.CAMPFIRE_BLOCK || id == BlockID.SOUL_CAMPFIRE_BLOCK;
+    }
+
+    @Override
+    public void close() {
+        if (!closed) {
+            for (Player player : new ArrayList<>(this.inventory.getViewers())) {
+                player.removeWindow(this.inventory);
+            }
+            super.close();
+        }
+    }
+
+    @Override
+    public Item getItem(int index) {
+        if (index < 0 || index >= getSize()) {
+            return new ItemBlock(Block.get(0), 0, 0);
+        } else {
+            CompoundTag data = this.namedTag.getCompound("Item" + (index + 1));
+            return NBTIO.getItemHelper(data);
+        }
+    }
+
+    public boolean getKeepItem(int slot) {
+        if (slot < 0 || slot >= keepItem.length) {
+            return false;
+        }
+        return keepItem[slot];
+    }
+
+    @Override
+    public CompoundTag getSpawnCompound(int protocol) {
+        CompoundTag c = new CompoundTag()
+                .putString("id", BlockEntity.CAMPFIRE)
+                .putInt("x", (int) this.x)
+                .putInt("y", (int) this.y)
+                .putInt("z", (int) this.z);
+
+        for (int i = 1; i <= burnTime.length; i++) {
+            Item item = inventory.getItem(i - 1);
+            if (item == null || item.getId() == BlockID.AIR || item.getCount() <= 0) {
+                c.remove("Item" + i);
+            } else {
+                c.putCompound("Item" + i, protocol > ProtocolInfo.v1_16_0 ? NBTIO.putNetworkItemHelper(protocol, item) : NBTIO.putItemHelper(item));
+            }
+        }
+
+        return c;
+    }
+
+    @Override
     protected void initBlockEntity() {
         this.inventory = new CampfireInventory(this);
         this.burnTime = new int[4];
@@ -36,8 +110,8 @@ public class BlockEntityCampfire extends BlockEntitySpawnable implements Invento
         this.keepItem = new boolean[4];
 
         for (int i = 1; i <= burnTime.length; i++) {
-            burnTime[i -1] = namedTag.getInt("ItemTime" + i);
-            keepItem[i -1] = namedTag.getBoolean("KeepItem" + 1);
+            burnTime[i - 1] = namedTag.getInt("ItemTime" + i);
+            keepItem[i - 1] = namedTag.getBoolean("KeepItem" + 1);
 
             if (this.namedTag.contains("Item" + i) && this.namedTag.get("Item" + i) instanceof CompoundTag) {
                 inventory.setItem(i - 1, NBTIO.getItemHelper(this.namedTag.getCompound("Item" + i)));
@@ -46,6 +120,14 @@ public class BlockEntityCampfire extends BlockEntitySpawnable implements Invento
 
         super.initBlockEntity();
         this.scheduleUpdate();
+    }
+
+    @Override
+    public void onBreak() {
+        for (Item content : inventory.getContents().values()) {
+            level.dropItem(this, content);
+        }
+        inventory.clearAll();
     }
 
     @Override
@@ -106,20 +188,6 @@ public class BlockEntityCampfire extends BlockEntitySpawnable implements Invento
         return needsUpdate;
     }
 
-    public boolean getKeepItem(int slot) {
-        if (slot < 0 || slot >= keepItem.length) {
-            return false;
-        }
-        return keepItem[slot];
-    }
-
-    public void setKeepItem(int slot, boolean keep) {
-        if (slot < 0 || slot >= keepItem.length) {
-            return;
-        }
-        this.keepItem[slot] = keep;
-    }
-
     @Override
     public void saveNBT() {
         super.saveNBT();
@@ -127,89 +195,14 @@ public class BlockEntityCampfire extends BlockEntitySpawnable implements Invento
         for (int i = 1; i <= burnTime.length; i++) {
             Item item = inventory.getItem(i - 1);
             if (item == null || item.getId() == BlockID.AIR || item.getCount() <= 0) {
-                namedTag.remove("Item"+i);
+                namedTag.remove("Item" + i);
                 namedTag.putInt("ItemTime" + i, 0);
-                namedTag.remove("KeepItem"+i);
+                namedTag.remove("KeepItem" + i);
             } else {
-                namedTag.putCompound("Item"+i, NBTIO.putItemHelper(item));
+                namedTag.putCompound("Item" + i, NBTIO.putItemHelper(item));
                 namedTag.putInt("ItemTime" + i, burnTime[i - 1]);
-                namedTag.putBoolean("KeepItem"+i, keepItem[i-1]);
+                namedTag.putBoolean("KeepItem" + i, keepItem[i - 1]);
             }
-        }
-    }
-
-    public void setRecipe(int index, CampfireRecipe recipe) {
-        this.recipes[index] = recipe;
-    }
-
-    @Override
-    public void close() {
-        if (!closed) {
-            for (Player player : new ArrayList<>(this.inventory.getViewers())) {
-                player.removeWindow(this.inventory);
-            }
-            super.close();
-        }
-    }
-
-    @Override
-    public void onBreak() {
-        for (Item content : inventory.getContents().values()) {
-            level.dropItem(this, content);
-        }
-        inventory.clearAll();
-    }
-
-    @Override
-    public String getName() {
-        return "Campfire";
-    }
-
-    @Override
-    public void spawnTo(Player player) {
-        if (!this.closed) {
-            player.dataPacket(this.createSpawnPacket());
-        }
-    }
-
-    @Override
-    public CompoundTag getSpawnCompound() {
-        CompoundTag c = new CompoundTag()
-                .putString("id", BlockEntity.CAMPFIRE)
-                .putInt("x", (int) this.x)
-                .putInt("y", (int) this.y)
-                .putInt("z", (int) this.z);
-
-        for (int i = 1; i <= burnTime.length; i++) {
-            Item item = inventory.getItem(i - 1);
-            if (item == null || item.getId() == BlockID.AIR || item.getCount() <= 0) {
-                c.remove("Item"+i);
-            } else {
-                c.putCompound("Item"+i, NBTIO.putNetworkItemHelper(item));
-            }
-        }
-
-        return c;
-    }
-
-    @Override
-    public boolean isBlockEntityValid() {
-        int id = level.getBlockIdAt(chunk, (int) x, (int) y, (int) z);
-        return id == BlockID.CAMPFIRE_BLOCK || id == BlockID.SOUL_CAMPFIRE_BLOCK;
-    }
-
-    @Override
-    public int getSize() {
-        return 4;
-    }
-
-    @Override
-    public Item getItem(int index) {
-        if (index < 0 || index >= getSize()) {
-            return new ItemBlock(Block.get(0), 0, 0);
-        } else {
-            CompoundTag data = this.namedTag.getCompound("Item" + (index + 1));
-            return NBTIO.getItemHelper(data);
         }
     }
 
@@ -223,8 +216,21 @@ public class BlockEntityCampfire extends BlockEntitySpawnable implements Invento
         this.namedTag.putCompound("Item" + (index + 1), nbt);
     }
 
+    public void setKeepItem(int slot, boolean keep) {
+        if (slot < 0 || slot >= keepItem.length) {
+            return;
+        }
+        this.keepItem[slot] = keep;
+    }
+
+    public void setRecipe(int index, CampfireRecipe recipe) {
+        this.recipes[index] = recipe;
+    }
+
     @Override
-    public CampfireInventory getInventory() {
-        return inventory;
+    public void spawnTo(Player player) {
+        if (!this.closed) {
+            player.dataPacket(this.createSpawnPacket(player.protocol));
+        }
     }
 }

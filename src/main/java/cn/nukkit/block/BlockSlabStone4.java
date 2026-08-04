@@ -12,7 +12,7 @@ public class BlockSlabStone4 extends BlockSlabStone {
     public static final int CUT_SANDSTONE = 3;
     public static final int CUT_RED_SANDSTONE = 4;
 
-    private static final String[] NAMES = {
+    private static final String[] names = {
             "Mossy Stone Brick",
             "Smooth Quartz",
             "Stone",
@@ -26,13 +26,6 @@ public class BlockSlabStone4 extends BlockSlabStone {
 
     public BlockSlabStone4(int meta) {
         super(meta, DOUBLE_STONE_SLAB4);
-    }
-
-    @Override
-    public String getName() {
-        int variant = this.getDamage() & 0x07;
-        String name = variant >= NAMES.length ? NAMES[0] : NAMES[variant];
-        return ((this.getDamage() & 0x08) > 0 ? "Upper " : "") + name + " Slab";
     }
 
     @Override
@@ -54,6 +47,13 @@ public class BlockSlabStone4 extends BlockSlabStone {
     @Override
     public int getId() {
         return STONE_SLAB4;
+    }
+
+    @Override
+    public String getName() {
+        int variant = this.getDamage() & 0x07;
+        String name = variant >= names.length ? names[0] : names[variant];
+        return ((this.getDamage() & 0x08) > 0 ? "Upper " : "") + name + " Slab";
     }
 
     @Override

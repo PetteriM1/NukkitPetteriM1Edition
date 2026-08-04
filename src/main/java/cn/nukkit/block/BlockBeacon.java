@@ -16,8 +16,8 @@ import cn.nukkit.utils.BlockColor;
 public class BlockBeacon extends BlockTransparent {
 
     @Override
-    public int getId() {
-        return BEACON;
+    public BlockColor getColor() {
+        return BlockColor.DIAMOND_BLOCK_COLOR;
     }
 
     @Override
@@ -26,12 +26,22 @@ public class BlockBeacon extends BlockTransparent {
     }
 
     @Override
-    public double getResistance() {
-        return 15;
+    public int getId() {
+        return BEACON;
     }
 
     @Override
     public int getLightLevel() {
+        return 15;
+    }
+
+    @Override
+    public String getName() {
+        return "Beacon";
+    }
+
+    @Override
+    public double getResistance() {
         return 15;
     }
 
@@ -41,13 +51,28 @@ public class BlockBeacon extends BlockTransparent {
     }
 
     @Override
-    public String getName() {
-        return "Beacon";
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.WHEN_PLACED_IN_WATER;
+    }
+
+    @Override
+    public boolean alwaysDropsOnExplosion() {
+        return true;
+    }
+
+    @Override
+    public boolean breakWhenPushed() {
+        return true;
     }
 
     @Override
     public boolean canBeActivated() {
         return true;
+    }
+
+    @Override
+    public boolean canBePushed() {
+        return false;
     }
 
     @Override
@@ -77,30 +102,5 @@ public class BlockBeacon extends BlockTransparent {
         }
 
         return false;
-    }
-
-    @Override
-    public boolean canBePushed() {
-        return false;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.DIAMOND_BLOCK_COLOR;
-    }
-
-    @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.WHEN_PLACED_IN_WATER;
-    }
-
-    @Override
-    public boolean breakWhenPushed() {
-        return true;
-    }
-
-    @Override
-    public boolean alwaysDropsOnExplosion() {
-        return true;
     }
 }

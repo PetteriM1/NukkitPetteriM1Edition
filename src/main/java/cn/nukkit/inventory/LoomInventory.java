@@ -12,10 +12,16 @@ public class LoomInventory extends FakeBlockUIComponent {
         super(playerUI, InventoryType.LOOM, OFFSET, position);
     }
 
-    @Override
-    public void onOpen(Player who) {
-        super.onOpen(who);
-        who.craftingType = Player.LOOM_WINDOW_ID;
+    public void setBanner(Item item) {
+        this.setItem(0, item);
+    }
+
+    public void setDye(Item item) {
+        this.setItem(1, item);
+    }
+
+    public void setPattern(Item item) {
+        this.setItem(2, item);
     }
 
     public Item getBanner() {
@@ -30,15 +36,9 @@ public class LoomInventory extends FakeBlockUIComponent {
         return getItem(2);
     }
 
-    public void setBanner(Item item) {
-        this.setItem(0, item);
-    }
-
-    public void setDye(Item item) {
-        this.setItem(1, item);
-    }
-
-    public void setPattern(Item item) {
-        this.setItem(2, item);
+    @Override
+    public void onOpen(Player who) {
+        super.onOpen(who);
+        who.craftingType = Player.LOOM_WINDOW_ID;
     }
 }

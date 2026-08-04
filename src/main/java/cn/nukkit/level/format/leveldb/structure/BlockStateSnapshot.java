@@ -1,6 +1,7 @@
 package cn.nukkit.level.format.leveldb.structure;
 
-import cn.nukkit.level.GlobalBlockPalette;
+import cn.nukkit.block.Block;
+import cn.nukkit.block.BlockUnknown;
 import cn.nukkit.level.format.leveldb.BlockStateMapping;
 import org.cloudburstmc.nbt.NbtMap;
 import lombok.Builder;
@@ -24,7 +25,26 @@ public class BlockStateSnapshot {
     private int legacyData = -1;
 
     @Builder.Default
-    private int runtimeIdNetworkProtocol = -1;
+    private Block block = null;
+
+    private Block getBlock() {
+        if (this.block == null) {
+            this.block = Block.get(this.getLegacyId(), this.getLegacyData());
+        }
+        return this.block;
+    }
+
+    public int getLegacyData() {
+        if (this.legacyData != -1) {
+            return this.legacyData;
+        }
+
+        int data = BlockStateMapping.get().getLegacyData(this.runtimeId);
+        if (this.version == BlockStateMapping.get().getVersion()) {
+            this.legacyData = data;
+        }
+        return data;
+    }
 
     public int getLegacyId() {
         if (this.legacyId != -1) {
@@ -41,23 +61,17 @@ public class BlockStateSnapshot {
         return id;
     }
 
-    public int getLegacyData() {
-        if (this.legacyData != -1) {
-            return this.legacyData;
+    public int getLegacyData(int protocol) {
+        if (protocol >= this.version || this.getBlock().getMinimumVersion() == 0 || this.getBlock() instanceof BlockUnknown) {
+            return this.getLegacyData();
         }
-
-        int data = BlockStateMapping.get().getLegacyData(this.runtimeId);
-        if (this.version == BlockStateMapping.get().getVersion()) {
-            this.legacyData = data;
-        }
-        return data;
+        return this.getBlock().getAlternateMeta(protocol);
     }
 
-    int getRuntimeIdNetworkProtocol() {
-        if (this.runtimeIdNetworkProtocol == -1) {
-            this.runtimeIdNetworkProtocol = GlobalBlockPalette.getOrCreateRuntimeId(this.getLegacyId(), this.getLegacyData());
+    public int getLegacyId(int protocol) {
+        if (protocol >= this.version || this.getBlock().getMinimumVersion() == 0 || this.getBlock() instanceof BlockUnknown) {
+            return this.getLegacyId();
         }
-
-        return this.runtimeIdNetworkProtocol;
+        return this.getBlock().getAlternateBlock(protocol).getLegacyId();
     }
 }

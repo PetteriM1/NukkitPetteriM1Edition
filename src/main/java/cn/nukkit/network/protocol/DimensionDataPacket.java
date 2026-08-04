@@ -13,11 +13,6 @@ public class DimensionDataPacket extends DataPacket {
     public List<DimensionDefinition> definitions;
 
     @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
-    @Override
     public void decode() {
         this.decodeUnsupported();
     }
@@ -31,7 +26,17 @@ public class DimensionDataPacket extends DataPacket {
             this.putVarInt(definition.getMaximumHeight());
             this.putVarInt(definition.getMinimumHeight());
             this.putVarInt(definition.getGeneratorType());
-            this.putVarInt(definition.getDimensionType());
+            if (protocol >= ProtocolInfo.v1_26_20_26) {
+                this.putVarInt(definition.getDimensionType());
+                if (protocol >= ProtocolInfo.v1_26_40) {
+                    this.putUUID(definition.getPackId());
+                }
+            }
         }
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

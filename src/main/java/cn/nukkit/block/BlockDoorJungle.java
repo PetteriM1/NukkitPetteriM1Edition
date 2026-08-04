@@ -14,8 +14,8 @@ public class BlockDoorJungle extends BlockDoorWood {
     }
 
     @Override
-    public String getName() {
-        return "Jungle Door Block";
+    public BlockColor getColor() {
+        return BlockColor.DIRT_BLOCK_COLOR;
     }
 
     @Override
@@ -24,12 +24,12 @@ public class BlockDoorJungle extends BlockDoorWood {
     }
 
     @Override
-    public Item toItem() {
-        return Item.get(Item.JUNGLE_DOOR);
+    public String getName() {
+        return "Jungle Door Block";
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.DIRT_BLOCK_COLOR;
+    public Item toItem() {
+        return Item.get(Item.JUNGLE_DOOR);
     }
 }

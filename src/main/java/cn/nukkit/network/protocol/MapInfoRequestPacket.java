@@ -13,17 +13,20 @@ public class MapInfoRequestPacket extends DataPacket {
     public long mapId;
 
     @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
-    @Override
     public void decode() {
         mapId = this.getEntityUniqueId();
+        if (protocol > ProtocolInfo.v1_19_20) {
+            this.getLInt(); // pixels count
+        }
     }
 
     @Override
     public void encode() {
         this.encodeUnsupported();
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

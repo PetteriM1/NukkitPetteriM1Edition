@@ -16,48 +16,13 @@ public class BlockTurtleEgg extends BlockTransparentMeta {
     }
 
     @Override
-    public String getName() {
-        return "Turtle Egg";
+    public double getHardness() {
+        return 0.1; //0.5
     }
 
     @Override
     public int getId() {
         return TURTLE_EGG;
-    }
-
-    @Override
-    public double getResistance() {
-        return 0.5;
-    }
-
-    @Override
-    public double getHardness() {
-        return 0.5;
-    }
-
-    @Override
-    public boolean canHarvestWithHand() {
-        return false;
-    }
-
-    @Override
-    public boolean canSilkTouch() {
-        return true;
-    }
-
-    @Override
-    public Item[] getDrops(Item item) {
-        return new Item[0];
-    }
-
-    @Override
-    public double getMinX() {
-        return this.x + 0.2;
-    }
-
-    @Override
-    public double getMinZ() {
-        return this.z + 0.2;
     }
 
     @Override
@@ -73,6 +38,51 @@ public class BlockTurtleEgg extends BlockTransparentMeta {
     @Override
     public double getMaxZ() {
         return this.z + 0.8;
+    }
+
+    @Override
+    public double getMinX() {
+        return this.x + 0.2;
+    }
+
+    @Override
+    public double getMinZ() {
+        return this.z + 0.2;
+    }
+
+    @Override
+    public String getName() {
+        return "Turtle Egg";
+    }
+
+    @Override
+    public double getResistance() {
+        return 2.5;
+    }
+
+    @Override
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.WHEN_PLACED_IN_WATER;
+    }
+
+    @Override
+    public boolean breakWhenPushed() {
+        return true;
+    }
+
+    @Override
+    public boolean canHarvestWithHand() {
+        return false;
+    }
+
+    @Override
+    public boolean canSilkTouch() {
+        return true;
+    }
+
+    @Override
+    public Item[] getDrops(Item item) {
+        return new Item[0];
     }
 
     @Override
@@ -100,15 +110,5 @@ public class BlockTurtleEgg extends BlockTransparentMeta {
         }
         this.getLevel().setBlock(this, this, true, true);
         return true;
-    }
-
-    @Override
-    public boolean breakWhenPushed() {
-        return true;
-    }
-
-    @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.WHEN_PLACED_IN_WATER;
     }
 }

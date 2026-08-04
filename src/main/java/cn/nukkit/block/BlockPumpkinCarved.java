@@ -10,13 +10,13 @@ public class BlockPumpkinCarved extends BlockPumpkin {
     }
 
     @Override
-    public String getName() {
-        return "Carved Pumpkin";
+    public int getId() {
+        return CARVED_PUMPKIN;
     }
 
     @Override
-    public int getId() {
-        return CARVED_PUMPKIN;
+    public String getName() {
+        return "Carved Pumpkin";
     }
 
     @Override

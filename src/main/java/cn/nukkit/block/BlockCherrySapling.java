@@ -6,6 +6,8 @@ import cn.nukkit.item.ItemBlock;
 import cn.nukkit.level.ListChunkManager;
 import cn.nukkit.level.generator.object.tree.ObjectCherryTree;
 import cn.nukkit.math.NukkitRandom;
+import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockCherrySapling extends BlockSapling {
 
@@ -23,8 +25,18 @@ public class BlockCherrySapling extends BlockSapling {
     }
 
     @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_20_0_23;
+    }
+
+    @Override
     public String getName() {
         return "Cherry Sapling";
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.SAPLING;
     }
 
     @Override

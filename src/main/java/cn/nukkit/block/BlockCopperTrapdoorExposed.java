@@ -14,8 +14,8 @@ public class BlockCopperTrapdoorExposed extends BlockCopperTrapdoor {
     }
 
     @Override
-    public String getName() {
-        return "Exposed Copper Trapdoor";
+    public BlockColor getColor() {
+        return BlockColor.LIGHT_GRAY_TERRACOTA_BLOCK_COLOR;
     }
 
     @Override
@@ -24,8 +24,8 @@ public class BlockCopperTrapdoorExposed extends BlockCopperTrapdoor {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.LIGHT_GRAY_TERRACOTA_BLOCK_COLOR;
+    public String getName() {
+        return "Exposed Copper Trapdoor";
     }
 
     @Override

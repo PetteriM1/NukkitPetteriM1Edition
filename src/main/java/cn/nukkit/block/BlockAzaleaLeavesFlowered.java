@@ -14,13 +14,13 @@ public class BlockAzaleaLeavesFlowered extends BlockAzaleaLeaves {
     }
 
     @Override
-    public String getName() {
-        return "Flowering Azalea Leaves";
+    public int getId() {
+        return AZALEA_LEAVES_FLOWERED;
     }
 
     @Override
-    public int getId() {
-        return AZALEA_LEAVES_FLOWERED;
+    public String getName() {
+        return "Flowering Azalea Leaves";
     }
 
     @Override

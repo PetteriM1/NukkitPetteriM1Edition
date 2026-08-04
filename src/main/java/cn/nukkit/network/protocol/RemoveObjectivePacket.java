@@ -10,11 +10,6 @@ public class RemoveObjectivePacket extends DataPacket {
     public String objectiveId;
 
     @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
-    @Override
     public void decode() {
         this.decodeUnsupported();
     }
@@ -23,5 +18,10 @@ public class RemoveObjectivePacket extends DataPacket {
     public void encode() {
         this.reset();
         this.putString(this.objectiveId);
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

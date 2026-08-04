@@ -3,7 +3,7 @@ package cn.nukkit.block;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.utils.BlockColor;
 
-public class BlockDoubleSlabStone3 extends BlockDoubleSlabBase  {
+public class BlockDoubleSlabStone3 extends BlockDoubleSlabBase {
 
     public static final int END_STONE_BRICKS = 0;
     public static final int SMOOTH_RED_SANDSTONE = 1;
@@ -34,41 +34,6 @@ public class BlockDoubleSlabStone3 extends BlockDoubleSlabBase  {
     }
 
     @Override
-    public String getSlabName() {
-        return NAMES[this.getDamage() & 0x07];
-    }
-
-    @Override
-    public int getId() {
-        return DOUBLE_STONE_SLAB3;
-    }
-
-    @Override
-    public int getSingleSlabId() {
-        return STONE_SLAB3;
-    }
-
-    @Override
-    public double getResistance() {
-        return this.getToolType() > ItemTool.TIER_WOODEN ? 30 : 15;
-    }
-
-    @Override
-    public double getHardness() {
-        return 2;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
-    }
-
-    @Override
-    public int getItemDamage() {
-        return this.getDamage() & 0x07;
-    }
-
-    @Override
     public BlockColor getColor() {
         switch (this.getDamage() & 0x07) {
             case END_STONE_BRICKS:
@@ -86,6 +51,41 @@ public class BlockDoubleSlabStone3 extends BlockDoubleSlabBase  {
             case POLISHED_GRANITE:
                 return BlockColor.DIRT_BLOCK_COLOR;
         }
+    }
+
+    @Override
+    public double getHardness() {
+        return 2;
+    }
+
+    @Override
+    public int getId() {
+        return DOUBLE_STONE_SLAB3;
+    }
+
+    @Override
+    public int getItemDamage() {
+        return this.getDamage() & 0x07;
+    }
+
+    @Override
+    public double getResistance() {
+        return this.getToolType() > ItemTool.TIER_WOODEN ? 30 : 15;
+    }
+
+    @Override
+    public int getSingleSlabId() {
+        return STONE_SLAB3;
+    }
+
+    @Override
+    public String getSlabName() {
+        return NAMES[this.getDamage() & 0x07];
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
     }
 
     @Override

@@ -23,6 +23,7 @@ public class EntityDefinition {
     private final int runtimeId;
 
     private CompoundTag networkTag;
+    private CompoundTag networkTagOld; // 1.16 and older
 
     @Builder
     public EntityDefinition(String identifier, String parentEntity, boolean spawnEgg, String alternateName, Class<? extends Entity> implementation, boolean serverSideOnly) {
@@ -52,6 +53,21 @@ public class EntityDefinition {
         }
     }
 
+    public CompoundTag getNetworkTag() {
+        if (this.networkTag == null) {
+            this.networkTag = this.createNetworkTag();
+        }
+        return this.networkTag;
+    }
+
+    public CompoundTag getNetworkTagOld() {
+        if (this.networkTagOld == null) {
+            this.networkTagOld = this.createNetworkTag();
+            this.networkTagOld.putBoolean("experimental", false);
+        }
+        return this.networkTagOld;
+    }
+
     private CompoundTag createNetworkTag() {
         CompoundTag nbt = new CompoundTag("");
         nbt.putBoolean("hasspawnegg", this.spawnEgg);
@@ -60,12 +76,5 @@ public class EntityDefinition {
         nbt.putString("bid", this.parentEntity == null ? "" : this.parentEntity);
         nbt.putInt("rid", this.runtimeId);
         return nbt;
-    }
-
-    public CompoundTag getNetworkTag() {
-        if (this.networkTag == null) {
-            this.networkTag = this.createNetworkTag();
-        }
-        return this.networkTag;
     }
 }

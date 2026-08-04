@@ -36,6 +36,14 @@ public class FurnaceRecipe implements Recipe {
         this.networkId = ++CraftingManager.NEXT_NETWORK_ID;
     }
 
+    public void setId(UUID id) {
+        this.id = id;
+
+        if (this.recipeId == null) {
+            this.recipeId = this.getId().toString();
+        }
+    }
+
     public void setInput(Item item) {
         this.ingredient = item.clone();
     }
@@ -50,20 +58,12 @@ public class FurnaceRecipe implements Recipe {
     }
 
     @Override
-    public void registerToCraftingManager(CraftingManager manager) {
-        manager.registerFurnaceRecipe(this);
-    }
-
-    @Override
     public RecipeType getType() {
         return this.ingredient.hasMeta() ? RecipeType.FURNACE_DATA : RecipeType.FURNACE;
     }
 
-    public void setId(UUID id) {
-        this.id = id;
-
-        if (this.recipeId == null) {
-            this.recipeId = this.getId().toString();
-        }
+    @Override
+    public void registerToCraftingManager(CraftingManager manager) {
+        manager.registerFurnaceRecipe(this);
     }
 }

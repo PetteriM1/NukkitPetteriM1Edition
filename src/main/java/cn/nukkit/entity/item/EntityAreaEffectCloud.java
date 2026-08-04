@@ -18,6 +18,8 @@ import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.potion.Effect;
 import cn.nukkit.potion.InstantEffect;
 import cn.nukkit.potion.Potion;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,168 +35,132 @@ public class EntityAreaEffectCloud extends Entity {
     private int nextApply;
     public List<Effect> cloudEffects;
     private int lastAge;
+    @Setter
+    @Getter
+    private boolean fromDragon;
 
     public EntityAreaEffectCloud(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
-    }
-
-    public int getWaitTime() {
-        return this.getDataPropertyInt(DATA_AREA_EFFECT_CLOUD_WAITING);
-    }
-
-    public void setWaitTime(int waitTime) {
-        setWaitTime(waitTime, true);
-    }
-
-    public void setWaitTime(int waitTime, boolean send) {
-        this.setDataProperty(new IntEntityData(DATA_AREA_EFFECT_CLOUD_WAITING, waitTime), send);
-    }
-
-    public int getPotionId() {
-        return this.getDataPropertyShort(DATA_POTION_AUX_VALUE);
-    }
-
-    public void setPotionId(int potionId) {
-        setPotionId(potionId, true);
-    }
-
-    public void setPotionId(int potionId, boolean send) {
-        this.setDataProperty(new ShortEntityData(DATA_POTION_AUX_VALUE, potionId & 0xFFFF), send);
-    }
-
-    public void recalculatePotionColor() {
-        recalculatePotionColor(true);
-    }
-
-    public void recalculatePotionColor(boolean send) {
-        int a;
-        int r;
-        int g;
-        int b;
-
-        int color;
-        if (namedTag.contains("ParticleColor")) {
-            color = namedTag.getInt("ParticleColor");
-            a = (color & 0xFF000000) >> 24;
-            r = (color & 0x00FF0000) >> 16;
-            g = (color & 0x0000FF00) >> 8;
-            b = color & 0x000000FF;
-        } else {
-            a = 255;
-            Effect effect = Potion.getEffect(getPotionId(), true);
-            if (effect == null) {
-                r = 40;
-                g = 40;
-                b = 255;
-            } else {
-                int[] colors = effect.getColor();
-                r = colors[0];
-                g = colors[1];
-                b = colors[2];
-            }
-        }
-
-        setPotionColor(a, r, g, b, send);
-    }
-
-    public int getPotionColor() {
-        return this.getDataPropertyInt(DATA_POTION_COLOR);
-    }
-
-    public void setPotionColor(int alpha, int red, int green, int blue, boolean send) {
-        setPotionColor(((alpha & 0xff) << 24) | ((red & 0xff) << 16) | ((green & 0xff) << 8) | (blue & 0xff), send);
-    }
-
-    public void setPotionColor(int argp) {
-        setPotionColor(argp, true);
-    }
-
-    public void setPotionColor(int argp, boolean send) {
-        this.setDataProperty(new IntEntityData(DATA_POTION_COLOR, argp), send);
-    }
-
-    public int getPickupCount() {
-        return this.getDataPropertyInt(DATA_PICKUP_COUNT);
-    }
-
-    public void setPickupCount(int pickupCount) {
-        setPickupCount(pickupCount, true);
-    }
-
-    public void setPickupCount(int pickupCount, boolean send) {
-        this.setDataProperty(new IntEntityData(DATA_PICKUP_COUNT, pickupCount), send);
-    }
-
-    public float getRadiusChangeOnPickup() {
-        return this.getDataPropertyFloat(DATA_CHANGE_ON_PICKUP);
-    }
-
-    public void setRadiusChangeOnPickup(float radiusChangeOnPickup) {
-        setRadiusChangeOnPickup(radiusChangeOnPickup, true);
-    }
-
-    public void setRadiusChangeOnPickup(float radiusChangeOnPickup, boolean send) {
-        this.setDataProperty(new FloatEntityData(DATA_CHANGE_ON_PICKUP, radiusChangeOnPickup), send);
-    }
-
-    public float getRadiusPerTick() {
-        return this.getDataPropertyFloat(DATA_CHANGE_RATE);
-    }
-
-    public void setRadiusPerTick(float radiusPerTick) {
-        setRadiusPerTick(radiusPerTick, true);
-    }
-
-    public void setRadiusPerTick(float radiusPerTick, boolean send) {
-        this.setDataProperty(new FloatEntityData(DATA_CHANGE_RATE, radiusPerTick), send);
-    }
-
-    public long getSpawnTime() {
-        return this.getDataPropertyInt(DATA_SPAWN_TIME);
-    }
-
-    public void setSpawnTime(long spawnTime) {
-        setSpawnTime(spawnTime, true);
-    }
-
-    public void setSpawnTime(long spawnTime, boolean send) {
-        this.setDataProperty(new LongEntityData(DATA_SPAWN_TIME, spawnTime), send);
-    }
-
-    public int getDuration() {
-        return this.getDataPropertyInt(DATA_DURATION);
     }
 
     public void setDuration(int duration) {
         setDuration(duration, true);
     }
 
-    public void setDuration(int duration, boolean send) {
-        this.setDataProperty(new IntEntityData(DATA_DURATION, duration), send);
+    public void setParticleId(int particleId) {
+        setParticleId(particleId, true);
     }
 
-    public float getRadius() {
-        return this.getDataPropertyFloat(DATA_AREA_EFFECT_CLOUD_RADIUS);
+    public void setPickupCount(int pickupCount) {
+        setPickupCount(pickupCount, true);
+    }
+
+    public void setPotionColor(int argp) {
+        setPotionColor(argp, true);
+    }
+
+    public void setPotionId(int potionId) {
+        setPotionId(potionId, true);
     }
 
     public void setRadius(float radius) {
         setRadius(radius, true);
     }
 
-    public void setRadius(float radius, boolean send) {
-        this.setDataProperty(new FloatEntityData(DATA_AREA_EFFECT_CLOUD_RADIUS, radius), send);
+    public void setRadiusChangeOnPickup(float radiusChangeOnPickup) {
+        setRadiusChangeOnPickup(radiusChangeOnPickup, true);
+    }
+
+    public void setRadiusPerTick(float radiusPerTick) {
+        setRadiusPerTick(radiusPerTick, true);
+    }
+
+    public void setSpawnTime(long spawnTime) {
+        setSpawnTime(spawnTime, true);
+    }
+
+    public void setWaitTime(int waitTime) {
+        setWaitTime(waitTime, true);
+    }
+
+    @Override
+    protected float getDrag() {
+        return 0;
+    }
+
+    public int getDuration() {
+        return this.getDataPropertyInt(DATA_DURATION);
+    }
+
+    @Override
+    protected float getGravity() {
+        return 0;
+    }
+
+    @Override
+    public float getHeight() {
+        return 0.3F + (getRadius() / 2F);
+    }
+
+    @Override
+    public float getLength() {
+        return getRadius();
+    }
+
+    @Override
+    public int getNetworkId() {
+        return NETWORK_ID;
     }
 
     public int getParticleId() {
         return this.getDataPropertyInt(DATA_AREA_EFFECT_CLOUD_PARTICLE_ID);
     }
 
-    public void setParticleId(int particleId) {
-        setParticleId(particleId, true);
+    public int getPickupCount() {
+        return this.getDataPropertyInt(DATA_PICKUP_COUNT);
     }
 
-    public void setParticleId(int particleId, boolean send) {
-        this.setDataProperty(new IntEntityData(DATA_AREA_EFFECT_CLOUD_PARTICLE_ID, particleId), send);
+    public int getPotionColor() {
+        return this.getDataPropertyInt(DATA_POTION_COLOR);
+    }
+
+    public int getPotionId() {
+        return this.getDataPropertyShort(DATA_POTION_AUX_VALUE);
+    }
+
+    public float getRadius() {
+        return this.getDataPropertyFloat(DATA_AREA_EFFECT_CLOUD_RADIUS);
+    }
+
+    public float getRadiusChangeOnPickup() {
+        return this.getDataPropertyFloat(DATA_CHANGE_ON_PICKUP);
+    }
+
+    public float getRadiusPerTick() {
+        return this.getDataPropertyFloat(DATA_CHANGE_RATE);
+    }
+
+    public long getSpawnTime() {
+        return this.getDataPropertyInt(DATA_SPAWN_TIME);
+    }
+
+    public int getWaitTime() {
+        return this.getDataPropertyInt(DATA_AREA_EFFECT_CLOUD_WAITING);
+    }
+
+    @Override
+    public float getWidth() {
+        return getRadius();
+    }
+
+    @Override
+    public boolean attack(EntityDamageEvent source) {
+        return false;
+    }
+
+    @Override
+    public boolean canCollideWith(Entity entity) {
+        return entity instanceof EntityLiving;
     }
 
     @Override
@@ -266,37 +232,6 @@ public class EntityAreaEffectCloud extends Entity {
         } else {
             setWaitTime(10, false);
         }
-    }
-
-    @Override
-    public boolean attack(EntityDamageEvent source) {
-        return false;
-    }
-
-    @Override
-    public void saveNBT() {
-        super.saveNBT();
-        ListTag<CompoundTag> effectsTag = new ListTag<>("mobEffects");
-        for (Effect effect : cloudEffects) {
-            effectsTag.add(new CompoundTag().putByte("Id", effect.getId())
-                    .putBoolean("Ambient", effect.isAmbient())
-                    .putByte("Amplifier", effect.getAmplifier())
-                    .putBoolean("DisplayOnScreenTextureAnimation", effect.isVisible())
-                    .putInt("Duration", effect.getDuration())
-            );
-        }
-        namedTag.putList(effectsTag);
-        namedTag.putInt("ParticleColor", getPotionColor());
-        namedTag.putShort("PotionId", getPotionId());
-        namedTag.putInt("Duration", getDuration());
-        namedTag.putInt("DurationOnUse", durationOnUse);
-        namedTag.putInt("ReapplicationDelay", reapplicationDelay);
-        namedTag.putFloat("Radius", getRadius());
-        namedTag.putFloat("RadiusChangeOnPickup", getRadiusChangeOnPickup());
-        namedTag.putFloat("RadiusOnUse", radiusOnUse);
-        namedTag.putFloat("RadiusPerTick", getRadiusPerTick());
-        namedTag.putInt("WaitTime", getWaitTime());
-        namedTag.putFloat("InitialRadius", initialRadius);
     }
 
     @Override
@@ -373,38 +308,108 @@ public class EntityAreaEffectCloud extends Entity {
         return true;
     }
 
-    @Override
-    public boolean canCollideWith(Entity entity) {
-        return entity instanceof EntityLiving;
+    public void recalculatePotionColor() {
+        recalculatePotionColor(true);
+    }
+
+    public void recalculatePotionColor(boolean send) {
+        int a;
+        int r;
+        int g;
+        int b;
+
+        int color;
+        if (namedTag.contains("ParticleColor")) {
+            color = namedTag.getInt("ParticleColor");
+            a = (color & 0xFF000000) >> 24;
+            r = (color & 0x00FF0000) >> 16;
+            g = (color & 0x0000FF00) >> 8;
+            b = color & 0x000000FF;
+        } else {
+            a = 255;
+            Effect effect = Potion.getEffect(getPotionId(), true);
+            if (effect == null) {
+                r = 40;
+                g = 40;
+                b = 255;
+            } else {
+                int[] colors = effect.getColor();
+                r = colors[0];
+                g = colors[1];
+                b = colors[2];
+            }
+        }
+
+        setPotionColor(a, r, g, b, send);
     }
 
     @Override
-    public float getHeight() {
-        return 0.3F + (getRadius() / 2F);
+    public void saveNBT() {
+        super.saveNBT();
+        ListTag<CompoundTag> effectsTag = new ListTag<>("mobEffects");
+        for (Effect effect : cloudEffects) {
+            effectsTag.add(new CompoundTag().putByte("Id", effect.getId())
+                    .putBoolean("Ambient", effect.isAmbient())
+                    .putByte("Amplifier", effect.getAmplifier())
+                    .putBoolean("DisplayOnScreenTextureAnimation", effect.isVisible())
+                    .putInt("Duration", effect.getDuration())
+            );
+        }
+        namedTag.putList(effectsTag);
+        namedTag.putInt("ParticleColor", getPotionColor());
+        namedTag.putShort("PotionId", getPotionId());
+        namedTag.putInt("Duration", getDuration());
+        namedTag.putInt("DurationOnUse", durationOnUse);
+        namedTag.putInt("ReapplicationDelay", reapplicationDelay);
+        namedTag.putFloat("Radius", getRadius());
+        namedTag.putFloat("RadiusChangeOnPickup", getRadiusChangeOnPickup());
+        namedTag.putFloat("RadiusOnUse", radiusOnUse);
+        namedTag.putFloat("RadiusPerTick", getRadiusPerTick());
+        namedTag.putInt("WaitTime", getWaitTime());
+        namedTag.putFloat("InitialRadius", initialRadius);
     }
 
-    @Override
-    public float getWidth() {
-        return getRadius();
+    public void setDuration(int duration, boolean send) {
+        this.setDataProperty(new IntEntityData(DATA_DURATION, duration), send);
     }
 
-    @Override
-    public float getLength() {
-        return getRadius();
+    public void setParticleId(int particleId, boolean send) {
+        this.setDataProperty(new IntEntityData(DATA_AREA_EFFECT_CLOUD_PARTICLE_ID, particleId), send);
     }
 
-    @Override
-    protected float getGravity() {
-        return 0;
+    public void setPickupCount(int pickupCount, boolean send) {
+        this.setDataProperty(new IntEntityData(DATA_PICKUP_COUNT, pickupCount), send);
     }
 
-    @Override
-    protected float getDrag() {
-        return 0;
+    public void setPotionColor(int alpha, int red, int green, int blue, boolean send) {
+        setPotionColor(((alpha & 0xff) << 24) | ((red & 0xff) << 16) | ((green & 0xff) << 8) | (blue & 0xff), send);
     }
 
-    @Override
-    public int getNetworkId() {
-        return NETWORK_ID;
+    public void setPotionColor(int argp, boolean send) {
+        this.setDataProperty(new IntEntityData(DATA_POTION_COLOR, argp), send);
+    }
+
+    public void setPotionId(int potionId, boolean send) {
+        this.setDataProperty(new ShortEntityData(DATA_POTION_AUX_VALUE, potionId & 0xFFFF), send);
+    }
+
+    public void setRadius(float radius, boolean send) {
+        this.setDataProperty(new FloatEntityData(DATA_AREA_EFFECT_CLOUD_RADIUS, radius), send);
+    }
+
+    public void setRadiusChangeOnPickup(float radiusChangeOnPickup, boolean send) {
+        this.setDataProperty(new FloatEntityData(DATA_CHANGE_ON_PICKUP, radiusChangeOnPickup), send);
+    }
+
+    public void setRadiusPerTick(float radiusPerTick, boolean send) {
+        this.setDataProperty(new FloatEntityData(DATA_CHANGE_RATE, radiusPerTick), send);
+    }
+
+    public void setSpawnTime(long spawnTime, boolean send) {
+        this.setDataProperty(new LongEntityData(DATA_SPAWN_TIME, spawnTime), send);
+    }
+
+    public void setWaitTime(int waitTime, boolean send) {
+        this.setDataProperty(new IntEntityData(DATA_AREA_EFFECT_CLOUD_WAITING, waitTime), send);
     }
 }

@@ -15,15 +15,61 @@ public interface Inventory {
 
     int MAX_STACK = 64;
 
-    int getSize();
-
-    int getMaxStackSize();
+    void setContents(Map<Integer, Item> items);
 
     void setMaxStackSize(int size);
 
+    Map<Integer, Item> getContents();
+
+    InventoryHolder getHolder();
+
+    int getMaxStackSize();
+
     String getName();
 
+    int getSize();
+
     String getTitle();
+
+    InventoryType getType();
+
+    Set<Player> getViewers();
+
+    boolean isEmpty();
+
+    boolean isFull();
+
+    Item[] addItem(Item... slots);
+
+    Map<Integer, Item> all(Item item);
+
+    default boolean allowedToAdd(Item item) {
+        return true;
+    }
+
+    boolean canAddItem(Item item);
+
+    default boolean clear(int index) {
+        return clear(index, true);
+    }
+
+    boolean clear(int index, boolean send);
+
+    void clearAll();
+
+    void close(Player who);
+
+    boolean contains(Item item);
+
+    void decreaseCount(int slot);
+
+    default int first(Item item) {
+        return first(item, false);
+    }
+
+    int first(Item item, boolean exact);
+
+    int firstEmpty(Item item);
 
     Item getItem(int index);
 
@@ -31,25 +77,17 @@ public interface Inventory {
         return getItem(index);
     }
 
-    default boolean setItem(int index, Item item) {
-        return setItem(index, item, true);
-    }
+    void onClose(Player who);
 
-    boolean setItem(int index, Item item, boolean send);
+    void onOpen(Player who);
 
-    Item[] addItem(Item... slots);
+    void onSlotChange(int index, Item before, boolean send);
 
-    boolean canAddItem(Item item);
+    boolean open(Player who);
 
-    default boolean allowedToAdd(Item item) {
-        return true;
-    }
+    void remove(Item item);
 
     Item[] removeItem(Item... slots);
-
-    Map<Integer, Item> getContents();
-
-    void setContents(Map<Integer, Item> items);
 
     void sendContents(Player player);
 
@@ -63,47 +101,9 @@ public interface Inventory {
 
     void sendSlot(int index, Collection<Player> players);
 
-    boolean contains(Item item);
-
-    Map<Integer, Item> all(Item item);
-
-    default int first(Item item) {
-        return first(item, false);
+    default boolean setItem(int index, Item item) {
+        return setItem(index, item, true);
     }
 
-    int first(Item item, boolean exact);
-
-    int firstEmpty(Item item);
-
-    void decreaseCount(int slot);
-
-    void remove(Item item);
-
-    default boolean clear(int index) {
-        return clear(index, true);
-    }
-
-    boolean clear(int index, boolean send);
-
-    void clearAll();
-
-    boolean isFull();
-
-    boolean isEmpty();
-
-    Set<Player> getViewers();
-
-    InventoryType getType();
-
-    InventoryHolder getHolder();
-
-    void onOpen(Player who);
-
-    boolean open(Player who);
-
-    void close(Player who);
-
-    void onClose(Player who);
-
-    void onSlotChange(int index, Item before, boolean send);
+    boolean setItem(int index, Item item, boolean send);
 }

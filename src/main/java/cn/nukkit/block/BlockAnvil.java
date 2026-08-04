@@ -41,8 +41,23 @@ public class BlockAnvil extends BlockFallableMeta implements Faceable {
     }
 
     @Override
+    public BlockFace getBlockFace() {
+        return BlockFace.fromHorizontalIndex(this.getDamage() & 0x3);
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.IRON_BLOCK_COLOR;
+    }
+
+    @Override
     public int getFullId() {
         return (getId() << DATA_BITS) + getDamage();
+    }
+
+    @Override
+    public double getHardness() {
+        return 5;
     }
 
     @Override
@@ -51,18 +66,28 @@ public class BlockAnvil extends BlockFallableMeta implements Faceable {
     }
 
     @Override
-    public boolean canBeActivated() {
-        return true;
+    public double getMaxX() {
+        return this.x + (this.getBlockFace().getAxis() == BlockFace.Axis.X ? 1 : 1 - 2 / 16.0);
     }
 
     @Override
-    public boolean isTransparent() {
-        return true;
+    public double getMaxZ() {
+        return this.z + (this.getBlockFace().getAxis() == BlockFace.Axis.Z ? 1 : 1 - 2 / 16.0);
     }
 
     @Override
-    public double getHardness() {
-        return 5;
+    public double getMinX() {
+        return this.x + (this.getBlockFace().getAxis() == BlockFace.Axis.X ? 0 : 2 / 16.0);
+    }
+
+    @Override
+    public double getMinZ() {
+        return this.z + (this.getBlockFace().getAxis() == BlockFace.Axis.Z ? 0 : 2 / 16.0);
+    }
+
+    @Override
+    public String getName() {
+        return NAMES[this.getDamage() > 11 ? 0 : this.getDamage()];
     }
 
     @Override
@@ -76,8 +101,46 @@ public class BlockAnvil extends BlockFallableMeta implements Faceable {
     }
 
     @Override
-    public String getName() {
-        return NAMES[this.getDamage() > 11 ? 0 : this.getDamage()];
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.WHEN_PLACED_IN_WATER;
+    }
+
+    @Override
+    public boolean isSolid() {
+        return false;
+    }
+
+    @Override
+    public boolean isTransparent() {
+        return true;
+    }
+
+    @Override
+    public boolean canBeActivated() {
+        return true;
+    }
+
+    @Override
+    public boolean canHarvestWithHand() {
+        return false;
+    }
+
+    @Override
+    public Item[] getDrops(Item item) {
+        if (item.isPickaxe()) {
+            return new Item[]{
+                    this.toItem()
+            };
+        }
+        return new Item[0];
+    }
+
+    @Override
+    public boolean onActivate(Item item, Player player) {
+        if (player != null) {
+            player.addWindow(new AnvilInventory(player.getUIInventory(), this), Player.ANVIL_WINDOW_ID);
+        }
+        return true;
     }
 
     @Override
@@ -95,77 +158,14 @@ public class BlockAnvil extends BlockFallableMeta implements Faceable {
     }
 
     @Override
-    public boolean onActivate(Item item, Player player) {
-        if (player != null) {
-            player.addWindow(new AnvilInventory(player.getUIInventory(), this), Player.ANVIL_WINDOW_ID);
-        }
-        return true;
-    }
-
-    @Override
     public Item toItem() {
         int damage = this.getDamage();
         if (damage >= 4 && damage <= 7) {
-            return new ItemBlock(this, this.getDamage() & 0x04);
+            return new ItemBlock(Block.get(this.getId(), 4), 4);
         } else if (damage >= 8 && damage <= 11) {
-            return new ItemBlock(this, this.getDamage() & 0x08);
+            return new ItemBlock(Block.get(this.getId(), 8), 8);
         } else {
-            return new ItemBlock(this);
+            return new ItemBlock(Block.get(this.getId(), 0), 0);
         }
-    }
-
-    @Override
-    public Item[] getDrops(Item item) {
-        if (item.isPickaxe()) {
-            return new Item[]{
-                    this.toItem()
-            };
-        }
-        return new Item[0];
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.IRON_BLOCK_COLOR;
-    }
-
-    @Override
-    public boolean canHarvestWithHand() {
-        return false;
-    }
-
-    @Override
-    public BlockFace getBlockFace() {
-        return BlockFace.fromHorizontalIndex(this.getDamage() & 0x3);
-    }
-
-    @Override
-    public double getMinX() {
-        return this.x + (this.getBlockFace().getAxis() == BlockFace.Axis.X ? 0 : 2 / 16.0);
-    }
-
-    @Override
-    public double getMinZ() {
-        return this.z + (this.getBlockFace().getAxis() == BlockFace.Axis.Z ? 0 : 2 / 16.0);
-    }
-
-    @Override
-    public double getMaxX() {
-        return this.x + (this.getBlockFace().getAxis() == BlockFace.Axis.X ? 1 : 1 - 2 / 16.0);
-    }
-
-    @Override
-    public double getMaxZ() {
-        return this.z + (this.getBlockFace().getAxis() == BlockFace.Axis.Z ? 1 : 1 - 2 / 16.0);
-    }
-
-    @Override
-    public boolean isSolid() {
-        return false;
-    }
-
-    @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.WHEN_PLACED_IN_WATER;
     }
 }

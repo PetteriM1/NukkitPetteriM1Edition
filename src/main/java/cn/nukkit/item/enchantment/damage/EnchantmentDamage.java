@@ -21,16 +21,6 @@ public abstract class EnchantmentDamage extends Enchantment {
     }
 
     @Override
-    public boolean checkCompatibility(Enchantment enchantment) {
-        return !(enchantment instanceof EnchantmentDamage);
-    }
-
-    @Override
-    public boolean canEnchant(Item item) {
-        return item.isAxe() || super.canEnchant(item);
-    }
-
-    @Override
     public int getMaxLevel() {
         return 5;
     }
@@ -43,5 +33,15 @@ public abstract class EnchantmentDamage extends Enchantment {
     @Override
     public boolean isMajor() {
         return true;
+    }
+
+    @Override
+    public boolean canEnchant(Item item) {
+        return item.isAxe() || super.canEnchant(item);
+    }
+
+    @Override
+    public boolean checkCompatibility(Enchantment enchantment) {
+        return !(enchantment instanceof EnchantmentDamage);
     }
 }

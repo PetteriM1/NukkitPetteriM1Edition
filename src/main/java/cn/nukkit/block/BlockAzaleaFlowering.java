@@ -6,12 +6,12 @@ public class BlockAzaleaFlowering extends BlockAzalea {
     }
 
     @Override
-    public String getName() {
-        return "Flowering Azalea";
+    public int getId() {
+        return FLOWERING_AZALEA;
     }
 
     @Override
-    public int getId() {
-        return FLOWERING_AZALEA;
+    public String getName() {
+        return "Flowering Azalea";
     }
 }

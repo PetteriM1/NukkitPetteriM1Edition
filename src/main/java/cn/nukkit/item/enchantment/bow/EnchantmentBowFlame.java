@@ -12,12 +12,12 @@ public class EnchantmentBowFlame extends EnchantmentBow {
     }
 
     @Override
-    public int getMinEnchantAbility(int level) {
-        return 20;
+    public int getMaxEnchantAbility(int level) {
+        return 50;
     }
 
     @Override
-    public int getMaxEnchantAbility(int level) {
-        return 50;
+    public int getMinEnchantAbility(int level) {
+        return 20;
     }
 }

@@ -13,29 +13,6 @@ import org.iq80.leveldb.WriteBatch;
 
 public class Data3dSerializer {
 
-    public static void serialize(WriteBatch db, LevelDBChunk chunk) {
-        DimensionData dimensionData = chunk.getProvider().getLevel().getDimensionData();
-
-        ByteBuf buffer  = ByteBufAllocator.DEFAULT.ioBuffer();
-        try {
-            byte[] heightMap = chunk.getHeightMapArray();
-            for (int height : heightMap) {
-                buffer.writeShortLE(height);
-            }
-
-            for (int i = 0; i < dimensionData.getHeight() >> 4; i++) {
-                PalettedBlockStorage storage = chunk.getBiomeStorage(i);
-                storage.writeToStorage(buffer);
-            }
-
-            byte[] data = new byte[buffer.readableBytes()];
-            buffer.readBytes(data);
-            db.put(LevelDBKey.DATA_3D.getKey(chunk.getX(), chunk.getZ(), chunk.getProvider().getLevel().getDimension()), data);
-        } finally {
-            buffer.release();
-        }
-    }
-
     public static void deserialize(DB db, ChunkBuilder builder) {
         DimensionData dimensionData = builder.getProvider().getLevel().getDimensionData();
 
@@ -44,8 +21,7 @@ public class Data3dSerializer {
             return;
         }
 
-
-        int[] heightMap = new int[512];
+        int[] heightMap = new int[256];
         PalettedBlockStorage[] biomes = new PalettedBlockStorage[dimensionData.getHeight() >> 4];
 
         ByteBuf buffer = ByteBufAllocator.DEFAULT.ioBuffer(data3d.length);
@@ -86,5 +62,28 @@ public class Data3dSerializer {
         PalettedBlockStorage storage = PalettedBlockStorage.createWithDefaultState(BitArrayVersion.V0, 0);
         storage.readFromStorage(buffer);
         return storage;
+    }
+
+    public static void serialize(WriteBatch db, LevelDBChunk chunk) {
+        DimensionData dimensionData = chunk.getProvider().getLevel().getDimensionData();
+
+        ByteBuf buffer = ByteBufAllocator.DEFAULT.ioBuffer();
+        try {
+            byte[] heightMap = chunk.getHeightMapArray();
+            for (int height : heightMap) {
+                buffer.writeShortLE(height);
+            }
+
+            for (int i = 0; i < dimensionData.getHeight() >> 4; i++) {
+                PalettedBlockStorage storage = chunk.getBiomeStorage(i);
+                storage.writeToStorage(buffer);
+            }
+
+            byte[] data = new byte[buffer.readableBytes()];
+            buffer.readBytes(data);
+            db.put(LevelDBKey.DATA_3D.getKey(chunk.getX(), chunk.getZ(), chunk.getProvider().getLevel().getDimension()), data);
+        } finally {
+            buffer.release();
+        }
     }
 }

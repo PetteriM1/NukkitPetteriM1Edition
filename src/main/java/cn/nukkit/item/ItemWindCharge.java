@@ -1,5 +1,7 @@
 package cn.nukkit.item;
 
+import cn.nukkit.network.protocol.ProtocolInfo;
+
 public class ItemWindCharge extends ProjectileItem {
 
     public ItemWindCharge() {
@@ -22,5 +24,10 @@ public class ItemWindCharge extends ProjectileItem {
     @Override
     public float getThrowForce() {
         return 1.5f;
+    }
+
+    @Override
+    public boolean isSupportedOn(int protocol) {
+        return protocol >= ProtocolInfo.v1_21_0;
     }
 }

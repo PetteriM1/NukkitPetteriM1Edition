@@ -19,16 +19,6 @@ public class ItemChestplateLeather extends ItemColorArmor {
     }
 
     @Override
-    public int getTier() {
-        return ItemArmor.TIER_LEATHER;
-    }
-
-    @Override
-    public boolean isChestplate() {
-        return true;
-    }
-
-    @Override
     public int getArmorPoints() {
         return 3;
     }
@@ -36,5 +26,15 @@ public class ItemChestplateLeather extends ItemColorArmor {
     @Override
     public int getMaxDurability() {
         return 81;
+    }
+
+    @Override
+    public int getTier() {
+        return ItemArmor.TIER_LEATHER;
+    }
+
+    @Override
+    public boolean isChestplate() {
+        return true;
     }
 }

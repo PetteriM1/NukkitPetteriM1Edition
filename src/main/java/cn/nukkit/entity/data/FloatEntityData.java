@@ -15,16 +15,16 @@ public class FloatEntityData extends EntityData<Float> {
         this.data = data;
     }
 
-    public Float getData() {
-        return data;
-    }
-
     public void setData(Float data) {
         if (data == null) {
             this.data = 0;
         } else {
             this.data = data;
         }
+    }
+
+    public Float getData() {
+        return data;
     }
 
     @Override

@@ -5,7 +5,7 @@ package cn.nukkit.entity.weather;
  */
 public interface EntityLightningStrike extends EntityWeather {
 
-    boolean isEffect();
-
     void setEffect(boolean e);
+
+    boolean isEffect();
 }

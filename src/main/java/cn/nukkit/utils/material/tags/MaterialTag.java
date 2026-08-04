@@ -6,11 +6,11 @@ import java.util.Set;
 
 public interface MaterialTag {
 
+    Set<MaterialType> getMaterials();
+
     default boolean has(MaterialType type) {
         return this.getMaterials().contains(type);
     }
-
-    Set<MaterialType> getMaterials();
 
     static MaterialTag of(MaterialType... materials) {
         return new SimpleMaterialTag(materials);

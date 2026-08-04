@@ -9,8 +9,8 @@ public class EnchantmentCrossbowQuickCharge extends EnchantmentCrossbow {
     }
 
     @Override
-    public int getMinEnchantAbility(int level) {
-        return 12 + 20 * (level - 1);
+    public int getMaxLevel() {
+        return 3;
     }
 
     @Override
@@ -19,7 +19,7 @@ public class EnchantmentCrossbowQuickCharge extends EnchantmentCrossbow {
     }
 
     @Override
-    public int getMaxLevel() {
-        return 3;
+    public int getMinEnchantAbility(int level) {
+        return 12 + 20 * (level - 1);
     }
 }

@@ -13,18 +13,8 @@ import cn.nukkit.utils.Utils;
 public class BlockMobSpawner extends BlockTransparent {
 
     @Override
-    public String getName() {
-        return "Monster Spawner";
-    }
-
-    @Override
-    public int getId() {
-        return MONSTER_SPAWNER;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
+    public int getDropExp() {
+        return Utils.rand(15, 43);
     }
 
     @Override
@@ -33,18 +23,33 @@ public class BlockMobSpawner extends BlockTransparent {
     }
 
     @Override
+    public int getId() {
+        return MONSTER_SPAWNER;
+    }
+
+    @Override
+    public String getName() {
+        return "Monster Spawner";
+    }
+
+    @Override
     public double getResistance() {
         return 25;
     }
 
     @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        if (super.place(item, block, target, face, fx, fy, fz, player)) {
-            BlockEntity.createBlockEntity(BlockEntity.MOB_SPAWNER, this.getChunk(), BlockEntity.getDefaultCompound(this, BlockEntity.MOB_SPAWNER));
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
+    }
 
-            return true;
-        }
-        return false;
+    @Override
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.WHEN_PLACED_IN_WATER;
+    }
+
+    @Override
+    public boolean breakWhenPushed() {
+        return true;
     }
 
     @Override
@@ -63,17 +68,12 @@ public class BlockMobSpawner extends BlockTransparent {
     }
 
     @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.WHEN_PLACED_IN_WATER;
-    }
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        if (super.place(item, block, target, face, fx, fy, fz, player)) {
+            BlockEntity.createBlockEntity(BlockEntity.MOB_SPAWNER, this.getChunk(), BlockEntity.getDefaultCompound(this, BlockEntity.MOB_SPAWNER));
 
-    @Override
-    public boolean breakWhenPushed() {
-        return true;
-    }
-
-    @Override
-    public int getDropExp() {
-        return Utils.rand(15, 43);
+            return true;
+        }
+        return false;
     }
 }

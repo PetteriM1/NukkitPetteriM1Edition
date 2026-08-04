@@ -10,7 +10,7 @@ public abstract class NumberTag<T extends Number> extends Tag {
         super(name);
     }
 
-    public abstract T getData();
-
     public abstract void setData(T data);
+
+    public abstract T getData();
 }

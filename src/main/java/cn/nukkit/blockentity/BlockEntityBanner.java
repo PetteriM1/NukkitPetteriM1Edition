@@ -15,45 +15,9 @@ public class BlockEntityBanner extends BlockEntitySpawnable {
         super(chunk, nbt);
     }
 
-    @Override
-    protected void initBlockEntity() {
-        if (!this.namedTag.contains("color")) {
-            this.namedTag.putByte("color", 0);
-        }
-
-        this.color = this.namedTag.getByte("color");
-
-        super.initBlockEntity();
-    }
-
-    @Override
-    public boolean isBlockEntityValid() {
-        int id = level.getBlockIdAt(chunk, (int) x, (int) y, (int) z);
-        return id == Block.WALL_BANNER || id == Block.STANDING_BANNER;
-    }
-
-    @Override
-    public void saveNBT() {
-        super.saveNBT();
-        this.namedTag.putByte("color", this.color);
-    }
-
-    @Override
-    public String getName() {
-        return "Banner";
-    }
-
-    public int getBaseColor() {
-        return this.namedTag.getInt("Base");
-    }
-
     public void setBaseColor(DyeColor color) {
         this.namedTag.putInt("Base", color.getDyeData() & 0x0f);
         setDirty();
-    }
-
-    public int getType() {
-        return this.namedTag.getInt("Type");
     }
 
     public void setType(int type) {
@@ -61,25 +25,17 @@ public class BlockEntityBanner extends BlockEntitySpawnable {
         setDirty();
     }
 
-    public void addPattern(BannerPattern pattern) {
-        ListTag<CompoundTag> patterns = this.namedTag.getList("Patterns", CompoundTag.class);
-        patterns.add(new CompoundTag("").
-                putInt("Color", pattern.getColor().getDyeData() & 0x0f).
-                putString("Pattern", pattern.getType().getName()));
-        this.namedTag.putList(patterns);
-        setDirty();
+    public int getBaseColor() {
+        return this.namedTag.getInt("Base");
     }
 
-    public BannerPattern getPattern(int index) {
-        return BannerPattern.fromCompoundTag(this.namedTag.getList("Patterns").size() > index && index >= 0 ? this.namedTag.getList("Patterns", CompoundTag.class).get(index) : new CompoundTag());
+    public DyeColor getDyeColor() {
+        return DyeColor.getByWoolData(color);
     }
 
-    public void removePattern(int index) {
-        ListTag<CompoundTag> patterns = this.namedTag.getList("Patterns", CompoundTag.class);
-        if (patterns.size() > index && index >= 0) {
-            patterns.remove(index);
-        }
-        setDirty();
+    @Override
+    public String getName() {
+        return "Banner";
     }
 
     public int getPatternsSize() {
@@ -95,7 +51,51 @@ public class BlockEntityBanner extends BlockEntitySpawnable {
                 .putByte("color", this.color);
     }
 
-    public DyeColor getDyeColor() {
-        return DyeColor.getByWoolData(color);
+    public int getType() {
+        return this.namedTag.getInt("Type");
+    }
+
+    @Override
+    public boolean isBlockEntityValid() {
+        int id = level.getBlockIdAt(chunk, (int) x, (int) y, (int) z);
+        return id == Block.WALL_BANNER || id == Block.STANDING_BANNER;
+    }
+
+    public void addPattern(BannerPattern pattern) {
+        ListTag<CompoundTag> patterns = this.namedTag.getList("Patterns", CompoundTag.class);
+        patterns.add(new CompoundTag("").
+                putInt("Color", pattern.getColor().getDyeData() & 0x0f).
+                putString("Pattern", pattern.getType().getName()));
+        this.namedTag.putList(patterns);
+        setDirty();
+    }
+
+    public BannerPattern getPattern(int index) {
+        return BannerPattern.fromCompoundTag(this.namedTag.getList("Patterns").size() > index && index >= 0 ? this.namedTag.getList("Patterns", CompoundTag.class).get(index) : new CompoundTag());
+    }
+
+    @Override
+    protected void initBlockEntity() {
+        if (!this.namedTag.contains("color")) {
+            this.namedTag.putByte("color", 0);
+        }
+
+        this.color = this.namedTag.getByte("color");
+
+        super.initBlockEntity();
+    }
+
+    public void removePattern(int index) {
+        ListTag<CompoundTag> patterns = this.namedTag.getList("Patterns", CompoundTag.class);
+        if (patterns.size() > index && index >= 0) {
+            patterns.remove(index);
+        }
+        setDirty();
+    }
+
+    @Override
+    public void saveNBT() {
+        super.saveNBT();
+        this.namedTag.putByte("color", this.color);
     }
 }

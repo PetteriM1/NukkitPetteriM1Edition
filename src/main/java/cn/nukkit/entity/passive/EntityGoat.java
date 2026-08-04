@@ -13,20 +13,6 @@ public class EntityGoat extends EntityWalkingAnimal {
     }
 
     @Override
-    public void initEntity() {
-        this.setMaxHealth(10);
-        super.initEntity();
-    }
-
-    @Override
-    public float getWidth() {
-        if (this.isBaby()) {
-            return 0.65f;
-        }
-        return 1.3f;
-    }
-
-    @Override
     public float getHeight() {
         if (this.isBaby()) {
             return 0.45f;
@@ -42,5 +28,24 @@ public class EntityGoat extends EntityWalkingAnimal {
     @Override
     public int getNetworkId() {
         return NETWORK_ID;
+    }
+
+    @Override
+    public double getSpeed() {
+        return 1.1;
+    }
+
+    @Override
+    public float getWidth() {
+        if (this.isBaby()) {
+            return 0.65f;
+        }
+        return 1.3f;
+    }
+
+    @Override
+    public void initEntity() {
+        this.setMaxHealth(10);
+        super.initEntity();
     }
 }

@@ -11,12 +11,12 @@ public class BlockPressurePlatePolishedBlackstone extends BlockPressurePlateSton
     }
 
     @Override
-    public String getName() {
-        return "Polished Blackstone Pressure Plate";
+    public int getId() {
+        return POLISHED_BLACKSTONE_PRESSURE_PLATE;
     }
 
     @Override
-    public int getId() {
-        return POLISHED_BLACKSTONE_PRESSURE_PLATE;
+    public String getName() {
+        return "Polished Blackstone Pressure Plate";
     }
 }

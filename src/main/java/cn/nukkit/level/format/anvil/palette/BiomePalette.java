@@ -2,9 +2,9 @@ package cn.nukkit.level.format.anvil.palette;
 
 import cn.nukkit.math.MathHelper;
 import cn.nukkit.utils.ThreadCache;
+
 import java.util.Arrays;
 
-@Deprecated
 public final class BiomePalette {
 
     private int biome;
@@ -29,13 +29,21 @@ public final class BiomePalette {
         this.biome = Integer.MIN_VALUE;
     }
 
-    public int get(int x, int z) {
-        return get(getIndex(x, z));
+    public synchronized BiomePalette clone() {
+        return new BiomePalette(this);
     }
 
     public synchronized int get(int index) {
         if (encodedData == null) return biome;
         return palette.getKey(encodedData.getAt(index));
+    }
+
+    public int get(int x, int z) {
+        return get(getIndex(x, z));
+    }
+
+    public int getIndex(int x, int z) {
+        return (z << 4) | x;
     }
 
     public void set(int x, int z, int value) {
@@ -109,13 +117,5 @@ public final class BiomePalette {
             }
         }
         return buffer;
-    }
-
-    public int getIndex(int x, int z) {
-        return (z << 4) | x;
-    }
-
-    public synchronized BiomePalette clone() {
-        return new BiomePalette(this);
     }
 }

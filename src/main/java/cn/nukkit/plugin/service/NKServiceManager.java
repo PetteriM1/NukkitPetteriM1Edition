@@ -12,33 +12,8 @@ public class NKServiceManager implements ServiceManager {
     private final Map<Class<?>, List<RegisteredServiceProvider<?>>> handle = new HashMap<>();
 
     @Override
-    public <T> boolean register(Class<T> service, T provider, Plugin plugin, ServicePriority priority) {
-        Preconditions.checkNotNull(provider, "provider");
-        Preconditions.checkNotNull(priority, "priority");
-        Preconditions.checkNotNull(service, "service");
-
-        // build-in service provider needn't plugin param
-        if (plugin == null && provider.getClass().getClassLoader() != Server.class.getClassLoader()) {
-            throw new NullPointerException("plugin");
-        }
-
-        return provide(service, provider, plugin, priority);
-    }
-
-    protected <T> boolean provide(Class<T> service, T instance, Plugin plugin, ServicePriority priority) {
-        synchronized (handle) {
-            List<RegisteredServiceProvider<?>> list = handle.computeIfAbsent(service, k -> new ArrayList<>());
-
-            RegisteredServiceProvider<T> registered = new RegisteredServiceProvider<>(service, instance, priority, plugin);
-
-            int position = Collections.binarySearch(list, registered);
-
-            if (position > -1) return false;
-
-            list.add(-(position + 1), registered);
-        }
-
-        return true;
+    public List<Class<?>> getKnownService() {
+        return ImmutableList.copyOf(handle.keySet());
     }
 
     @Override
@@ -97,11 +72,6 @@ public class NKServiceManager implements ServiceManager {
     }
 
     @Override
-    public List<Class<?>> getKnownService() {
-        return ImmutableList.copyOf(handle.keySet());
-    }
-
-    @Override
     public List<RegisteredServiceProvider<?>> getRegistrations(Plugin plugin) {
         ImmutableList.Builder<RegisteredServiceProvider<?>> builder = ImmutableList.builder();
         synchronized (handle) {
@@ -125,7 +95,7 @@ public class NKServiceManager implements ServiceManager {
                 return ImmutableList.of();
             }
             for (RegisteredServiceProvider<?> provider : registered) {
-                builder.add((RegisteredServiceProvider<T>)provider);
+                builder.add((RegisteredServiceProvider<T>) provider);
             }
         }
         return builder.build();
@@ -136,5 +106,35 @@ public class NKServiceManager implements ServiceManager {
         synchronized (handle) {
             return handle.containsKey(service);
         }
+    }
+
+    protected <T> boolean provide(Class<T> service, T instance, Plugin plugin, ServicePriority priority) {
+        synchronized (handle) {
+            List<RegisteredServiceProvider<?>> list = handle.computeIfAbsent(service, k -> new ArrayList<>());
+
+            RegisteredServiceProvider<T> registered = new RegisteredServiceProvider<>(service, instance, priority, plugin);
+
+            int position = Collections.binarySearch(list, registered);
+
+            if (position > -1) return false;
+
+            list.add(-(position + 1), registered);
+        }
+
+        return true;
+    }
+
+    @Override
+    public <T> boolean register(Class<T> service, T provider, Plugin plugin, ServicePriority priority) {
+        Preconditions.checkNotNull(provider, "provider");
+        Preconditions.checkNotNull(priority, "priority");
+        Preconditions.checkNotNull(service, "service");
+
+        // build-in service provider needn't plugin param
+        if (plugin == null && provider.getClass().getClassLoader() != Server.class.getClassLoader()) {
+            throw new NullPointerException("plugin");
+        }
+
+        return provide(service, provider, plugin, priority);
     }
 }

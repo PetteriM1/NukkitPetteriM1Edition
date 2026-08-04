@@ -25,13 +25,12 @@ public class BlockTerracottaStained extends BlockSolidMeta {
     }
 
     @Override
-    public String getName() {
-        return getDyeColor().getName() + " Terracotta";
+    public BlockColor getColor() {
+        return TerracottaColor.getByTerracottaData(getDamage()).getColor();
     }
 
-    @Override
-    public int getId() {
-        return STAINED_TERRACOTTA;
+    public DyeColor getDyeColor() {
+        return DyeColor.getByWoolData(getDamage());
     }
 
     @Override
@@ -40,8 +39,18 @@ public class BlockTerracottaStained extends BlockSolidMeta {
     }
 
     @Override
+    public int getId() {
+        return STAINED_TERRACOTTA;
+    }
+
+    @Override
+    public String getName() {
+        return getDyeColor().getName() + " Terracotta";
+    }
+
+    @Override
     public double getResistance() {
-        return 0.75;
+        return 21;
     }
 
     @Override
@@ -56,14 +65,5 @@ public class BlockTerracottaStained extends BlockSolidMeta {
         } else {
             return new Item[0];
         }
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return TerracottaColor.getByTerracottaData(getDamage()).getColor();
-    }
-
-    public DyeColor getDyeColor() {
-        return DyeColor.getByWoolData(getDamage());
     }
 }

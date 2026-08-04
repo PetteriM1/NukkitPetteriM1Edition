@@ -9,17 +9,11 @@ import cn.nukkit.item.Item;
 public class RepairItemEvent extends InventoryEvent implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
-
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private final Item oldItem;
     private final Item newItem;
     private final Item materialItem;
     private int cost;
     private final Player player;
-
     public RepairItemEvent(AnvilInventory inventory, Item oldItem, Item newItem, Item materialItem, int cost, Player player) {
         super(inventory);
         this.oldItem = oldItem;
@@ -29,24 +23,28 @@ public class RepairItemEvent extends InventoryEvent implements Cancellable {
         this.player = player;
     }
 
-    public Item getOldItem() {
-        return this.oldItem;
-    }
-
-    public Item getNewItem() {
-        return this.newItem;
-    }
-
-    public Item getMaterialItem() {
-        return this.materialItem;
+    public void setCost(int cost) {
+        this.cost = cost;
     }
 
     public int getCost() {
         return this.cost;
     }
 
-    public void setCost(int cost) {
-        this.cost = cost;
+    public static HandlerList getHandlers() {
+        return handlers;
+    }
+
+    public Item getMaterialItem() {
+        return this.materialItem;
+    }
+
+    public Item getNewItem() {
+        return this.newItem;
+    }
+
+    public Item getOldItem() {
+        return this.oldItem;
     }
 
     public Player getPlayer() {

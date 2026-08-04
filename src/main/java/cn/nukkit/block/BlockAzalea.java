@@ -10,6 +10,8 @@ import cn.nukkit.level.generator.object.tree.ObjectAzaleaTree;
 import cn.nukkit.level.particle.BoneMealParticle;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.NukkitRandom;
+import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.utils.material.BlockType;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -20,13 +22,63 @@ public class BlockAzalea extends BlockTransparent {
     }
 
     @Override
-    public String getName() {
-        return "Azalea";
+    public double getHardness() {
+        return 0;
     }
 
     @Override
     public int getId() {
         return AZALEA;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_17_0;
+    }
+
+    @Override
+    public String getName() {
+        return "Azalea";
+    }
+
+    @Override
+    public double getResistance() {
+        return 0;
+    }
+
+    @Override
+    public boolean isSolid() {
+        return false;
+    }
+
+    @Override
+    public boolean breakWhenPushed() {
+        return true;
+    }
+
+    @Override
+    public boolean canBeActivated() {
+        return true;
+    }
+
+    @Override
+    public boolean canBeClimbed() {
+        return true;
+    }
+
+    @Override
+    public boolean canBeFlowedInto() {
+        return true;
+    }
+
+    @Override
+    public boolean canBePushed() {
+        return false;
+    }
+
+    @Override
+    public boolean canPassThrough() {
+        return true;
     }
 
     @Override
@@ -47,48 +99,8 @@ public class BlockAzalea extends BlockTransparent {
     }
 
     @Override
-    public boolean canBeClimbed() {
-        return true;
-    }
-
-    @Override
-    public boolean canBePushed() {
-        return false;
-    }
-
-    @Override
-    public boolean canBeFlowedInto() {
-        return true;
-    }
-
-    @Override
-    public boolean canPassThrough() {
-        return true;
-    }
-
-    @Override
-    public double getHardness() {
-        return 0;
-    }
-
-    @Override
-    public double getResistance() {
-        return 0;
-    }
-
-    @Override
-    public boolean isSolid() {
-        return false;
-    }
-
-    @Override
-    protected AxisAlignedBB recalculateBoundingBox() {
-        return null;
-    }
-
-    @Override
-    public boolean breakWhenPushed() {
-        return true;
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.GRASS;
     }
 
     @Override
@@ -96,8 +108,21 @@ public class BlockAzalea extends BlockTransparent {
         return new Item[0];
     }
 
-    @Override
-    public boolean canBeActivated() {
+    private boolean growTreeHere() {
+        NukkitRandom random = new NukkitRandom();
+        ObjectAzaleaTree tree = new ObjectAzaleaTree();
+        ListChunkManager chunkManager = new ListChunkManager(this.level);
+        tree.placeObject(chunkManager, (int) this.x, (int) this.y, (int) this.z, random);
+
+        StructureGrowEvent ev = new StructureGrowEvent(this, chunkManager.getBlocks());
+        this.level.getServer().getPluginManager().callEvent(ev);
+        if (ev.isCancelled()) {
+            return false;
+        }
+
+        for (Block block : ev.getBlockList()) {
+            this.level.setBlock(block, block);
+        }
         return true;
     }
 
@@ -118,21 +143,8 @@ public class BlockAzalea extends BlockTransparent {
         return false;
     }
 
-    private boolean growTreeHere() {
-        NukkitRandom random = new NukkitRandom();
-        ObjectAzaleaTree tree = new ObjectAzaleaTree();
-        ListChunkManager chunkManager = new ListChunkManager(this.level);
-        tree.placeObject(chunkManager, (int) this.x, (int) this.y, (int) this.z, random);
-
-        StructureGrowEvent ev = new StructureGrowEvent(this, chunkManager.getBlocks());
-        this.level.getServer().getPluginManager().callEvent(ev);
-        if (ev.isCancelled()) {
-            return false;
-        }
-
-        for (Block block : ev.getBlockList()) {
-            this.level.setBlock(block, block);
-        }
-        return true;
+    @Override
+    protected AxisAlignedBB recalculateBoundingBox() {
+        return null;
     }
 }

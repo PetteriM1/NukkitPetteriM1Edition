@@ -6,6 +6,7 @@ import cn.nukkit.scheduler.AsyncTask;
 
 public interface GeneratorTaskFactory {
 
-    AsyncTask populateChunkTask(BaseFullChunk chunk, Level level);
     AsyncTask generateChunkTask(BaseFullChunk chunk, Level level);
+
+    AsyncTask populateChunkTask(BaseFullChunk chunk, Level level);
 }

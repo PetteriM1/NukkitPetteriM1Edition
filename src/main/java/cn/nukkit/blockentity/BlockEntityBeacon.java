@@ -25,6 +25,113 @@ public class BlockEntityBeacon extends BlockEntitySpawnable {
     public BlockEntityBeacon(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
     }
+    private static final int POWER_LEVEL_MAX = 4;
+    private static final IntSet ALLOWED_EFFECTS = new IntOpenHashSet(new int[]{0, Effect.SPEED, Effect.HASTE, Effect.DAMAGE_RESISTANCE, Effect.JUMP, Effect.STRENGTH, Effect.REGENERATION});
+    private static final IntSet ITEMS = new IntOpenHashSet(new int[]{Item.AIR, ItemID.NETHERITE_INGOT, ItemID.EMERALD, ItemID.DIAMOND, ItemID.GOLD_INGOT, ItemID.IRON_INGOT});
+
+    public void setPowerLevel(int level) {
+        int currentLevel = getPowerLevel();
+        if (level != currentLevel) {
+            namedTag.putInt("Level", level);
+            setDirty();
+        }
+    }
+
+    public void setPrimaryPower(int power) {
+        int currentPower = getPrimaryPower();
+        if (power != currentPower) {
+            namedTag.putInt("Primary", power);
+            setDirty();
+        }
+    }
+
+    public void setSecondaryPower(int power) {
+        int currentPower = getSecondaryPower();
+        if (power != currentPower) {
+            namedTag.putInt("Secondary", power);
+            setDirty();
+        }
+    }
+
+    public int getPowerLevel() {
+        return namedTag.getInt("Level");
+    }
+
+    public int getPrimaryPower() {
+        return namedTag.getInt("Primary");
+    }
+
+    public int getSecondaryPower() {
+        return namedTag.getInt("Secondary");
+    }
+
+    @Override
+    public CompoundTag getSpawnCompound() {
+        return new CompoundTag()
+                .putString("id", BlockEntity.BEACON)
+                .putInt("x", (int) this.x)
+                .putInt("y", (int) this.y)
+                .putInt("z", (int) this.z)
+                .putString("Lock", this.namedTag.getString("Lock"))
+                .putInt("Levels", this.namedTag.getInt("Levels"))
+                .putInt("Primary", this.namedTag.getInt("Primary"))
+                .putInt("Secondary", this.namedTag.getInt("Secondary"));
+    }
+
+    @Override
+    public boolean isBlockEntityValid() {
+        return level.getBlockIdAt(chunk, (int) x, (int) y, (int) z) == Block.BEACON;
+    }
+
+    private int calculatePowerLevel() {
+        int tileX = (int) this.x;
+        int tileY = (int) this.y;
+        int tileZ = (int) this.z;
+
+        //The power level that we're testing for
+        for (int powerLevel = 1; powerLevel <= POWER_LEVEL_MAX; powerLevel++) {
+            int queryY = tileY - powerLevel; //Layer below the beacon block
+
+            for (int queryX = tileX - powerLevel; queryX <= tileX + powerLevel; queryX++) {
+                for (int queryZ = tileZ - powerLevel; queryZ <= tileZ + powerLevel; queryZ++) {
+
+                    int testBlockId = getBlockIdIfLoaded(queryX, queryY, queryZ);
+                    if (testBlockId == -1) {
+                        return -1;
+                    }
+
+                    if (
+                            testBlockId != Block.IRON_BLOCK &&
+                                    testBlockId != Block.GOLD_BLOCK &&
+                                    testBlockId != Block.EMERALD_BLOCK &&
+                                    testBlockId != Block.DIAMOND_BLOCK &&
+                                    testBlockId != Block.NETHERITE_BLOCK
+                    ) {
+                        return powerLevel - 1;
+                    }
+                }
+            }
+        }
+
+        return POWER_LEVEL_MAX;
+    }
+
+    private boolean hasSkyAccess() {
+        int tileX = (int) this.x;
+        int tileY = (int) this.y;
+        int tileZ = (int) this.z;
+
+        //Check every block from our y coord to the top of the world
+        for (int y = tileY + 1; y <= this.level.getMaxBlockY(); y++) {
+            int testBlockId = level.getBlockIdAt(chunk, tileX, y, tileZ);
+            if (!Block.isBlockTransparentById(testBlockId)) {
+                //There is no sky access
+                return false;
+            }
+        }
+
+        return true;
+    }
 
     @Override
     protected void initBlockEntity() {
@@ -47,24 +154,6 @@ public class BlockEntityBeacon extends BlockEntitySpawnable {
         this.scheduleUpdate();
 
         super.initBlockEntity();
-    }
-
-    @Override
-    public boolean isBlockEntityValid() {
-        return level.getBlockIdAt(chunk, (int) x, (int) y, (int) z) == Block.BEACON;
-    }
-
-    @Override
-    public CompoundTag getSpawnCompound() {
-        return new CompoundTag()
-                .putString("id", BlockEntity.BEACON)
-                .putInt("x", (int) this.x)
-                .putInt("y", (int) this.y)
-                .putInt("z", (int) this.z)
-                .putString("Lock", this.namedTag.getString("Lock"))
-                .putInt("Levels", this.namedTag.getInt("Levels"))
-                .putInt("Primary", this.namedTag.getInt("Primary"))
-                .putInt("Secondary", this.namedTag.getInt("Secondary"));
     }
 
     @Override
@@ -160,102 +249,11 @@ public class BlockEntityBeacon extends BlockEntitySpawnable {
         return true;
     }
 
-    private static final int POWER_LEVEL_MAX = 4;
-
-    private boolean hasSkyAccess() {
-        int tileX = (int) this.x;
-        int tileY = (int) this.y;
-        int tileZ = (int) this.z;
-
-        //Check every block from our y coord to the top of the world
-        for (int y = tileY + 1; y <= this.level.getMaxBlockY(); y++) {
-            int testBlockId = level.getBlockIdAt(chunk, tileX, y, tileZ);
-            if (!Block.isBlockTransparentById(testBlockId)) {
-                //There is no sky access
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    private int calculatePowerLevel() {
-        int tileX = (int) this.x;
-        int tileY = (int) this.y;
-        int tileZ = (int) this.z;
-
-        //The power level that we're testing for
-        for (int powerLevel = 1; powerLevel <= POWER_LEVEL_MAX; powerLevel++) {
-            int queryY = tileY - powerLevel; //Layer below the beacon block
-
-            for (int queryX = tileX - powerLevel; queryX <= tileX + powerLevel; queryX++) {
-                for (int queryZ = tileZ - powerLevel; queryZ <= tileZ + powerLevel; queryZ++) {
-
-                    int testBlockId = getBlockIdIfLoaded(queryX, queryY, queryZ);
-                    if (testBlockId == -1) {
-                        return -1;
-                    }
-
-                    if (
-                            testBlockId != Block.IRON_BLOCK &&
-                                    testBlockId != Block.GOLD_BLOCK &&
-                                    testBlockId != Block.EMERALD_BLOCK &&
-                                    testBlockId != Block.DIAMOND_BLOCK &&
-                                    testBlockId != Block.NETHERITE_BLOCK
-                    ) {
-                        return powerLevel - 1;
-                    }
-                }
-            }
-        }
-
-        return POWER_LEVEL_MAX;
-    }
-
     @Override
     public void setDirty() {
         super.setDirty();
         this.spawnToAll();
     }
-
-    public int getPowerLevel() {
-        return namedTag.getInt("Level");
-    }
-
-    public void setPowerLevel(int level) {
-        int currentLevel = getPowerLevel();
-        if (level != currentLevel) {
-            namedTag.putInt("Level", level);
-            setDirty();
-        }
-    }
-
-    public int getPrimaryPower() {
-        return namedTag.getInt("Primary");
-    }
-
-    public void setPrimaryPower(int power) {
-        int currentPower = getPrimaryPower();
-        if (power != currentPower) {
-            namedTag.putInt("Primary", power);
-            setDirty();
-        }
-    }
-
-    public int getSecondaryPower() {
-        return namedTag.getInt("Secondary");
-    }
-
-    public void setSecondaryPower(int power) {
-        int currentPower = getSecondaryPower();
-        if (power != currentPower) {
-            namedTag.putInt("Secondary", power);
-            setDirty();
-        }
-    }
-
-    private static final IntSet ALLOWED_EFFECTS = new IntOpenHashSet(new int[]{0, Effect.SPEED, Effect.HASTE, Effect.DAMAGE_RESISTANCE, Effect.JUMP, Effect.STRENGTH, Effect.REGENERATION});
-    private static final IntSet ITEMS = new IntOpenHashSet(new int[]{Item.AIR, ItemID.NETHERITE_INGOT, ItemID.EMERALD, ItemID.DIAMOND, ItemID.GOLD_INGOT, ItemID. IRON_INGOT});
 
     @Override
     public boolean updateCompoundTag(CompoundTag nbt, Player player) {

@@ -10,11 +10,6 @@ public class SetLocalPlayerAsInitializedPacket extends DataPacket {
     public long eid;
 
     @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
-    @Override
     public void decode() {
         this.eid = this.getUnsignedVarLong();
     }
@@ -23,5 +18,10 @@ public class SetLocalPlayerAsInitializedPacket extends DataPacket {
     public void encode() {
         this.reset();
         this.putUnsignedVarLong(eid);
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

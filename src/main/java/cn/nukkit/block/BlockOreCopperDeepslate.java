@@ -9,13 +9,8 @@ public class BlockOreCopperDeepslate extends BlockOreCopper {
     }
 
     @Override
-    public String getName() {
-        return "Deepslate Copper Ore";
-    }
-
-    @Override
-    public int getId() {
-        return DEEPSLATE_COPPER_ORE;
+    public BlockColor getColor() {
+        return BlockColor.DEEPSLATE_GRAY_BLOCK_COLOR;
     }
 
     @Override
@@ -24,7 +19,12 @@ public class BlockOreCopperDeepslate extends BlockOreCopper {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.DEEPSLATE_GRAY_BLOCK_COLOR;
+    public int getId() {
+        return DEEPSLATE_COPPER_ORE;
+    }
+
+    @Override
+    public String getName() {
+        return "Deepslate Copper Ore";
     }
 }

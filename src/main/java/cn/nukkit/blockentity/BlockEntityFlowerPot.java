@@ -14,30 +14,6 @@ public class BlockEntityFlowerPot extends BlockEntitySpawnable {
     public BlockEntityFlowerPot(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
     }
-
-    @Override
-    protected void initBlockEntity() {
-        if (!namedTag.contains("item")) {
-            namedTag.putShort("item", 0);
-        }
-
-        if (!namedTag.contains("data")) {
-            if (namedTag.contains("mData")) {
-                namedTag.putInt("data", namedTag.getInt("mData"));
-                namedTag.remove("mData");
-            } else {
-                namedTag.putInt("data", 0);
-            }
-        }
-
-        super.initBlockEntity();
-    }
-
-    @Override
-    public boolean isBlockEntityValid() {
-        return level.getBlockIdAt(chunk, (int) x, (int) y, (int) z) == Block.FLOWER_POT_BLOCK;
-    }
-
     private static final Int2ObjectOpenHashMap<String> HAS_STRING_ITEM_OVERRIDE = new Int2ObjectOpenHashMap<>();
 
     static {
@@ -66,5 +42,28 @@ public class BlockEntityFlowerPot extends BlockEntitySpawnable {
             }
         }
         return tag;
+    }
+
+    @Override
+    public boolean isBlockEntityValid() {
+        return level.getBlockIdAt(chunk, (int) x, (int) y, (int) z) == Block.FLOWER_POT_BLOCK;
+    }
+
+    @Override
+    protected void initBlockEntity() {
+        if (!namedTag.contains("item")) {
+            namedTag.putShort("item", 0);
+        }
+
+        if (!namedTag.contains("data")) {
+            if (namedTag.contains("mData")) {
+                namedTag.putInt("data", namedTag.getInt("mData"));
+                namedTag.remove("mData");
+            } else {
+                namedTag.putInt("data", 0);
+            }
+        }
+
+        super.initBlockEntity();
     }
 }

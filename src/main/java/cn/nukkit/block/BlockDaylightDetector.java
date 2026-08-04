@@ -14,13 +14,8 @@ import cn.nukkit.utils.BlockColor;
 public class BlockDaylightDetector extends BlockTransparent {
 
     @Override
-    public int getId() {
-        return DAYLIGHT_DETECTOR;
-    }
-
-    @Override
-    public String getName() {
-        return "Daylight Detector";
+    public BlockColor getColor() {
+        return BlockColor.WOOD_BLOCK_COLOR;
     }
 
     @Override
@@ -29,24 +24,23 @@ public class BlockDaylightDetector extends BlockTransparent {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.WOOD_BLOCK_COLOR;
+    public int getId() {
+        return DAYLIGHT_DETECTOR;
     }
 
     @Override
-    public boolean canBeActivated() {
-        return true;
+    public double getMaxY() {
+        return this.y + 0.625;
     }
 
     @Override
-    public boolean onActivate(Item item, Player player) {
-        this.getLevel().setBlock(this, Block.get(DAYLIGHT_DETECTOR_INVERTED));
-        return true;
+    public String getName() {
+        return "Daylight Detector";
     }
 
     @Override
-    public Item toItem() {
-        return new ItemBlock(Block.get(this.getId(), 0), 0);
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.WHEN_PLACED_IN_WATER;
     }
 
     @Override
@@ -55,9 +49,13 @@ public class BlockDaylightDetector extends BlockTransparent {
     }
 
     @Override
-    public int getWeakPower(BlockFace face) {
-        int time = level.getTime() % Level.TIME_FULL;
-        return time < 13184 || time > 22800 ? 15 : 0;
+    public boolean isSolid() {
+        return false;
+    }
+
+    @Override
+    public boolean canBeActivated() {
+        return true;
     }
 
     @Override
@@ -66,13 +64,14 @@ public class BlockDaylightDetector extends BlockTransparent {
     }
 
     @Override
-    public boolean isSolid() {
-        return false;
+    public int getWeakPower(BlockFace face) {
+        return this.level.isAnimalSpawningAllowedByTime() ? 15 : 0;
     }
 
     @Override
-    public double getMaxY() {
-        return this.y + 0.625;
+    public boolean onActivate(Item item, Player player) {
+        this.getLevel().setBlock(this, Block.get(DAYLIGHT_DETECTOR_INVERTED));
+        return true;
     }
 
     @Override
@@ -87,16 +86,16 @@ public class BlockDaylightDetector extends BlockTransparent {
     }
 
     @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.WHEN_PLACED_IN_WATER;
-    }
-
-    @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
         if (this.getLevel().setBlock(this, this, true, true)) {
             this.level.scheduleUpdate(this, 20);
             return true;
         }
         return false;
+    }
+
+    @Override
+    public Item toItem() {
+        return new ItemBlock(Block.get(this.getId(), 0), 0);
     }
 }

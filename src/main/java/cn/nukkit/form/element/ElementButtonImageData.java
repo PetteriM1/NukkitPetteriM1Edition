@@ -14,19 +14,19 @@ public class ElementButtonImageData {
         this.data = data;
     }
 
-    public String getType() {
-        return type;
-    }
-
-    public String getData() {
-        return data;
+    public void setData(String data) {
+        this.data = data;
     }
 
     public void setType(String type) {
         this.type = type;
     }
 
-    public void setData(String data) {
-        this.data = data;
+    public String getData() {
+        return data;
+    }
+
+    public String getType() {
+        return type;
     }
 }

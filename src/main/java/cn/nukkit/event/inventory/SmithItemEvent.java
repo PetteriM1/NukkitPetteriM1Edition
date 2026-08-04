@@ -9,16 +9,10 @@ import cn.nukkit.item.Item;
 public class SmithItemEvent extends InventoryEvent implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
-
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private final Item oldItem;
     private final Item newItem;
     private final Item materialItem;
     private final Player player;
-
     public SmithItemEvent(SmithingInventory inventory, Item oldItem, Item newItem, Item materialItem, Player player) {
         super(inventory);
         this.oldItem = oldItem;
@@ -27,16 +21,20 @@ public class SmithItemEvent extends InventoryEvent implements Cancellable {
         this.player = player;
     }
 
-    public Item getOldItem() {
-        return this.oldItem;
+    public static HandlerList getHandlers() {
+        return handlers;
+    }
+
+    public Item getMaterialItem() {
+        return this.materialItem;
     }
 
     public Item getNewItem() {
         return this.newItem;
     }
 
-    public Item getMaterialItem() {
-        return this.materialItem;
+    public Item getOldItem() {
+        return this.oldItem;
     }
 
     public Player getPlayer() {

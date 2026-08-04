@@ -15,11 +15,7 @@ public class PlaySoundPacket extends DataPacket {
     public float volume;
     public float pitch;
     public Long serverSoundHandle;
-
-    @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
+    public int loopCount; // Since 26.40
 
     @Override
     public void decode() {
@@ -30,9 +26,21 @@ public class PlaySoundPacket extends DataPacket {
     public void encode() {
         this.reset();
         this.putString(this.name);
-        this.putBlockVector3(this.x << 3, this.y << 3, this.z << 3);
+        this.putBlockVector3(protocol, this.x << 3, this.y << 3, this.z << 3);
         this.putLFloat(this.volume);
         this.putLFloat(this.pitch);
-        this.putOptionalNull(this.serverSoundHandle, BinaryStream::putLLong);
+
+        if (protocol >= ProtocolInfo.v1_26_40) {
+            this.putVarInt(this.loopCount);
+        }
+
+        if (protocol >= ProtocolInfo.v1_26_20_26) {
+            this.putOptionalNull(this.serverSoundHandle, BinaryStream::putLLong);
+        }
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

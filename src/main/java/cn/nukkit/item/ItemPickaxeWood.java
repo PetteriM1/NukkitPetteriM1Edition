@@ -19,13 +19,13 @@ public class ItemPickaxeWood extends ItemTool {
     }
 
     @Override
-    public int getMaxDurability() {
-        return ItemTool.DURABILITY_WOODEN;
+    public int getAttackDamage() {
+        return 2;
     }
 
     @Override
-    public boolean isPickaxe() {
-        return true;
+    public int getMaxDurability() {
+        return ItemTool.DURABILITY_WOODEN;
     }
 
     @Override
@@ -34,7 +34,7 @@ public class ItemPickaxeWood extends ItemTool {
     }
 
     @Override
-    public int getAttackDamage() {
-        return 2;
+    public boolean isPickaxe() {
+        return true;
     }
 }

@@ -9,7 +9,7 @@ import cn.nukkit.math.NukkitRandom;
  * Nukkit Project
  * <p>
  * make sure this is touching another extreme hills type or it'll look dumb
- *
+ * <p>
  * very smooth hills with flat areas between
  */
 public class ExtremeHillsMBiome extends ExtremeHillsPlusBiome {
@@ -33,13 +33,8 @@ public class ExtremeHillsMBiome extends ExtremeHillsPlusBiome {
     }
 
     @Override
-    public int getSurfaceId(int x, int y, int z) {
-        return gravelNoise.noise2D(x, z, true) < -0.75f ? GRAVEL << Block.DATA_BITS : super.getSurfaceId(x, y, z);
-    }
-
-    @Override
-    public int getSurfaceDepth(int x, int y, int z) {
-        return gravelNoise.noise2D(x, z, true) < -0.75f ? 4 : super.getSurfaceDepth(x, y, z);
+    public boolean doesOverhang() {
+        return false;
     }
 
     @Override
@@ -48,7 +43,12 @@ public class ExtremeHillsMBiome extends ExtremeHillsPlusBiome {
     }
 
     @Override
-    public boolean doesOverhang() {
-        return false;
+    public int getSurfaceDepth(int x, int y, int z) {
+        return gravelNoise.noise2D(x, z, true) < -0.75f ? 4 : super.getSurfaceDepth(x, y, z);
+    }
+
+    @Override
+    public int getSurfaceId(int x, int y, int z) {
+        return gravelNoise.noise2D(x, z, true) < -0.75f ? GRAVEL << Block.DATA_BITS : super.getSurfaceId(x, y, z);
     }
 }

@@ -1,5 +1,7 @@
 package cn.nukkit.entity.passive;
 
+import cn.nukkit.Player;
+import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
@@ -17,34 +19,6 @@ public class EntityCat extends EntityWalkingAnimal {
     }
 
     @Override
-    public int getNetworkId() {
-        return NETWORK_ID;
-    }
-
-    @Override
-    public float getWidth() {
-        if (this.isBaby()) {
-            return 0.3f;
-        }
-        return 0.6f;
-    }
-
-    @Override
-    public float getHeight() {
-        if (this.isBaby()) {
-            return 0.35f;
-        }
-        return 0.7f;
-    }
-
-    @Override
-    public void initEntity() {
-        this.setMaxHealth(10);
-        super.initEntity();
-        this.noFallDamage = true;
-    }
-
-    @Override
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
 
@@ -58,7 +32,48 @@ public class EntityCat extends EntityWalkingAnimal {
     }
 
     @Override
+    public float getHeight() {
+        if (this.isBaby()) {
+            return 0.35f;
+        }
+        return 0.7f;
+    }
+
+    @Override
     public int getKillExperience() {
         return this.isBaby() ? 0 : Utils.rand(1, 3);
+    }
+
+    @Override
+    public int getNetworkId() {
+        return NETWORK_ID;
+    }
+
+    @Override
+    public float getWidth() {
+        if (this.isBaby()) {
+            return 0.3f;
+        }
+        return 0.6f;
+    }
+
+    @Override
+    public void initEntity() {
+        this.setMaxHealth(10);
+        super.initEntity();
+        this.noFallDamage = true;
+    }
+
+    @Override
+    public boolean targetOption(EntityCreature creature, double distance) {
+        if (creature instanceof Player) {
+            Player player = (Player) creature;
+            if (player.closed) {
+                return false;
+            }
+            int id = player.getInventory().getItemInHandFast().getId();
+            return player.spawned && player.isAlive() && (id == Item.RAW_FISH || id == Item.RAW_SALMON) && distance <= 49;
+        }
+        return super.targetOption(creature, distance);
     }
 }

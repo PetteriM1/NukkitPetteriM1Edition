@@ -58,6 +58,40 @@ public class ZippedResourcePack extends AbstractResourcePack {
         }
     }
 
+    @Override
+    public String getEncryptionKey() {
+        return this.encryptionKey;
+    }
+
+    @Override
+    public int getPackSize() {
+        return (int) this.file.length();
+    }
+
+    @Override
+    public byte[] getSha256() {
+        return this.sha256;
+    }
+
+    @Override
+    public byte[] getPackChunk(int off, int len) {
+        byte[] chunk;
+        if (this.getPackSize() - off > len) {
+            chunk = new byte[len];
+        } else {
+            chunk = new byte[this.getPackSize() - off];
+        }
+
+        try {
+            byteBuffer.position(off);
+            byteBuffer.get(chunk);
+        } catch (Exception e) {
+            Server.getInstance().getLogger().error("An error occurred while processing the resource pack " + getPackName() + " at offset:" + off + " and length: " + len, e);
+        }
+
+        return chunk;
+    }
+
     private void loadZip(ZipFile zip) throws IOException {
         ZipEntry entry = zip.getEntry("manifest.json");
         if (entry == null) {
@@ -92,39 +126,5 @@ public class ZippedResourcePack extends AbstractResourcePack {
         byteBuffer = ByteBuffer.allocateDirect(bytes.length);
         byteBuffer.put(bytes);
         byteBuffer.flip();
-    }
-
-    @Override
-    public byte[] getPackChunk(int off, int len) {
-        byte[] chunk;
-        if (this.getPackSize() - off > len) {
-            chunk = new byte[len];
-        } else {
-            chunk = new byte[this.getPackSize() - off];
-        }
-
-        try {
-            byteBuffer.position(off);
-            byteBuffer.get(chunk);
-        } catch (Exception e) {
-            Server.getInstance().getLogger().error("An error occurred while processing the resource pack " + getPackName() + " at offset:" + off + " and length: " + len, e);
-        }
-
-        return chunk;
-    }
-
-    @Override
-    public int getPackSize() {
-        return (int) this.file.length();
-    }
-
-    @Override
-    public byte[] getSha256() {
-        return this.sha256;
-    }
-
-    @Override
-    public String getEncryptionKey() {
-        return this.encryptionKey;
     }
 }

@@ -14,18 +14,8 @@ import java.util.concurrent.ThreadLocalRandom;
 public class BlockGlowstone extends BlockTransparent {
 
     @Override
-    public String getName() {
-        return "Glowstone";
-    }
-
-    @Override
-    public int getId() {
-        return GLOWSTONE_BLOCK;
-    }
-
-    @Override
-    public double getResistance() {
-        return 1.5;
+    public BlockColor getColor() {
+        return BlockColor.SAND_BLOCK_COLOR;
     }
 
     @Override
@@ -34,8 +24,28 @@ public class BlockGlowstone extends BlockTransparent {
     }
 
     @Override
+    public int getId() {
+        return GLOWSTONE_BLOCK;
+    }
+
+    @Override
     public int getLightLevel() {
         return 15;
+    }
+
+    @Override
+    public String getName() {
+        return "Glowstone";
+    }
+
+    @Override
+    public double getResistance() {
+        return 1.5;
+    }
+
+    @Override
+    public boolean canSilkTouch() {
+        return true;
     }
 
     @Override
@@ -54,15 +64,5 @@ public class BlockGlowstone extends BlockTransparent {
         return new Item[]{
                 Item.get(Item.GLOWSTONE_DUST, 0, MathHelper.clamp(count, 1, 4))
         };
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.SAND_BLOCK_COLOR;
-    }
-
-    @Override
-    public boolean canSilkTouch() {
-        return true;
     }
 }

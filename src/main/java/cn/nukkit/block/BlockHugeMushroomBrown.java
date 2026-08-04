@@ -22,18 +22,8 @@ public class BlockHugeMushroomBrown extends BlockSolidMeta {
     }
 
     @Override
-    public String getName() {
-        return "Brown Mushroom Block";
-    }
-
-    @Override
-    public int getId() {
-        return BROWN_MUSHROOM_BLOCK;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_AXE;
+    public BlockColor getColor() {
+        return BlockColor.WOOD_BLOCK_COLOR;
     }
 
     @Override
@@ -42,11 +32,18 @@ public class BlockHugeMushroomBrown extends BlockSolidMeta {
     }
 
     @Override
-    public Item[] getDrops(Item item) {
-        if (item != null && item.hasEnchantment(Enchantment.ID_SILK_TOUCH)) {
-            return new Item[]{this.toItem()};
-        }
-        return new Item[]{new ItemBlock(Block.get(BROWN_MUSHROOM), 0, Utils.rand() ? Utils.rand(0, 2) : 0)};
+    public int getId() {
+        return BROWN_MUSHROOM_BLOCK;
+    }
+
+    @Override
+    public String getName() {
+        return "Brown Mushroom Block";
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_AXE;
     }
 
     @Override
@@ -55,8 +52,11 @@ public class BlockHugeMushroomBrown extends BlockSolidMeta {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.WOOD_BLOCK_COLOR;
+    public Item[] getDrops(Item item) {
+        if (item != null && item.hasEnchantment(Enchantment.ID_SILK_TOUCH)) {
+            return new Item[]{this.toItem()};
+        }
+        return new Item[]{new ItemBlock(Block.get(BROWN_MUSHROOM), 0, Utils.rand() ? Utils.rand(0, 2) : 0)};
     }
 
     @Override

@@ -13,22 +13,6 @@ public abstract class Noise {
     protected double persistence;
     protected double expansion;
 
-    public static int floor(double x) {
-        return x >= 0 ? (int) x : (int) (x - 1);
-    }
-
-    public static double fade(double x) {
-        return x * x * x * (x * (x * 6 - 15) + 10);
-    }
-
-    public static double lerp(double x, double y, double z) {
-        return y + x * (z - y);
-    }
-
-    public static double linearLerp(double x, double x1, double x2, double q0, double q1) {
-        return ((x2 - x) / (x2 - x1)) * q0 + ((x - x1) / (x2 - x1)) * q1;
-    }
-
     public static double bilinearLerp(double x, double y, double q00, double q01, double q10, double q11, double x1, double x2, double y1, double y2) {
         double dx1 = ((x2 - x) / (x2 - x1));
         double dx2 = ((x - x1) / (x2 - x1));
@@ -40,39 +24,34 @@ public abstract class Noise {
         );
     }
 
-    public static double trilinearLerp(double x, double y, double z, double q000, double q001, double q010, double q011, double q100, double q101, double q110, double q111, double x1, double x2, double y1, double y2, double z1, double z2) {
-        double dx1 = ((x2 - x) / (x2 - x1));
-        double dx2 = ((x - x1) / (x2 - x1));
-        double dy1 = ((y2 - y) / (y2 - y1));
-        double dy2 = ((y - y1) / (y2 - y1));
-
-        return ((z2 - z) / (z2 - z1)) * (
-                dy1 * (
-                        dx1 * q000 + dx2 * q100
-                ) + dy2 * (
-                        dx1 * q001 + dx2 * q101
-                )
-        ) + ((z - z1) / (z2 - z1)) * (
-                dy1 * (
-                        dx1 * q010 + dx2 * q110
-                ) + dy2 * (
-                        dx1 * q011 + dx2 * q111
-                )
-        );
+    public static double fade(double x) {
+        return x * x * x * (x * (x * 6 - 15) + 10);
     }
 
-    public static double grad(int hash, double x, double y, double z) {
-        hash &= 15;
-        double u = hash < 8 ? x : y;
-        double v = hash < 4 ? y : ((hash == 12 || hash == 14) ? x :
-                z);
-
-        return ((hash & 1) == 0 ? u : -u) + ((hash & 2) == 0 ? v : -v);
+    public static int floor(double x) {
+        return x >= 0 ? (int) x : (int) (x - 1);
     }
 
     abstract public double getNoise2D(double x, double z);
 
     abstract public double getNoise3D(double x, double y, double z);
+
+    public static double grad(int hash, double x, double y, double z) {
+        hash &= 15;
+        double u = hash < 8 ? x : y;
+        double v = hash < 4 ? y : ((hash == 12 || hash == 14) ? x :
+                                   z);
+
+        return ((hash & 1) == 0 ? u : -u) + ((hash & 2) == 0 ? v : -v);
+    }
+
+    public static double lerp(double x, double y, double z) {
+        return y + x * (z - y);
+    }
+
+    public static double linearLerp(double x, double x1, double x2, double q0, double q1) {
+        return ((x2 - x) / (x2 - x1)) * q0 + ((x - x1) / (x2 - x1)) * q1;
+    }
 
     public double noise2D(double x, double z) {
         return noise2D(x, z, false);
@@ -133,5 +112,26 @@ public abstract class Noise {
         this.offsetX = x;
         this.offsetY = y;
         this.offsetZ = z;
+    }
+
+    public static double trilinearLerp(double x, double y, double z, double q000, double q001, double q010, double q011, double q100, double q101, double q110, double q111, double x1, double x2, double y1, double y2, double z1, double z2) {
+        double dx1 = ((x2 - x) / (x2 - x1));
+        double dx2 = ((x - x1) / (x2 - x1));
+        double dy1 = ((y2 - y) / (y2 - y1));
+        double dy2 = ((y - y1) / (y2 - y1));
+
+        return ((z2 - z) / (z2 - z1)) * (
+                dy1 * (
+                        dx1 * q000 + dx2 * q100
+                ) + dy2 * (
+                        dx1 * q001 + dx2 * q101
+                )
+        ) + ((z - z1) / (z2 - z1)) * (
+                dy1 * (
+                        dx1 * q010 + dx2 * q110
+                ) + dy2 * (
+                        dx1 * q011 + dx2 * q111
+                )
+        );
     }
 }

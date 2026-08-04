@@ -12,14 +12,18 @@ public class EntityCopperGolem extends EntityWalkingAnimal {
     }
 
     @Override
-    public int getNetworkId() {
-        return NETWORK_ID;
+    public float getHeight() {
+        return 1f;
     }
 
     @Override
-    public void initEntity() {
-        this.setMaxHealth(12);
-        super.initEntity();
+    public int getKillExperience() {
+        return 0;
+    }
+
+    @Override
+    public int getNetworkId() {
+        return NETWORK_ID;
     }
 
     @Override
@@ -28,12 +32,8 @@ public class EntityCopperGolem extends EntityWalkingAnimal {
     }
 
     @Override
-    public float getHeight() {
-        return 1f;
-    }
-
-    @Override
-    public int getKillExperience() {
-        return 0;
+    public void initEntity() {
+        this.setMaxHealth(12);
+        super.initEntity();
     }
 }

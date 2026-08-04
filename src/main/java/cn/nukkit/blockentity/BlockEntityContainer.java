@@ -17,6 +17,14 @@ import cn.nukkit.item.Item;
 public interface BlockEntityContainer {
 
     /**
+     * 返回这个容器最多能包含的物品数量。<br>
+     * Returns the max number of items that this container can contain.
+     *
+     * @return 最多能包含的物品数量。<br>The max number.
+     */
+    int getSize();
+
+    /**
      * 返回一个存储在容器里的物品的{@code Item}对象。<br>
      * Returns an item that stores in this container, as an {@code Item} object.
      *
@@ -36,12 +44,4 @@ public interface BlockEntityContainer {
      * @param item  描述这个物品的 {@code Item}对象。<br>The {@code Item} object that describes this item.
      */
     void setItem(int index, Item item);
-
-    /**
-     * 返回这个容器最多能包含的物品数量。<br>
-     * Returns the max number of items that this container can contain.
-     *
-     * @return 最多能包含的物品数量。<br>The max number.
-     */
-    int getSize();
 }

@@ -28,6 +28,18 @@ public class SmithingTransaction extends InventoryTransaction {
         super(source, actions);
     }
 
+    public Item getInputItem() {
+        return this.equipmentItem;
+    }
+
+    public Item getMaterialItem() {
+        return this.ingredientItem;
+    }
+
+    public Item getOutputItem() {
+        return this.outputItem;
+    }
+
     @Override
     public void addAction(InventoryAction action) {
         if (action instanceof SmithingItemAction) {
@@ -77,6 +89,12 @@ public class SmithingTransaction extends InventoryTransaction {
                 }
                 this.ingredientItem = action.getTargetItem();
             }
+        } else if (!(action instanceof SlotChangeAction)) {
+            this.invalid = true;
+            if (Nukkit.DEBUG > 1) {
+                source.getServer().getLogger().debug(this.getClass().getSimpleName() + " unexpected addAction: " + action);
+            }
+            return;
         }
         super.addAction(action);
     }
@@ -125,6 +143,11 @@ public class SmithingTransaction extends InventoryTransaction {
     }
 
     @Override
+    public boolean checkForItemPart(List<InventoryAction> actions) {
+        return isIn(actions);
+    }
+
+    @Override
     public boolean execute() {
         if (this.hasExecuted() || !this.canExecute() || this.invalid) {
             this.source.removeAllWindows(false);
@@ -154,27 +177,10 @@ public class SmithingTransaction extends InventoryTransaction {
         return true;
     }
 
-    public Item getInputItem() {
-        return this.equipmentItem;
-    }
-
-    public Item getMaterialItem() {
-        return this.ingredientItem;
-    }
-
-    public Item getOutputItem() {
-        return this.outputItem;
-    }
-
     public static boolean isIn(List<InventoryAction> actions) {
         for (InventoryAction action : actions) {
             if (action instanceof SmithingItemAction) return true;
         }
         return false;
-    }
-
-    @Override
-    public boolean checkForItemPart(List<InventoryAction> actions) {
-        return isIn(actions);
     }
 }

@@ -32,6 +32,14 @@ public class ItemArmorStand extends Item {
         return true;
     }
 
+    private static float getDirection(float yaw) {
+        float rot = (Math.round(yaw / 22.5f / 2f) * 45f) - 180f;
+        if (rot < 0) {
+            rot += 360f;
+        }
+        return rot;
+    }
+
     @Override
     public boolean onActivate(Level level, Player player, Block block, Block target, BlockFace face, double fx, double fy, double fz) {
         FullChunk chunk = level.getChunk((int) block.getX() >> 4, (int) block.getZ() >> 4);
@@ -76,13 +84,5 @@ public class ItemArmorStand extends Item {
             player.getLevel().addLevelEvent(entity, LevelEventPacket.EVENT_SOUND_ARMOR_STAND_PLACE);
         }
         return true;
-    }
-
-    private static float getDirection(float yaw) {
-        float rot = (Math.round(yaw / 22.5f / 2f) * 45f) - 180f;
-        if (rot < 0) {
-            rot += 360f;
-        }
-        return rot;
     }
 }

@@ -110,22 +110,14 @@ public class ShapedRecipe implements CraftingRecipe {
         this.networkId = ++CraftingManager.NEXT_NETWORK_ID;
     }
 
-    public int getWidth() {
-        return this.shape[0].length();
-    }
+    public static class Entry {
+        public final int x;
+        public final int y;
 
-    public int getHeight() {
-        return this.shape.length;
-    }
-
-    @Override
-    public Item getResult() {
-        return this.primaryResult;
-    }
-
-    @Override
-    public String getRecipeId() {
-        return this.recipeId;
+        public Entry(int x, int y) {
+            this.x = x;
+            this.y = y;
+        }
     }
 
     @Override
@@ -137,17 +129,22 @@ public class ShapedRecipe implements CraftingRecipe {
         }
     }
 
-    public ShapedRecipe setIngredient(String key, Item item) {
-        return this.setIngredient(key.charAt(0), item);
+    @Override
+    public List<Item> getAllResults() {
+        List<Item> list = new ArrayList<>();
+        list.add(primaryResult);
+        list.addAll(extraResults);
+
+        return list;
     }
 
-    public ShapedRecipe setIngredient(char key, Item item) {
-        if (String.join("", this.shape).indexOf(key) < 0) {
-            throw new RuntimeException("Symbol does not appear in the shape: " + key);
-        }
+    @Override
+    public List<Item> getExtraResults() {
+        return extraResults;
+    }
 
-        this.ingredients.put(key, item);
-        return this;
+    public int getHeight() {
+        return this.shape.length;
     }
 
     public List<Item> getIngredientList() {
@@ -176,10 +173,28 @@ public class ShapedRecipe implements CraftingRecipe {
         return ingredients;
     }
 
-    public Item getIngredient(int x, int y) {
-        Item item = this.ingredients.get(this.shape[y].charAt(x));
+    @Override
+    public List<Item> getIngredientsAggregate() {
+        return ingredientsAggregate;
+    }
 
-        return item != null ? item.clone() : Item.get(Item.AIR);
+    public int getNetworkId() {
+        return this.networkId;
+    }
+
+    @Override
+    public int getPriority() {
+        return this.priority;
+    }
+
+    @Override
+    public String getRecipeId() {
+        return this.recipeId;
+    }
+
+    @Override
+    public Item getResult() {
+        return this.primaryResult;
     }
 
     public String[] getShape() {
@@ -187,32 +202,51 @@ public class ShapedRecipe implements CraftingRecipe {
     }
 
     @Override
-    public void registerToCraftingManager(CraftingManager manager) {
-        manager.registerShapedRecipe(this);
-    }
-
-    @Override
     public RecipeType getType() {
         return RecipeType.SHAPED;
     }
 
-    @Override
-    public List<Item> getExtraResults() {
-        return extraResults;
+    public int getWidth() {
+        return this.shape[0].length();
     }
 
-    @Override
-    public List<Item> getAllResults() {
-        List<Item> list = new ArrayList<>();
-        list.add(primaryResult);
-        list.addAll(extraResults);
+    public Item getIngredient(int x, int y) {
+        Item item = this.ingredients.get(this.shape[y].charAt(x));
 
-        return list;
+        return item != null ? item.clone() : Item.get(Item.AIR);
     }
 
+    private static boolean matchItemList(List<Item> haveItems, List<Item> needItems) {
+        for (Item needItem : new ArrayList<>(needItems)) {
+            for (Item haveItem : new ArrayList<>(haveItems)) {
+                if (needItem.equals(haveItem, needItem.hasMeta(), needItem.hasCompoundTag())) {
+                    int amount = Math.min(haveItem.getCount(), needItem.getCount());
+                    needItem.setCount(needItem.getCount() - amount);
+                    haveItem.setCount(haveItem.getCount() - amount);
+                    if (haveItem.getCount() == 0) {
+                        haveItems.remove(haveItem);
+                    }
+                    if (needItem.getCount() == 0) {
+                        needItems.remove(needItem);
+                        break;
+                    }
+                }
+            }
+        }
+        return haveItems.isEmpty() && needItems.isEmpty();
+    }
+
+    /**
+     * Returns whether the specified list of crafting grid inputs and outputs matches this recipe. Outputs DO NOT
+     * include the primary result item.
+     *
+     * @param inputList       list of items taken from the crafting grid
+     * @param extraOutputList list of items put back into the crafting grid (secondary results)
+     * @return bool
+     */
     @Override
-    public int getPriority() {
-        return this.priority;
+    public boolean matchItems(List<Item> inputList, List<Item> extraOutputList) {
+        return matchItems(inputList, extraOutputList, 1);
     }
 
     public boolean matchItems(List<Item> inputList, List<Item> extraOutputList, int multiplier) {
@@ -271,37 +305,27 @@ public class ShapedRecipe implements CraftingRecipe {
         return matchItemList(haveOutputs, needOutputs);
     }
 
-    /**
-     * Returns whether the specified list of crafting grid inputs and outputs matches this recipe. Outputs DO NOT
-     * include the primary result item.
-     *
-     * @param inputList  list of items taken from the crafting grid
-     * @param extraOutputList list of items put back into the crafting grid (secondary results)
-     * @return bool
-     */
     @Override
-    public boolean matchItems(List<Item> inputList, List<Item> extraOutputList) {
-        return matchItems(inputList, extraOutputList, 1);
+    public void registerToCraftingManager(CraftingManager manager) {
+        manager.registerShapedRecipe(this);
     }
 
-    private static boolean matchItemList(List<Item> haveItems, List<Item> needItems) {
-        for (Item needItem : new ArrayList<>(needItems)) {
-            for (Item haveItem : new ArrayList<>(haveItems)) {
-                if (needItem.equals(haveItem, needItem.hasMeta(), needItem.hasCompoundTag())) {
-                    int amount = Math.min(haveItem.getCount(), needItem.getCount());
-                    needItem.setCount(needItem.getCount() - amount);
-                    haveItem.setCount(haveItem.getCount() - amount);
-                    if (haveItem.getCount() == 0) {
-                        haveItems.remove(haveItem);
-                    }
-                    if (needItem.getCount() == 0) {
-                        needItems.remove(needItem);
-                        break;
-                    }
-                }
-            }
+    @Override
+    public boolean requiresCraftingTable() {
+        return this.getHeight() > 2 || this.getWidth() > 2;
+    }
+
+    public ShapedRecipe setIngredient(String key, Item item) {
+        return this.setIngredient(key.charAt(0), item);
+    }
+
+    public ShapedRecipe setIngredient(char key, Item item) {
+        if (String.join("", this.shape).indexOf(key) < 0) {
+            throw new RuntimeException("Symbol does not appear in the shape: " + key);
         }
-        return haveItems.isEmpty() && needItems.isEmpty();
+
+        this.ingredients.put(key, item);
+        return this;
     }
 
     @Override
@@ -310,29 +334,5 @@ public class ShapedRecipe implements CraftingRecipe {
 
         ingredients.forEach((character, item) -> joiner.add(item.getName() + ':' + item.getDamage()));
         return joiner.toString();
-    }
-
-    @Override
-    public boolean requiresCraftingTable() {
-        return this.getHeight() > 2 || this.getWidth() > 2;
-    }
-
-    @Override
-    public List<Item> getIngredientsAggregate() {
-        return ingredientsAggregate;
-    }
-
-    public int getNetworkId() {
-        return this.networkId;
-    }
-
-    public static class Entry {
-        public final int x;
-        public final int y;
-
-        public Entry(int x, int y) {
-            this.x = x;
-            this.y = y;
-        }
     }
 }

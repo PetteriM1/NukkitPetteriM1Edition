@@ -1,5 +1,6 @@
 package cn.nukkit.command;
 
+import cn.nukkit.Nukkit;
 import cn.nukkit.Server;
 import cn.nukkit.command.data.CommandParameter;
 import cn.nukkit.command.defaults.*;
@@ -28,56 +29,79 @@ public class SimpleCommandMap implements CommandMap {
         this.setDefaultCommands();
     }
 
-    private void setDefaultCommands() {
-        this.register("nukkit", new VersionCommand("version"));
-        this.register("nukkit", new PluginsCommand("plugins"));
-        this.register("nukkit", new HelpCommand("help"));
-        this.register("nukkit", new StopCommand("stop"));
-        this.register("nukkit", new TellCommand("tell"));
-        this.register("nukkit", new BanCommand("ban"));
-        this.register("nukkit", new BanIpCommand("ban-ip"));
-        this.register("nukkit", new BanListCommand("banlist"));
-        this.register("nukkit", new PardonCommand("pardon"));
-        this.register("nukkit", new PardonIpCommand("pardon-ip"));
-        this.register("nukkit", new ListCommand("list"));
-        this.register("nukkit", new KickCommand("kick"));
-        this.register("nukkit", new OpCommand("op"));
-        this.register("nukkit", new DeopCommand("deop"));
-        this.register("nukkit", new SaveCommand("save"));
-        this.register("nukkit", new GiveCommand("give"));
-        this.register("nukkit", new ClearCommand("clear"));
-        this.register("nukkit", new EffectCommand("effect"));
-        this.register("nukkit", new EnchantCommand("enchant"));
-        this.register("nukkit", new GamemodeCommand("gamemode"));
-        this.register("nukkit", new KillCommand("kill"));
-        this.register("nukkit", new SetWorldSpawnCommand("setworldspawn"));
-        this.register("nukkit", new TeleportCommand("tp"));
-        this.register("nukkit", new TimeCommand("time"));
-        this.register("nukkit", new ReloadCommand("reload"));
-        this.register("nukkit", new WeatherCommand("weather"));
-        this.register("nukkit", new XpCommand("xp"));
-        this.register("nukkit", new StatusCommand("status"));
-        this.register("nukkit", new SummonCommand("summon"));
-        this.register("nukkit", new WhitelistCommand("whitelist"));
-        this.register("nukkit", new GameruleCommand("gamerule"));
-        this.register("nukkit", new ConvertCommand("convert"));
-        this.register("nukkit", new DefaultGamemodeCommand("defaultgamemode"));
-        this.register("nukkit", new SayCommand("say"));
-        this.register("nukkit", new MeCommand("me"));
-        this.register("nukkit", new DifficultyCommand("difficulty"));
-        this.register("nukkit", new ParticleCommand("particle"));
-        this.register("nukkit", new SpawnpointCommand("spawnpoint"));
-        this.register("nukkit", new TitleCommand("title"));
-        this.register("nukkit", new SeedCommand("seed"));
-        this.register("nukkit", new PlaySoundCommand("playsound"));
-        this.register("nukkit", new GarbageCollectorCommand("gc"));
+    public Map<String, Command> getCommands() {
+        return knownCommands;
     }
 
     @Override
-    public void registerAll(String fallbackPrefix, List<? extends Command> commands) {
-        for (Command command : commands) {
-            this.register(fallbackPrefix, command);
+    public void clearCommands() {
+        for (Command command : this.knownCommands.values()) {
+            command.unregister(this);
         }
+        this.knownCommands.clear();
+        this.setDefaultCommands();
+    }
+
+    @Override
+    public boolean dispatch(CommandSender sender, String cmdLine) {
+        ArrayList<String> parsed = parseArguments(cmdLine);
+        if (parsed.isEmpty()) {
+            return false;
+        }
+
+        String sentCommandLabel = parsed.remove(0).toLowerCase(Locale.ROOT);
+        String[] args = parsed.toArray(new String[0]);
+        Command target = this.getCommand(sentCommandLabel);
+
+        if (target == null) {
+            return false;
+        }
+
+        try {
+            target.execute(sender, sentCommandLabel, args);
+        } catch (Exception e) {
+            sender.sendMessage(new TranslationContainer(TextFormat.RED + "%commands.generic.exception"));
+            this.server.getLogger().critical(this.server.getLanguage().translateString("nukkit.command.exception", cmdLine, target.toString(), Utils.getExceptionMessage(e)), e);
+        }
+
+        return true;
+    }
+
+    @Override
+    public Command getCommand(String name) {
+        return this.knownCommands.get(name);
+    }
+
+    private static ArrayList<String> parseArguments(String cmdLine) {
+        StringBuilder sb = new StringBuilder(cmdLine);
+        ArrayList<String> args = new ArrayList<>();
+        boolean notQuoted = true;
+        int start = 0;
+
+        for (int i = 0; i < sb.length(); i++) {
+            if (sb.charAt(i) == '\\') {
+                sb.deleteCharAt(i);
+                continue;
+            }
+
+            if (sb.charAt(i) == ' ' && notQuoted) {
+                String arg = sb.substring(start, i);
+                if (!arg.isEmpty()) {
+                    args.add(arg);
+                }
+                start = i + 1;
+            } else if (sb.charAt(i) == '"') {
+                sb.deleteCharAt(i);
+                --i;
+                notQuoted = !notQuoted;
+            }
+        }
+
+        String arg = sb.substring(start);
+        if (!arg.isEmpty()) {
+            args.add(arg);
+        }
+        return args;
     }
 
     @Override
@@ -112,44 +136,6 @@ public class SimpleCommandMap implements CommandMap {
         command.register(this);
 
         return registered;
-    }
-
-    @Override
-    public void registerSimpleCommands(Object object) {
-        for (Method method : object.getClass().getDeclaredMethods()) {
-            cn.nukkit.command.simple.Command def = method.getAnnotation(cn.nukkit.command.simple.Command.class);
-            if (def != null) {
-                SimpleCommand sc = new SimpleCommand(object, method, def.name(), def.description(), def.usageMessage(), def.aliases());
-
-                Arguments args = method.getAnnotation(Arguments.class);
-                if (args != null) {
-                    sc.setMaxArgs(args.max());
-                    sc.setMinArgs(args.min());
-                }
-
-                CommandPermission perm = method.getAnnotation(CommandPermission.class);
-                if (perm != null) {
-                    sc.setPermission(perm.value());
-                }
-
-                if (method.isAnnotationPresent(ForbidConsole.class)) {
-                    sc.setForbidConsole(true);
-                }
-
-                CommandParameters commandParameters = method.getAnnotation(CommandParameters.class);
-                if (commandParameters != null) {
-                    Map<String, CommandParameter[]> map = Arrays.stream(commandParameters.parameters())
-                            .collect(Collectors.toMap(Parameters::name, parameters -> Arrays.stream(parameters.parameters())
-                                    .map(parameter -> new CommandParameter(parameter.name(), parameter.type(), parameter.optional()))
-                                    .distinct()
-                                    .toArray(CommandParameter[]::new)));
-
-                    sc.commandParameters.putAll(map);
-                }
-
-                this.register(def.name(), sc);
-            }
-        }
     }
 
     private boolean registerAlias(Command command, boolean isAlias, String fallbackPrefix, String label) {
@@ -201,118 +187,102 @@ public class SimpleCommandMap implements CommandMap {
         return true;
     }
 
-    private static ArrayList<String> parseArguments(String cmdLine) {
-        StringBuilder sb = new StringBuilder(cmdLine);
-        ArrayList<String> args = new ArrayList<>();
-        boolean notQuoted = true;
-        int start = 0;
+    @Override
+    public void registerAll(String fallbackPrefix, List<? extends Command> commands) {
+        for (Command command : commands) {
+            this.register(fallbackPrefix, command);
+        }
+    }
 
-        for (int i = 0; i < sb.length(); i++) {
-            if (sb.charAt(i) == '\\') {
-                sb.deleteCharAt(i);
-                continue;
-            }
+    @Override
+    public void registerSimpleCommands(Object object) {
+        for (Method method : object.getClass().getDeclaredMethods()) {
+            cn.nukkit.command.simple.Command def = method.getAnnotation(cn.nukkit.command.simple.Command.class);
+            if (def != null) {
+                SimpleCommand sc = new SimpleCommand(object, method, def.name(), def.description(), def.usageMessage(), def.aliases());
 
-            if (sb.charAt(i) == ' ' && notQuoted) {
-                String arg = sb.substring(start, i);
-                if (!arg.isEmpty()) {
-                    args.add(arg);
+                Arguments args = method.getAnnotation(Arguments.class);
+                if (args != null) {
+                    sc.setMaxArgs(args.max());
+                    sc.setMinArgs(args.min());
                 }
-                start = i + 1;
-            } else if (sb.charAt(i) == '"') {
-                sb.deleteCharAt(i);
-                --i;
-                notQuoted = !notQuoted;
-            }
-        }
 
-        String arg = sb.substring(start);
-        if (!arg.isEmpty()) {
-            args.add(arg);
-        }
-        return args;
-    }
-
-    @Override
-    public boolean dispatch(CommandSender sender, String cmdLine) {
-        ArrayList<String> parsed = parseArguments(cmdLine);
-        if (parsed.isEmpty()) {
-            return false;
-        }
-
-        String sentCommandLabel = parsed.remove(0).toLowerCase(Locale.ROOT);
-        String[] args = parsed.toArray(new String[0]);
-        Command target = this.getCommand(sentCommandLabel);
-
-        if (target == null) {
-            return false;
-        }
-
-        try {
-            target.execute(sender, sentCommandLabel, args);
-        } catch (Exception e) {
-            sender.sendMessage(new TranslationContainer(TextFormat.RED + "%commands.generic.exception"));
-            this.server.getLogger().critical(this.server.getLanguage().translateString("nukkit.command.exception", cmdLine, target.toString(), Utils.getExceptionMessage(e)), e);
-        }
-
-        return true;
-    }
-
-    @Override
-    public void clearCommands() {
-        for (Command command : this.knownCommands.values()) {
-            command.unregister(this);
-        }
-        this.knownCommands.clear();
-        this.setDefaultCommands();
-    }
-
-    @Override
-    public Command getCommand(String name) {
-        return this.knownCommands.get(name);
-    }
-
-    public Map<String, Command> getCommands() {
-        return knownCommands;
-    }
-
-    public void registerServerAliases() {
-        Map<String, List<String>> values = this.server.getCommandAliases();
-        for (Map.Entry<String, List<String>> entry : values.entrySet()) {
-            String alias = entry.getKey();
-            List<String> commandStrings = entry.getValue();
-            if (alias.contains(" ") || alias.contains(":")) {
-                this.server.getLogger().warning(this.server.getLanguage().translateString("nukkit.command.alias.illegal", alias));
-                continue;
-            }
-            List<String> targets = new ArrayList<>();
-
-            StringBuilder bad = new StringBuilder();
-
-            for (String commandString : commandStrings) {
-                String[] args = commandString.split(" ");
-                Command command = this.getCommand(args[0]);
-
-                if (command == null) {
-                    if (bad.length() > 0) {
-                        bad.append(", ");
-                    }
-                    bad.append(commandString);
-                } else {
-                    targets.add(commandString);
+                CommandPermission perm = method.getAnnotation(CommandPermission.class);
+                if (perm != null) {
+                    sc.setPermission(perm.value());
                 }
-            }
 
-            if (bad.length() > 0) {
-                this.server.getLogger().warning(this.server.getLanguage().translateString("nukkit.command.alias.notFound", new String[]{alias, bad.toString()}));
-                continue;
-            }
+                if (method.isAnnotationPresent(ForbidConsole.class)) {
+                    sc.setForbidConsole(true);
+                }
 
-            if (!targets.isEmpty()) {
-                this.knownCommands.put(alias.toLowerCase(Locale.ROOT), new FormattedCommandAlias(alias.toLowerCase(Locale.ROOT), targets));
-            } else {
-                this.knownCommands.remove(alias.toLowerCase(Locale.ROOT));
+                CommandParameters commandParameters = method.getAnnotation(CommandParameters.class);
+                if (commandParameters != null) {
+                    Map<String, CommandParameter[]> map = Arrays.stream(commandParameters.parameters())
+                            .collect(Collectors.toMap(Parameters::name, parameters -> Arrays.stream(parameters.parameters())
+                                    .map(parameter -> new CommandParameter(parameter.name(), parameter.type(), parameter.optional()))
+                                    .distinct()
+                                    .toArray(CommandParameter[]::new)));
+
+                    sc.commandParameters.putAll(map);
+                }
+
+                this.register(def.name(), sc);
             }
+        }
+    }
+
+    private void setDefaultCommands() {
+        this.register("nukkit", new VersionCommand("version"));
+        this.register("nukkit", new PluginsCommand("plugins"));
+        this.register("nukkit", new HelpCommand("help"));
+        this.register("nukkit", new StopCommand("stop"));
+        this.register("nukkit", new TellCommand("tell"));
+        this.register("nukkit", new BanCommand("ban"));
+        this.register("nukkit", new BanIpCommand("ban-ip"));
+        this.register("nukkit", new BanListCommand("banlist"));
+        this.register("nukkit", new PardonCommand("pardon"));
+        this.register("nukkit", new PardonIpCommand("pardon-ip"));
+        this.register("nukkit", new ListCommand("list"));
+        this.register("nukkit", new KickCommand("kick"));
+        this.register("nukkit", new OpCommand("op"));
+        this.register("nukkit", new DeopCommand("deop"));
+        this.register("nukkit", new SaveCommand("save"));
+        this.register("nukkit", new GiveCommand("give"));
+        this.register("nukkit", new ClearCommand("clear"));
+        this.register("nukkit", new EffectCommand("effect"));
+        this.register("nukkit", new EnchantCommand("enchant"));
+        this.register("nukkit", new GamemodeCommand("gamemode"));
+        this.register("nukkit", new KillCommand("kill"));
+        this.register("nukkit", new SetWorldSpawnCommand("setworldspawn"));
+        this.register("nukkit", new TeleportCommand("tp"));
+        this.register("nukkit", new TimeCommand("time"));
+        this.register("nukkit", new ReloadCommand("reload"));
+        this.register("nukkit", new WeatherCommand("weather"));
+        this.register("nukkit", new XpCommand("xp"));
+        this.register("nukkit", new StatusCommand("status"));
+        this.register("nukkit", new SummonCommand("summon"));
+        this.register("nukkit", new WorldCommand("world"));
+        this.register("nukkit", new GenerateWorldCommand("genworld"));
+        this.register("nukkit", new WhitelistCommand("whitelist"));
+        this.register("nukkit", new GameruleCommand("gamerule"));
+        this.register("nukkit", new SpawnCommand("spawn"));
+        this.register("nukkit", new ConvertCommand("convert"));
+        if (Nukkit.DEBUG > 1 || !Server.getInstance().suomiCraftPEMode()) {
+            this.register("nukkit", new DefaultGamemodeCommand("defaultgamemode"));
+            this.register("nukkit", new SayCommand("say"));
+            this.register("nukkit", new MeCommand("me"));
+            this.register("nukkit", new DifficultyCommand("difficulty"));
+            this.register("nukkit", new ParticleCommand("particle"));
+            this.register("nukkit", new SpawnpointCommand("spawnpoint"));
+            this.register("nukkit", new TitleCommand("title"));
+            this.register("nukkit", new TransferServerCommand("transfer"));
+            this.register("nukkit", new SeedCommand("seed"));
+            this.register("nukkit", new PlaySoundCommand("playsound"));
+            this.register("nukkit", new GarbageCollectorCommand("gc"));
+        }
+        if (Nukkit.DEBUG > 1) {
+            this.register("nukkit", new BiomeCommand("biome"));
         }
     }
 }

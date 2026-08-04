@@ -15,28 +15,8 @@ public class BlockCrimsonStem extends BlockStem {
     }
 
     @Override
-    public String getName() {
-        return "Crimson Stem";
-    }
-
-    @Override
-    public int getId() {
-        return CRIMSON_STEM;
-    }
-
-    @Override
-    public Item toItem() {
-        return new ItemBlock(Block.get(this.getId(), 0), 0);
-    }
-
-    @Override
-    public int getStrippedId() {
-        return STRIPPED_CRIMSON_STEM;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.CRIMSON_STEM_BLOCK_COLOR;
+    public int getBurnAbility() {
+        return 0;
     }
 
     @Override
@@ -45,7 +25,27 @@ public class BlockCrimsonStem extends BlockStem {
     }
 
     @Override
-    public int getBurnAbility() {
-        return 0;
+    public BlockColor getColor() {
+        return BlockColor.CRIMSON_STEM_BLOCK_COLOR;
+    }
+
+    @Override
+    public int getId() {
+        return CRIMSON_STEM;
+    }
+
+    @Override
+    public String getName() {
+        return "Crimson Stem";
+    }
+
+    @Override
+    public int getStrippedId() {
+        return STRIPPED_CRIMSON_STEM;
+    }
+
+    @Override
+    public Item toItem() {
+        return new ItemBlock(Block.get(this.getId(), 0), 0);
     }
 }

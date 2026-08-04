@@ -20,22 +20,22 @@ public class BlockCampfireSoul extends BlockCampfire {
     }
 
     @Override
+    public int getLightLevel() {
+        return isExtinguished() ? 0 : 10;
+    }
+
+    @Override
     public String getName() {
         return "Soul Campfire";
     }
 
     @Override
-    public int getLightLevel() {
-        return isExtinguished()? 0 : 10;
+    public Item[] getDrops(Item item) {
+        return new Item[]{new ItemBlock(Block.get(Block.SOUL_SOIL, 0), 0)};
     }
 
     @Override
     public Item toItem() {
         return Item.get(ItemID.SOUL_CAMPFIRE);
-    }
-
-    @Override
-    public Item[] getDrops(Item item) {
-        return new Item[]{ new ItemBlock(Block.get(Block.SOUL_SOIL, 0), 0) };
     }
 }

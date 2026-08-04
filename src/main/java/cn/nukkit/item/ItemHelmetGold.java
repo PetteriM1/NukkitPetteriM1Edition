@@ -19,16 +19,6 @@ public class ItemHelmetGold extends ItemArmor {
     }
 
     @Override
-    public int getTier() {
-        return ItemArmor.TIER_GOLD;
-    }
-
-    @Override
-    public boolean isHelmet() {
-        return true;
-    }
-
-    @Override
     public int getArmorPoints() {
         return 2;
     }
@@ -36,5 +26,15 @@ public class ItemHelmetGold extends ItemArmor {
     @Override
     public int getMaxDurability() {
         return 78;
+    }
+
+    @Override
+    public int getTier() {
+        return ItemArmor.TIER_GOLD;
+    }
+
+    @Override
+    public boolean isHelmet() {
+        return true;
     }
 }

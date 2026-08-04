@@ -32,6 +32,38 @@ public class Pow2BitArray implements BitArray {
         }
     }
 
+    public BitArrayVersion getVersion() {
+        return version;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@inheritDoc}
+     */
+    @Override
+    public int[] getWords() {
+        return this.words;
+    }
+
+    @Override
+    public BitArray copy() {
+        return new Pow2BitArray(this.version, this.size, Arrays.copyOf(this.words, this.words.length));
+    }
+
+    /**
+     * Gets the entry at the given index
+     */
+    public int get(int index) {
+        if (index < 0 || index >= this.size) {
+            throw new IndexOutOfBoundsException();
+        }
+        int bitIndex = index * this.version.bits;
+        int arrayIndex = bitIndex >> 5;
+        int wordOffset = bitIndex & 31;
+        return this.words[arrayIndex] >>> wordOffset & this.version.maxEntryValue;
+    }
+
     /**
      * Sets the entry at the given location to the given value
      */
@@ -50,41 +82,9 @@ public class Pow2BitArray implements BitArray {
     }
 
     /**
-     * Gets the entry at the given index
-     */
-    public int get(int index) {
-        if (index < 0 || index >= this.size) {
-            throw new IndexOutOfBoundsException();
-        }
-        int bitIndex = index * this.version.bits;
-        int arrayIndex = bitIndex >> 5;
-        int wordOffset = bitIndex & 31;
-        return this.words[arrayIndex] >>> wordOffset & this.version.maxEntryValue;
-    }
-
-    /**
      * Gets the long array that is used to store the data in this BitArray. This is useful for sending packet data.
      */
     public int size() {
         return this.size;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @return {@inheritDoc}
-     */
-    @Override
-    public int[] getWords() {
-        return this.words;
-    }
-
-    public BitArrayVersion getVersion() {
-        return version;
-    }
-
-    @Override
-    public BitArray copy() {
-        return new Pow2BitArray(this.version, this.size, Arrays.copyOf(this.words, this.words.length));
     }
 }

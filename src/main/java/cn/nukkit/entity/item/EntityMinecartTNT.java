@@ -21,7 +21,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * @author Adam Matthew [larryTheCoder]
- *
+ * <p>
  * Nukkit Project.
  */
 public class EntityMinecartTNT extends EntityMinecartAbstract implements EntityExplosive {
@@ -36,20 +36,35 @@ public class EntityMinecartTNT extends EntityMinecartAbstract implements EntityE
     }
 
     @Override
+    public int getNetworkId() {
+        return EntityMinecartTNT.NETWORK_ID;
+    }
+
+    @Override
+    public MinecartType getType() {
+        return MinecartType.valueOf(3);
+    }
+
+    @Override
     public boolean isRideable() {
         return false;
     }
 
     @Override
-    public void initEntity() {
-        super.initEntity();
+    public void activate(int x, int y, int z, boolean flag) {
+        level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_IGNITE);
+        this.fuse = 80;
+    }
 
-        if (namedTag.contains("fuse")) {
-            fuse = namedTag.getByte("fuse");
-        } else {
-            fuse = -1;
+    @Override
+    public void dropItem() {
+        if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
+            Entity damager = ((EntityDamageByEntityEvent) this.lastDamageCause).getDamager();
+            if (damager instanceof Player && ((Player) damager).isCreative()) {
+                return;
+            }
         }
-        //this.setDataFlag(DATA_FLAGS, DATA_FLAG_CHARGED, false);
+        level.dropItem(this, Item.get(Item.MINECART_WITH_TNT));
     }
 
     @Override
@@ -75,17 +90,6 @@ public class EntityMinecartTNT extends EntityMinecartAbstract implements EntityE
         return hasUpdate;
     }
 
-    @Override
-    public void activate(int x, int y, int z, boolean flag) {
-        level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_IGNITE);
-        this.fuse = 80;
-    }
-
-    @Override
-    public void explode() {
-        explode(0);
-    }
-
     public void explode(double square) {
         double root = Math.sqrt(square);
 
@@ -107,31 +111,25 @@ public class EntityMinecartTNT extends EntityMinecartAbstract implements EntityE
     }
 
     @Override
-    public void dropItem() {
-        if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
-            Entity damager = ((EntityDamageByEntityEvent) this.lastDamageCause).getDamager();
-            if (damager instanceof Player && ((Player) damager).isCreative()) {
-                return;
-            }
+    public void explode() {
+        explode(0);
+    }
+
+    @Override
+    public void initEntity() {
+        super.initEntity();
+
+        if (namedTag.contains("fuse")) {
+            fuse = namedTag.getByte("fuse");
+        } else {
+            fuse = -1;
         }
-        level.dropItem(this, Item.get(Item.MINECART_WITH_TNT));
+        //this.setDataFlag(DATA_FLAGS, DATA_FLAG_CHARGED, false);
     }
 
     @Override
-    public MinecartType getType() {
-        return MinecartType.valueOf(3);
-    }
-
-    @Override
-    public int getNetworkId() {
-        return EntityMinecartTNT.NETWORK_ID;
-    }
-
-    @Override
-    public void saveNBT() {
-        super.saveNBT();
-
-        super.namedTag.putInt("fuse", this.fuse);
+    public boolean mountEntity(Entity entity, byte mode) {
+        return false;
     }
 
     @Override
@@ -146,7 +144,9 @@ public class EntityMinecartTNT extends EntityMinecartAbstract implements EntityE
     }
 
     @Override
-    public boolean mountEntity(Entity entity, byte mode) {
-        return false;
+    public void saveNBT() {
+        super.saveNBT();
+
+        super.namedTag.putInt("fuse", this.fuse);
     }
 }

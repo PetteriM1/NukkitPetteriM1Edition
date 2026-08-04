@@ -164,44 +164,50 @@ public class BlockIterator implements Iterator<Block> {
         this.maxDistanceInt = (int) Math.round(maxDistance / (Math.sqrt(mainDirection * mainDirection + secondDirection * secondDirection + thirdDirection * thirdDirection) / mainDirection));
     }
 
+    private static double getPosition(double direction, double position, double blockPosition) {
+        return direction > 0 ? (position - blockPosition) : (blockPosition + 1 - position);
+    }
+
     private static BlockFace getXFace(Vector3 direction) {
         return ((direction.x) > 0) ? BlockFace.EAST : BlockFace.WEST;
-    }
-
-    private static BlockFace getYFace(Vector3 direction) {
-        return ((direction.y) > 0) ? BlockFace.UP : BlockFace.DOWN;
-    }
-
-    private static BlockFace getZFace(Vector3 direction) {
-        return ((direction.z) > 0) ? BlockFace.SOUTH : BlockFace.NORTH;
     }
 
     private static double getXLength(Vector3 direction) {
         return Math.abs(direction.x);
     }
 
-    private static double getYLength(Vector3 direction) {
-        return Math.abs(direction.y);
-    }
-
-    private static double getZLength(Vector3 direction) {
-        return Math.abs(direction.z);
-    }
-
-    private static double getPosition(double direction, double position, double blockPosition) {
-        return direction > 0 ? (position - blockPosition) : (blockPosition + 1 - position);
-    }
-
     private static double getXPosition(Vector3 direction, Vector3 position, Block block) {
         return getPosition(direction.x, position.x, block.x);
+    }
+
+    private static BlockFace getYFace(Vector3 direction) {
+        return ((direction.y) > 0) ? BlockFace.UP : BlockFace.DOWN;
+    }
+
+    private static double getYLength(Vector3 direction) {
+        return Math.abs(direction.y);
     }
 
     private static double getYPosition(Vector3 direction, Vector3 position, Block block) {
         return getPosition(direction.y, position.y, block.y);
     }
 
+    private static BlockFace getZFace(Vector3 direction) {
+        return ((direction.z) > 0) ? BlockFace.SOUTH : BlockFace.NORTH;
+    }
+
+    private static double getZLength(Vector3 direction) {
+        return Math.abs(direction.z);
+    }
+
     private static double getZPosition(Vector3 direction, Vector3 position, Block block) {
         return getPosition(direction.z, position.z, block.z);
+    }
+
+    @Override
+    public boolean hasNext() {
+        this.scan();
+        return this.currentBlock != -1;
     }
 
     @Override
@@ -213,12 +219,6 @@ public class BlockIterator implements Iterator<Block> {
         } else {
             return this.level.getBlock(this.blockQueue[this.currentBlock--]);
         }
-    }
-
-    @Override
-    public boolean hasNext() {
-        this.scan();
-        return this.currentBlock != -1;
     }
 
     private void scan() {

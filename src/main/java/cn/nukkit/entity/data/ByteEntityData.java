@@ -15,16 +15,16 @@ public class ByteEntityData extends EntityData<Integer> {
         this.data = data;
     }
 
-    public Integer getData() {
-        return data;
-    }
-
     public void setData(Integer data) {
         if (data == null) {
             this.data = 0;
         } else {
             this.data = data;
         }
+    }
+
+    public Integer getData() {
+        return data;
     }
 
     @Override

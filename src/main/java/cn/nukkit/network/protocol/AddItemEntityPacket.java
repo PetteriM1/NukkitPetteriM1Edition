@@ -13,12 +13,6 @@ import lombok.ToString;
 public class AddItemEntityPacket extends DataPacket {
 
     public static final byte NETWORK_ID = ProtocolInfo.ADD_ITEM_ENTITY_PACKET;
-
-    @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
     public long entityUniqueId;
     public long entityRuntimeId;
     public Item item;
@@ -41,10 +35,17 @@ public class AddItemEntityPacket extends DataPacket {
         this.reset();
         this.putEntityUniqueId(this.entityUniqueId);
         this.putEntityRuntimeId(this.entityRuntimeId);
-        this.putSlot(this.item);
+        this.putSlot(protocol, this.item);
         this.putVector3f(this.x, this.y, this.z);
         this.putVector3f(this.speedX, this.speedY, this.speedZ);
-        this.put(Binary.writeMetadata(metadata));
-        this.putBoolean(this.isFromFishing);
+        this.put(Binary.writeMetadata(protocol, metadata));
+        if (protocol >= 223) {
+            this.putBoolean(this.isFromFishing);
+        }
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

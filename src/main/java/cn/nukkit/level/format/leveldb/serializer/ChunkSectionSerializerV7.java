@@ -11,11 +11,6 @@ public class ChunkSectionSerializerV7 implements ChunkSectionSerializer {
     public static final ChunkSectionSerializer INSTANCE = new ChunkSectionSerializerV7();
 
     @Override
-    public void serialize(ByteBuf buf, StateBlockStorage[] storage, int ySection) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public StateBlockStorage[] deserialize(ByteBuf buf, ChunkBuilder builder) {
         byte[] blockIds = new byte[4096];
         buf.readBytes(blockIds);
@@ -37,5 +32,10 @@ public class ChunkSectionSerializerV7 implements ChunkSectionSerializer {
             storage.setBlockStateUnsafe(i, BlockStateMapping.get().getState(blockIds[i], data.get(i)));
         }
         return storage;
+    }
+
+    @Override
+    public void serialize(ByteBuf buf, StateBlockStorage[] storage, int ySection) {
+        throw new UnsupportedOperationException();
     }
 }

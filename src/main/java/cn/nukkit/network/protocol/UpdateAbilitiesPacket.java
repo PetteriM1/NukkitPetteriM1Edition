@@ -33,6 +33,21 @@ public class UpdateAbilitiesPacket extends DataPacket {
     private CommandPermission commandPermission;
     private final List<AbilityLayer> abilityLayers = new ObjectArrayList<>(2);
 
+    public enum PlayerPermission {
+        VISITOR,
+        MEMBER,
+        OPERATOR,
+        CUSTOM
+    }
+
+    public enum CommandPermission {
+        NORMAL,
+        OPERATOR,
+        HOST,
+        AUTOMATION,
+        ADMIN
+    }
+
     @Override
     public void decode() {
         this.decodeUnsupported();
@@ -45,15 +60,6 @@ public class UpdateAbilitiesPacket extends DataPacket {
         this.putUnsignedVarInt(this.playerPermission.ordinal());
         this.putUnsignedVarInt(this.commandPermission.ordinal());
         this.putArray(this.abilityLayers, this::writeAbilityLayer);
-    }
-
-    private void writeAbilityLayer(BinaryStream buffer, AbilityLayer abilityLayer) {
-        buffer.putLShort(abilityLayer.getLayerType().ordinal());
-        buffer.putLInt(getAbilitiesNumber(abilityLayer.getAbilitiesSet()));
-        buffer.putLInt(getAbilitiesNumber(abilityLayer.getAbilityValues()));
-        buffer.putLFloat(abilityLayer.getFlySpeed());
-        buffer.putLFloat(abilityLayer.getVerticalFlySpeed());
-        buffer.putLFloat(abilityLayer.getWalkSpeed());
     }
 
     private static int getAbilitiesNumber(Set<PlayerAbility> abilities) {
@@ -69,18 +75,14 @@ public class UpdateAbilitiesPacket extends DataPacket {
         return NETWORK_ID;
     }
 
-    public enum PlayerPermission {
-        VISITOR,
-        MEMBER,
-        OPERATOR,
-        CUSTOM
-    }
-
-    public enum CommandPermission {
-        NORMAL,
-        OPERATOR,
-        HOST,
-        AUTOMATION,
-        ADMIN
+    private void writeAbilityLayer(BinaryStream buffer, AbilityLayer abilityLayer) {
+        buffer.putLShort(abilityLayer.getLayerType().ordinal());
+        buffer.putLInt(getAbilitiesNumber(abilityLayer.getAbilitiesSet()));
+        buffer.putLInt(getAbilitiesNumber(abilityLayer.getAbilityValues()));
+        buffer.putLFloat(abilityLayer.getFlySpeed());
+        if (protocol >= ProtocolInfo.v1_21_60) {
+            buffer.putLFloat(abilityLayer.getVerticalFlySpeed());
+        }
+        buffer.putLFloat(abilityLayer.getWalkSpeed());
     }
 }

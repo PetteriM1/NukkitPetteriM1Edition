@@ -17,7 +17,7 @@ abstract public class BaseRegionLoader {
 
     public static final byte COMPRESSION_GZIP = 1;
     public static final byte COMPRESSION_ZLIB = 2;
-    public static final int MAX_SECTOR_LENGTH = 256 << 12;
+    public static final int MAX_SECTOR_LENGTH = 1048576;
 
     protected int x;
     protected int z;
@@ -57,41 +57,41 @@ abstract public class BaseRegionLoader {
         }
     }
 
+    public Integer[] getLocationIndexes() {
+        return this.locationTable.keySet().toArray(new Integer[0]);
+    }
+
     public RandomAccessFile getRandomAccessFile() {
         return randomAccessFile;
     }
-
-    protected abstract boolean isChunkGenerated(int index);
-
-    public abstract BaseFullChunk readChunk(int x, int z) throws IOException;
-
-    protected abstract BaseFullChunk unserializeChunk(byte[] data);
-
-    public abstract boolean chunkExists(int x, int z);
-
-    protected abstract void saveChunk(int x, int z, byte[] chunkData) throws IOException;
-
-    public abstract void removeChunk(int x, int z);
-
-    public abstract void writeChunk(FullChunk chunk) throws Exception;
-
-    public void close() throws IOException {
-        if (randomAccessFile != null) randomAccessFile.close();
-    }
-
-    protected abstract void loadLocationTable() throws IOException;
-
-    public abstract int doSlowCleanUp() throws Exception;
-
-    protected abstract void writeLocationIndex(int index) throws IOException;
-
-    protected abstract void createBlank() throws IOException;
 
     public abstract int getX();
 
     public abstract int getZ();
 
-    public Integer[] getLocationIndexes() {
-        return this.locationTable.keySet().toArray(new Integer[0]);
+    public abstract boolean chunkExists(int x, int z);
+
+    public void close() throws IOException {
+        if (randomAccessFile != null) randomAccessFile.close();
     }
+
+    protected abstract void createBlank() throws IOException;
+
+    public abstract int doSlowCleanUp() throws Exception;
+
+    protected abstract boolean isChunkGenerated(int index);
+
+    protected abstract void loadLocationTable() throws IOException;
+
+    public abstract BaseFullChunk readChunk(int x, int z) throws IOException;
+
+    public abstract void removeChunk(int x, int z);
+
+    protected abstract void saveChunk(int x, int z, byte[] chunkData) throws IOException;
+
+    protected abstract BaseFullChunk unserializeChunk(byte[] data);
+
+    public abstract void writeChunk(FullChunk chunk) throws Exception;
+
+    protected abstract void writeLocationIndex(int index) throws IOException;
 }

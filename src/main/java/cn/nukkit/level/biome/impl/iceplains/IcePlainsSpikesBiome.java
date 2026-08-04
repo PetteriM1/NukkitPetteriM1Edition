@@ -19,22 +19,16 @@ public class IcePlainsSpikesBiome extends IcePlainsBiome {
         this.addPopulator(iceSpikes);
     }
 
-    @Override
-    public int getSurfaceId(int x, int y, int z) {
-        return Block.SNOW_BLOCK << Block.DATA_BITS;
-    }
-
-    public String getName() {
-        return "Ice Plains Spikes";
-    }
-
-
     /**
      * @author DaPorkchop_
      * <p>
      * Please excuse this mess, but it runs way faster than the correct method
      */
     private static class PopulatorIceSpikes extends Populator {
+
+        public int getHighestWorkableBlock(int x, int z, FullChunk chunk) {
+            return chunk.getHighestBlockAt(x & 0xF, z & 0xF) - 5;
+        }
 
         @Override
         public void populate(ChunkManager level, int chunkX, int chunkZ, NukkitRandom random, FullChunk chunk) {
@@ -95,9 +89,14 @@ public class IcePlainsSpikesBiome extends IcePlainsBiome {
                 }
             }
         }
+    }
 
-        public int getHighestWorkableBlock(int x, int z, FullChunk chunk) {
-            return chunk.getHighestBlockAt(x & 0xF, z & 0xF) - 5;
-        }
+    public String getName() {
+        return "Ice Plains Spikes";
+    }
+
+    @Override
+    public int getSurfaceId(int x, int y, int z) {
+        return Block.SNOW_BLOCK << Block.DATA_BITS;
     }
 }

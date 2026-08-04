@@ -15,8 +15,8 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.Tag;
 import cn.nukkit.network.protocol.LevelEventPacket;
 import cn.nukkit.network.protocol.OpenSignPacket;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
-import cn.nukkit.utils.DyeColor;
 import cn.nukkit.utils.Faceable;
 
 /**
@@ -33,8 +33,18 @@ public class BlockSignPost extends BlockTransparentMeta implements Faceable {
     }
 
     @Override
-    public int getId() {
-        return SIGN_POST;
+    public BlockFace getBlockFace() {
+        return BlockFace.fromIndex(this.getDamage() & 0x07);
+    }
+
+    @Override
+    public AxisAlignedBB getBoundingBox() {
+        return null;
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.AIR_BLOCK_COLOR;
     }
 
     @Override
@@ -43,8 +53,36 @@ public class BlockSignPost extends BlockTransparentMeta implements Faceable {
     }
 
     @Override
+    public int getId() {
+        return SIGN_POST;
+    }
+
+    @Override
+    public String getName() {
+        return "Oak Sign Post";
+    }
+
+    protected int getPostId() {
+        return SIGN_POST;
+    }
+
+    @Override
     public double getResistance() {
         return 5;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_AXE;
+    }
+
+    protected int getWallId() {
+        return WALL_SIGN;
+    }
+
+    @Override
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.WHEN_PLACED_IN_WATER;
     }
 
     @Override
@@ -53,21 +91,97 @@ public class BlockSignPost extends BlockTransparentMeta implements Faceable {
     }
 
     @Override
-    public String getName() {
-        return "Oak Sign Post";
+    public boolean breakWhenPushed() {
+        return true;
     }
 
     @Override
-    public AxisAlignedBB getBoundingBox() {
-        return null;
+    public boolean canBeActivated() {
+        return true;
     }
 
-    protected int getPostId() {
-        return SIGN_POST;
+    @Override
+    public boolean onActivate(Item item, Player player) {
+        if (item instanceof ItemDye) {
+            BlockEntity blockEntity = this.level.getBlockEntityIfLoaded(player == null ? null : player.chunk, this);
+            if (!(blockEntity instanceof BlockEntitySign)) {
+                return false;
+            }
+            BlockEntitySign sign = (BlockEntitySign) blockEntity;
+
+            int meta = item.getDamage();
+            if (meta == ItemDye.INK_SAC || meta == ItemDye.GLOW_INK_SAC) {
+                boolean glow = meta == ItemDye.GLOW_INK_SAC;
+                if (sign.isGlowing() == glow) {
+                    if (player != null) {
+                        sign.spawnTo(player);
+                    }
+                    return false;
+                }
+
+                SignGlowEvent event = new SignGlowEvent(this, player, glow);
+                this.level.getServer().getPluginManager().callEvent(event);
+                if (event.isCancelled()) {
+                    /*if (player != null) {
+                        sign.spawnTo(player);
+                    }*/
+                    return false;
+                }
+
+                sign.setGlowing(glow);
+                sign.spawnToAll();
+
+                this.level.addLevelEvent(this, LevelEventPacket.EVENT_SOUND_INK_SAC_USED);
+
+                if (player != null && (player.getGamemode() & 0x01) == 0) {
+                    item.count--;
+                }
+
+                return true;
+            }
+
+            BlockColor color = ((ItemDye) item).getDyeColor().getSignColor();
+            if (color.equals(sign.getColor())) {
+                /*if (player != null) {
+                    sign.spawnTo(player);
+                }*/
+                return false;
+            }
+
+            SignColorChangeEvent event = new SignColorChangeEvent(this, player, color);
+            this.level.getServer().getPluginManager().callEvent(event);
+            if (event.isCancelled()) {
+                if (player != null) {
+                    sign.spawnTo(player);
+                }
+                return false;
+            }
+
+            sign.setColor(color);
+            sign.spawnToAll();
+
+            this.level.addLevelEvent(this, LevelEventPacket.EVENT_SOUND_DYE_USED);
+
+            if (player != null && (player.getGamemode() & 0x01) == 0) {
+                item.count--;
+            }
+
+            return true;
+        }
+        return false;
     }
 
-    protected int getWallId() {
-        return WALL_SIGN;
+    @Override
+    public int onUpdate(int type) {
+        if (type == Level.BLOCK_UPDATE_NORMAL) {
+            if (down().getId() == Block.AIR) {
+                getLevel().useBreakOn(this);
+
+                return Level.BLOCK_UPDATE_NORMAL;
+            }
+        }
+
+        return 0;
     }
 
     @Override
@@ -106,7 +220,7 @@ public class BlockSignPost extends BlockTransparentMeta implements Faceable {
 
             BlockEntity.createBlockEntity(BlockEntity.SIGN, this.getChunk(), nbt);
 
-            if (player != null) {
+            if (player != null && player.protocol >= ProtocolInfo.v1_19_80) {
                 OpenSignPacket pk = new OpenSignPacket();
                 pk.position = this.asBlockVector3();
                 pk.frontSide = true;
@@ -119,121 +233,7 @@ public class BlockSignPost extends BlockTransparentMeta implements Faceable {
     }
 
     @Override
-    public int onUpdate(int type) {
-        if (type == Level.BLOCK_UPDATE_NORMAL) {
-            if (down().getId() == Block.AIR) {
-                getLevel().useBreakOn(this);
-
-                return Level.BLOCK_UPDATE_NORMAL;
-            }
-        }
-
-        return 0;
-    }
-
-    @Override
     public Item toItem() {
         return Item.get(Item.SIGN);
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_AXE;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.AIR_BLOCK_COLOR;
-    }
-
-    @Override
-    public BlockFace getBlockFace() {
-        return BlockFace.fromIndex(this.getDamage() & 0x07);
-    }
-
-    @Override
-    public boolean canBeActivated() {
-        return true;
-    }
-
-    @Override
-    public boolean onActivate(Item item, Player player) {
-        if (item.getId() == Item.DYE) {
-            BlockEntity blockEntity = this.level.getBlockEntityIfLoaded(player == null ? null : player.chunk, this);
-            if (!(blockEntity instanceof BlockEntitySign)) {
-                return false;
-            }
-            BlockEntitySign sign = (BlockEntitySign) blockEntity;
-
-            int meta = item.getDamage();
-            if (meta == ItemDye.INK_SAC || meta == ItemDye.GLOW_INK_SAC) {
-                boolean glow = meta == ItemDye.GLOW_INK_SAC;
-                if (sign.isGlowing() == glow) {
-                    if (player != null) {
-                        sign.spawnTo(player);
-                    }
-                    return false;
-                }
-
-                SignGlowEvent event = new SignGlowEvent(this, player, glow);
-                this.level.getServer().getPluginManager().callEvent(event);
-                if (event.isCancelled()) {
-                    /*if (player != null) {
-                        sign.spawnTo(player);
-                    }*/
-                    return false;
-                }
-
-                sign.setGlowing(glow);
-                sign.spawnToAll();
-
-                this.level.addLevelEvent(this, LevelEventPacket.EVENT_SOUND_INK_SAC_USED);
-
-                if (player != null && (player.getGamemode() & 0x01) == 0) {
-                    item.count--;
-                }
-
-                return true;
-            }
-
-            BlockColor color = DyeColor.getByDyeData(meta).getSignColor();
-            if (color.equals(sign.getColor())) {
-                /*if (player != null) {
-                    sign.spawnTo(player);
-                }*/
-                return false;
-            }
-
-            SignColorChangeEvent event = new SignColorChangeEvent(this, player, color);
-            this.level.getServer().getPluginManager().callEvent(event);
-            if (event.isCancelled()) {
-                if (player != null) {
-                    sign.spawnTo(player);
-                }
-                return false;
-            }
-
-            sign.setColor(color);
-            sign.spawnToAll();
-
-            this.level.addLevelEvent(this, LevelEventPacket.EVENT_SOUND_DYE_USED);
-
-            if (player != null && (player.getGamemode() & 0x01) == 0) {
-                item.count--;
-            }
-
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public boolean breakWhenPushed() {
-        return true;
-    }
-
-    @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.WHEN_PLACED_IN_WATER;
     }
 }

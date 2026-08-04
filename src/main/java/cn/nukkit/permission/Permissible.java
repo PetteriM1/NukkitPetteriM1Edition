@@ -10,13 +10,7 @@ import java.util.Map;
  */
 public interface Permissible extends ServerOperator {
 
-    boolean isPermissionSet(String name);
-
-    boolean isPermissionSet(Permission permission);
-
-    boolean hasPermission(String name);
-
-    boolean hasPermission(Permission permission);
+    Map<String, PermissionAttachmentInfo> getEffectivePermissions();
 
     PermissionAttachment addAttachment(Plugin plugin);
 
@@ -24,9 +18,15 @@ public interface Permissible extends ServerOperator {
 
     PermissionAttachment addAttachment(Plugin plugin, String name, Boolean value);
 
-    void removeAttachment(PermissionAttachment attachment);
+    boolean hasPermission(Permission permission);
+
+    boolean hasPermission(String name);
+
+    boolean isPermissionSet(Permission permission);
+
+    boolean isPermissionSet(String name);
 
     void recalculatePermissions();
 
-    Map<String, PermissionAttachmentInfo> getEffectivePermissions();
+    void removeAttachment(PermissionAttachment attachment);
 }

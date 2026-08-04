@@ -3,32 +3,24 @@ package cn.nukkit.block;
 import cn.nukkit.Player;
 import cn.nukkit.block.properties.OxidizationLevel;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemTool;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.material.BlockType;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public abstract class BlockSlabCopperBase extends BlockSlab implements Waxable, Oxidizable {
-    
+
     public BlockSlabCopperBase(int meta, int doubleSlab) {
         super(meta, doubleSlab);
     }
 
     @Override
-    public boolean onActivate(@Nonnull Item item, @Nullable Player player) {
-        return Waxable.super.onActivate(item, player)
-                || Oxidizable.super.onActivate(item, player);
-    }
-
-    @Override
-    public int onUpdate(int type) {
-        return Oxidizable.super.onUpdate(type);
-    }
-
-    @Override
-    public boolean canBeActivated() {
-        return true;
+    public void setTopBit(boolean topBit) {
+        this.setDamage(topBit ? 1 : 0);
     }
 
     @Override
@@ -42,8 +34,8 @@ public abstract class BlockSlabCopperBase extends BlockSlab implements Waxable, 
     }
 
     @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_17_0;
     }
 
     @Override
@@ -52,13 +44,51 @@ public abstract class BlockSlabCopperBase extends BlockSlab implements Waxable, 
     }
 
     @Override
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
+    }
+
+    @Override
+    public boolean isWaxed() {
+        return false;
+    }
+
+    @Override
+    public boolean canBeActivated() {
+        return true;
+    }
+
+    @Override
     public boolean canHarvestWithHand() {
         return false;
     }
 
     @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.STONE_SLAB;
+    }
+
+    protected abstract int getCopperId(boolean waxed, OxidizationLevel oxidizationLevel);
+
+    @Override
     public Block getStateWithOxidizationLevel(OxidizationLevel oxidizationLevel) {
         return Block.get(this.getCopperId(this.isWaxed(), oxidizationLevel), this.getDamage());
+    }
+
+    @Override
+    public boolean hasTopBit() {
+        return (this.getDamage() & 0x01) == 1;
+    }
+
+    @Override
+    public boolean onActivate(@Nonnull Item item, @Nullable Player player) {
+        return Waxable.super.onActivate(item, player)
+                || Oxidizable.super.onActivate(item, player);
+    }
+
+    @Override
+    public int onUpdate(int type) {
+        return Oxidizable.super.onUpdate(type);
     }
 
     @Override
@@ -78,9 +108,7 @@ public abstract class BlockSlabCopperBase extends BlockSlab implements Waxable, 
     }
 
     @Override
-    public boolean isWaxed() {
-        return false;
+    public Item toItem() {
+        return new ItemBlock(Block.get(this.getId(), 0), 0);
     }
-
-    protected abstract int getCopperId(boolean waxed, OxidizationLevel oxidizationLevel);
 }

@@ -13,6 +13,16 @@ public class EntityTurtle extends EntityWaterAnimal {
     }
 
     @Override
+    public float getHeight() {
+        return 0.4f;
+    }
+
+    @Override
+    public int getKillExperience() {
+        return this.isBaby() ? 0 : Utils.rand(1, 3);
+    }
+
+    @Override
     public int getNetworkId() {
         return NETWORK_ID;
     }
@@ -23,18 +33,8 @@ public class EntityTurtle extends EntityWaterAnimal {
     }
 
     @Override
-    public float getHeight() {
-        return 0.4f;
-    }
-
-    @Override
     public void initEntity() {
         this.setMaxHealth(30);
         super.initEntity();
-    }
-
-    @Override
-    public int getKillExperience() {
-        return this.isBaby() ? 0 : Utils.rand(1, 3);
     }
 }

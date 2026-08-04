@@ -23,10 +23,16 @@ public class BlockSandstone extends BlockSolidMeta {
     public BlockSandstone(int meta) {
         super(meta);
     }
+    private static final String[] names = {
+            "Sandstone",
+            "Chiseled Sandstone",
+            "Cut Sandstone",
+            "Smooth Sandstone"
+    };
 
     @Override
-    public int getId() {
-        return SANDSTONE;
+    public BlockColor getColor() {
+        return BlockColor.SAND_BLOCK_COLOR;
     }
 
     @Override
@@ -35,20 +41,28 @@ public class BlockSandstone extends BlockSolidMeta {
     }
 
     @Override
-    public double getResistance() {
-        return 0.8;
+    public int getId() {
+        return SANDSTONE;
     }
-
-    private static final String[] NAMES = {
-            "Sandstone",
-            "Chiseled Sandstone",
-            "Cut Sandstone",
-            "Smooth Sandstone"
-    };
 
     @Override
     public String getName() {
-        return NAMES[this.getDamage() & 0x03];
+        return names[this.getDamage() & 0x03];
+    }
+
+    @Override
+    public double getResistance() {
+        return 4;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
+    }
+
+    @Override
+    public boolean canHarvestWithHand() {
+        return false;
     }
 
     @Override
@@ -65,20 +79,5 @@ public class BlockSandstone extends BlockSolidMeta {
     @Override
     public Item toItem() {
         return new ItemBlock(this, this.getDamage() & 0x03);
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.SAND_BLOCK_COLOR;
-    }
-
-    @Override
-    public boolean canHarvestWithHand() {
-        return false;
     }
 }

@@ -17,6 +17,11 @@ public class BlockFenceGateSpruce extends BlockFenceGate {
     }
 
     @Override
+    public BlockColor getColor() {
+        return BlockColor.SPRUCE_BLOCK_COLOR;
+    }
+
+    @Override
     public int getId() {
         return FENCE_GATE_SPRUCE;
     }
@@ -24,10 +29,5 @@ public class BlockFenceGateSpruce extends BlockFenceGate {
     @Override
     public String getName() {
         return "Spruce Fence Gate";
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.SPRUCE_BLOCK_COLOR;
     }
 }

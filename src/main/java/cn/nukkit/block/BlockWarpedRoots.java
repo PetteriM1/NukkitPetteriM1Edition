@@ -13,6 +13,11 @@ public class BlockWarpedRoots extends BlockRoots {
     }
 
     @Override
+    public BlockColor getColor() {
+        return BlockColor.NETHERRACK_BLOCK_COLOR;
+    }
+
+    @Override
     public int getId() {
         return WARPED_ROOTS;
     }
@@ -23,17 +28,12 @@ public class BlockWarpedRoots extends BlockRoots {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.NETHERRACK_BLOCK_COLOR;
-    }
-
-    @Override
-    public boolean canBeReplaced() {
+    public boolean breakWhenPushed() {
         return true;
     }
 
     @Override
-    public boolean breakWhenPushed() {
+    public boolean canBeReplaced() {
         return true;
     }
 }

@@ -39,12 +39,22 @@ public class OfflinePlayer implements IPlayer {
         this.server = server;
 
         CompoundTag nbt;
-        if (uuid != null) {
-            nbt = this.server.getOfflinePlayerData(uuid, false);
-        } else if (name != null) {
-            nbt = this.server.getOfflinePlayerData(name, false);
-        } else {
-            throw new IllegalArgumentException("Name and UUID cannot both be null");
+        if (server.savePlayerDataByUuid) {
+            if (uuid != null) {
+                nbt = this.server.getOfflinePlayerData(uuid, false);
+            } else if (name != null) {
+                nbt = this.server.getOfflinePlayerData(name, false);
+            } else {
+                throw new IllegalArgumentException("Name and UUID cannot both be null");
+            }
+        } else { // When not using UUIDs check for the data saved by name first
+            if (name != null) {
+                nbt = this.server.getOfflinePlayerData(name, false);
+            } else if (uuid != null) {
+                nbt = this.server.getOfflinePlayerData(uuid, false);
+            } else {
+                throw new IllegalArgumentException("Name and UUID cannot both be null");
+            }
         }
 
         if (nbt == null) {
@@ -63,38 +73,12 @@ public class OfflinePlayer implements IPlayer {
     }
 
     @Override
-    public boolean isOnline() {
-        return this.getPlayer() != null;
-    }
-
-    @Override
-    public String getName() {
-        if (namedTag != null && namedTag.contains("NameTag")) {
-            return namedTag.getString("NameTag");
+    public void setBanned(boolean value) {
+        if (value) {
+            this.server.getNameBans().addBan(this.getName(), null, null, null);
+        } else {
+            this.server.getNameBans().remove(this.getName());
         }
-        return null;
-    }
-
-    @Override
-    public UUID getUniqueId() {
-        if (namedTag != null) {
-            long least = namedTag.getLong("UUIDLeast");
-            long most = namedTag.getLong("UUIDMost");
-
-            if (least != 0 && most != 0) {
-                return new UUID(most, least);
-            }
-        }
-        return null;
-    }
-
-    public Server getServer() {
-        return server;
-    }
-
-    @Override
-    public boolean isOp() {
-        return this.server.isOp(this.getName());
     }
 
     @Override
@@ -111,36 +95,12 @@ public class OfflinePlayer implements IPlayer {
     }
 
     @Override
-    public boolean isBanned() {
-        return this.server.getNameBans().isBanned(this.getName());
-    }
-
-    @Override
-    public void setBanned(boolean value) {
-        if (value) {
-            this.server.getNameBans().addBan(this.getName(), null, null, null);
-        } else {
-            this.server.getNameBans().remove(this.getName());
-        }
-    }
-
-    @Override
-    public boolean isWhitelisted() {
-        return this.server.isWhitelisted(this.getName());
-    }
-
-    @Override
     public void setWhitelisted(boolean value) {
         if (value) {
             this.server.addWhitelist(this.getName());
         } else {
             this.server.removeWhitelist(this.getName());
         }
-    }
-
-    @Override
-    public Player getPlayer() {
-        return this.server.getPlayerExact(this.getName());
     }
 
     @Override
@@ -154,12 +114,53 @@ public class OfflinePlayer implements IPlayer {
     }
 
     @Override
-    public boolean hasPlayedBefore() {
-        return this.namedTag != null;
+    public String getName() {
+        if (namedTag != null && namedTag.contains("NameTag")) {
+            return namedTag.getString("NameTag");
+        }
+        return null;
     }
 
-    public void setMetadata(String metadataKey, MetadataValue newMetadataValue) {
-        this.server.getPlayerMetadata().setMetadata(this, metadataKey, newMetadataValue);
+    @Override
+    public Player getPlayer() {
+        return this.server.getPlayerExact(this.getName());
+    }
+
+    public Server getServer() {
+        return server;
+    }
+
+    @Override
+    public UUID getUniqueId() {
+        if (namedTag != null) {
+            long least = namedTag.getLong("UUIDLeast");
+            long most = namedTag.getLong("UUIDMost");
+
+            if (least != 0 && most != 0) {
+                return new UUID(most, least);
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public boolean isBanned() {
+        return this.server.getNameBans().isBanned(this.getName());
+    }
+
+    @Override
+    public boolean isOnline() {
+        return this.getPlayer() != null;
+    }
+
+    @Override
+    public boolean isOp() {
+        return this.server.isOp(this.getName());
+    }
+
+    @Override
+    public boolean isWhitelisted() {
+        return this.server.isWhitelisted(this.getName());
     }
 
     public List<MetadataValue> getMetadata(String metadataKey) {
@@ -170,7 +171,16 @@ public class OfflinePlayer implements IPlayer {
         return this.server.getPlayerMetadata().hasMetadata(this, metadataKey);
     }
 
+    @Override
+    public boolean hasPlayedBefore() {
+        return this.namedTag != null;
+    }
+
     public void removeMetadata(String metadataKey, Plugin owningPlugin) {
         this.server.getPlayerMetadata().removeMetadata(this, metadataKey, owningPlugin);
+    }
+
+    public void setMetadata(String metadataKey, MetadataValue newMetadataValue) {
+        this.server.getPlayerMetadata().setMetadata(this, metadataKey, newMetadataValue);
     }
 }

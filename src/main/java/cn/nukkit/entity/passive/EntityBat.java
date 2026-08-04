@@ -12,6 +12,16 @@ public class EntityBat extends EntityFlyingAnimal {
     }
 
     @Override
+    public float getHeight() {
+        return 0.9f;
+    }
+
+    @Override
+    public int getKillExperience() {
+        return 0;
+    }
+
+    @Override
     public int getNetworkId() {
         return NETWORK_ID;
     }
@@ -22,18 +32,8 @@ public class EntityBat extends EntityFlyingAnimal {
     }
 
     @Override
-    public float getHeight() {
-        return 0.9f;
-    }
-
-    @Override
     public void initEntity() {
         this.setMaxHealth(6);
         super.initEntity();
-    }
-
-    @Override
-    public int getKillExperience() {
-        return 0;
     }
 }

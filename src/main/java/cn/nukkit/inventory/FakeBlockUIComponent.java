@@ -25,35 +25,10 @@ public class FakeBlockUIComponent extends PlayerUIComponent {
     }
 
     @Override
-    public boolean open(Player who) {
-        InventoryOpenEvent ev = new InventoryOpenEvent(this, who);
+    public void close(Player who) {
+        InventoryCloseEvent ev = new InventoryCloseEvent(this, who);
         who.getServer().getPluginManager().callEvent(ev);
-        if (ev.isCancelled()) {
-            return false;
-        }
-        this.onOpen(who);
-
-        return true;
-    }
-
-    @Override
-    public void onOpen(Player who) {
-        super.onOpen(who);
-        ContainerOpenPacket pk = new ContainerOpenPacket();
-        pk.windowId = who.getWindowId(this);
-        pk.type = type.getNetworkType();
-        InventoryHolder holder = this.getHolder();
-        if (holder != null) {
-            pk.x = (int) ((Vector3) holder).getX();
-            pk.y = (int) ((Vector3) holder).getY();
-            pk.z = (int) ((Vector3) holder).getZ();
-        } else {
-            pk.x = pk.y = pk.z = 0;
-        }
-
-        who.dataPacket(pk);
-
-        this.sendContents(who);
+        this.onClose(who);
     }
 
     @Override
@@ -72,9 +47,34 @@ public class FakeBlockUIComponent extends PlayerUIComponent {
     }
 
     @Override
-    public void close(Player who) {
-        InventoryCloseEvent ev = new InventoryCloseEvent(this, who);
+    public void onOpen(Player who) {
+        super.onOpen(who);
+        ContainerOpenPacket pk = new ContainerOpenPacket();
+        pk.windowId = who.getWindowId(this);
+        pk.type = this.type.getNetworkType();
+        InventoryHolder holder = this.getHolder();
+        if (holder != null) {
+            pk.x = (int) ((Vector3) holder).getX();
+            pk.y = (int) ((Vector3) holder).getY();
+            pk.z = (int) ((Vector3) holder).getZ();
+        } else {
+            pk.x = pk.y = pk.z = 0;
+        }
+
+        who.dataPacket(pk);
+
+        this.sendContents(who);
+    }
+
+    @Override
+    public boolean open(Player who) {
+        InventoryOpenEvent ev = new InventoryOpenEvent(this, who);
         who.getServer().getPluginManager().callEvent(ev);
-        this.onClose(who);
+        if (ev.isCancelled()) {
+            return false;
+        }
+        this.onOpen(who);
+
+        return true;
     }
 }

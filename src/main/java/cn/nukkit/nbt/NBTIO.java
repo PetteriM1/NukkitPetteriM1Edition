@@ -3,6 +3,7 @@ package cn.nukkit.nbt;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.RuntimeItemMapping;
 import cn.nukkit.item.RuntimeItems;
+import cn.nukkit.level.format.leveldb.LevelDBConstants;
 import cn.nukkit.nbt.stream.FastByteArrayOutputStream;
 import cn.nukkit.nbt.stream.NBTInputStream;
 import cn.nukkit.nbt.stream.NBTOutputStream;
@@ -25,6 +26,39 @@ import java.util.zip.GZIPInputStream;
  */
 public class NBTIO {
 
+    public static Item getItemHelper(CompoundTag tag) {
+        if (!tag.contains("Count")) {
+            return Item.get(0);
+        }
+
+        // Nukkit format
+        if (tag.contains("id")) {
+            return Item.get(
+                    tag.getShort("id"),
+                    tag.getShort("Damage"),
+                    tag.getByte("Count"),
+                    tag.get("tag")
+            );
+        }
+
+        // Vanilla format (current leveldb version only)
+        if (tag.contains("Name")) {
+            RuntimeItemMapping.LegacyEntry legacy = RuntimeItems.getMapping(LevelDBConstants.PALETTE_VERSION).fromIdentifier(tag.getString("Name"));
+            if (legacy == null) {
+                return Item.get(0);
+            }
+
+            return Item.get(
+                    legacy.getLegacyId(),
+                    legacy.isHasDamage() ? legacy.getDamage() : tag.getShort("Damage"),
+                    tag.getByte("Count"),
+                    tag.get("tag")
+            );
+        }
+
+        return Item.get(0);
+    }
+
     public static CompoundTag putItemHelper(Item item) {
         return putItemHelper(item, null);
     }
@@ -45,9 +79,9 @@ public class NBTIO {
         return tag;
     }
 
-    public static CompoundTag putNetworkItemHelper(Item item) {
+    public static CompoundTag putNetworkItemHelper(int protocol, Item item) {
         CompoundTag tag = new CompoundTag(null)
-                .putString("Name", RuntimeItems.getMapping().toRuntime(item.getId(), item.getDamage()).getIdentifier())
+                .putString("Name", RuntimeItems.getMapping(protocol).toRuntime(item.getId(), item.getDamage()).getIdentifier())
                 .putByte("Count", item.getCount())
                 .putShort("Damage", item.getDamage());
 
@@ -56,39 +90,6 @@ public class NBTIO {
         }
 
         return tag;
-    }
-
-    public static Item getItemHelper(CompoundTag tag) {
-        if (!tag.contains("Count")) {
-            return Item.get(0);
-        }
-
-        // Nukkit format
-        if (tag.contains("id")) {
-            return Item.get(
-                    tag.getShort("id"),
-                    tag.getShort("Damage"),
-                    tag.getByte("Count"),
-                    tag.get("tag")
-            );
-        }
-
-        // Vanilla format (current version only)
-        if (tag.contains("Name")) {
-            RuntimeItemMapping.LegacyEntry legacy = RuntimeItems.getMapping().fromIdentifier(tag.getString("Name"));
-            if (legacy == null) {
-                return Item.get(0);
-            }
-
-            return Item.get(
-                    legacy.getLegacyId(),
-                    legacy.isHasDamage() ? legacy.getDamage() : tag.getShort("Damage"),
-                    tag.getByte("Count"),
-                    tag.get("tag")
-            );
-        }
-
-        return Item.get(0);
     }
 
     public static CompoundTag read(File file) throws IOException {
@@ -115,18 +116,6 @@ public class NBTIO {
                 return (CompoundTag) tag;
             }
             throw new IOException("Root tag must be a named compound tag");
-        }
-    }
-
-    public static Tag readNetwork(InputStream inputStream) throws IOException {
-        try (NBTInputStream stream = new NBTInputStream(inputStream, ByteOrder.LITTLE_ENDIAN, true)) {
-            return Tag.readNamedTag(stream);
-        }
-    }
-
-    public static Tag readTag(InputStream inputStream, ByteOrder endianness, boolean network) throws IOException {
-        try (NBTInputStream stream = new NBTInputStream(inputStream, endianness, network)) {
-            return Tag.readNamedTag(stream);
         }
     }
 
@@ -158,6 +147,12 @@ public class NBTIO {
         return read(new BufferedInputStream(new GZIPInputStream(new ByteArrayInputStream(data))), endianness, true);
     }
 
+    public static Tag readNetwork(InputStream inputStream) throws IOException {
+        try (NBTInputStream stream = new NBTInputStream(inputStream, ByteOrder.LITTLE_ENDIAN, true)) {
+            return Tag.readNamedTag(stream);
+        }
+    }
+
     public static CompoundTag readNetworkCompressed(InputStream inputStream) throws IOException {
         return readNetworkCompressed(inputStream, ByteOrder.BIG_ENDIAN);
     }
@@ -172,6 +167,31 @@ public class NBTIO {
 
     public static CompoundTag readNetworkCompressed(byte[] data, ByteOrder endianness) throws IOException {
         return read(new BufferedInputStream(new GZIPInputStream(new ByteArrayInputStream(data))), endianness, true);
+    }
+
+    public static CompoundTag readSafely(InputStream inputStream, ByteOrder endianness, boolean network) throws IOException {
+        try (NBTInputStream stream = new NBTInputStream(inputStream, endianness, network).readSafely()) {
+            Tag tag = Tag.readNamedTag(stream);
+            if (tag instanceof CompoundTag) {
+                return (CompoundTag) tag;
+            }
+            throw new IOException("Root tag must be a named compound tag");
+        }
+    }
+
+    public static Tag readTag(InputStream inputStream, ByteOrder endianness, boolean network) throws IOException {
+        try (NBTInputStream stream = new NBTInputStream(inputStream, endianness, network)) {
+            return Tag.readNamedTag(stream);
+        }
+    }
+
+    public static void safeWrite(CompoundTag tag, File file) throws IOException {
+        File tmpFile = new File(file.getAbsolutePath() + "_tmp");
+        if (tmpFile.exists()) {
+            tmpFile.delete();
+        }
+        write(tag, tmpFile);
+        Files.move(tmpFile.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
     }
 
     public static byte[] write(CompoundTag tag) throws IOException {
@@ -234,14 +254,6 @@ public class NBTIO {
         }
     }
 
-    public static byte[] writeNetwork(Tag tag) throws IOException {
-        FastByteArrayOutputStream baos = ThreadCache.fbaos.get().reset();
-        try (NBTOutputStream stream = new NBTOutputStream(baos, ByteOrder.LITTLE_ENDIAN, true)) {
-            Tag.writeNamedTag(tag, stream);
-        }
-        return baos.toByteArray();
-    }
-
     public static byte[] writeGZIPCompressed(CompoundTag tag) throws IOException {
         return writeGZIPCompressed(tag, ByteOrder.BIG_ENDIAN);
     }
@@ -258,6 +270,14 @@ public class NBTIO {
 
     public static void writeGZIPCompressed(CompoundTag tag, OutputStream outputStream, ByteOrder endianness) throws IOException {
         write(tag, new PGZIPOutputStream(outputStream), endianness);
+    }
+
+    public static byte[] writeNetwork(Tag tag) throws IOException {
+        FastByteArrayOutputStream baos = ThreadCache.fbaos.get().reset();
+        try (NBTOutputStream stream = new NBTOutputStream(baos, ByteOrder.LITTLE_ENDIAN, true)) {
+            Tag.writeNamedTag(tag, stream);
+        }
+        return baos.toByteArray();
     }
 
     public static byte[] writeNetworkGZIPCompressed(CompoundTag tag) throws IOException {
@@ -292,14 +312,5 @@ public class NBTIO {
 
     public static void writeZLIBCompressed(CompoundTag tag, OutputStream outputStream, int level, ByteOrder endianness) throws IOException {
         write(tag, new DeflaterOutputStream(outputStream, new Deflater(level)), endianness);
-    }
-
-    public static void safeWrite(CompoundTag tag, File file) throws IOException {
-        File tmpFile = new File(file.getAbsolutePath() + "_tmp");
-        if (tmpFile.exists()) {
-            tmpFile.delete();
-        }
-        write(tag, tmpFile);
-        Files.move(tmpFile.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
     }
 }

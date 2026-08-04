@@ -16,13 +16,28 @@ public class EntityWindCharge extends EntityProjectile {
 
     public static final int NETWORK_ID = 143;
 
+    public EntityWindCharge(FullChunk chunk, CompoundTag nbt) {
+        this(chunk, nbt, null);
+    }
+
+    public EntityWindCharge(FullChunk chunk, CompoundTag nbt, Entity shootingEntity) {
+        super(chunk, nbt, shootingEntity);
+    }
+    private static final double BURST_RADIUS = 3.0;
+    private static final double BURST_POWER = 1.1;
+
     @Override
-    public int getNetworkId() {
-        return NETWORK_ID;
+    protected float getDrag() {
+        return 0.01f;
     }
 
     @Override
-    public float getWidth() {
+    protected float getGravity() {
+        return 0.0f;
+    }
+
+    @Override
+    public float getHeight() {
         return 0.3125f;
     }
 
@@ -32,45 +47,14 @@ public class EntityWindCharge extends EntityProjectile {
     }
 
     @Override
-    public float getHeight() {
+    public int getNetworkId() {
+        return NETWORK_ID;
+    }
+
+    @Override
+    public float getWidth() {
         return 0.3125f;
     }
-
-    @Override
-    protected float getGravity() {
-        return 0.0f;
-    }
-
-    @Override
-    protected float getDrag() {
-        return 0.01f;
-    }
-
-    public EntityWindCharge(FullChunk chunk, CompoundTag nbt) {
-        this(chunk, nbt, null);
-    }
-
-    public EntityWindCharge(FullChunk chunk, CompoundTag nbt, Entity shootingEntity) {
-        super(chunk, nbt, shootingEntity);
-    }
-
-    @Override
-    public boolean onUpdate(int currentTick) {
-        if (this.closed) {
-            return false;
-        }
-
-        if (this.age > 1200 || this.isCollided || this.hadCollision) {
-            this.close();
-            return false;
-        }
-
-        super.onUpdate(currentTick);
-        return !this.closed;
-    }
-
-    private static final double BURST_RADIUS = 3.0;
-    private static final double BURST_POWER = 1.1;
 
     @Override
     public void onHit() {
@@ -110,5 +94,20 @@ public class EntityWindCharge extends EntityProjectile {
                 }
             }
         }
+    }
+
+    @Override
+    public boolean onUpdate(int currentTick) {
+        if (this.closed) {
+            return false;
+        }
+
+        if (this.age > 1200 || this.isCollided || this.hadCollision) {
+            this.close();
+            return false;
+        }
+
+        super.onUpdate(currentTick);
+        return !this.closed;
     }
 }

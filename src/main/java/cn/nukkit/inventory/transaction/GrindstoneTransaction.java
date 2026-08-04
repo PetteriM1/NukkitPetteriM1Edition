@@ -56,6 +56,12 @@ public class GrindstoneTransaction extends InventoryTransaction {
                     this.outputItem = action.getSourceItem();
                     break;
             }
+        } else if (!(action instanceof SlotChangeAction)) {
+            this.invalid = true;
+            if (Nukkit.DEBUG > 1) {
+                source.getServer().getLogger().debug(this.getClass().getSimpleName() + " unexpected addAction: " + action);
+            }
+            return;
         }
         super.addAction(action);
     }
@@ -101,6 +107,11 @@ public class GrindstoneTransaction extends InventoryTransaction {
     }
 
     @Override
+    public boolean checkForItemPart(List<InventoryAction> actions) {
+        return isIn(actions);
+    }
+
+    @Override
     public boolean execute() {
         if (this.hasExecuted() || !this.canExecute() || this.invalid) {
             this.source.removeAllWindows(false);
@@ -134,10 +145,5 @@ public class GrindstoneTransaction extends InventoryTransaction {
             if (action instanceof GrindstoneItemAction) return true;
         }
         return false;
-    }
-
-    @Override
-    public boolean checkForItemPart(List<InventoryAction> actions) {
-        return isIn(actions);
     }
 }

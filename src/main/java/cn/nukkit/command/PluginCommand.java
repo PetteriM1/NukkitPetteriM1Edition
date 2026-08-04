@@ -20,6 +20,19 @@ public class PluginCommand<T extends Plugin> extends Command implements PluginId
         this.usageMessage = "";
     }
 
+    public void setExecutor(CommandExecutor executor) {
+        this.executor = (executor != null) ? executor : this.owningPlugin;
+    }
+
+    public CommandExecutor getExecutor() {
+        return executor;
+    }
+
+    @Override
+    public T getPlugin() {
+        return this.owningPlugin;
+    }
+
     @Override
     public boolean execute(CommandSender sender, String commandLabel, String[] args) {
         if (!this.owningPlugin.isEnabled()) {
@@ -37,18 +50,5 @@ public class PluginCommand<T extends Plugin> extends Command implements PluginId
         }
 
         return success;
-    }
-
-    public CommandExecutor getExecutor() {
-        return executor;
-    }
-
-    public void setExecutor(CommandExecutor executor) {
-        this.executor = (executor != null) ? executor : this.owningPlugin;
-    }
-
-    @Override
-    public T getPlugin() {
-        return this.owningPlugin;
     }
 }

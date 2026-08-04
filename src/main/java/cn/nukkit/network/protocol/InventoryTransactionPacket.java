@@ -1,5 +1,6 @@
 package cn.nukkit.network.protocol;
 
+import cn.nukkit.Server;
 import cn.nukkit.inventory.transaction.data.ReleaseItemData;
 import cn.nukkit.inventory.transaction.data.TransactionData;
 import cn.nukkit.inventory.transaction.data.UseItemData;
@@ -51,38 +52,38 @@ public class InventoryTransactionPacket extends DataPacket {
     public boolean isEnchantingPart = false;
     public boolean isRepairItemPart = false;
 
-    @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
-    @Override
-    public void encode() {
-        this.encodeUnsupported();
+    private Vector3 getVector3fAsVector3() {
+        return new Vector3(this.getLFloat(), this.getLFloat(), this.getLFloat());
     }
 
     @Override
     public void decode() {
-        this.legacyRequestId = this.getVarInt();
+        if (protocol >= 407) {
+            this.legacyRequestId = this.getVarInt();
 
-        if (this.getBoolean() && legacyRequestId < -1 && (legacyRequestId & 1) == 0) {
-            int length = (int) this.getUnsignedVarInt();
-            if (length > 4096) {
-                throw new RuntimeException("Too many legacy inventory transactions in one packet");
-            }
+            if ((protocol < ProtocolInfo.v1_26_30 || this.getBoolean()) && legacyRequestId < -1 && (legacyRequestId & 1) == 0) {
+                int length = (int) this.getUnsignedVarInt();
+                if (length > 4096) {
+                    throw new RuntimeException("Too many legacy inventory transactions in one packet");
+                }
 
-            for (int i = 0; i < length; i++) {
-                this.getByte(); // container id
-                this.getByteArray();
+                for (int i = 0; i < length; i++) {
+                    this.getByte(); // container id
+                    this.getByteArray();
+                }
             }
         }
 
-        if (!this.getBoolean()) {
+        if (protocol >= ProtocolInfo.v1_26_30 && !this.getBoolean()) {
             throw new IllegalStateException("Expected InventoryTransactionType");
         }
         this.transactionType = (int) this.getUnsignedVarInt();
 
-        if (!this.getBoolean()) {
+        if (protocol >= 407 && protocol < ProtocolInfo.v1_16_220) {
+            this.hasNetworkIds = this.getBoolean();
+        }
+
+        if (protocol >= ProtocolInfo.v1_26_30 && !this.getBoolean()) {
             throw new IllegalStateException("Expected InventoryActionData");
         }
 
@@ -104,17 +105,32 @@ public class InventoryTransactionPacket extends DataPacket {
             case TYPE_USE_ITEM:
                 UseItemData itemData = new UseItemData();
 
-                itemData.actionType = this.getVarInt();
-                itemData.triggerType = this.getByte();
-                itemData.blockPos = this.getBlockVector3();
-                itemData.face = BlockFace.fromIndex(this.getByte());
+                itemData.actionType = protocol >= ProtocolInfo.v1_26_30 ? this.getVarInt() : (int) this.getUnsignedVarInt();
+                if (protocol >= ProtocolInfo.v1_21_20) {
+                    itemData.triggerType = protocol >= ProtocolInfo.v1_26_30 ? this.getByte() : (int) this.getUnsignedVarInt();
+                }
+                itemData.blockPos = this.getBlockVector3(protocol);
+                itemData.face = protocol >= ProtocolInfo.v1_26_30 ? BlockFace.fromIndex(this.getByte()) : this.getBlockFace();
                 itemData.hotbarSlot = this.getVarInt();
-                itemData.itemInHand = this.getNetworkItemStackDescriptor();
+
+                if (protocol >= ProtocolInfo.v1_26_30) {
+                    itemData.itemInHand = this.getNetworkItemStackDescriptor(this.protocol);
+                } else {
+                    itemData.itemInHand = this.getSlot(this.protocol);
+                }
+
                 itemData.playerPos = this.getVector3fAsVector3();
                 itemData.clickPos = this.getVector3f();
-                itemData.blockRuntimeId = (int) this.getUnsignedVarInt();
-                itemData.clientInteractPrediction = this.getByte();
-                itemData.clientCooldownState = this.getByte();
+                if (protocol >= ProtocolInfo.v1_10_0) {
+                    itemData.blockRuntimeId = (int) this.getUnsignedVarInt();
+                    if (protocol >= ProtocolInfo.v1_21_20) {
+                        itemData.clientInteractPrediction = this.getByte();
+
+                        if (protocol >= ProtocolInfo.v1_26_10) {
+                            itemData.clientCooldownState = this.getByte();
+                        }
+                    }
+                }
 
                 this.transactionData = itemData;
                 break;
@@ -122,9 +138,23 @@ public class InventoryTransactionPacket extends DataPacket {
                 UseItemOnEntityData useItemOnEntityData = new UseItemOnEntityData();
 
                 useItemOnEntityData.entityRuntimeId = this.getEntityRuntimeId();
-                useItemOnEntityData.actionType = this.getVarInt();
+                useItemOnEntityData.actionType = protocol >= ProtocolInfo.v1_26_30 ? this.getVarInt() : (int) this.getUnsignedVarInt();
                 useItemOnEntityData.hotbarSlot = this.getVarInt();
-                useItemOnEntityData.itemInHand = this.getNetworkItemStackDescriptor();
+
+                if (protocol >= ProtocolInfo.v1_26_30) {
+                    if (Server.getInstance().suomiCraftPEMode()) {
+                        this.getDummyNetworkItemStackDescriptor(this.protocol);
+                    } else {
+                        useItemOnEntityData.itemInHand = this.getNetworkItemStackDescriptor(this.protocol);
+                    }
+                } else {
+                    if (Server.getInstance().suomiCraftPEMode()) {
+                        this.getDummySlot(this.protocol);
+                    } else {
+                        useItemOnEntityData.itemInHand = this.getSlot(this.protocol);
+                    }
+                }
+
                 useItemOnEntityData.playerPos = this.getVector3fAsVector3();
                 useItemOnEntityData.clickPos = this.getVector3fAsVector3();
 
@@ -133,9 +163,23 @@ public class InventoryTransactionPacket extends DataPacket {
             case TYPE_RELEASE_ITEM:
                 ReleaseItemData releaseItemData = new ReleaseItemData();
 
-                releaseItemData.actionType = this.getVarInt();
+                releaseItemData.actionType = protocol >= ProtocolInfo.v1_26_30 ? this.getVarInt() : (int) this.getUnsignedVarInt();
                 releaseItemData.hotbarSlot = this.getVarInt();
-                releaseItemData.itemInHand = this.getNetworkItemStackDescriptor();
+
+                if (protocol >= ProtocolInfo.v1_26_30) {
+                    if (Server.getInstance().suomiCraftPEMode()) {
+                        this.getDummyNetworkItemStackDescriptor(this.protocol);
+                    } else {
+                        releaseItemData.itemInHand = this.getNetworkItemStackDescriptor(this.protocol);
+                    }
+                } else {
+                    if (Server.getInstance().suomiCraftPEMode()) {
+                        this.getDummySlot(this.protocol);
+                    } else {
+                        releaseItemData.itemInHand = this.getSlot(this.protocol);
+                    }
+                }
+
                 releaseItemData.headRot = this.getVector3fAsVector3();
 
                 this.transactionData = releaseItemData;
@@ -145,7 +189,13 @@ public class InventoryTransactionPacket extends DataPacket {
         }
     }
 
-    private Vector3 getVector3fAsVector3() {
-        return new Vector3(this.getLFloat(), this.getLFloat(), this.getLFloat());
+    @Override
+    public void encode() {
+        this.encodeUnsupported();
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

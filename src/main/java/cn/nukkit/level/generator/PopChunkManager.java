@@ -2,6 +2,7 @@ package cn.nukkit.level.generator;
 
 import cn.nukkit.level.DimensionData;
 import cn.nukkit.level.format.generic.BaseFullChunk;
+
 import java.util.Arrays;
 import java.util.function.Supplier;
 
@@ -21,6 +22,16 @@ public class PopChunkManager extends SimpleChunkManager {
     public PopChunkManager(long seed, Supplier<DimensionData> dimensionDataSupplier) {
         super(seed);
         this.dimensionDataSupplier = dimensionDataSupplier;
+    }
+
+    @Override
+    public int getMaxBlockY() {
+        return this.dimensionDataSupplier.get().getMaxHeight();
+    }
+
+    @Override
+    public int getMinBlockY() {
+        return this.dimensionDataSupplier.get().getMinHeight();
     }
 
     @Override
@@ -99,15 +110,5 @@ public class PopChunkManager extends SimpleChunkManager {
         }
         clean = false;
         chunks[index] = chunk;
-    }
-
-    @Override
-    public int getMaxBlockY() {
-        return this.dimensionDataSupplier.get().getMaxHeight();
-    }
-
-    @Override
-    public int getMinBlockY() {
-        return this.dimensionDataSupplier.get().getMinHeight();
     }
 }

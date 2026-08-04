@@ -23,17 +23,13 @@ public abstract class BlockCrops extends BlockFlowable {
     }
 
     @Override
-    public boolean canBeActivated() {
-        return true;
+    public BlockColor getColor() {
+        return BlockColor.FOLIAGE_BLOCK_COLOR;
     }
 
     @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        if (block.down().getId() == FARMLAND) {
-            this.getLevel().setBlock(block, this, true, true);
-            return true;
-        }
-        return false;
+    public boolean canBeActivated() {
+        return true;
     }
 
     @Override
@@ -97,7 +93,11 @@ public abstract class BlockCrops extends BlockFlowable {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.FOLIAGE_BLOCK_COLOR;
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        if (block.down().getId() == FARMLAND) {
+            this.getLevel().setBlock(block, this, true, true);
+            return true;
+        }
+        return false;
     }
 }

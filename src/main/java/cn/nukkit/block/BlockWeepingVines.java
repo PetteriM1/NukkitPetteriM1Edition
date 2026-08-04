@@ -14,13 +14,13 @@ public class BlockWeepingVines extends BlockVinesNether {
     }
 
     @Override
-    public String getName() {
-        return "Weeping Vines";
+    public void setVineAge(int vineAge) {
+        this.setDamage(vineAge & 0x19);
     }
 
     @Override
-    public int getId() {
-        return WEEPING_VINES;
+    public BlockColor getColor() {
+        return BlockColor.NETHERRACK_BLOCK_COLOR;
     }
 
     @Override
@@ -29,13 +29,8 @@ public class BlockWeepingVines extends BlockVinesNether {
     }
 
     @Override
-    public int getVineAge() {
-        return this.getDamage();
-    }
-
-    @Override
-    public void setVineAge(int vineAge) {
-        this.setDamage(vineAge & 0x19);
+    public int getId() {
+        return WEEPING_VINES;
     }
 
     public int getMaxVineAge() {
@@ -43,7 +38,12 @@ public class BlockWeepingVines extends BlockVinesNether {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.NETHERRACK_BLOCK_COLOR;
+    public String getName() {
+        return "Weeping Vines";
+    }
+
+    @Override
+    public int getVineAge() {
+        return this.getDamage();
     }
 }

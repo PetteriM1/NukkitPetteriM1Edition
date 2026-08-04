@@ -14,8 +14,8 @@ public class BlockDoorSpruce extends BlockDoorWood {
     }
 
     @Override
-    public String getName() {
-        return "Spruce Door Block";
+    public BlockColor getColor() {
+        return BlockColor.SPRUCE_BLOCK_COLOR;
     }
 
     @Override
@@ -24,12 +24,12 @@ public class BlockDoorSpruce extends BlockDoorWood {
     }
 
     @Override
-    public Item toItem() {
-        return Item.get(Item.SPRUCE_DOOR);
+    public String getName() {
+        return "Spruce Door Block";
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.SPRUCE_BLOCK_COLOR;
+    public Item toItem() {
+        return Item.get(Item.SPRUCE_DOOR);
     }
 }

@@ -16,16 +16,6 @@ public class EnchantmentFireAspect extends Enchantment {
     }
 
     @Override
-    public int getMinEnchantAbility(int level) {
-        return 10 + (level - 1) * 20;
-    }
-
-    @Override
-    public int getMaxEnchantAbility(int level) {
-        return super.getMinEnchantAbility(level) + 50;
-    }
-
-    @Override
     public int getMaxLevel() {
         return 2;
     }
@@ -42,5 +32,15 @@ public class EnchantmentFireAspect extends Enchantment {
                 entity.setOnFire(ev.getDuration());
             }
         }
+    }
+
+    @Override
+    public int getMaxEnchantAbility(int level) {
+        return super.getMinEnchantAbility(level) + 50;
+    }
+
+    @Override
+    public int getMinEnchantAbility(int level) {
+        return 10 + (level - 1) * 20;
     }
 }

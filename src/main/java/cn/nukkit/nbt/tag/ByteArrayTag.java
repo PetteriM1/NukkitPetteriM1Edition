@@ -3,6 +3,7 @@ package cn.nukkit.nbt.tag;
 import cn.nukkit.nbt.stream.NBTInputStream;
 import cn.nukkit.nbt.stream.NBTOutputStream;
 import cn.nukkit.utils.Binary;
+import it.unimi.dsi.fastutil.bytes.ByteArrayList;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -20,23 +21,6 @@ public class ByteArrayTag extends Tag {
         this.data = data;
     }
 
-    @Override
-    void write(NBTOutputStream dos) throws IOException {
-        if (data == null) {
-            dos.writeInt(0);
-            return;
-        }
-        dos.writeInt(data.length);
-        dos.write(data);
-    }
-
-    @Override
-    public void load(NBTInputStream dis) throws IOException {
-        int length = dis.readInt();
-        data = new byte[length];
-        dis.readFully(data);
-    }
-
     public byte[] getData() {
         return data;
     }
@@ -47,8 +31,10 @@ public class ByteArrayTag extends Tag {
     }
 
     @Override
-    public String toString() {
-        return "ByteArrayTag " + this.getName() + " (data: 0x" + Binary.bytesToHexString(data, true) + " [" + data.length + " bytes])";
+    public Tag copy() {
+        byte[] cp = new byte[data.length];
+        System.arraycopy(data, 0, cp, 0, data.length);
+        return new ByteArrayTag(getName(), cp);
     }
 
     @Override
@@ -61,14 +47,40 @@ public class ByteArrayTag extends Tag {
     }
 
     @Override
-    public Tag copy() {
-        byte[] cp = new byte[data.length];
-        System.arraycopy(data, 0, cp, 0, data.length);
-        return new ByteArrayTag(getName(), cp);
+    public void load(NBTInputStream dis) throws IOException {
+        int length = dis.readInt();
+
+        if (dis.isReadSafely() && length > 64) {
+            ByteArrayList list = new ByteArrayList(64);
+
+            for (int i = 0; i < length; i++) {
+                list.add(dis.readByte());
+            }
+
+            data = list.toArray(new byte[0]);
+        } else {
+            data = new byte[length];
+            dis.readFully(data);
+        }
     }
 
     @Override
     public byte[] parseValue() {
         return this.data;
+    }
+
+    @Override
+    public String toString() {
+        return "ByteArrayTag " + this.getName() + " (data: 0x" + Binary.bytesToHexString(data, true) + " [" + data.length + " bytes])";
+    }
+
+    @Override
+    public void write(NBTOutputStream dos) throws IOException {
+        if (data == null) {
+            dos.writeInt(0);
+            return;
+        }
+        dos.writeInt(data.length);
+        dos.write(data);
     }
 }

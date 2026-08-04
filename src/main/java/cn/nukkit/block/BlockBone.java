@@ -23,6 +23,21 @@ public class BlockBone extends BlockSolid implements Faceable {
     };
 
     @Override
+    public BlockFace getBlockFace() {
+        return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.SAND_BLOCK_COLOR;
+    }
+
+    @Override
+    public double getHardness() {
+        return 2;
+    }
+
+    @Override
     public int getId() {
         return BONE_BLOCK;
     }
@@ -30,11 +45,6 @@ public class BlockBone extends BlockSolid implements Faceable {
     @Override
     public String getName() {
         return "Bone Block";
-    }
-
-    @Override
-    public double getHardness() {
-        return 2;
     }
 
     @Override
@@ -57,19 +67,9 @@ public class BlockBone extends BlockSolid implements Faceable {
     }
 
     @Override
-    public BlockFace getBlockFace() {
-        return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
-    }
-
-    @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
         this.setDamage(((this.getDamage() & 0x3) | FACES[face.getIndex()]));
         this.getLevel().setBlock(block, this, true);
         return true;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.SAND_BLOCK_COLOR;
     }
 }

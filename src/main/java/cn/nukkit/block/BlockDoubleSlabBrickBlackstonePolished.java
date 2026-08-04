@@ -11,6 +11,11 @@ public class BlockDoubleSlabBrickBlackstonePolished extends BlockDoubleSlabBlack
     }
 
     @Override
+    public double getHardness() {
+        return 2;
+    }
+
+    @Override
     public int getId() {
         return POLISHED_BLACKSTONE_BRICK_DOUBLE_SLAB;
     }
@@ -23,10 +28,5 @@ public class BlockDoubleSlabBrickBlackstonePolished extends BlockDoubleSlabBlack
     @Override
     public String getSlabName() {
         return "Polished Blackstone Brick";
-    }
-
-    @Override
-    public double getHardness() {
-        return 2;
     }
 }
