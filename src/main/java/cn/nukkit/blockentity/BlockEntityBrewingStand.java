@@ -268,7 +268,7 @@ public class BlockEntityBrewingStand extends BlockEntitySpawnable implements Inv
     }
 
     private MixRecipe[] matchRecipes(boolean quickTest) {
-        MixRecipe[] recipes = new MixRecipe[quickTest? 1 : 3];
+        MixRecipe[] recipes = new MixRecipe[quickTest ? 1 : 3];
         Item ingredient = inventory.getIngredient();
         CraftingManager craftingManager = getLevel().getServer().getCraftingManager();
         for (int i = 0; i < 3; i++) {

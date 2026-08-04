@@ -65,6 +65,35 @@ public class NukkitMath {
         return Math.max(diffX, diffZ);
     }
 
+    public static double sign(double d) {
+        if (d > 0) {
+            return 1;
+        }
+
+        if (d < 0) {
+            return -1;
+        }
+
+        return 0;
+    }
+
+    public static double boundary(double start, double distance) {
+        if (distance == 0) {
+            return Double.POSITIVE_INFINITY;
+        }
+
+        if (distance < 0) {
+            start = -start;
+            distance = -distance;
+
+            if (Math.floor(start) == start) {
+                return 0;
+            }
+        }
+
+        return (1 - (start - Math.floor(start))) / distance;
+    }
+
     public static double lerp(double a, double b, double t) {
         return a + (b - a) * t;
     }

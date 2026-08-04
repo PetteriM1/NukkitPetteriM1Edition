@@ -4,7 +4,10 @@ import cn.nukkit.Player;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.DyeColor;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockMossCarpet extends BlockTransparent {
 
@@ -33,7 +36,7 @@ public class BlockMossCarpet extends BlockTransparent {
 
     @Override
     public double getResistance() {
-        return 0.5;
+        return 2.5;
     }
 
     @Override
@@ -85,5 +88,20 @@ public class BlockMossCarpet extends BlockTransparent {
     @Override
     public boolean breakWhenPushed() {
         return true;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_17_0;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.CARPET;
+    }
+
+    @Override
+    public int getAlternateMeta(int protocol) {
+        return DyeColor.GREEN.getWoolData();
     }
 }

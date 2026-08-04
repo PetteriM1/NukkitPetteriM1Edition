@@ -1,13 +1,13 @@
 package cn.nukkit.item;
 
 import cn.nukkit.Nukkit;
-import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockID;
 import cn.nukkit.item.RuntimeItems.MappingEntry;
-import cn.nukkit.level.GlobalBlockPalette;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.ItemComponentPacket;
+import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.utils.BinaryStream;
 import cn.nukkit.utils.Utils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -29,60 +29,113 @@ import java.util.zip.GZIPInputStream;
 @Log4j2
 public class RuntimeItemMapping {
 
+    private final int protocolId;
+
     private final Int2ObjectMap<LegacyEntry> runtime2Legacy = new Int2ObjectOpenHashMap<>();
     private final Int2ObjectMap<RuntimeEntry> legacy2Runtime = new Int2ObjectOpenHashMap<>();
     private final Map<String, LegacyEntry> identifier2Legacy = new HashMap<>();
 
-    private final Map<String, ItemComponentPacket.ItemDefinition> vanillaItems = new HashMap<>();
+    private byte[] itemPalette;
 
-    public RuntimeItemMapping(Map<String, MappingEntry> mappings) {
-        JsonArray json = Utils.loadJsonResource("runtime_item_states.json").getAsJsonArray();
+    private final Map<String, ItemComponentPacket.ItemDefinition> vanillaItems;
+
+    public RuntimeItemMapping(Map<String, MappingEntry> mappings, int protocol) {
+        this.protocolId = protocol;
+
+        JsonArray json = Utils.loadJsonResource("runtime_item_states_" + protocol + ".json").getAsJsonArray();
         if (json.isEmpty()) {
             throw new IllegalStateException("Empty array");
         }
 
-        CompoundTag itemComponents;
-        try (InputStream stream = RuntimeItemMapping.class.getClassLoader().getResourceAsStream("item_components.nbt")) {
-            itemComponents = NBTIO.read(new BufferedInputStream(new GZIPInputStream(stream)), ByteOrder.BIG_ENDIAN, false);
-        } catch (Exception e) {
-            throw new AssertionError("Error while loading item_components.nbt", e);
+        CompoundTag itemComponents = null;
+        if (this.protocolId >= ProtocolInfo.v1_21_60) {
+            try (InputStream stream = RuntimeItemMapping.class.getClassLoader().getResourceAsStream("item_components_" + this.protocolId + ".nbt")) {
+                itemComponents = NBTIO.read(new BufferedInputStream(new GZIPInputStream(stream)), ByteOrder.BIG_ENDIAN, false);
+            } catch (Exception e) {
+                throw new AssertionError("Error while loading item_components_" + this.protocolId + ".nbt", e);
+            }
         }
+
+        this.vanillaItems = new HashMap<>();
 
         for (JsonElement element : json) {
             if (!element.isJsonObject()) {
-                throw new IllegalStateException("Invalid entry");
+                throw new IllegalStateException("(" + protocol + ") Invalid entry");
             }
             JsonObject entry = element.getAsJsonObject();
             String identifier = entry.get("name").getAsString();
             int runtimeId = entry.get("id").getAsInt();
 
-            int version = entry.get("version").getAsInt();
-            boolean componentBased = entry.get("componentBased").getAsBoolean();
-            CompoundTag components = (CompoundTag) itemComponents.get(identifier);
-            this.vanillaItems.put(identifier, new ItemComponentPacket.ItemDefinition(identifier, runtimeId, componentBased, version, components));
+            if (this.protocolId < ProtocolInfo.v1_16_100) {
+                this.registerOldItem(identifier, runtimeId);
+                continue;
+            }
+
+            if (this.protocolId >= ProtocolInfo.v1_21_60) {
+                int version = entry.get("version").getAsInt();
+                boolean componentBased = entry.get("componentBased").getAsBoolean();
+                CompoundTag components = (CompoundTag) itemComponents.get(identifier);
+                this.vanillaItems.put(identifier, new ItemComponentPacket.ItemDefinition(identifier, runtimeId, componentBased, version, components));
+            }
 
             boolean hasDamage = false;
             int damage = 0;
             int legacyId;
 
-            if (mappings.containsKey(identifier)) {
-                MappingEntry mapping = mappings.get(identifier);
+            MappingEntry mapping;
+            if (mappings.containsKey(identifier) && (mapping = mappings.get(identifier)).protocol <= protocol) {
                 legacyId = RuntimeItems.getLegacyIdFromLegacyString(mapping.getLegacyName());
                 if (legacyId == -1) {
-                    throw new IllegalStateException("Unable to match " + mapping + " with legacyId");
+                    throw new IllegalStateException("(" + protocol + ") Unable to match " + mapping + " with legacyId");
                 }
                 damage = mapping.getDamage();
                 hasDamage = true;
             } else {
                 legacyId = RuntimeItems.getLegacyIdFromLegacyString(identifier);
                 if (legacyId == -1) {
-                    log.trace("Unable to find legacyId for " + identifier);
+                    if (Nukkit.DEBUG > 2) {
+                        log.debug("(" + protocol + ") Unable to find legacyId for " + identifier);
+                    }
                     continue;
                 }
             }
 
             this.registerItem(identifier, runtimeId, legacyId, damage, hasDamage);
         }
+
+        this.generatePalette();
+    }
+
+    @Data
+    public static class LegacyEntry {
+        private final int legacyId;
+        private final boolean hasDamage;
+        private final int damage;
+
+        public int getDamage() {
+            return this.hasDamage ? this.damage : 0;
+        }
+    }
+
+    @Data
+    public static class RuntimeEntry {
+        private final String identifier;
+        private final int runtimeId;
+        private final boolean hasDamage;
+    }
+
+    private void registerOldItem(String identifier, int legacyId) {
+        int fullId = this.getFullId(legacyId, 0);
+        LegacyEntry legacyEntry = new LegacyEntry(legacyId, false, 0);
+
+        if (Nukkit.DEBUG > 1) {
+            if (this.runtime2Legacy.containsKey(legacyId)) {
+                log.warn("RuntimeItemMapping (Legacy): Registering " + identifier + " but runtime id " + legacyId + " is already used");
+            }
+        }
+        this.runtime2Legacy.put(legacyId, legacyEntry);
+        this.identifier2Legacy.put(identifier, legacyEntry);
+        this.legacy2Runtime.put(fullId, new RuntimeEntry(identifier, legacyId, false));
     }
 
     public void registerItem(String identifier, int runtimeId, int legacyId, int damage) {
@@ -95,24 +148,45 @@ public class RuntimeItemMapping {
 
         if (Nukkit.DEBUG > 1) {
             if (this.runtime2Legacy.containsKey(runtimeId)) {
-                log.warn("RuntimeItemMapping: Registering " + identifier + " but runtime id " + runtimeId + " is already used");
+                log.warn("RuntimeItemMapping (Protocol " + this.protocolId + "): Registering " + identifier + " but runtime id " + runtimeId + " is already used");
             }
         }
 
         this.runtime2Legacy.put(runtimeId, legacyEntry);
         this.identifier2Legacy.put(identifier, legacyEntry);
         if (!hasDamage && this.legacy2Runtime.containsKey(fullId)) {
-            log.debug("RuntimeItemMapping contains duplicated legacy item state runtimeId=" + runtimeId + " identifier=" + identifier);
+            if (Nukkit.DEBUG > 1) {
+                log.debug("RuntimeItemMapping (Protocol " + this.protocolId + ") contains duplicated legacy item state runtimeId=" + runtimeId + " identifier=" + identifier);
+            }
         } else {
             this.legacy2Runtime.put(fullId, new RuntimeEntry(identifier, runtimeId, hasDamage));
         }
     }
 
+    public void generatePalette() {
+        if (protocolId >= ProtocolInfo.v1_21_60) {
+            return; // See getItemDefinitions
+        }
+
+        BinaryStream paletteBuffer = new BinaryStream();
+        paletteBuffer.putUnsignedVarInt(this.legacy2Runtime.size());
+        for (RuntimeEntry entry : this.legacy2Runtime.values()) {
+            paletteBuffer.putString(entry.getIdentifier());
+            paletteBuffer.putLShort(entry.getRuntimeId());
+            if (this.protocolId >= ProtocolInfo.v1_16_100) {
+                paletteBuffer.putBoolean(!entry.getIdentifier().startsWith("minecraft:")); // TODO: Component item without bc break
+            }
+        }
+        this.itemPalette = paletteBuffer.getBuffer();
+    }
+
     public LegacyEntry fromRuntime(int runtimeId) {
         LegacyEntry legacyEntry = this.runtime2Legacy.get(runtimeId);
         if (legacyEntry == null) {
-            //throw new IllegalArgumentException("Unknown runtime2Legacy mapping: " + runtimeId);
-            log.debug("Unknown runtime2Legacy mapping: " + runtimeId); // TODO: resolve unknown recipes and enable this as warning again
+            //throw new IllegalArgumentException("(" + protocolId + ") Unknown runtime2Legacy mapping: " + runtimeId);
+            if (Nukkit.DEBUG > 1) {
+                log.warn("(" + protocolId + ") Unknown runtime2Legacy mapping: " + runtimeId);
+            }
             return new LegacyEntry(0, false, 0);
         }
         return legacyEntry;
@@ -125,23 +199,38 @@ public class RuntimeItemMapping {
         }
 
         if (runtimeEntry == null) {
-            log.warn("Unknown legacy2Runtime mapping: id=" + id + " meta=" + meta);
+            if (Nukkit.DEBUG > 1) {
+                log.warn("(" + protocolId + ") Unknown legacy2Runtime mapping: id=" + id + " meta=" + meta);
+            }
             runtimeEntry = this.legacy2Runtime.get(this.getFullId(Item.INFO_UPDATE, 0));
-            if (runtimeEntry == null) throw new RuntimeException("Runtime ID for Item.INFO_UPDATE must exist!");
-            //throw new IllegalArgumentException("Unknown legacy2Runtime mapping: id=" + id + " meta=" + meta);
+            if (runtimeEntry == null)
+                throw new RuntimeException("(" + protocolId + ") Runtime ID for Item.INFO_UPDATE must exist!");
+            //throw new IllegalArgumentException("(" + protocolId + ") Unknown legacy2Runtime mapping: id=" + id + " meta=" + meta); // Not very multiversion friendly
         }
         return runtimeEntry;
     }
 
+    boolean isSupported(int id, int meta) {
+        boolean found = this.legacy2Runtime.containsKey(this.getFullId(id, meta));
+        if (!found) {
+            found = this.legacy2Runtime.containsKey(this.getFullId(id, 0));
+        }
+        return found;
+    }
+
     public Item parseCreativeItem(JsonObject json, boolean ignoreUnknown) {
+        return this.parseCreativeItem(json, ignoreUnknown, this.protocolId);
+    }
+
+    public Item parseCreativeItem(JsonObject json, boolean ignoreUnknown, int protocolId) {
         String identifier = json.get("id").getAsString();
         LegacyEntry legacyEntry = this.fromIdentifier(identifier);
         if (legacyEntry == null) {
             if (!ignoreUnknown) {
-                throw new IllegalStateException("Can not find legacyEntry for " + identifier);
+                throw new IllegalStateException("(" + protocolId + ") Can not find legacyEntry for " + identifier);
             }
             if (Nukkit.DEBUG > 2) {
-                log.debug("Can not find legacyEntry for " + identifier);
+                log.debug("(" + protocolId + ") Can not find legacyEntry for " + identifier);
             }
             return null;
         }
@@ -161,22 +250,24 @@ public class RuntimeItemMapping {
             damage = json.get("damage").getAsInt();
         } else if (legacyEntry.isHasDamage()) {
             damage = legacyEntry.getDamage();
-        } else if (json.has("blockRuntimeId")) {
+        /*} else if (json.has("blockRuntimeId")) {
             int runtimeId = json.get("blockRuntimeId").getAsInt();
+
             if (runtimeId != 0) {
-                int fullId = GlobalBlockPalette.getLegacyFullId(runtimeId);
+                int fullId = GlobalBlockPalette.getLegacyFullId(protocolId, runtimeId);
                 if (fullId == -1) {
                     if (ignoreUnknown) {
                         return null;
                     } else {
-                        throw new IllegalStateException("Can not find blockRuntimeId for " + identifier + " (" + runtimeId + ")");
+                        throw new IllegalStateException("(" + protocolId + ") Can not find blockRuntimeId for " + identifier + " (" + runtimeId + ")");
                     }
                 }
 
                 damage = fullId & Block.DATA_MASK;
-            }
+            }*/
         }
 
+        // Disabled it for now as it apparently messed up some crafting recipes, mushroom blocks seem to be the only ones requiring manual fix
         if (legacyId == BlockID.RED_MUSHROOM_BLOCK || legacyId == BlockID.BROWN_MUSHROOM_BLOCK) {
             damage = 14;
         }
@@ -193,25 +284,15 @@ public class RuntimeItemMapping {
         return (((short) id) << 16) | ((data & 0x7fff) << 1);
     }
 
+    public byte[] getItemPalette() {
+        return this.itemPalette;
+    }
+
+    public int getProtocolId() {
+        return this.protocolId;
+    }
+
     public Collection<ItemComponentPacket.ItemDefinition> getVanillaItemDefinitions() {
         return vanillaItems.values();
-    }
-
-    @Data
-    public static class LegacyEntry {
-        private final int legacyId;
-        private final boolean hasDamage;
-        private final int damage;
-
-        public int getDamage() {
-            return this.hasDamage ? this.damage : 0;
-        }
-    }
-
-    @Data
-    public static class RuntimeEntry {
-        private final String identifier;
-        private final int runtimeId;
-        private final boolean hasDamage;
     }
 }

@@ -3,6 +3,7 @@ package cn.nukkit.entity.item;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.block.Block;
+import cn.nukkit.block.BlockLayer;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -10,6 +11,7 @@ import cn.nukkit.event.entity.ItemDespawnEvent;
 import cn.nukkit.event.entity.ItemSpawnEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
+import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.NukkitMath;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
@@ -17,6 +19,11 @@ import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.network.protocol.AddItemEntityPacket;
 import cn.nukkit.network.protocol.DataPacket;
 import cn.nukkit.network.protocol.EntityEventPacket;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author MagicDroidX
@@ -30,7 +37,9 @@ public class EntityItem extends Entity {
     protected int pickupDelay;
     protected boolean floatsInLava;
     public Player droppedBy;
-
+    @Setter
+    @Getter
+    private boolean allowNonPlayerPickup = true;
     private boolean deadOnceAndForAll;
 
     public EntityItem(FullChunk chunk, CompoundTag nbt) {
@@ -162,6 +171,75 @@ public class EntityItem extends Entity {
     }
 
     @Override
+    public List<Block> getBlocksAround() {
+        if (this.blocksAround == null) {
+            AxisAlignedBB bb = this.boundingBox.clone();
+            bb.setMinY(this.boundingBox.getMinY() - 0.25);
+
+            int minX = NukkitMath.floorDouble(bb.getMinX());
+            int minY = NukkitMath.floorDouble(bb.getMinY());
+            int minZ = NukkitMath.floorDouble(bb.getMinZ());
+            int maxX = NukkitMath.ceilDouble(bb.getMaxX());
+            int maxY = NukkitMath.ceilDouble(bb.getMaxY());
+            int maxZ = NukkitMath.ceilDouble(bb.getMaxZ());
+
+            this.blocksAround = new ArrayList<>();
+
+            for (int z = minZ; z <= maxZ; ++z) {
+                for (int x = minX; x <= maxX; ++x) {
+                    for (int y = minY; y <= maxY; ++y) {
+                        if (server.suomiCraftPEMode()) {
+                            if (y < level.getMinBlockY() || y > level.getMaxBlockY()) {
+                                continue;
+                            }
+
+                            int cx = x >> 4;
+                            int cz = z >> 4;
+
+                            FullChunk chunk = this.chunk;
+                            if (chunk == null || cx != chunk.getX() || cz != chunk.getZ()) {
+                                chunk = level.getChunkIfLoaded(cx, cz);
+                            }
+
+                            if (chunk != null) {
+                                int fullState = chunk.getFullBlock(x & 0xF, y, z & 0xF, BlockLayer.NORMAL);
+                                if (fullState != 0) {
+                                    this.blocksAround.add(Block.get(fullState, this.level, x, y, z, BlockLayer.NORMAL));
+                                }
+                            }
+                        } else {
+                            this.blocksAround.add(this.level.getBlock(this.chunk, x, y, z, false));
+                        }
+                    }
+                }
+            }
+        }
+
+        return this.blocksAround;
+    }
+
+    // Hack: add collisions for block below to fix movement in flowing water
+
+    @Override
+    public List<Block> getCollisionBlocks() {
+        if (this.collisionBlocks == null) {
+            this.collisionBlocks = new ArrayList<>();
+
+            AxisAlignedBB bb = this.boundingBox.clone();
+            bb.setMinY(this.boundingBox.getMinY() - 0.25);
+
+            List<Block> bl = this.getBlocksAround();
+            for (Block b : bl) {
+                if (b.collidesWithBB(bb, true)) {
+                    this.collisionBlocks.add(b);
+                }
+            }
+        }
+
+        return this.collisionBlocks;
+    }
+
+    @Override
     public boolean onUpdate(int currentTick) {
         if (this.closed) {
             return false;
@@ -234,6 +312,12 @@ public class EntityItem extends Entity {
             } else if (Block.isWater((blockId = level.getBlockIdAt(this.chunk, this.getFloorX(), NukkitMath.floorDouble(this.y + 0.53), this.getFloorZ()))) ||
                     (this.floatsInLava && (blockId == Block.LAVA || blockId == Block.STILL_LAVA))) {
                 this.motionY = this.getGravity() / 2;
+
+                // Flowing water, force checkBlockCollision
+                int data = level.getBlockDataAt(this.chunk, this.getFloorX(), this.getFloorY(), this.getFloorZ(), BlockLayer.NORMAL);
+                if (data > 0 && data < 8) {
+                    this.collisionBlocks = null;
+                }
             } else {
                 this.motionY -= this.getGravity();
             }
@@ -372,7 +456,20 @@ public class EntityItem extends Entity {
         addEntity.speedY = (float) this.motionY;
         addEntity.speedZ = (float) this.motionZ;
         addEntity.metadata = this.dataProperties.clone();
-        addEntity.item = this.item;
+
+        if (!server.reduceTraffic) {
+            addEntity.item = this.item;
+        } else {
+            Item clean = Item.get(item.getId(), item.getDamage(), item.getCount());
+
+            CompoundTag oldTag = item.getNamedTag();
+
+            if (oldTag != null) {
+                clean.setNamedTag(CompoundTag.sanitize(oldTag));
+            }
+
+            addEntity.item = clean;
+        }
         return addEntity;
     }
 }

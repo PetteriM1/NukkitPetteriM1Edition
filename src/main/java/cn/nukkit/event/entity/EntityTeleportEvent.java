@@ -13,15 +13,9 @@ import cn.nukkit.level.Location;
 public class EntityTeleportEvent extends EntityEvent implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
-
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private Location from;
     private Location to;
     private final PlayerTeleportEvent.TeleportCause cause;
-
     public EntityTeleportEvent(Entity entity, Location from, Location to) {
         this(entity, from, to, PlayerTeleportEvent.TeleportCause.UNKNOWN);
     }
@@ -31,6 +25,10 @@ public class EntityTeleportEvent extends EntityEvent implements Cancellable {
         this.from = from;
         this.to = to;
         this.cause = cause;
+    }
+
+    public static HandlerList getHandlers() {
+        return handlers;
     }
 
     public Location getFrom() {

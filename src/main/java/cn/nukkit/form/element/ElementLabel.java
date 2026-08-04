@@ -3,7 +3,7 @@ package cn.nukkit.form.element;
 public class ElementLabel extends Element implements SimpleElement {
 
     @SuppressWarnings("unused")
-    private final String type = "label"; //This variable is used for JSON import operations. Do NOT delete :) -- @Snake1999
+    private final String type = "label";
     private String text = "";
 
     public ElementLabel(String text) {

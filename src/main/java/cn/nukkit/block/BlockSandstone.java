@@ -23,6 +23,12 @@ public class BlockSandstone extends BlockSolidMeta {
     public BlockSandstone(int meta) {
         super(meta);
     }
+    private static final String[] names = {
+            "Sandstone",
+            "Chiseled Sandstone",
+            "Cut Sandstone",
+            "Smooth Sandstone"
+    };
 
     @Override
     public int getId() {
@@ -36,19 +42,12 @@ public class BlockSandstone extends BlockSolidMeta {
 
     @Override
     public double getResistance() {
-        return 0.8;
+        return 4;
     }
-
-    private static final String[] NAMES = {
-            "Sandstone",
-            "Chiseled Sandstone",
-            "Cut Sandstone",
-            "Smooth Sandstone"
-    };
 
     @Override
     public String getName() {
-        return NAMES[this.getDamage() & 0x03];
+        return names[this.getDamage() & 0x03];
     }
 
     @Override

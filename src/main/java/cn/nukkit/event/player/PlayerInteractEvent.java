@@ -16,19 +16,10 @@ import cn.nukkit.math.Vector3;
 public class PlayerInteractEvent extends PlayerEvent implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
-
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     protected final Block blockTouched;
-
     protected final Vector3 touchVector;
-
     protected final BlockFace blockFace;
-
     protected final Item item;
-
     protected final Action action;
 
     public PlayerInteractEvent(Player player, Item item, Vector3 block, BlockFace face) {
@@ -50,6 +41,18 @@ public class PlayerInteractEvent extends PlayerEvent implements Cancellable {
         this.action = action;
     }
 
+    public enum Action {
+        LEFT_CLICK_BLOCK,
+        RIGHT_CLICK_BLOCK,
+        LEFT_CLICK_AIR,
+        RIGHT_CLICK_AIR,
+        PHYSICAL
+    }
+
+    public static HandlerList getHandlers() {
+        return handlers;
+    }
+
     public Action getAction() {
         return action;
     }
@@ -68,13 +71,5 @@ public class PlayerInteractEvent extends PlayerEvent implements Cancellable {
 
     public BlockFace getFace() {
         return blockFace;
-    }
-
-    public enum Action {
-        LEFT_CLICK_BLOCK,
-        RIGHT_CLICK_BLOCK,
-        LEFT_CLICK_AIR,
-        RIGHT_CLICK_AIR,
-        PHYSICAL
     }
 }

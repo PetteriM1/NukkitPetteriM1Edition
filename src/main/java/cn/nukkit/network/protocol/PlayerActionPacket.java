@@ -24,7 +24,8 @@ public class PlayerActionPacket extends DataPacket {
     public static final int ACTION_STOP_SPRINT = 10;
     public static final int ACTION_START_SNEAK = 11;
     public static final int ACTION_STOP_SNEAK = 12;
-    public static final int ACTION_CREATIVE_PLAYER_DESTROY_BLOCK = 13;
+    public static final int ACTION_DIMENSION_CHANGE_REQUEST = 13; //sent when dying in different dimension (< 1.19)
+    public static final int ACTION_CREATIVE_PLAYER_DESTROY_BLOCK = 13; //1.19+
     public static final int ACTION_DIMENSION_CHANGE_ACK = 14; //sent when spawning in a different dimension to tell the server we spawned
     public static final int ACTION_START_GLIDE = 15;
     public static final int ACTION_STOP_GLIDE = 16;
@@ -36,6 +37,7 @@ public class PlayerActionPacket extends DataPacket {
     public static final int ACTION_STOP_SWIMMING = 22;
     public static final int ACTION_START_SPIN_ATTACK = 23;
     public static final int ACTION_STOP_SPIN_ATTACK = 24;
+    // Since 1.19.0
     public static final int ACTION_INTERACT_BLOCK = 25;
     public static final int ACTION_PREDICT_DESTROY_BLOCK = 26;
     public static final int ACTION_CONTINUE_DESTROY_BLOCK = 27;
@@ -54,11 +56,13 @@ public class PlayerActionPacket extends DataPacket {
     public void decode() {
         this.entityId = this.getEntityRuntimeId();
         this.action = this.getVarInt();
-        BlockVector3 v = this.getBlockVector3();
+        BlockVector3 v = this.getBlockVector3(protocol);
         this.x = v.x;
         this.y = v.y;
         this.z = v.z;
-        this.resultPosition = this.getBlockVector3();
+        if (protocol >= ProtocolInfo.v1_19_0_29) {
+            this.resultPosition = this.getBlockVector3(protocol);
+        }
         this.face = this.getVarInt();
     }
 
@@ -67,11 +71,13 @@ public class PlayerActionPacket extends DataPacket {
         this.reset();
         this.putEntityRuntimeId(this.entityId);
         this.putVarInt(this.action);
-        this.putBlockVector3(this.x, this.y, this.z);
-        if (this.resultPosition == null) {
-            this.putBlockVector3(0, 0, 0);
-        } else {
-            this.putBlockVector3(this.resultPosition);
+        this.putBlockVector3(protocol, this.x, this.y, this.z);
+        if (protocol >= ProtocolInfo.v1_19_0_29) {
+            if (this.resultPosition == null) {
+                this.putBlockVector3(protocol, 0, 0, 0);
+            } else {
+                this.putBlockVector3(protocol, this.resultPosition);
+            }
         }
         this.putVarInt(this.face);
     }

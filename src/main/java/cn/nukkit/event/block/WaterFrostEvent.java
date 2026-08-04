@@ -11,15 +11,16 @@ public class WaterFrostEvent extends BlockEvent implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
 
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     /**
      * Event called on water freezing.
+     *
      * @param block Block frozen.
      */
     public WaterFrostEvent(Block block) {
         super(block);
+    }
+
+    public static HandlerList getHandlers() {
+        return handlers;
     }
 }

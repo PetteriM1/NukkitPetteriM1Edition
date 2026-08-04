@@ -1,5 +1,6 @@
 package cn.nukkit.item;
 
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.potion.Effect;
 
 import javax.annotation.Nullable;
@@ -133,6 +134,18 @@ public class ItemArrow extends Item {
             default:
                 return null;
         }
+    }
+
+    @Override
+    public boolean isSupportedOn(int protocol) {
+        int damage = this.getDamage();
+        if (damage <= 42) {
+            return true;
+        }
+        if (damage == 43) {
+            return protocol >= ProtocolInfo.v1_16_0;
+        }
+        return protocol >= ProtocolInfo.v1_21_0;
     }
 
     @Override

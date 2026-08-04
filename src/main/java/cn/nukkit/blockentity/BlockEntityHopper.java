@@ -40,6 +40,9 @@ public class BlockEntityHopper extends BlockEntitySpawnable implements Inventory
     public BlockEntityHopper(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
     }
+    // Performance: Don't update power state every tick
+    private boolean cachedPowerState;
+    private int poweredCacheAge = 17; // Always update on first tick
 
     @Override
     protected void initBlockEntity() {
@@ -169,10 +172,18 @@ public class BlockEntityHopper extends BlockEntitySpawnable implements Inventory
             return false;
         }
 
+        if (this.server.suomiCraftPEMode() && noPlayersInTickingRange()) {
+            return true;
+        }
+
         this.transferCooldown--;
 
+        if (this.server.suomiCraftPEMode()) {
+            this.poweredCacheAge++;
+        }
+
         if (!this.isOnTransferCooldown()) {
-            if (this.level.isBlockPowered(this.chunk, this)) {
+            if (this.isPowered()) {
                 return true;
             }
 
@@ -181,7 +192,9 @@ public class BlockEntityHopper extends BlockEntitySpawnable implements Inventory
             boolean changed = !this.inventory.slots.isEmpty() && (pushItems() || pushItemsToMinecart());
 
             if (!changed && !this.inventory.isFull()) {
-                BlockEntity blockEntity = this.level.getBlockEntity(this.chunk, this.up());
+                BlockEntity blockEntity = server.suomiCraftPEMode() ?
+                        this.level.getBlockEntityIfLoaded(this.chunk, this.up()) :
+                        this.level.getBlockEntity(this.chunk, this.up());
                 Block block = null;
                 if (blockEntity instanceof BlockEntityContainer || (block = this.level.getBlock(this.chunk, this.getFloorX(), this.getFloorY() + 1, this.getFloorZ(), false)) instanceof BlockComposter) {
                     changed = pullItems(blockEntity, block);
@@ -191,7 +204,7 @@ public class BlockEntityHopper extends BlockEntitySpawnable implements Inventory
             }
 
             if (changed) {
-                this.setTransferCooldown(8);
+                this.setTransferCooldown((server.suomiCraftPEMode() ? 16 : 8));
                 setDirty();
             }
         }
@@ -211,6 +224,7 @@ public class BlockEntityHopper extends BlockEntitySpawnable implements Inventory
                     Item itemToAdd = item.clone();
                     itemToAdd.count = 1;
                     if (!this.inventory.canAddItem(itemToAdd)) {
+                        this.optimizeTick();
                         continue;
                     }
 
@@ -282,7 +296,7 @@ public class BlockEntityHopper extends BlockEntitySpawnable implements Inventory
 
     public boolean pullItems() {
         return this.pullItems(
-                this.level.getBlockEntity(this.chunk, this.up()),
+                this.server.suomiCraftPEMode() ? this.level.getBlockEntityIfLoaded(this.chunk, this.up()) : this.level.getBlockEntity(this.chunk, this.up()),
                 this.level.getBlock(this.chunk, this.getFloorX(), this.getFloorY() + 1, this.getFloorZ(), false));
     }
 
@@ -296,6 +310,7 @@ public class BlockEntityHopper extends BlockEntitySpawnable implements Inventory
                 itemToAdd.count = 1;
 
                 if (!this.inventory.canAddItem(itemToAdd)) {
+                    this.optimizeTick();
                     return false;
                 }
 
@@ -303,6 +318,7 @@ public class BlockEntityHopper extends BlockEntitySpawnable implements Inventory
                 this.server.getPluginManager().callEvent(ev);
 
                 if (ev.isCancelled()) {
+                    this.optimizeTick();
                     return false;
                 }
 
@@ -325,6 +341,7 @@ public class BlockEntityHopper extends BlockEntitySpawnable implements Inventory
                     itemToAdd.count = 1;
 
                     if (!this.inventory.canAddItem(itemToAdd)) {
+                        this.optimizeTick();
                         continue;
                     }
 
@@ -350,20 +367,24 @@ public class BlockEntityHopper extends BlockEntitySpawnable implements Inventory
         } else if (block instanceof BlockComposter) {
             BlockComposter composter = (BlockComposter) block;
             if (!composter.isFull()) {
+                this.optimizeTick();
                 return false;
             }
             Item item = composter.empty();
             if (item == null || item.isNull()) {
+                this.optimizeTick();
                 return false;
             }
             Item itemToAdd = item.clone();
             itemToAdd.setCount(1);
             if (!this.inventory.canAddItem(itemToAdd)) {
+                this.optimizeTick();
                 return false;
             }
             InventoryMoveItemEvent ev = new InventoryMoveItemEvent(null, this.inventory, this, item, InventoryMoveItemEvent.Action.PICKUP);
             this.server.getPluginManager().callEvent(ev);
             if (ev.isCancelled()) {
+                this.optimizeTick();
                 return false;
             }
             Item[] items = inventory.addItem(itemToAdd);
@@ -373,10 +394,18 @@ public class BlockEntityHopper extends BlockEntitySpawnable implements Inventory
     }
 
     public boolean pickupItems() {
+        if (this.chunk == null) {
+            return false;
+        }
+
         boolean pickedUpItem = false;
 
-        for (Entity entity : this.level.getCollidingEntities(this.pickupArea)) {
-            if (entity.isClosed() || !(entity instanceof EntityItem)) {
+        for (Entity entity : new ArrayList<>(this.chunk.getEntities().values())) {
+            if (entity.isClosed() || !(entity instanceof EntityItem) || !((EntityItem) entity).isAllowNonPlayerPickup()) {
+                continue;
+            }
+
+            if (!entity.boundingBox.intersectsWith(this.pickupArea)) {
                 continue;
             }
 
@@ -390,6 +419,7 @@ public class BlockEntityHopper extends BlockEntitySpawnable implements Inventory
             int originalCount = item.getCount();
 
             if (!this.inventory.canAddItem(item)) {
+                this.optimizeTick();
                 continue;
             }
 
@@ -435,9 +465,26 @@ public class BlockEntityHopper extends BlockEntitySpawnable implements Inventory
         inventory.clearAll();
     }
 
+    private int getBlockDataAt() {
+        if (this.y < this.level.getMinBlockY() || this.y > this.level.getMaxBlockY()) {
+            return 0;
+        }
+        int cx = (int) this.x >> 4;
+        int cz = (int) this.z >> 4;
+        FullChunk chunk = this.chunk;
+        if (chunk == null || cx != chunk.getX() || cz != chunk.getZ()) {
+            chunk = this.level.getChunkIfLoaded(cx, cz);
+        }
+        if (chunk == null) return 0;
+        return chunk.getBlockData((int) this.x & 0x0f, (int) this.y, (int) this.z & 0x0f);
+    }
+
     public boolean pushItems() {
-        int blockData = this.level.getBlockDataAt(this.chunk, (int) x, (int) y, (int) z, Block.LAYER_NORMAL) & 0x7;
-        BlockEntity be = this.level.getBlockEntity(this.chunk, this.getSide(BlockFace.fromIndex(blockData)));
+        int blockData = (server.suomiCraftPEMode() ? getBlockDataAt() :
+                this.level.getBlockDataAt(this.chunk, (int) x, (int) y, (int) z, Block.LAYER_NORMAL)) & 0x7;
+        BlockEntity be = server.suomiCraftPEMode() ?
+                this.level.getBlockEntityIfLoaded(this.chunk, this.getSide(BlockFace.fromIndex(blockData))) :
+                this.level.getBlockEntity(this.chunk, this.getSide(BlockFace.fromIndex(blockData))); // Cached chunk doesn't have to be correct
 
         if (!(be instanceof InventoryHolder) || (be instanceof BlockEntityHopper && blockData == 0)) {
             return false;
@@ -605,6 +652,7 @@ public class BlockEntityHopper extends BlockEntitySpawnable implements Inventory
                     itemToAdd.setCount(1);
 
                     if (!inventory.canAddItem(itemToAdd)) {
+                        this.optimizeTick();
                         continue;
                     }
 
@@ -644,5 +692,32 @@ public class BlockEntityHopper extends BlockEntitySpawnable implements Inventory
         }
 
         return c;
+    }
+
+    private void optimizeTick() {
+        if (this.server.suomiCraftPEMode()) {
+            this.transferCooldown = 8; // Performance: Only loop inventory contents every other tick when none of the items couldn't be added
+        }
+    }
+
+    private boolean isPowered() {
+        if (this.server.suomiCraftPEMode()) {
+            if (this.poweredCacheAge > 16) {
+                this.cachedPowerState = this.level.isBlockPowered(this.chunk, this);
+                this.poweredCacheAge = 0;
+            }
+            return this.cachedPowerState;
+        } else {
+            return this.level.isBlockPowered(this.chunk, this);
+        }
+    }
+
+    private boolean noPlayersInTickingRange() {
+        for (Player player : this.level.getPlayersList()) {
+            if (player.distanceSquared(this) < 6400) { // 80 blocks
+                return false;
+            }
+        }
+        return true;
     }
 }

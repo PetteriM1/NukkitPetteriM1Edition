@@ -31,32 +31,31 @@ public class Nether extends Generator {
 
     private ChunkManager level;
     private NukkitRandom nukkitRandom;
+    private ScaleOctavesOffsetFilter selector;
+    private ScaleOctavesOffsetFilter low;
+    private ScaleOctavesOffsetFilter high;
     private static final int lavaHeight = 32; // should be 31
+    private long localSeed1;
+    private long localSeed2;
+    private SimplexF biomeNoise;
     private final SimplexF[] noiseGen = new SimplexF[3];
     private final List<Populator> populators = new ArrayList<>();
     private final List<Populator> generationPopulators = new ArrayList<>();
 
-    private long localSeed1;
-    private long localSeed2;
-    private SimplexF biomeNoise;
-
     private static final int STEP_X = 4;
     private static final int STEP_Y = 8;
     private static final int STEP_Z = STEP_X;
-    private static final int SAMPLES_X = 16 / STEP_X;
-    private static final int SAMPLES_Y = 256 / STEP_Y;
     private static final int SAMPLES_Z = 16 / STEP_Z;
-    private static final int CACHE_X = SAMPLES_X + 1;
-    private static final int CACHE_Y = SAMPLES_Y + 1;
     private static final int CACHE_Z = SAMPLES_Z + 1;
+    private static final double SCALE_Z = 1.0d / STEP_Z;
+    private static final int SAMPLES_X = 16 / STEP_X;
+    private static final int CACHE_X = SAMPLES_X + 1;
+    private static final int SAMPLES_Y = 256 / STEP_Y;
+    private static final int CACHE_Y = SAMPLES_Y + 1;
     private static final double SCALE_X = 1.0d / STEP_X;
     private static final double SCALE_Y = 1.0d / STEP_Y;
-    private static final double SCALE_Z = 1.0d / STEP_Z;
     private static final double NOISE_SCALE_FACTOR = ((1 << 16) - 1.0d) / 512.0d;
     private static final Ref<ThreadData> THREAD_DATA_CACHE = ThreadRef.soft(ThreadData::new);
-    private ScaleOctavesOffsetFilter selector;
-    private ScaleOctavesOffsetFilter low;
-    private ScaleOctavesOffsetFilter high;
 
     public Nether() {
         this(Collections.emptyMap());
@@ -65,6 +64,10 @@ public class Nether extends Generator {
     public Nether(Map<String, Object> options) {
         this.legacy = !options.containsKey("__LevelDB");
         this.version = (int) options.getOrDefault("__Version", 0);
+    }
+
+    private static final class ThreadData {
+        private double[] densityCache;
     }
 
     @Override
@@ -178,7 +181,7 @@ public class Nether extends Generator {
                     }
                 }
             }
-        } else { // use generator from Cloudburst
+        } else {
             CoveredBiome[][] biomes = new CoveredBiome[16][16];
 
             for (int x = 0; x < 16; ++x) {
@@ -190,7 +193,7 @@ public class Nether extends Generator {
             }
 
             final ThreadData threadData = THREAD_DATA_CACHE.get();
-            final double[] densityCache = threadData.densityCache = densityGet(threadData.densityCache, baseX, 0, baseZ);
+            final double[] densityCache = threadData.densityCache = densityGet(threadData.densityCache, baseX, baseZ);
 
             for (int i = 0, sectionX = 0; sectionX < SAMPLES_X; sectionX++) {
                 for (int sectionZ = 0; sectionZ < SAMPLES_Z; sectionZ++) {
@@ -309,7 +312,7 @@ public class Nether extends Generator {
         return outputNoise - offset;
     }
 
-    private double[] densityGet(double[] arr, int x, int y, int z) {
+    private double[] densityGet(double[] arr, int x, int z) {
         int totalSize = CACHE_X * CACHE_Y * CACHE_Z;
         if (arr == null || arr.length < totalSize) {
             arr = new double[totalSize];
@@ -360,15 +363,11 @@ public class Nether extends Generator {
         return new Vector3(0.5, 64, 0.5);
     }
 
-    public float getNoise(int x, int y, int z)  {
+    public float getNoise(int x, int y, int z) {
         float val = 0f;
-        for (int i = 0; i < noiseGen.length; i++)   {
+        for (int i = 0; i < noiseGen.length; i++) {
             val += noiseGen[i].noise3D(x >> i, y, z >> i, true);
         }
         return val;
-    }
-
-    private static final class ThreadData {
-        private double[] densityCache;
     }
 }

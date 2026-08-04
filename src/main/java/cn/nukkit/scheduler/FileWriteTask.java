@@ -17,6 +17,7 @@ public class FileWriteTask extends AsyncTask {
 
     private final File file;
     private final InputStream contents;
+    private StringBuilder lazyInit;
 
     public FileWriteTask(String path, String contents) {
         this(new File(path), contents);
@@ -46,10 +47,20 @@ public class FileWriteTask extends AsyncTask {
         this.contents = contents;
     }
 
+    public FileWriteTask(File file, StringBuilder contents) {
+        this.file = file;
+        this.contents = null;
+        this.lazyInit = contents;
+    }
+
     @Override
     public void onRun() {
         try {
-            Utils.writeFile(file, contents);
+            if (contents == null && lazyInit != null) {
+                Utils.writeFile(file, new ByteArrayInputStream(lazyInit.toString().getBytes(StandardCharsets.UTF_8)));
+            } else {
+                Utils.writeFile(file, contents);
+            }
         } catch (IOException e) {
             Server.getInstance().getLogger().logException(e);
         }

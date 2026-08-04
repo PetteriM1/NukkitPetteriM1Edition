@@ -45,6 +45,7 @@ public class MesaBiome extends CoveredBiome {
 
     protected int moundHeight;
     private final SimplexF moundNoise = new SimplexF(new NukkitRandom(347228794), 2f, 1 / 4f, getMoundFrequency());
+
     public MesaBiome() {
         PopulatorCactus cactus = new PopulatorCactus();
         cactus.setBaseAmount(1);

@@ -25,6 +25,9 @@ public class BlockEntityBeacon extends BlockEntitySpawnable {
     public BlockEntityBeacon(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
     }
+    private static final int POWER_LEVEL_MAX = 4;
+    private static final IntSet ALLOWED_EFFECTS = new IntOpenHashSet(new int[]{0, Effect.SPEED, Effect.HASTE, Effect.DAMAGE_RESISTANCE, Effect.JUMP, Effect.STRENGTH, Effect.REGENERATION});
+    private static final IntSet ITEMS = new IntOpenHashSet(new int[]{Item.AIR, ItemID.NETHERITE_INGOT, ItemID.EMERALD, ItemID.DIAMOND, ItemID.GOLD_INGOT, ItemID.IRON_INGOT});
 
     @Override
     protected void initBlockEntity() {
@@ -160,8 +163,6 @@ public class BlockEntityBeacon extends BlockEntitySpawnable {
         return true;
     }
 
-    private static final int POWER_LEVEL_MAX = 4;
-
     private boolean hasSkyAccess() {
         int tileX = (int) this.x;
         int tileY = (int) this.y;
@@ -253,9 +254,6 @@ public class BlockEntityBeacon extends BlockEntitySpawnable {
             setDirty();
         }
     }
-
-    private static final IntSet ALLOWED_EFFECTS = new IntOpenHashSet(new int[]{0, Effect.SPEED, Effect.HASTE, Effect.DAMAGE_RESISTANCE, Effect.JUMP, Effect.STRENGTH, Effect.REGENERATION});
-    private static final IntSet ITEMS = new IntOpenHashSet(new int[]{Item.AIR, ItemID.NETHERITE_INGOT, ItemID.EMERALD, ItemID.DIAMOND, ItemID.GOLD_INGOT, ItemID. IRON_INGOT});
 
     @Override
     public boolean updateCompoundTag(CompoundTag nbt, Player player) {

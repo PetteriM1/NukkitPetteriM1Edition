@@ -1,6 +1,7 @@
 package cn.nukkit.item;
 
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.network.protocol.ProtocolInfo;
 
 /**
  * Created on 2015/12/27 by xtypr.
@@ -39,5 +40,17 @@ public class ItemPotionSplash extends ProjectileItem {
     @Override
     protected void correctNBT(CompoundTag nbt) {
         nbt.putInt("PotionId", this.meta);
+    }
+
+    @Override
+    public boolean isSupportedOn(int protocol) {
+        int damage = this.getDamage();
+        if (damage <= 42) {
+            return true;
+        }
+        if (damage == 43) {
+            return protocol >= ProtocolInfo.v1_16_0;
+        }
+        return protocol >= ProtocolInfo.v1_21_0;
     }
 }

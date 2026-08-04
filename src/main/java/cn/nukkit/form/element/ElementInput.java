@@ -7,7 +7,7 @@ import javax.annotation.Nullable;
 public class ElementInput extends Element {
 
     @SuppressWarnings("unused")
-    private final String type = "input"; //This variable is used for JSON import operations. Do NOT delete :) -- @Snake1999
+    private final String type = "input";
     private String text = "";
     private String placeholder = "";
     @SerializedName("default")

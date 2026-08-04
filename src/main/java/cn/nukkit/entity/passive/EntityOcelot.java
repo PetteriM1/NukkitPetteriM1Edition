@@ -1,5 +1,8 @@
 package cn.nukkit.entity.passive;
 
+import cn.nukkit.Player;
+import cn.nukkit.entity.EntityCreature;
+import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.utils.Utils;
@@ -34,10 +37,28 @@ public class EntityOcelot extends EntityTameableAnimal {
     }
 
     @Override
+    public double getSpeed() {
+        return 1.4;
+    }
+
+    @Override
     protected void initEntity() {
         this.setMaxHealth(10);
         super.initEntity();
         this.noFallDamage = true;
+    }
+
+    @Override
+    public boolean targetOption(EntityCreature creature, double distance) {
+        if (creature instanceof Player) {
+            Player player = (Player) creature;
+            if (player.closed) {
+                return false;
+            }
+            int id = player.getInventory().getItemInHandFast().getId();
+            return player.spawned && player.isAlive() && (id == Item.RAW_FISH || id == Item.RAW_SALMON) && distance <= 49;
+        }
+        return super.targetOption(creature, distance);
     }
 
     @Override

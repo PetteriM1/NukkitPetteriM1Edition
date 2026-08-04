@@ -1,22 +1,29 @@
 package cn.nukkit.level.format.leveldb.structure;
 
 import cn.nukkit.Nukkit;
+import cn.nukkit.Server;
 import cn.nukkit.block.Block;
+import cn.nukkit.block.BlockID;
+import cn.nukkit.level.GlobalBlockPalette;
+import cn.nukkit.level.Level;
 import cn.nukkit.level.format.leveldb.BlockStateMapping;
 import cn.nukkit.level.util.BitArray;
 import cn.nukkit.level.util.BitArrayVersion;
+import cn.nukkit.level.util.PalettedBlockStorage;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BinaryStream;
 import cn.nukkit.utils.MainLogger;
-import org.cloudburstmc.nbt.NBTInputStream;
-import org.cloudburstmc.nbt.NBTOutputStream;
-import org.cloudburstmc.nbt.NbtMap;
-import org.cloudburstmc.nbt.NbtUtils;
+import cn.nukkit.utils.bugreport.ExceptionHandler;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufOutputStream;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.cloudburstmc.nbt.NBTInputStream;
+import org.cloudburstmc.nbt.NBTOutputStream;
+import org.cloudburstmc.nbt.NbtMap;
+import org.cloudburstmc.nbt.NbtUtils;
 
 import java.io.IOException;
 import java.util.List;
@@ -111,12 +118,13 @@ public class StateBlockStorage {
                         NbtMap updatedState = BlockStateMapping.get().updateVanillaState(state);
                         blockState = BlockStateMapping.get().getUpdatedOrCustom(state, updatedState);
                         if (!blockState.isCustom()) {
-                            if (Nukkit.DEBUG > 1) log.info("[{}] Updated unmapped block state: {} => {}", chunkBuilder.debugString(), state, blockState.getVanillaState());
+                            if (Nukkit.DEBUG > 1)
+                                log.info("[{}] Updated unmapped block state: {} => {}", chunkBuilder.debugString(), state, blockState.getVanillaState());
                             chunkBuilder.dirty();
                         }
 
                         if (Nukkit.DEBUG > 1 && blockState.getRuntimeId() == BlockStateMapping.get().getDefaultRuntimeId()) {
-                            log.info("[{}] Chunk contains unknown block {}  => {}", chunkBuilder.debugString(), state, updatedState);
+                            log.info("[{}] Chunk contains unknown block {} => {}", chunkBuilder.debugString(), state, updatedState);
                         }
                     }
 
@@ -126,6 +134,7 @@ public class StateBlockStorage {
                     this.palette.add(blockState);
                 } catch (Exception e) {
                     MainLogger.getLogger().error("[" + chunkBuilder.debugString() + "] Unable to deserialize chunk block state", e);
+                    ExceptionHandler.handleSilently(e);
                 }
             }
         } catch (IOException e) {
@@ -208,8 +217,33 @@ public class StateBlockStorage {
         this.setBlockStateUnsafe(index, BlockStateMapping.get().getState(block, data));
     }
 
-    public void writeTo(BinaryStream stream) {
-        BitArray bitArray = this.bitArray;
+    public byte[] getBlockIds() {
+        // TODO: possible to iterate over XZY 0-16
+        Server.getInstance().getLogger().warning("Unsupported method getBlockIds()! LevelDB provider is 1.13+", new Throwable(""));
+        return new byte[0];
+    }
+
+    public byte[] getBlockData() {
+        // TODO: possible to iterate over XZY 0-16
+        Server.getInstance().getLogger().warning("Unsupported method getBlockData()! LevelDB provider is 1.13+", new Throwable(""));
+        return new byte[0];
+    }
+
+    public void writeTo(int protocol, BinaryStream stream, boolean obfuscated) {
+        // If palette size is 1, it will have one state, no obfuscation needed
+        if (obfuscated && this.palette.size() > 1) {
+            this.writeToObfuscated(stream, protocol);
+            return;
+        }
+
+        boolean legacy = protocol < ProtocolInfo.v1_18_0;
+
+        BitArray bitArray;
+        if (legacy && this.bitArray.getVersion() == BitArrayVersion.V0) {
+            bitArray = BitArrayVersion.V1.createPalette(SECTION_SIZE);
+        } else {
+            bitArray = this.bitArray;
+        }
 
         stream.putByte((byte) this.getPaletteHeader(bitArray.getVersion(), true));
         if (bitArray.getVersion() != BitArrayVersion.V0) {
@@ -219,9 +253,28 @@ public class StateBlockStorage {
             stream.putVarInt(this.palette.size());
         }
 
+        boolean mappingProtocol = protocol == Level.getChunkProtocol(BlockStateMapping.get().getVersion());
+
         for (BlockStateSnapshot state : this.palette) {
-            stream.putVarInt(state.getRuntimeIdNetworkProtocol());
+            if (mappingProtocol) {
+                stream.putVarInt(state.getRuntimeId());
+            } else {
+                stream.putVarInt(GlobalBlockPalette.getOrCreateRuntimeId(protocol, state.getLegacyId(protocol), state.getLegacyData(protocol)));
+            }
         }
+    }
+
+    private void writeToObfuscated(BinaryStream stream, int protocol) {
+        PalettedBlockStorage storage = PalettedBlockStorage.createFromBlockPalette(this.bitArray.getVersion(), protocol);
+        for (int i = 0; i < SECTION_SIZE; i++) {
+            BlockStateSnapshot state = this.getBlockState(i);
+            int id = state.getLegacyId(protocol);
+            if (Level.xrayableBlocks[id]) {
+                id = (id == BlockID.ANCIENT_DEBRIS || id == BlockID.NETHER_GOLD_ORE) ? BlockID.NETHERRACK : id > 650 ? BlockID.DEEPSLATE : BlockID.STONE;
+            }
+            storage.setBlock(i, GlobalBlockPalette.getOrCreateRuntimeId(protocol, id, state.getLegacyData(protocol)));
+        }
+        storage.writeTo(stream);
     }
 
     private void onResize(BitArrayVersion version) {

@@ -54,10 +54,10 @@ public class BlockBlackstoneGilded extends BlockSolid {
 
         ThreadLocalRandom random = ThreadLocalRandom.current();
         if (dropOdds > 1 && random.nextInt(dropOdds) != 0) {
-            return new Item[] { toItem() };
+            return new Item[]{toItem()};
         }
 
-        return new Item[] { Item.get(ItemID.GOLD_NUGGET, 0, random.nextInt(2, 6)) };
+        return new Item[]{Item.get(ItemID.GOLD_NUGGET, 0, random.nextInt(2, 6))};
     }
 
     @Override

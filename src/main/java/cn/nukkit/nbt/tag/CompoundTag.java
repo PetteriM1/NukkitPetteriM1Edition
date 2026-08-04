@@ -23,8 +23,34 @@ public class CompoundTag extends Tag implements Cloneable {
         super(name);
     }
 
+    public static CompoundTag sanitize(CompoundTag oldTag) {
+        CompoundTag newTag = new CompoundTag();
+
+        if (oldTag.contains("ench")) {
+            newTag.putList(new ListTag<>("ench"));
+        }
+
+        if (oldTag.contains("Base")) {
+            newTag.put("Base", oldTag.get("Base"));
+        }
+
+        if (oldTag.contains("Trim")) {
+            newTag.put("Trim", oldTag.get("Trim"));
+        }
+
+        if (oldTag.contains("Patterns")) {
+            newTag.put("Patterns", oldTag.get("Patterns"));
+        }
+
+        if (oldTag.contains("customColor")) {
+            newTag.put("customColor", oldTag.get("customColor"));
+        }
+
+        return newTag;
+    }
+
     @Override
-    void write(NBTOutputStream dos) throws IOException {
+    public void write(NBTOutputStream dos) throws IOException {
         for (Map.Entry<String, Tag> entry : this.tags.entrySet()) {
             Tag.writeNamedTag(entry.getValue(), entry.getKey(), dos);
         }
@@ -33,10 +59,10 @@ public class CompoundTag extends Tag implements Cloneable {
     }
 
     @Override
-    public void load(NBTInputStream dis) throws IOException {
+    public void load(NBTInputStream dis, int nested) throws IOException {
         tags.clear();
         Tag tag;
-        while ((tag = Tag.readNamedTag(dis)).getId() != Tag.TAG_End) {
+        while ((tag = Tag.readNamedTag(dis, nested)).getId() != Tag.TAG_End) {
             tags.put(tag.getName(), tag);
         }
     }
@@ -244,7 +270,7 @@ public class CompoundTag extends Tag implements Cloneable {
     public String toString() {
         StringJoiner joiner = new StringJoiner(",\n\t");
         tags.forEach((key, tag) -> joiner.add('\'' + key + "' : " + tag.toString().replace("\n", "\n\t")));
-        return "CompoundTag '" + this.getName() + "' (" + tags.size() + " entries) {\n\t" + joiner.toString() + "\n}";
+        return "CompoundTag '" + this.getName() + "' (" + tags.size() + " entries) {\n\t" + joiner + "\n}";
     }
 
     public void print(String prefix, PrintStream out) {

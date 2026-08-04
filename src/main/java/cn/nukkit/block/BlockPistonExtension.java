@@ -21,12 +21,12 @@ public class BlockPistonExtension extends BlockTransparent {
 
     @Override
     public double getResistance() {
-        return 0.1;
+        return 2.5;
     }
 
     @Override
     public Item[] getDrops(Item item) {
-            return new Item[0];
+        return new Item[0];
     }
 
     @Override

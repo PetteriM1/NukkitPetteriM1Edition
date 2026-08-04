@@ -184,11 +184,11 @@ public class EntityXPOrb extends Entity {
             if (this.age % 2 == 0) {
                 if (this.closestPlayer != null &&
                         (this.closestPlayer.level != this.level ||
-                        this.closestPlayer.closed ||
-                        !this.closestPlayer.isAlive() ||
-                        this.closestPlayer.isSpectator() ||
-                        !this.closestPlayer.canPickupXP() ||
-                        this.closestPlayer.distanceSquared(this) > 64.0D)) {
+                                this.closestPlayer.closed ||
+                                !this.closestPlayer.isAlive() ||
+                                this.closestPlayer.isSpectator() ||
+                                !this.closestPlayer.canPickupXP() ||
+                                this.closestPlayer.distanceSquared(this) > 64.0D)) {
                     this.closestPlayer = null;
                 }
 
@@ -296,5 +296,14 @@ public class EntityXPOrb extends Entity {
 
     public void setPickupDelay(int pickupDelay) {
         this.pickupDelay = pickupDelay;
+    }
+
+    @Override
+    public boolean goToNewChunk(FullChunk chunk) {
+        if (chunk.getEntities().size() > 400) { // no drops so slightly higher limit
+            this.close();
+            return false;
+        }
+        return true;
     }
 }

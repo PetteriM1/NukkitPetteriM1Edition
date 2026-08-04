@@ -101,14 +101,15 @@ public class BanIpCommand extends VanillaCommand {
     private static void processIPBan(String ip, CommandSender sender, String reason) {
         sender.getServer().getIPBans().addBan(ip, reason, null, sender.getName());
 
-        for (Player player : sender.getServer().getOnlinePlayers().values()) {
+        for (Player player : sender.getServer().getOnlinePlayersList()) {
             if (player.getAddress().equals(ip)) {
-                player.kick(PlayerKickEvent.Reason.IP_BANNED, !reason.isEmpty() ? reason : "IP banned", true);
+                player.kick(PlayerKickEvent.Reason.IP_BANNED, !reason.isEmpty() ? reason : "IP banned", true, "source=" + sender.getName() + ", reason=" + reason);
             }
         }
 
         try {
             sender.getServer().getNetwork().blockAddress(InetAddress.getByName(ip));
-        } catch (UnknownHostException ignore) {}
+        } catch (UnknownHostException ignore) {
+        }
     }
 }

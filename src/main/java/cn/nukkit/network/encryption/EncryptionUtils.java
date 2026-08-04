@@ -64,9 +64,9 @@ public class EncryptionUtils {
     private static final Map<String, Object> DISCOVERY_DATA = getDiscoveryData();
     private static final Map<String, Object> OPENID_CONFIGURATION = getOpenIdConfiguration();
     private static final String JWKS_URL = getJwksUrl();
-    private static final String ISSUER = getIssuer();
     private static final HttpsJwks JWKS = new HttpsJwks(JWKS_URL);
     private static final HttpsJwksVerificationKeyResolver RESOLVER = new HttpsJwksVerificationKeyResolver(JWKS);
+    private static final String ISSUER = getIssuer();
     private static final JwtConsumer MOJANG_CONSUMER = new JwtConsumerBuilder()
             .setVerificationKeyResolver(RESOLVER)
             .setRequireExpirationTime()
@@ -104,7 +104,8 @@ public class EncryptionUtils {
                 Server.getInstance().getLogger().info("Using previously cached discovery data");
                 //noinspection unchecked
                 return (Map<String, Object>) JSON_PARSER.parse(reader);
-            } catch (Exception ignore) {}
+            } catch (Exception ignore) {
+            }
             throw new AssertionError("Unable to fetch discovery data from " + DISCOVERY_ENDPOINT);
         }
         try (FileWriter writer = new FileWriter("discovery-cache.json")) {
@@ -154,7 +155,8 @@ public class EncryptionUtils {
                 Server.getInstance().getLogger().info("Using previously cached OpenID configuration");
                 //noinspection unchecked
                 return (Map<String, Object>) JSON_PARSER.parse(reader);
-            } catch (Exception ignore) {}
+            } catch (Exception ignore) {
+            }
             throw new AssertionError("Unable to fetch OpenID configuration from " + openIdConfigUrl);
         }
         try (FileWriter writer = new FileWriter("openid-cache.json")) {
@@ -392,7 +394,8 @@ public class EncryptionUtils {
             Cipher cipher = Cipher.getInstance(transformation);
             cipher.init(encrypt ? Cipher.ENCRYPT_MODE : Cipher.DECRYPT_MODE, key, new IvParameterSpec(iv));
             return cipher;
-        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | InvalidAlgorithmParameterException e) {
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException |
+                 InvalidAlgorithmParameterException e) {
             throw new AssertionError("Unable to initialize required encryption", e);
         }
     }

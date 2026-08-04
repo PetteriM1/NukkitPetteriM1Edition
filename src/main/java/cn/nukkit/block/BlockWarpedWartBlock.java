@@ -20,7 +20,7 @@ public class BlockWarpedWartBlock extends BlockNetherWartBlock {
 
     @Override
     public double getResistance() {
-        return 1;
+        return 5;
     }
 
     @Override

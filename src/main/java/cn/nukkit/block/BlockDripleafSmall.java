@@ -13,7 +13,9 @@ import cn.nukkit.level.particle.BoneMealParticle;
 import cn.nukkit.level.particle.DestroyBlockParticle;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.Faceable;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockDripleafSmall extends BlockFlowable implements BlockPropertiesHelper, Faceable {
 
@@ -193,5 +195,15 @@ public class BlockDripleafSmall extends BlockFlowable implements BlockProperties
     @Override
     public boolean canPassThrough() {
         return true;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_17_0;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.LILY_PAD;
     }
 }

@@ -1,6 +1,7 @@
 package cn.nukkit.level.format.leveldb.structure;
 
-import cn.nukkit.level.GlobalBlockPalette;
+import cn.nukkit.block.Block;
+import cn.nukkit.block.BlockUnknown;
 import cn.nukkit.level.format.leveldb.BlockStateMapping;
 import org.cloudburstmc.nbt.NbtMap;
 import lombok.Builder;
@@ -24,7 +25,14 @@ public class BlockStateSnapshot {
     private int legacyData = -1;
 
     @Builder.Default
-    private int runtimeIdNetworkProtocol = -1;
+    private Block block = null;
+
+    private Block getBlock() {
+        if (this.block == null) {
+            this.block = Block.get(this.getLegacyId(), this.getLegacyData());
+        }
+        return this.block;
+    }
 
     public int getLegacyId() {
         if (this.legacyId != -1) {
@@ -53,11 +61,17 @@ public class BlockStateSnapshot {
         return data;
     }
 
-    int getRuntimeIdNetworkProtocol() {
-        if (this.runtimeIdNetworkProtocol == -1) {
-            this.runtimeIdNetworkProtocol = GlobalBlockPalette.getOrCreateRuntimeId(this.getLegacyId(), this.getLegacyData());
+    public int getLegacyId(int protocol) {
+        if (protocol >= this.version || this.getBlock().getMinimumVersion() == 0 || this.getBlock() instanceof BlockUnknown) {
+            return this.getLegacyId();
         }
+        return this.getBlock().getAlternateBlock(protocol).getLegacyId();
+    }
 
-        return this.runtimeIdNetworkProtocol;
+    public int getLegacyData(int protocol) {
+        if (protocol >= this.version || this.getBlock().getMinimumVersion() == 0 || this.getBlock() instanceof BlockUnknown) {
+            return this.getLegacyData();
+        }
+        return this.getBlock().getAlternateMeta(protocol);
     }
 }

@@ -3,7 +3,11 @@ package cn.nukkit.entity.passive;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.entity.Attribute;
+import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.mob.EntityWalkingMob;
+import cn.nukkit.event.entity.EntityDamageByEntityEvent;
+import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemID;
 import cn.nukkit.level.format.FullChunk;
@@ -14,6 +18,7 @@ import cn.nukkit.network.protocol.UpdateAttributesPacket;
 import cn.nukkit.utils.Utils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class EntityIronGolem extends EntityWalkingMob {
@@ -40,10 +45,47 @@ public class EntityIronGolem extends EntityWalkingMob {
     }
 
     @Override
+    public double getSpeed() {
+        return 0.7;
+    }
+
+    @Override
+    protected float getKnockbackModifier() {
+        return 0f;
+    }
+
+    @Override
     public void initEntity() {
+        this.setFriendly(true);
         this.setMaxHealth(100);
         super.initEntity();
         this.noFallDamage = true;
+
+        this.setDamage(new int[]{0, 11, 21, 31});
+        this.setMinDamage(new int[]{0, 4, 7, 11});
+    }
+
+    public void attackEntity(Entity player) {
+        if (this.attackDelay > 40 && this.distanceSquared(player) < 2 + this.getWidth() * this.getWidth()) {
+            this.attackDelay = 0;
+            HashMap<EntityDamageEvent.DamageModifier, Float> damage = new HashMap<>();
+            damage.put(EntityDamageEvent.DamageModifier.BASE, (float) this.getDamage());
+
+            if (player instanceof Player) {
+                float points = 0;
+                for (Item i : ((Player) player).getInventory().getArmorContents()) {
+                    points += this.getArmorPoints(i.getId());
+                }
+                damage.put(EntityDamageEvent.DamageModifier.ARMOR,
+                        (float) (damage.getOrDefault(EntityDamageEvent.DamageModifier.ARMOR, 0f) - Math.floor(damage.getOrDefault(EntityDamageEvent.DamageModifier.BASE, 1f) * points * 0.04)));
+            }
+            player.attack(new EntityDamageByEntityEvent(this, player, EntityDamageEvent.DamageCause.ENTITY_ATTACK, damage));
+            this.playAttack();
+        }
+    }
+
+    public boolean targetOption(EntityCreature creature, double distance) {
+        return (!(creature instanceof Player) || creature.getId() == this.isAngryTo) && !(creature instanceof EntityWolf) && creature.isAlive() && distance <= 256;
     }
 
     @Override
@@ -69,6 +111,31 @@ public class EntityIronGolem extends EntityWalkingMob {
     @Override
     public String getName() {
         return this.hasCustomName() ? this.getNameTag() : "Iron Golem";
+    }
+
+    @Override
+    public boolean canDespawn() {
+        return false;
+    }
+
+    @Override
+    public boolean attack(EntityDamageEvent ev) {
+        if (super.attack(ev)) {
+            if (ev instanceof EntityDamageByEntityEvent) {
+                Entity damager = ((EntityDamageByEntityEvent) ev).getDamager();
+                if (!(damager instanceof Player) || ((Player) damager).isSurvival() || ((Player) damager).isAdventure()) {
+                    this.isAngryTo = damager.getId();
+                }
+            }
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean canTarget(Entity entity) {
+        return entity.canBeFollowed() && entity.getId() == this.isAngryTo;
     }
 
     @Override

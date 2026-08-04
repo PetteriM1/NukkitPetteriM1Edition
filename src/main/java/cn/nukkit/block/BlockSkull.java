@@ -120,6 +120,7 @@ public class BlockSkull extends BlockTransparentMeta implements Faceable {
     public BlockColor getColor() {
         return BlockColor.AIR_BLOCK_COLOR;
     }
+
     @Override
     public BlockFace getBlockFace() {
         return BlockFace.fromIndex(this.getDamage() & 0x7);

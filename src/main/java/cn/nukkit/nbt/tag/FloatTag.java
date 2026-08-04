@@ -9,16 +9,6 @@ public class FloatTag extends NumberTag<Float> {
 
     public float data;
 
-    @Override
-    public Float getData() {
-        return data;
-    }
-
-    @Override
-    public void setData(Float data) {
-        this.data = data == null ? 0 : data;
-    }
-
     public FloatTag(String name) {
         super(name);
     }
@@ -29,12 +19,22 @@ public class FloatTag extends NumberTag<Float> {
     }
 
     @Override
-    void write(NBTOutputStream dos) throws IOException {
+    public Float getData() {
+        return data;
+    }
+
+    @Override
+    public void setData(Float data) {
+        this.data = data == null ? 0 : data;
+    }
+
+    @Override
+    public void write(NBTOutputStream dos) throws IOException {
         dos.writeFloat(data);
     }
 
     @Override
-    public void load(NBTInputStream dis) throws IOException {
+    public void load(NBTInputStream dis, int nested) throws IOException {
         data = dis.readFloat();
     }
 

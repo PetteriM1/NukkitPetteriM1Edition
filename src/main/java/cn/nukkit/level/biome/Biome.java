@@ -6,13 +6,14 @@ import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.generator.populator.type.Populator;
 import cn.nukkit.math.NukkitRandom;
 import cn.nukkit.utils.Utils;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author MagicDroidX
@@ -22,7 +23,7 @@ public abstract class Biome implements BlockID {
 
     public static final Biome[] biomes = new Biome[256];
     public static final List<Biome> unorderedBiomes = new ObjectArrayList<>();
-    private static final Int2ObjectMap<String> runtimeId2Identifier = new Int2ObjectOpenHashMap<>();
+    private static final QuickLookupTable runtimeId2Identifier = new QuickLookupTable();
 
     private final ArrayList<Populator> populators = new ArrayList<>();
     private int id;
@@ -31,9 +32,34 @@ public abstract class Biome implements BlockID {
 
     static {
         JsonObject json = Utils.loadJsonResource("biome_id_map.json").getAsJsonObject();
-        for (String identifier : json.keySet()) {
-            int biomeId = json.get(identifier).getAsInt();
-            runtimeId2Identifier.put(biomeId, identifier);
+        for (Map.Entry<String, JsonElement> entry : json.entrySet()) {
+            int biomeId = entry.getValue().getAsInt();
+            runtimeId2Identifier.put(biomeId, entry.getKey());
+        }
+    }
+
+    private static class QuickLookupTable {
+
+        private String[] array = new String[256];
+
+        private void put(int k, String v) {
+            if (k < 0) {
+                throw new IllegalArgumentException();
+            }
+
+            if (array.length <= k) {
+                array = Arrays.copyOf(array, k + 1);
+            }
+
+            array[k] = v;
+        }
+
+        private String get(int k) {
+            if (k < 0 || array == null || k >= array.length) {
+                return null;
+            }
+
+            return array[k];
         }
     }
 
@@ -42,10 +68,10 @@ public abstract class Biome implements BlockID {
     }
 
     public static int getBiomeIdOrCorrect(int biomeId) {
-        if (runtimeId2Identifier.containsKey(biomeId)) {
-            return biomeId;
+        if (runtimeId2Identifier.get(biomeId) == null) {
+            return EnumBiome.OCEAN.id;
         }
-        return EnumBiome.OCEAN.id;
+        return biomeId;
     }
 
     protected static void register(int id, Biome biome) {
@@ -107,7 +133,7 @@ public abstract class Biome implements BlockID {
         this.baseHeight = baseHeight;
     }
 
-    public void setHeightVariation(float heightVariation)   {
+    public void setHeightVariation(float heightVariation) {
         this.heightVariation = heightVariation;
     }
 
@@ -145,7 +171,7 @@ public abstract class Biome implements BlockID {
      *
      * @return overhang
      */
-    public boolean doesOverhang()   {
+    public boolean doesOverhang() {
         return false;
     }
 
@@ -156,7 +182,7 @@ public abstract class Biome implements BlockID {
      * @param z z
      * @return height offset
      */
-    public int getHeightOffset(int x, int z)    {
+    public int getHeightOffset(int x, int z) {
         return 0;
     }
 

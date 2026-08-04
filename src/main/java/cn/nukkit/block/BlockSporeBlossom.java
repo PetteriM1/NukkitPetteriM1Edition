@@ -5,6 +5,8 @@ import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockSporeBlossom extends BlockTransparent {
 
@@ -75,5 +77,20 @@ public class BlockSporeBlossom extends BlockTransparent {
             this.getLevel().scheduleUpdate(this, 1);
         }
         return type;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_17_0;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.DOUBLE_PLANT;
+    }
+
+    @Override
+    public int getAlternateMeta(int protocol) {
+        return BlockDoublePlant.LILAC ^ BlockDoublePlant.TOP_HALF_BITMASK;
     }
 }

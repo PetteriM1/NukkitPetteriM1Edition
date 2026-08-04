@@ -1,5 +1,7 @@
 package cn.nukkit.item;
 
+import cn.nukkit.network.protocol.ProtocolInfo;
+
 public class ItemNautilusShell extends Item {
 
     public ItemNautilusShell() {
@@ -12,6 +14,11 @@ public class ItemNautilusShell extends Item {
 
     public ItemNautilusShell(Integer meta, int count) {
         super(NAUTILUS_SHELL, meta, count, "Nautilus Shell");
+    }
+
+    @Override
+    public boolean isSupportedOn(int protocol) {
+        return protocol >= ProtocolInfo.v1_4_0;
     }
 
     @Override

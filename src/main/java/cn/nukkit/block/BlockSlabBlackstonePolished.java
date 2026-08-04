@@ -52,7 +52,7 @@ public class BlockSlabBlackstonePolished extends BlockSlab {
     @Override
     public Item[] getDrops(Item item) {
         if (item.isPickaxe()) {
-            return new Item[]{ this.toItem() };
+            return new Item[]{this.toItem()};
         }
         return new Item[0];
     }

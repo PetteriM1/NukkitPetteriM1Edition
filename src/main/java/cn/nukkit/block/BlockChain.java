@@ -4,6 +4,8 @@ import cn.nukkit.Player;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockChain extends BlockTransparentMeta {
 
@@ -108,5 +110,15 @@ public class BlockChain extends BlockTransparentMeta {
     @Override
     public boolean canHarvestWithHand() {
         return false;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_16_0;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.GLASS_PANE;
     }
 }

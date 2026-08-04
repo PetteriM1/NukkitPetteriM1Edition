@@ -10,6 +10,24 @@ import static java.lang.Math.PI;
  */
 public final class Angle implements Comparable<Angle> {
 
+    private final float floatValue;
+    private final double doubleValue;
+    private final boolean isDegree, isOriginDouble;
+
+    private Angle(float floatValue, boolean isDegree) {
+        this.isOriginDouble = false;
+        this.floatValue = floatValue;
+        this.doubleValue = 0.0;
+        this.isDegree = isDegree;
+    }
+
+    private Angle(double doubleValue, boolean isDegree) {
+        this.isOriginDouble = true;
+        this.floatValue = 0.0f;
+        this.doubleValue = doubleValue;
+        this.isDegree = isDegree;
+    }
+
     public static Angle fromDegree(float floatDegree) {
         return new Angle(floatDegree, true);
     }
@@ -57,7 +75,7 @@ public final class Angle implements Comparable<Angle> {
         } else {
             if (isDegree) return floatValue * (float) PI / 180.0f;
             else return floatValue;
-    }
+        }
     }
 
     public double asDoubleRadian() {
@@ -67,7 +85,7 @@ public final class Angle implements Comparable<Angle> {
         } else {
             if (isDegree) return floatValue * PI / 180.0;
             else return floatValue;
-    }
+        }
     }
 
     public float asFloatDegree() {
@@ -77,7 +95,7 @@ public final class Angle implements Comparable<Angle> {
         } else {
             if (isDegree) return floatValue;
             else return floatValue * 180.0f / (float) PI;
-    }
+        }
     }
 
     public double asDoubleDegree() {
@@ -87,14 +105,12 @@ public final class Angle implements Comparable<Angle> {
         } else {
             if (isDegree) return floatValue;
             else return floatValue * 180.0 / PI;
-    }
+        }
     }
 
     public static int compare(Angle a, Angle b) {
         return a.compareTo(b);
     }
-
-  /* -- Override -- */
 
     @Override
     public String toString() {
@@ -127,25 +143,5 @@ public final class Angle implements Comparable<Angle> {
         else hash = Float.hashCode(floatValue);
         if (isDegree) hash = hash ^ 0xABCD1234;
         return hash;
-    }
-
-  /* -- Internal Part -- */
-
-    private final float floatValue;
-    private final double doubleValue;
-    private final boolean isDegree, isOriginDouble;
-
-    private Angle(float floatValue, boolean isDegree) {
-        this.isOriginDouble = false;
-        this.floatValue = floatValue;
-        this.doubleValue = 0.0;
-        this.isDegree = isDegree;
-    }
-
-    private Angle(double doubleValue, boolean isDegree) {
-        this.isOriginDouble = true;
-        this.floatValue = 0.0f;
-        this.doubleValue = doubleValue;
-        this.isDegree = isDegree;
     }
 }

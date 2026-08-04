@@ -11,6 +11,7 @@ import cn.nukkit.level.format.Chunk;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.IntTag;
+import cn.nukkit.network.protocol.ProtocolInfo;
 
 public class BlockEntityLectern extends BlockEntitySpawnable {
 
@@ -35,7 +36,19 @@ public class BlockEntityLectern extends BlockEntitySpawnable {
     }
 
     @Override
+    public void spawnTo(Player player) {
+        if (!this.closed) {
+            player.dataPacket(this.createSpawnPacket(player.protocol));
+        }
+    }
+
+    @Override
     public CompoundTag getSpawnCompound() {
+        return this.getSpawnCompound(ProtocolInfo.CURRENT_PROTOCOL);
+    }
+
+    @Override
+    public CompoundTag getSpawnCompound(int protocol) {
         CompoundTag c = new CompoundTag()
                 .putString("id", BlockEntity.LECTERN)
                 .putInt("x", (int) this.x)
@@ -44,7 +57,7 @@ public class BlockEntityLectern extends BlockEntitySpawnable {
 
         Item book = getBook();
         if (book.getId() != BlockID.AIR) {
-            c.putCompound("book", NBTIO.putItemHelper(book));
+            c.putCompound("book", protocol > ProtocolInfo.v1_16_0 ? NBTIO.putNetworkItemHelper(protocol, book) : NBTIO.putItemHelper(book));
             c.putBoolean("hasBook", true);
             c.putInt("page", getRawPage());
             c.putInt("totalPages", totalPages);

@@ -18,21 +18,14 @@ import java.util.function.Consumer;
 public class PlayerAsyncPreLoginEvent extends PlayerEvent {
 
     private static final HandlerList handlers = new HandlerList();
-
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private final String name;
     private final UUID uuid;
     private final LoginChainData chainData;
     private Skin skin;
     private final String address;
     private final int port;
-
     private LoginResult loginResult = LoginResult.SUCCESS;
     private String kickMessage = "Plugin Reason";
-
     private final List<Consumer<Server>> scheduledActions = new ArrayList<>();
 
     public PlayerAsyncPreLoginEvent(String name, UUID uuid, LoginChainData chainData, Skin skin, String address, int port) {
@@ -42,6 +35,15 @@ public class PlayerAsyncPreLoginEvent extends PlayerEvent {
         this.skin = skin;
         this.address = address;
         this.port = port;
+    }
+
+    public enum LoginResult {
+        SUCCESS,
+        KICK
+    }
+
+    public static HandlerList getHandlers() {
+        return handlers;
     }
 
     public String getName() {
@@ -107,10 +109,5 @@ public class PlayerAsyncPreLoginEvent extends PlayerEvent {
     public void disAllow(String message) {
         this.loginResult = LoginResult.KICK;
         this.kickMessage = message;
-    }
-
-    public enum LoginResult {
-        SUCCESS,
-        KICK
     }
 }

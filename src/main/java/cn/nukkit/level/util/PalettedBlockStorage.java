@@ -2,6 +2,7 @@ package cn.nukkit.level.util;
 
 import cn.nukkit.Server;
 import cn.nukkit.level.GlobalBlockPalette;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BinaryStream;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.ints.Int2IntFunction;
@@ -15,12 +16,34 @@ public class PalettedBlockStorage {
     private final IntList palette;
     private BitArray bitArray;
 
+    private PalettedBlockStorage(BitArrayVersion version, int defaultState) {
+        this.bitArray = version.createPalette(SIZE);
+        this.palette = new IntArrayList(16);
+        this.palette.add(defaultState);
+    }
+
+    private PalettedBlockStorage(BitArray bitArray, IntList palette) {
+        this.palette = palette;
+        this.bitArray = bitArray;
+    }
+
     public static PalettedBlockStorage createFromBlockPalette() {
         return createFromBlockPalette(BitArrayVersion.V2);
     }
 
     public static PalettedBlockStorage createFromBlockPalette(BitArrayVersion version) {
-        int runtimeId = GlobalBlockPalette.getOrCreateRuntimeId(0);
+        return createFromBlockPalette(version, 0);
+    }
+
+    public static PalettedBlockStorage createFromBlockPalette(int protocol) {
+        return createFromBlockPalette(BitArrayVersion.V2, protocol);
+    }
+
+    public static PalettedBlockStorage createFromBlockPalette(BitArrayVersion version, int protocol) {
+        int runtimeId = 0;
+        if (protocol >= ProtocolInfo.v1_16_100) {
+            runtimeId = GlobalBlockPalette.getOrCreateRuntimeId(protocol, 0);
+        }
         return new PalettedBlockStorage(version, runtimeId);
     }
 
@@ -34,17 +57,6 @@ public class PalettedBlockStorage {
 
     public static PalettedBlockStorage createFromBitArray(BitArray bitArray, IntList palette) {
         return new PalettedBlockStorage(bitArray, palette);
-    }
-
-    private PalettedBlockStorage(BitArrayVersion version, int defaultState) {
-        this.bitArray = version.createPalette(SIZE);
-        this.palette = new IntArrayList(16);
-        this.palette.add(defaultState);
-    }
-
-    private PalettedBlockStorage(BitArray bitArray, IntList palette) {
-        this.palette = palette;
-        this.bitArray = bitArray;
     }
 
     private int getPaletteHeader(BitArrayVersion version, boolean runtime) {

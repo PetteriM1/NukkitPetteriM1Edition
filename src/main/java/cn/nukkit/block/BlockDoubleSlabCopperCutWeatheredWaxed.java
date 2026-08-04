@@ -1,11 +1,11 @@
 package cn.nukkit.block;
 
 public class BlockDoubleSlabCopperCutWeatheredWaxed extends BlockDoubleSlabCopperCutWeathered {
-    
+
     public BlockDoubleSlabCopperCutWeatheredWaxed() {
         this(0);
     }
-    
+
     public BlockDoubleSlabCopperCutWeatheredWaxed(int meta) {
         super(meta);
     }

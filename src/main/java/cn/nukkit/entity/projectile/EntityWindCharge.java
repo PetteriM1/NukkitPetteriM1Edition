@@ -16,6 +16,16 @@ public class EntityWindCharge extends EntityProjectile {
 
     public static final int NETWORK_ID = 143;
 
+    public EntityWindCharge(FullChunk chunk, CompoundTag nbt) {
+        this(chunk, nbt, null);
+    }
+
+    public EntityWindCharge(FullChunk chunk, CompoundTag nbt, Entity shootingEntity) {
+        super(chunk, nbt, shootingEntity);
+    }
+    private static final double BURST_RADIUS = 3.0;
+    private static final double BURST_POWER = 1.1;
+
     @Override
     public int getNetworkId() {
         return NETWORK_ID;
@@ -46,14 +56,6 @@ public class EntityWindCharge extends EntityProjectile {
         return 0.01f;
     }
 
-    public EntityWindCharge(FullChunk chunk, CompoundTag nbt) {
-        this(chunk, nbt, null);
-    }
-
-    public EntityWindCharge(FullChunk chunk, CompoundTag nbt, Entity shootingEntity) {
-        super(chunk, nbt, shootingEntity);
-    }
-
     @Override
     public boolean onUpdate(int currentTick) {
         if (this.closed) {
@@ -68,9 +70,6 @@ public class EntityWindCharge extends EntityProjectile {
         super.onUpdate(currentTick);
         return !this.closed;
     }
-
-    private static final double BURST_RADIUS = 3.0;
-    private static final double BURST_POWER = 1.1;
 
     @Override
     public void onHit() {

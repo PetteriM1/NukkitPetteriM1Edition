@@ -10,6 +10,8 @@ import cn.nukkit.item.ItemTool;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.utils.material.BlockType;
 
 import java.util.EnumSet;
 import java.util.Set;
@@ -55,11 +57,6 @@ public class BlockSculkVein extends BlockTransparentMeta implements BlockPropert
     }
 
     @Override
-    public double getResistance() {
-        return 0.2;
-    }
-
-    @Override
     public boolean canHarvestWithHand() {
         return false;
     }
@@ -72,6 +69,16 @@ public class BlockSculkVein extends BlockTransparentMeta implements BlockPropert
             };
         }
         return new Item[0];
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_19_0;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.AIR;
     }
 
     @Override

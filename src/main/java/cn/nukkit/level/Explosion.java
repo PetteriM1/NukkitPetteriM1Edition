@@ -51,7 +51,9 @@ public class Explosion {
     private final Object what;
     private boolean doesDamage = true;
     private double minHeight = Integer.MIN_VALUE;
+    private double maxResistance = Integer.MAX_VALUE;
     private double fireSpawnChance;
+    private boolean breakObsidian;
 
     public Explosion(Position center, double size, Entity what) {
         this.level = center.getLevel();
@@ -70,7 +72,6 @@ public class Explosion {
     /**
      * @return bool
      */
-    @Deprecated
     public boolean explode() {
         if (explodeA()) {
             return explodeB();
@@ -87,6 +88,7 @@ public class Explosion {
             return true;
         }
         if (this.size < 0.1) return false;
+        if (!level.getServer().explosionBreakBlocks) return true;
 
         Vector3 vector = new Vector3(0, 0, 0);
         Vector3 vBlock = new Vector3(0, 0, 0);
@@ -117,8 +119,9 @@ public class Explosion {
 
                             Block block = this.level.getBlock(vBlock);
                             if (block.getId() != Block.AIR) {
-                                blastForce -= (block.getResistance() / 5 + 0.3d) * stepLen;
-                                if (blastForce > 0 && block.y >= this.minHeight) {
+                                double resistance = this.breakObsidian && (block.getId() == Block.OBSIDIAN || block.getId() == Block.CRYING_OBSIDIAN || block.getId() == Block.ANCIENT_DEBRIS) ? 30 : block.getResistance();
+                                blastForce -= (resistance / 5 + 0.3d) * stepLen;
+                                if (blastForce > 0 && block.y >= this.minHeight && block.getResistance() <= this.maxResistance) {
                                     if (!this.affectedBlocks.contains(block)) {
                                         this.affectedBlocks.add(block);
                                     }
@@ -274,6 +277,7 @@ public class Explosion {
                         ev.getBlock().onUpdate(Level.BLOCK_UPDATE_NORMAL);
                     }
                     updateBlocks.add(index);
+                    level.antiXrayOnBlockChange(null, block, null, 0);
                 }
             }
         }
@@ -383,13 +387,13 @@ public class Explosion {
         Vector3 current = new Vector3(start.x, start.y, start.z);
         Vector3 direction = end.subtract(start).normalize();
 
-        double stepX = sign(direction.getX());
-        double stepY = sign(direction.getY());
-        double stepZ = sign(direction.getZ());
+        double stepX = NukkitMath.sign(direction.getX());
+        double stepY = NukkitMath.sign(direction.getY());
+        double stepZ = NukkitMath.sign(direction.getZ());
 
-        double tMaxX = boundary(start.getX(), direction.getX());
-        double tMaxY = boundary(start.getY(), direction.getY());
-        double tMaxZ = boundary(start.getZ(), direction.getZ());
+        double tMaxX = NukkitMath.boundary(start.getX(), direction.getX());
+        double tMaxY = NukkitMath.boundary(start.getY(), direction.getY());
+        double tMaxZ = NukkitMath.boundary(start.getZ(), direction.getZ());
 
         double tDeltaX = direction.getX() == 0 ? 0 : stepX / direction.getX();
         double tDeltaY = direction.getY() == 0 ? 0 : stepY / direction.getY();
@@ -431,37 +435,9 @@ public class Explosion {
         return false;
     }
 
-    private static double sign(double d) {
-        if (d > 0) {
-            return 1;
-        }
-
-        if (d < 0) {
-            return -1;
-        }
-
-        return 0;
-    }
-
-    private static double boundary(double start, double distance) {
-        if (distance == 0) {
-            return Double.POSITIVE_INFINITY;
-        }
-
-        if (distance < 0) {
-            start = -start;
-            distance = -distance;
-
-            if (Math.floor(start) == start) {
-                return 0;
-            }
-        }
-
-        return (1 - (start - Math.floor(start))) / distance;
-    }
-
     /**
      * Set minimum height at which the explosion can break blocks
+     *
      * @param minHeight min y coordinate
      */
     public void setMinHeight(double minHeight) {
@@ -469,10 +445,29 @@ public class Explosion {
     }
 
     /**
+     * Set maximum resistance for affected blocks which the explosion can break blocks
+     *
+     * @param maxResistance max resistance for affected blocks
+     */
+    public void setMaxResistance(double maxResistance) {
+        this.maxResistance = maxResistance;
+    }
+
+    /**
      * Set chance for fire to be spawned
+     *
      * @param fireSpawnChance 0.0 - 1.0
      */
     public void setFireSpawnChance(double fireSpawnChance) {
         this.fireSpawnChance = fireSpawnChance;
+    }
+
+    /**
+     * Set can break obsidian
+     *
+     * @param breakObsidian can break obsidian
+     */
+    public void setBreakObsidian(boolean breakObsidian) {
+        this.breakObsidian = breakObsidian;
     }
 }

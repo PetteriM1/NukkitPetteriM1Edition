@@ -11,7 +11,6 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.nbt.tag.StringTag;
 import cn.nukkit.network.protocol.AddPlayerPacket;
-import cn.nukkit.network.protocol.MobArmorEquipmentPacket;
 import cn.nukkit.network.protocol.PlayerListPacket;
 import cn.nukkit.network.protocol.SetEntityLinkPacket;
 import cn.nukkit.utils.*;
@@ -40,6 +39,10 @@ public class EntityHuman extends EntityHumanType {
 
     protected Skin skin;
 
+    public EntityHuman(FullChunk chunk, CompoundTag nbt) {
+        super(chunk, nbt);
+    }
+
     @Override
     public float getWidth() {
         return 0.6f;
@@ -52,7 +55,7 @@ public class EntityHuman extends EntityHumanType {
 
     @Override
     public float getHeight() {
-        return isSwimming() || isGliding() || isCrawling() ? 0.6f : isSneaking() ? 1.5f : 1.8f;
+        return isSwimming() || isGliding() || isCrawling() ? 0.6f : isShortSneaking() ? 1.5f : 1.8f;
     }
 
     @Override
@@ -62,7 +65,7 @@ public class EntityHuman extends EntityHumanType {
 
     @Override
     public float getEyeHeight() {
-        return isSwimming() || isGliding() || isCrawling() ? 0.42f : isSneaking() ? 1.26f : 1.62f;
+        return isSwimming() || isGliding() || isCrawling() ? 0.42f : isShortSneaking() ? 1.26f : 1.62f;
     }
 
     @Override
@@ -73,10 +76,6 @@ public class EntityHuman extends EntityHumanType {
     @Override
     public int getNetworkId() {
         return -1;
-    }
-
-    public EntityHuman(FullChunk chunk, CompoundTag nbt) {
-        super(chunk, nbt);
     }
 
     public Skin getSkin() {
@@ -175,8 +174,8 @@ public class EntityHuman extends EntityHumanType {
                     for (CompoundTag piece : pieces.getAll()) {
                         newSkin.getPersonaPieces().add(new PersonaPiece(
                                 piece.getString("PieceId"),
-                                piece.getString("PieceType"),
-                                piece.getString("PackId"),
+                                PersonaPieceType.fromName(piece.getString("PieceType")),
+                                UUID.fromString(piece.getString("PackId")),
                                 piece.getBoolean("IsDefault"),
                                 piece.getString("ProductId")
                         ));
@@ -254,8 +253,8 @@ public class EntityHuman extends EntityHumanType {
                 ListTag<CompoundTag> piecesTag = new ListTag<>("PersonaPieces");
                 for (PersonaPiece piece : personaPieces) {
                     piecesTag.add(new CompoundTag().putString("PieceId", piece.id)
-                            .putString("PieceType", piece.type)
-                            .putString("PackId", piece.packId)
+                            .putString("PieceType", piece.type.getSerializeName())
+                            .putString("PackId", piece.packId.toString())
                             .putBoolean("IsDefault", piece.isDefault)
                             .putString("ProductId", piece.productId));
                 }
@@ -266,9 +265,9 @@ public class EntityHuman extends EntityHumanType {
                 ListTag<CompoundTag> tintsTag = new ListTag<>("PieceTintColors");
                 for (PersonaPieceTint tint : tints) {
                     ListTag<StringTag> colors = new ListTag<>("Colors");
-                    colors.setAll(tint.colors.stream().map(s -> new StringTag("", s)).collect(Collectors.toList()));
+                    colors.setAll(tint.getColors().stream().map(s -> new StringTag("", s)).collect(Collectors.toList()));
                     tintsTag.add(new CompoundTag()
-                            .putString("PieceType", tint.pieceType)
+                            .putString("PieceType", tint.getPieceType().getSerializeName())
                             .putList(colors));
                 }
             }
@@ -291,7 +290,7 @@ public class EntityHuman extends EntityHumanType {
         if (this != player && !this.hasSpawned.containsKey(player.getLoaderId())) {
             this.hasSpawned.put(player.getLoaderId(), player);
 
-            if (!this.getSkin().isValid()) {
+            if (!this.getSkin().isValid(this.server.doNotLimitSkinGeometry)) {
                 throw new IllegalStateException(this.getClass().getSimpleName() + " must have a valid skin set");
             }
 
@@ -323,13 +322,7 @@ public class EntityHuman extends EntityHumanType {
             if (this instanceof Player) {
                 this.inventory.sendArmorContents(player);
             } else {
-                Item[] armor = this.inventory.getArmorContents();
-                if (armor[0].getId() != 0 || armor[1].getId() != 0 || armor[2].getId() != 0 || armor[3].getId() != 0) {
-                    MobArmorEquipmentPacket pk2 = new MobArmorEquipmentPacket();
-                    pk2.eid = this.getId();
-                    pk2.slots = armor;
-                    player.dataPacket(pk2);
-                }
+                this.inventory.sendArmorContentsIfNotAr(player);
             }
             this.offhandInventory.sendContents(player);
 

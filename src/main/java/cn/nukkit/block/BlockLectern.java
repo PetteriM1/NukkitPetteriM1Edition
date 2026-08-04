@@ -14,6 +14,7 @@ import cn.nukkit.math.NukkitMath;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.ContainerOpenPacket;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
 import cn.nukkit.utils.Faceable;
 
@@ -47,7 +48,7 @@ public class BlockLectern extends BlockTransparentMeta implements Faceable {
     }
 
     public double getHardness() {
-        return 2.5;
+        return 2; // 2.5
     }
 
     public double getResistance() {
@@ -123,7 +124,8 @@ public class BlockLectern extends BlockTransparentMeta implements Faceable {
                 return false;
             }
 
-            BlockEntityLectern lectern = (BlockEntityLectern) t;;
+            BlockEntityLectern lectern = (BlockEntityLectern) t;
+            ;
             Item currentBook = lectern.getBook();
             if (currentBook.getId() == BlockID.AIR) {
                 if (item.getId() == ItemID.WRITTEN_BOOK || item.getId() == ItemID.BOOK_AND_QUILL) {
@@ -136,7 +138,7 @@ public class BlockLectern extends BlockTransparentMeta implements Faceable {
                     lectern.spawnToAll();
                     this.level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_ITEM_BOOK_PUT);
                 }
-            } else {
+            } else if (player.protocol >= ProtocolInfo.v1_20_60) {
                 ContainerOpenPacket pk = new ContainerOpenPacket();
                 pk.windowId = -1;
                 pk.type = InventoryType.LECTERN.getNetworkType();

@@ -29,100 +29,6 @@ public class BlockNetherPortal extends BlockFlowable implements Faceable {
         super(0);
     }
 
-    @Override
-    public String getName() {
-        return "Nether Portal Block";
-    }
-
-    @Override
-    public int getId() {
-        return NETHER_PORTAL;
-    }
-
-    @Override
-    public boolean isBreakable(Item item) {
-        return false;
-    }
-
-    @Override
-    public double getHardness() {
-        return -1;
-    }
-
-    @Override
-    public int getLightLevel() {
-        return 11;
-    }
-
-    @Override
-    public Item toItem() {
-        return new ItemBlock(Block.get(BlockID.AIR));
-    }
-
-    @Override
-    public boolean canBeFlowedInto() {
-        return false;
-    }
-
-    @Override
-    public boolean onBreak(Item item) {
-        boolean result = super.onBreak(item);
-        for (BlockFace face : BlockFace.values()) {
-            Block b = this.getSide(face);
-            if (b instanceof BlockNetherPortal) {
-                result &= b.onBreak(item);
-            }
-        }
-        return result;
-    }
-
-    @Override
-    public boolean hasEntityCollision() {
-        return true;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.AIR_BLOCK_COLOR;
-    }
-
-    @Override
-    public boolean canBePushed() {
-        return false;
-    }
-
-    @Override
-    public boolean canHarvestWithHand() {
-        return false;
-    }
-
-    public static boolean trySpawnPortal(Level level, Vector3 pos) {
-        return trySpawnPortal(level, pos, false);
-    }
-
-    @Override
-    protected AxisAlignedBB recalculateBoundingBox() {
-        return this;
-    }
-
-    public static boolean trySpawnPortal(Level level, Vector3 pos, boolean force) {
-        PortalBuilder builder = new PortalBuilder(level, pos, Axis.X, force);
-
-        if (builder.isValid() && builder.portalBlockCount == 0) {
-            builder.placePortalBlocks();
-            return true;
-        } else {
-            builder = new PortalBuilder(level, pos, Axis.Z, force);
-
-            if (builder.isValid() && builder.portalBlockCount == 0) {
-                builder.placePortalBlocks();
-                return true;
-            } else {
-                return false;
-            }
-        }
-    }
-
     public static class PortalBuilder {
 
         private final Level level;
@@ -260,6 +166,100 @@ public class BlockNetherPortal extends BlockFlowable implements Faceable {
                 for (int j = 0; j < this.height; ++j) {
                     this.level.setBlock(blockpos.up(j), Block.get(NETHER_PORTAL, this.axis == Axis.X ? 1 : this.axis == Axis.Z ? 2 : 0));
                 }
+            }
+        }
+    }
+
+    @Override
+    public String getName() {
+        return "Nether Portal Block";
+    }
+
+    @Override
+    public int getId() {
+        return NETHER_PORTAL;
+    }
+
+    @Override
+    public boolean isBreakable(Item item) {
+        return false;
+    }
+
+    @Override
+    public double getHardness() {
+        return -1;
+    }
+
+    @Override
+    public int getLightLevel() {
+        return 11;
+    }
+
+    @Override
+    public Item toItem() {
+        return new ItemBlock(Block.get(BlockID.AIR));
+    }
+
+    @Override
+    public boolean canBeFlowedInto() {
+        return false;
+    }
+
+    @Override
+    public boolean onBreak(Item item) {
+        boolean result = super.onBreak(item);
+        for (BlockFace face : BlockFace.values()) {
+            Block b = this.getSide(face);
+            if (b instanceof BlockNetherPortal) {
+                result &= b.onBreak(item);
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public boolean hasEntityCollision() {
+        return true;
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.AIR_BLOCK_COLOR;
+    }
+
+    @Override
+    public boolean canBePushed() {
+        return false;
+    }
+
+    @Override
+    public boolean canHarvestWithHand() {
+        return false;
+    }
+
+    public static boolean trySpawnPortal(Level level, Vector3 pos) {
+        return trySpawnPortal(level, pos, false);
+    }
+
+    @Override
+    protected AxisAlignedBB recalculateBoundingBox() {
+        return this;
+    }
+
+    public static boolean trySpawnPortal(Level level, Vector3 pos, boolean force) {
+        PortalBuilder builder = new PortalBuilder(level, pos, Axis.X, force);
+
+        if (builder.isValid() && builder.portalBlockCount == 0) {
+            builder.placePortalBlocks();
+            return true;
+        } else {
+            builder = new PortalBuilder(level, pos, Axis.Z, force);
+
+            if (builder.isValid() && builder.portalBlockCount == 0) {
+                builder.placePortalBlocks();
+                return true;
+            } else {
+                return false;
             }
         }
     }

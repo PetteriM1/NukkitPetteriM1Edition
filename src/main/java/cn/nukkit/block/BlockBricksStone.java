@@ -21,6 +21,12 @@ public class BlockBricksStone extends BlockSolidMeta {
     public BlockBricksStone(int meta) {
         super(meta);
     }
+    private static final String[] names = {
+            "Stone Bricks",
+            "Mossy Stone Bricks",
+            "Cracked Stone Bricks",
+            "Chiseled Stone Bricks"
+    };
 
     @Override
     public int getId() {
@@ -37,16 +43,9 @@ public class BlockBricksStone extends BlockSolidMeta {
         return 30;
     }
 
-    private static final String[] NAMES = {
-            "Stone Bricks",
-            "Mossy Stone Bricks",
-            "Cracked Stone Bricks",
-            "Chiseled Stone Bricks"
-    };
-
     @Override
     public String getName() {
-        return NAMES[this.getDamage() & 0x03];
+        return names[this.getDamage() & 0x03];
     }
 
     @Override

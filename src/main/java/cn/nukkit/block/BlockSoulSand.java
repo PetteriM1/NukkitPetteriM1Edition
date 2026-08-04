@@ -29,7 +29,7 @@ public class BlockSoulSand extends BlockSolid {
 
     @Override
     public double getResistance() {
-        return 0.5;
+        return 2.5;
     }
 
     @Override

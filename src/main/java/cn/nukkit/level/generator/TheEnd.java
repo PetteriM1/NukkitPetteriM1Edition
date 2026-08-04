@@ -26,15 +26,15 @@ public class TheEnd extends Generator {
     private static final int STEP_X = 4;
     private static final int STEP_Y = 8;
     private static final int STEP_Z = STEP_X;
-    private static final int SAMPLES_X = 16 / STEP_X;
-    private static final int SAMPLES_Y = 256 / STEP_Y;
     private static final int SAMPLES_Z = 16 / STEP_Z;
-    private static final int CACHE_X = SAMPLES_X + 1;
-    private static final int CACHE_Y = SAMPLES_Y + 1;
     private static final int CACHE_Z = SAMPLES_Z + 1;
+    private static final double SCALE_Z = 1.0d / STEP_Z;
+    private static final int SAMPLES_X = 16 / STEP_X;
+    private static final int CACHE_X = SAMPLES_X + 1;
+    private static final int SAMPLES_Y = 256 / STEP_Y;
+    private static final int CACHE_Y = SAMPLES_Y + 1;
     private static final double SCALE_X = 1.0d / STEP_X;
     private static final double SCALE_Y = 1.0d / STEP_Y;
-    private static final double SCALE_Z = 1.0d / STEP_Z;
     private static final double NOISE_SCALE_FACTOR = ((1 << 16) - 1.0d) / 512.0d;
     private static final Ref<ThreadData> THREAD_DATA_CACHE = ThreadRef.soft(ThreadData::new);
     private static final double maxHeightCutoff = 56.0;
@@ -50,6 +50,68 @@ public class TheEnd extends Generator {
     }
 
     public TheEnd(Map<String, Object> options) {
+    }
+
+    private static final class ThreadData {
+        private double[] densityCache;
+    }
+
+    private static class IslandCache {
+
+        private static final long NaN = Double.doubleToRawLongBits(Double.NaN);
+
+        private final Ref<Long2LongLinkedOpenHashMap> cacheCache = ThreadRef.soft(Long2LongLinkedOpenHashMap::new);
+        private NoiseSource island;
+        private NoiseSource weight;
+
+        private double get(int x, int z) {
+            Long2LongLinkedOpenHashMap cache = this.cacheCache.get();
+            long val = cache.getOrDefault(Level.chunkHash(x, z), NaN);
+            if (val == NaN) {
+                if (cache.size() >= 1024) {
+                    cache.removeFirstLong();
+                }
+
+                cache.put(Level.chunkHash(x, z), val = Double.doubleToRawLongBits(this.computeValue(x, z)));
+            }
+            return Double.longBitsToDouble(val);
+        }
+
+        private void init(PRandom random) {
+            this.island = new ScaleOctavesOffsetFilter(new SimplexNoiseEngine(PRandom.wrap(new Random(random.nextLong()))), 1, 1, 1, 1, 1, 0);
+            this.weight = new ScaleOctavesOffsetFilter(new SimplexNoiseEngine(PRandom.wrap(new Random(random.nextLong()))), 1, 1, 1, 1, 6.5, 15.5);
+        }
+
+        private double computeValue(int x, int z) {
+            final double islandRadius = 100.0;
+            final double outerIslandStartRadiusSq = (1024.0 / 16.0d) * (1024.0 / 16.0d);
+            final double outerIslandSeedThreshold = -0.8;
+
+            final double chunkX = x >> 4;
+            final double chunkZ = z >> 4;
+            final double tileX = (x & 0xF) * 0.125d;
+            final double tileZ = (z & 0xF) * 0.125d;
+
+            double val = islandRadius - Math.sqrt((x * 0.125d) * (x * 0.125d) + (z * 0.125d) * (z * 0.125d)) * 8.0d;
+
+            for (int dx = -12; dx <= 12; dx++) {
+                for (int dz = -12; dz <= 12; dz++) {
+                    double islandX = chunkX + dx;
+                    double islandZ = chunkZ + dz;
+
+                    if (islandX * islandX + islandZ * islandZ > outerIslandStartRadiusSq && this.island.get(islandX, islandZ) < outerIslandSeedThreshold) {
+                        double weight = this.weight.get(islandX, islandZ);
+
+                        double offsetX = tileX - dx * 2.0d;
+                        double offsetZ = tileZ - dz * 2.0d;
+
+                        val = Math.max(val, islandRadius - Math.sqrt(offsetX * offsetX + offsetZ * offsetZ) * weight);
+                    }
+                }
+            }
+
+            return NukkitMath.clamp(val, -100.0d, 80.0d);
+        }
     }
 
     @Override
@@ -208,68 +270,5 @@ public class TheEnd extends Generator {
 
     public Vector3 getSpawn() {
         return new Vector3(100.5, 49, 0.5);
-    }
-
-    private static final class ThreadData {
-        private double[] densityCache;
-    }
-
-    private static class IslandCache {
-
-        private static final long NaN = Double.doubleToRawLongBits(Double.NaN);
-
-        private final Ref<Long2LongLinkedOpenHashMap> cacheCache = ThreadRef.soft(Long2LongLinkedOpenHashMap::new);
-
-        private double get(int x, int z) {
-            Long2LongLinkedOpenHashMap cache = this.cacheCache.get();
-            long val = cache.getOrDefault(Level.chunkHash(x, z), NaN);
-            if (val == NaN) {
-                if (cache.size() >= 1024) {
-                    cache.removeFirstLong();
-                }
-
-                cache.put(Level.chunkHash(x, z), val = Double.doubleToRawLongBits(this.computeValue(x, z)));
-            }
-            return Double.longBitsToDouble(val);
-        }
-
-        private NoiseSource island;
-        private NoiseSource weight;
-
-        private void init(PRandom random) {
-            this.island = new ScaleOctavesOffsetFilter(new SimplexNoiseEngine(PRandom.wrap(new Random(random.nextLong()))), 1, 1, 1, 1, 1, 0);
-            this.weight = new ScaleOctavesOffsetFilter(new SimplexNoiseEngine(PRandom.wrap(new Random(random.nextLong()))), 1, 1, 1, 1, 6.5, 15.5);
-        }
-
-        private double computeValue(int x, int z) {
-            final double islandRadius = 100.0;
-            final double outerIslandStartRadiusSq = (1024.0 / 16.0d) * (1024.0 / 16.0d);
-            final double outerIslandSeedThreshold = -0.8;
-
-            final double chunkX = x >> 4;
-            final double chunkZ = z >> 4;
-            final double tileX = (x & 0xF) * 0.125d;
-            final double tileZ = (z & 0xF) * 0.125d;
-
-            double val = islandRadius - Math.sqrt((x * 0.125d) * (x * 0.125d) + (z * 0.125d) * (z * 0.125d)) * 8.0d;
-
-            for (int dx = -12; dx <= 12; dx++) {
-                for (int dz = -12; dz <= 12; dz++) {
-                    double islandX = chunkX + dx;
-                    double islandZ = chunkZ + dz;
-
-                    if (islandX * islandX + islandZ * islandZ > outerIslandStartRadiusSq && this.island.get(islandX, islandZ) < outerIslandSeedThreshold) {
-                        double weight = this.weight.get(islandX, islandZ);
-
-                        double offsetX = tileX - dx * 2.0d;
-                        double offsetZ = tileZ - dz * 2.0d;
-
-                        val = Math.max(val, islandRadius - Math.sqrt(offsetX * offsetX + offsetZ * offsetZ) * weight);
-                    }
-                }
-            }
-
-            return NukkitMath.clamp(val, -100.0d, 80.0d);
-        }
     }
 }

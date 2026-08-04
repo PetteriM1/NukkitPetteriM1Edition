@@ -43,6 +43,7 @@ public class Normal extends Generator {
         }
     }
 
+    private final boolean legacy;
     private final int version;
     private List<Populator> populators = Collections.emptyList();
     private List<Populator> generationPopulators = Collections.emptyList();
@@ -67,6 +68,7 @@ public class Normal extends Generator {
     }
 
     public Normal(Map<String, Object> options) {
+        this.legacy = !options.containsKey("__LevelDB");
         this.version = (int) options.getOrDefault("__Version", 0);
     }
 
@@ -117,26 +119,48 @@ public class Normal extends Generator {
                 new PopulatorGroundCover()
         );
 
-        this.populators = ImmutableList.of(
-                new PopulatorOre(STONE, new OreType[]{
-                        new OreType(Block.get(BlockID.COAL_ORE), 20, 17, 0, 131),
-                        new OreType(Block.get(BlockID.COPPER_ORE), 20, 9, 0, 192),
-                        new OreType(Block.get(BlockID.IRON_ORE), 20, 9, 0, 63),
-                        new OreType(Block.get(BlockID.REDSTONE_ORE), 8, 8, 0, 15),
-                        new OreType(Block.get(BlockID.LAPIS_ORE), 1, 7, 0, 33),
-                        new OreType(Block.get(BlockID.GOLD_ORE), 2, 9, 0, 33),
-                        new OreType(Block.get(BlockID.DIAMOND_ORE), 1, 8, 0, 15),
-                        new OreType(Block.get(BlockID.DIRT), 10, 33, 0, 128),
-                        new OreType(Block.get(BlockID.GRAVEL), 8, 33, 0, 128),
-                        new OreType(Block.get(BlockID.STONE, BlockStone.GRANITE), 10, 33, 0, 80),
-                        new OreType(Block.get(BlockID.STONE, BlockStone.DIORITE), 10, 33, 0, 80),
-                        new OreType(Block.get(BlockID.STONE, BlockStone.ANDESITE), 10, 33, 0, 80)
-                }),
-                new PopulatorCaves(),
-                new WaterIcePopulator(), // Populate water ice here to avoid sharp corners when the chunk is not fully on a freezing biome
-                new PopulatorSpring(BlockID.WATER, BlockID.STONE, 15, 8, 255),
-                new PopulatorSpring(BlockID.LAVA, BlockID.STONE, 10, 16, 255)
-        );
+        if (this.legacy) {
+            this.populators = ImmutableList.of(
+                    new PopulatorOre(STONE, new OreType[]{
+                            new OreType(Block.get(BlockID.COAL_ORE), 20, 17, 0, 127),
+                            new OreType(Block.get(BlockID.IRON_ORE), 20, 9, 0, 63),
+                            new OreType(Block.get(BlockID.REDSTONE_ORE), 8, 8, 0, 15),
+                            new OreType(Block.get(BlockID.LAPIS_ORE), 1, 7, 0, 33),
+                            new OreType(Block.get(BlockID.GOLD_ORE), 2, 9, 0, 33),
+                            new OreType(Block.get(BlockID.DIAMOND_ORE), 1, 8, 0, 15),
+                            new OreType(Block.get(BlockID.DIRT), 10, 33, 0, 128),
+                            new OreType(Block.get(BlockID.GRAVEL), 8, 33, 0, 128),
+                            new OreType(Block.get(BlockID.STONE, BlockStone.GRANITE), 10, 33, 0, 80),
+                            new OreType(Block.get(BlockID.STONE, BlockStone.DIORITE), 10, 33, 0, 80),
+                            new OreType(Block.get(BlockID.STONE, BlockStone.ANDESITE), 10, 33, 0, 80)
+                    }),
+                    new PopulatorCaves(),
+                    new WaterIcePopulator(), // Populate water ice here to avoid sharp corners when the chunk is not fully on a freezing biome
+                    new PopulatorSpring(BlockID.WATER, BlockID.STONE, 15, 8, 255),
+                    new PopulatorSpring(BlockID.LAVA, BlockID.STONE, 10, 16, 255)
+            );
+        } else {
+            this.populators = ImmutableList.of(
+                    new PopulatorOre(STONE, new OreType[]{
+                            new OreType(Block.get(BlockID.COAL_ORE), 20, 17, 0, 131),
+                            new OreType(Block.get(BlockID.COPPER_ORE), 20, 9, 0, 192),
+                            new OreType(Block.get(BlockID.IRON_ORE), 20, 9, 0, 63),
+                            new OreType(Block.get(BlockID.REDSTONE_ORE), 8, 8, 0, 15),
+                            new OreType(Block.get(BlockID.LAPIS_ORE), 1, 7, 0, 33),
+                            new OreType(Block.get(BlockID.GOLD_ORE), 2, 9, 0, 33),
+                            new OreType(Block.get(BlockID.DIAMOND_ORE), 1, 8, 0, 15),
+                            new OreType(Block.get(BlockID.DIRT), 10, 33, 0, 128),
+                            new OreType(Block.get(BlockID.GRAVEL), 8, 33, 0, 128),
+                            new OreType(Block.get(BlockID.STONE, BlockStone.GRANITE), 10, 33, 0, 80),
+                            new OreType(Block.get(BlockID.STONE, BlockStone.DIORITE), 10, 33, 0, 80),
+                            new OreType(Block.get(BlockID.STONE, BlockStone.ANDESITE), 10, 33, 0, 80)
+                    }),
+                    new PopulatorCaves(),
+                    new WaterIcePopulator(), // Populate water ice here to avoid sharp corners when the chunk is not fully on a freezing biome
+                    new PopulatorSpring(BlockID.WATER, BlockID.STONE, 15, 8, 255),
+                    new PopulatorSpring(BlockID.LAVA, BlockID.STONE, 10, 16, 255)
+            );
+        }
     }
 
     @Override

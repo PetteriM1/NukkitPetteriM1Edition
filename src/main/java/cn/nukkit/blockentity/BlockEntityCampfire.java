@@ -13,6 +13,7 @@ import cn.nukkit.item.ItemBlock;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.network.protocol.ProtocolInfo;
 
 import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
@@ -36,8 +37,8 @@ public class BlockEntityCampfire extends BlockEntitySpawnable implements Invento
         this.keepItem = new boolean[4];
 
         for (int i = 1; i <= burnTime.length; i++) {
-            burnTime[i -1] = namedTag.getInt("ItemTime" + i);
-            keepItem[i -1] = namedTag.getBoolean("KeepItem" + 1);
+            burnTime[i - 1] = namedTag.getInt("ItemTime" + i);
+            keepItem[i - 1] = namedTag.getBoolean("KeepItem" + 1);
 
             if (this.namedTag.contains("Item" + i) && this.namedTag.get("Item" + i) instanceof CompoundTag) {
                 inventory.setItem(i - 1, NBTIO.getItemHelper(this.namedTag.getCompound("Item" + i)));
@@ -127,13 +128,13 @@ public class BlockEntityCampfire extends BlockEntitySpawnable implements Invento
         for (int i = 1; i <= burnTime.length; i++) {
             Item item = inventory.getItem(i - 1);
             if (item == null || item.getId() == BlockID.AIR || item.getCount() <= 0) {
-                namedTag.remove("Item"+i);
+                namedTag.remove("Item" + i);
                 namedTag.putInt("ItemTime" + i, 0);
-                namedTag.remove("KeepItem"+i);
+                namedTag.remove("KeepItem" + i);
             } else {
-                namedTag.putCompound("Item"+i, NBTIO.putItemHelper(item));
+                namedTag.putCompound("Item" + i, NBTIO.putItemHelper(item));
                 namedTag.putInt("ItemTime" + i, burnTime[i - 1]);
-                namedTag.putBoolean("KeepItem"+i, keepItem[i-1]);
+                namedTag.putBoolean("KeepItem" + i, keepItem[i - 1]);
             }
         }
     }
@@ -168,12 +169,17 @@ public class BlockEntityCampfire extends BlockEntitySpawnable implements Invento
     @Override
     public void spawnTo(Player player) {
         if (!this.closed) {
-            player.dataPacket(this.createSpawnPacket());
+            player.dataPacket(this.createSpawnPacket(player.protocol));
         }
     }
 
     @Override
     public CompoundTag getSpawnCompound() {
+        return this.getSpawnCompound(ProtocolInfo.CURRENT_PROTOCOL);
+    }
+
+    @Override
+    public CompoundTag getSpawnCompound(int protocol) {
         CompoundTag c = new CompoundTag()
                 .putString("id", BlockEntity.CAMPFIRE)
                 .putInt("x", (int) this.x)
@@ -183,9 +189,9 @@ public class BlockEntityCampfire extends BlockEntitySpawnable implements Invento
         for (int i = 1; i <= burnTime.length; i++) {
             Item item = inventory.getItem(i - 1);
             if (item == null || item.getId() == BlockID.AIR || item.getCount() <= 0) {
-                c.remove("Item"+i);
+                c.remove("Item" + i);
             } else {
-                c.putCompound("Item"+i, NBTIO.putNetworkItemHelper(item));
+                c.putCompound("Item" + i, protocol > ProtocolInfo.v1_16_0 ? NBTIO.putNetworkItemHelper(protocol, item) : NBTIO.putItemHelper(item));
             }
         }
 
