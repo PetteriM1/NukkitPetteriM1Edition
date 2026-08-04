@@ -19,6 +19,14 @@ public class BookEditPacket extends DataPacket {
     public String author;
     public String xuid;
 
+    public enum Action {
+        REPLACE_PAGE,
+        ADD_PAGE,
+        DELETE_PAGE,
+        SWAP_PAGES,
+        SIGN_BOOK
+    }
+
     @Override
     public byte pid() {
         return NETWORK_ID;
@@ -26,22 +34,40 @@ public class BookEditPacket extends DataPacket {
 
     @Override
     public void decode() {
-        this.inventorySlot = this.getVarInt();
-        this.action = Action.values()[(int) this.getUnsignedVarInt()];
+        if (protocol >= ProtocolInfo.v1_26_0) {
+            this.inventorySlot = this.getVarInt();
+            this.action = Action.values()[(int) this.getUnsignedVarInt()];
+        } else {
+            this.action = Action.values()[this.getByte()];
+            this.inventorySlot = this.getByte();
+        }
 
         switch (this.action) {
             case REPLACE_PAGE:
             case ADD_PAGE:
-                this.pageNumber = this.getVarInt();
+                if (protocol >= ProtocolInfo.v1_26_0) {
+                    this.pageNumber = this.getVarInt();
+                } else {
+                    this.pageNumber = this.getByte();
+                }
                 this.text = this.getString();
                 this.photoName = this.getString();
                 break;
             case DELETE_PAGE:
-                this.pageNumber = this.getVarInt();
+                if (protocol >= ProtocolInfo.v1_26_0) {
+                    this.pageNumber = this.getVarInt();
+                } else {
+                    this.pageNumber = this.getByte();
+                }
                 break;
             case SWAP_PAGES:
-                this.pageNumber = this.getVarInt();
-                this.secondaryPageNumber = this.getVarInt();
+                if (protocol >= ProtocolInfo.v1_26_0) {
+                    this.pageNumber = this.getVarInt();
+                    this.secondaryPageNumber = this.getVarInt();
+                } else {
+                    this.pageNumber = this.getByte();
+                    this.secondaryPageNumber = this.getByte();
+                }
                 break;
             case SIGN_BOOK:
                 this.title = this.getString();
@@ -54,13 +80,5 @@ public class BookEditPacket extends DataPacket {
     @Override
     public void encode() {
         this.encodeUnsupported();
-    }
-
-    public enum Action {
-        REPLACE_PAGE,
-        ADD_PAGE,
-        DELETE_PAGE,
-        SWAP_PAGES,
-        SIGN_BOOK
     }
 }

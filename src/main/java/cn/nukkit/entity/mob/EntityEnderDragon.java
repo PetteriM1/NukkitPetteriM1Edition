@@ -2,7 +2,9 @@ package cn.nukkit.entity.mob;
 
 import cn.nukkit.Player;
 import cn.nukkit.entity.Attribute;
+import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityBoss;
+import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
@@ -13,13 +15,13 @@ public class EntityEnderDragon extends EntityFlyingMob implements EntityBoss {
 
     public static final int NETWORK_ID = 53;
 
+    public EntityEnderDragon(FullChunk chunk, CompoundTag nbt) {
+        super(chunk, nbt);
+    }
+
     @Override
     public int getNetworkId() {
         return NETWORK_ID;
-    }
-
-    public EntityEnderDragon(FullChunk chunk, CompoundTag nbt) {
-        super(chunk, nbt);
     }
 
     @Override
@@ -33,6 +35,11 @@ public class EntityEnderDragon extends EntityFlyingMob implements EntityBoss {
     }
 
     @Override
+    public double getSpeed() {
+        return 3;
+    }
+
+    @Override
     public void initEntity() {
         this.setMaxHealth(200);
         super.initEntity();
@@ -43,7 +50,16 @@ public class EntityEnderDragon extends EntityFlyingMob implements EntityBoss {
 
     @Override
     public int getKillExperience() {
+        for (int i = 0; i < 167; ) {
+            this.level.dropExpOrb(this, 3);
+            i++;
+        }
         return 0;
+    }
+
+    @Override
+    public boolean targetOption(EntityCreature creature, double distance) {
+        return false;
     }
 
     @Override
@@ -72,7 +88,20 @@ public class EntityEnderDragon extends EntityFlyingMob implements EntityBoss {
     }
 
     @Override
+    public void knockBack(Entity attacker, double damage, double x, double z, double base) {
+    }
+
+    @Override
     protected boolean applyNameTag(Player player, Item nameTag) {
         return false;
+    }
+
+    @Override
+    public boolean canDespawn() {
+        return false;
+    }
+
+    @Override
+    public void attackEntity(Entity player) {
     }
 }

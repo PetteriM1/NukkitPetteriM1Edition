@@ -14,9 +14,9 @@ public class SkinAnimation {
     public final int expression;
 
     public SkinAnimation(SerializedImage image, int type, float frames, int expression) {
-            this.image = image;
-            this.type = type;
-            this.frames = frames;
-            this.expression = expression;
+        this.image = image;
+        this.type = type;
+        this.frames = frames;
+        this.expression = expression;
     }
 }

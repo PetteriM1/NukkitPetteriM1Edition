@@ -3,6 +3,9 @@ package cn.nukkit.level.format.generic;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockLayer;
 import cn.nukkit.level.format.ChunkSection;
+import cn.nukkit.level.util.BitArrayVersion;
+import cn.nukkit.level.util.PalettedBlockStorage;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BinaryStream;
 import cn.nukkit.utils.ChunkException;
 
@@ -15,6 +18,8 @@ import java.util.Arrays;
 public class EmptyChunkSection implements ChunkSection {
 
     public static final EmptyChunkSection[] EMPTY = new EmptyChunkSection[16];
+    private static final PalettedBlockStorage EMPTY_STORAGE_PRE419 = PalettedBlockStorage.createFromBlockPalette(BitArrayVersion.V1, 0);
+    private static final PalettedBlockStorage EMPTY_STORAGE = PalettedBlockStorage.createFromBlockPalette(BitArrayVersion.V1, ProtocolInfo.v1_16_100);
 
     public static final byte[] EMPTY_LIGHT_ARR = new byte[2048];
     public static final byte[] EMPTY_SKY_LIGHT_ARR = new byte[2048];
@@ -81,6 +86,11 @@ public class EmptyChunkSection implements ChunkSection {
 
     @Override
     public byte[] getIdArray() {
+        return this.getIdArray(1);
+    }
+
+    @Override
+    public byte[] getIdArray(int ver) {
         return EMPTY_ID_ARR;
     }
 
@@ -146,10 +156,26 @@ public class EmptyChunkSection implements ChunkSection {
     }
 
     @Override
-    public void writeTo(BinaryStream stream) {
-        stream.putByte((byte) 9); // SubChunk version
-        stream.putByte((byte) 0); // layers
-        stream.putByte((byte) this.y);
+    public byte[] getBytes(boolean obfuscated) {
+        return new byte[6144];
+    }
+
+    @Override
+    public void writeTo(int protocol, BinaryStream stream, boolean obfuscated) {
+        stream.putByte(protocol >= ProtocolInfo.v1_19_80 ? (byte) 9 : (byte) 8); // SubChunk version
+        if (protocol >= ProtocolInfo.v1_18_30) {
+            stream.putByte((byte) 0); // layers
+            if (protocol >= ProtocolInfo.v1_19_80) {
+                stream.putByte((byte) this.y);
+            }
+        } else {
+            stream.putByte((byte) 1); // layers
+            if (protocol >= ProtocolInfo.v1_16_100) {
+                EMPTY_STORAGE.writeTo(stream);
+            } else {
+                EMPTY_STORAGE_PRE419.writeTo(stream);
+            }
+        }
     }
 
     @Override

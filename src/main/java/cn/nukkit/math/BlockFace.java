@@ -81,6 +81,98 @@ public enum BlockFace {
         this.unitVector = unitVector;
     }
 
+    public enum Axis implements Predicate<BlockFace> {
+        X("x"),
+        Y("y"),
+        Z("z");
+
+        private final String name;
+        private Plane plane;
+
+        static {
+            X.plane = Plane.HORIZONTAL;
+            Y.plane = Plane.VERTICAL;
+            Z.plane = Plane.HORIZONTAL;
+        }
+
+        Axis(String name) {
+            this.name = name;
+        }
+
+        public boolean isVertical() {
+            return plane == Plane.VERTICAL;
+        }
+
+        public boolean isHorizontal() {
+            return plane == Plane.HORIZONTAL;
+        }
+
+        public Plane getPlane() {
+            return plane;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public boolean test(BlockFace face) {
+            return face != null && face.getAxis() == this;
+        }
+
+        public String toString() {
+            return name;
+        }
+    }
+
+    public enum AxisDirection {
+        POSITIVE(1, "Towards positive"),
+        NEGATIVE(-1, "Towards negative");
+
+        private final int offset;
+        private final String description;
+
+        AxisDirection(int offset, String description) {
+            this.offset = offset;
+            this.description = description;
+        }
+
+        public int getOffset() {
+            return offset;
+        }
+
+        public String toString() {
+            return description;
+        }
+    }
+
+    public enum Plane implements Predicate<BlockFace>, Iterable<BlockFace> {
+        HORIZONTAL,
+        VERTICAL;
+
+        static {
+            HORIZONTAL.faces = new BlockFace[]{NORTH, EAST, SOUTH, WEST};
+            VERTICAL.faces = new BlockFace[]{UP, DOWN};
+        }
+
+        private BlockFace[] faces;
+
+        public BlockFace random(NukkitRandom rand) {
+            return faces[rand.nextBoundedInt(faces.length)];
+        }
+
+        public BlockFace random() {
+            return faces[ThreadLocalRandom.current().nextInt(faces.length)];
+        }
+
+        public boolean test(BlockFace face) {
+            return face != null && face.getAxis().getPlane() == this;
+        }
+
+        public Iterator<BlockFace> iterator() {
+            return Iterators.forArray(faces);
+        }
+    }
+
     /**
      * Get a BlockFace by it's index (0-5). The order is D-U-N-S-W-E
      *
@@ -222,18 +314,18 @@ public enum BlockFace {
     }
 
     /**
-    * Get the opposite BlockFace (e.g. DOWN ==&gt; UP)
-    *
-    * @return block face
+     * Get the opposite BlockFace (e.g. DOWN ==&gt; UP)
+     *
+     * @return block face
      */
     public BlockFace getOpposite() {
         return fromIndex(opposite);
     }
 
     /**
-    * Rotate this BlockFace around the Y axis clockwise (NORTH =&gt; EAST =&gt; SOUTH =&gt; WEST =&gt; NORTH)
-    *
-    * @return block face
+     * Rotate this BlockFace around the Y axis clockwise (NORTH =&gt; EAST =&gt; SOUTH =&gt; WEST =&gt; NORTH)
+     *
+     * @return block face
      */
     public BlockFace rotateY() {
         switch (this) {
@@ -251,9 +343,9 @@ public enum BlockFace {
     }
 
     /**
-    * Rotate this BlockFace around the Y axis counter-clockwise (NORTH =&gt; WEST =&gt; SOUTH =&gt; EAST =&gt; NORTH)
-    *
-    * @return block face
+     * Rotate this BlockFace around the Y axis counter-clockwise (NORTH =&gt; WEST =&gt; SOUTH =&gt; EAST =&gt; NORTH)
+     *
+     * @return block face
      */
     public BlockFace rotateYCCW() {
         switch (this) {
@@ -272,97 +364,5 @@ public enum BlockFace {
 
     public String toString() {
         return name;
-    }
-
-    public enum Axis implements Predicate<BlockFace> {
-        X("x"),
-        Y("y"),
-        Z("z");
-
-        private final String name;
-        private Plane plane;
-
-        static {
-            X.plane = Plane.HORIZONTAL;
-            Y.plane = Plane.VERTICAL;
-            Z.plane = Plane.HORIZONTAL;
-        }
-
-        Axis(String name) {
-            this.name = name;
-        }
-
-        public boolean isVertical() {
-            return plane == Plane.VERTICAL;
-        }
-
-        public boolean isHorizontal() {
-            return plane == Plane.HORIZONTAL;
-        }
-
-        public Plane getPlane() {
-            return plane;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public boolean test(BlockFace face) {
-            return face != null && face.getAxis() == this;
-        }
-
-        public String toString() {
-            return name;
-        }
-    }
-
-    public enum AxisDirection {
-        POSITIVE(1, "Towards positive"),
-        NEGATIVE(-1, "Towards negative");
-
-        private final int offset;
-        private final String description;
-
-        AxisDirection(int offset, String description) {
-            this.offset = offset;
-            this.description = description;
-        }
-
-        public int getOffset() {
-            return offset;
-        }
-
-        public String toString() {
-            return description;
-        }
-    }
-
-    public enum Plane implements Predicate<BlockFace>, Iterable<BlockFace> {
-        HORIZONTAL,
-        VERTICAL;
-
-        static {
-            HORIZONTAL.faces = new BlockFace[]{NORTH, EAST, SOUTH, WEST};
-            VERTICAL.faces = new BlockFace[]{UP, DOWN};
-        }
-
-        private BlockFace[] faces;
-
-        public BlockFace random(NukkitRandom rand) {
-            return faces[rand.nextBoundedInt(faces.length)];
-        }
-
-        public BlockFace random() {
-            return faces[ThreadLocalRandom.current().nextInt(faces.length)];
-        }
-
-        public boolean test(BlockFace face) {
-            return face != null && face.getAxis().getPlane() == this;
-        }
-
-        public Iterator<BlockFace> iterator() {
-            return Iterators.forArray(faces);
-        }
     }
 }

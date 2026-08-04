@@ -2,7 +2,9 @@ package cn.nukkit.inventory;
 
 import cn.nukkit.Player;
 import cn.nukkit.item.Item;
+import cn.nukkit.network.protocol.InventoryContentPacket;
 import cn.nukkit.network.protocol.InventorySlotPacket;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.network.protocol.types.ContainerIds;
 
 import java.util.HashMap;
@@ -66,7 +68,42 @@ public class PlayerUIInventory extends BaseInventory {
 
     @Override
     public void sendContents(Player... target) {
+        boolean hasLegacyPlayers = false;
+        for (Player p : target) {
+            if (p.protocol < ProtocolInfo.v1_16_0) {
+                hasLegacyPlayers = true;
+                break;
+            }
+        }
 
+        if (!hasLegacyPlayers) {
+            return;
+        }
+
+        InventoryContentPacket pk = new InventoryContentPacket();
+        pk.slots = new Item[this.getSize()];
+        for (int i = 0; i < this.getSize(); ++i) {
+            pk.slots[i] = this.getItem(i);
+        }
+
+        for (Player p : target) {
+            if (p.protocol >= ProtocolInfo.v1_16_0) {
+                continue;
+            }
+
+            if (p == this.getHolder()) {
+                pk.inventoryId = ContainerIds.UI;
+            } else {
+                int id;
+
+                if ((id = p.getWindowId(this)) == ContainerIds.NONE) {
+                    if (this.getHolder() != player) this.close(p);
+                    continue;
+                }
+                pk.inventoryId = id;
+            }
+            p.dataPacket(pk);
+        }
     }
 
     @Override

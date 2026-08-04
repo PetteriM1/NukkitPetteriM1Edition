@@ -132,7 +132,7 @@ public interface Plugin extends CommandExecutor {
      * 用户也无需从开发者处手动下载资源文件后再使用插件。<br>
      * This is usually used to save the default plugin resource when the plugin is LOADED .If this is used,
      * it won't happen to load an empty resource when plugin is ENABLED, and plugin users are not required to get
-     * default resources from the developer and place it manually. 
+     * default resources from the developer and place it manually.
      * <p>
      * 如果需要替换已存在的资源文件，建议使用{@link cn.nukkit.plugin.Plugin#saveResource(String, boolean)}<br>
      * If you need to REPLACE an existing resource file, it's recommended
@@ -200,7 +200,7 @@ public interface Plugin extends CommandExecutor {
      * 用户也无需从开发者处手动下载配置文件保存后再使用插件。<br>
      * This is usually used to save the default plugin config when the plugin is LOADED .If this is used,
      * it won't happen to load an empty config when plugin is ENABLED, and plugin users are not required to get
-     * default config from the developer and place it manually. 
+     * default config from the developer and place it manually.
      *
      * @see cn.nukkit.plugin.Plugin#getDataFolder
      * @see cn.nukkit.plugin.Plugin#saveResource

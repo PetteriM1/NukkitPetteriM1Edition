@@ -26,7 +26,7 @@ public class BlockCampfireSoul extends BlockCampfire {
 
     @Override
     public int getLightLevel() {
-        return isExtinguished()? 0 : 10;
+        return isExtinguished() ? 0 : 10;
     }
 
     @Override
@@ -36,6 +36,6 @@ public class BlockCampfireSoul extends BlockCampfire {
 
     @Override
     public Item[] getDrops(Item item) {
-        return new Item[]{ new ItemBlock(Block.get(Block.SOUL_SOIL, 0), 0) };
+        return new Item[]{new ItemBlock(Block.get(Block.SOUL_SOIL, 0), 0)};
     }
 }

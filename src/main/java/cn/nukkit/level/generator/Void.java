@@ -11,7 +11,6 @@ public class Void extends Generator {
     private ChunkManager level;
 
     public Void() {
-        //this(Collections.emptyMap());
     }
 
     public Void(Map<String, Object> options) {

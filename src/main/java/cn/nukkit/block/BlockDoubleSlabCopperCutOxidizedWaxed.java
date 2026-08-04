@@ -1,7 +1,7 @@
 package cn.nukkit.block;
 
 public class BlockDoubleSlabCopperCutOxidizedWaxed extends BlockDoubleSlabCopperCutOxidized {
-    
+
     public BlockDoubleSlabCopperCutOxidizedWaxed() {
         this(0);
     }

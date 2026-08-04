@@ -26,7 +26,7 @@ public class JarPluginResourcePackLoader implements ResourcePackLoader {
                 String fileExt = Files.getFileExtension(jar.getName());
                 if (!jar.isDirectory()) {
                     if (fileExt.equals("jar") && JarPluginResourcePack.hasResourcePack(jar)) {
-                        Server.getInstance().getLogger().info(Server.getInstance().getLanguage().translateString("nukkit.resources.plugin.loading", jar.getName()));
+                        Server.getInstance().getLogger().info("Loading plugin resource pack from " + jar.getName());
                         loadedResourcePacks.add(new JarPluginResourcePack(jar));
                     }
                 }

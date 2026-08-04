@@ -27,7 +27,8 @@ public abstract class EntityCreature extends EntityLiving {
 
     /**
      * Called when player interacts the entity with a name tag item
-     * @param player player
+     *
+     * @param player  player
      * @param nameTag name tag item
      * @return true to reduce name tag item count
      */

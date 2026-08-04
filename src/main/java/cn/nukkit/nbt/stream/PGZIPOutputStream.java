@@ -22,17 +22,52 @@ import java.util.zip.DeflaterOutputStream;
 public class PGZIPOutputStream extends FilterOutputStream {
 
     private static final ExecutorService EXECUTOR = Executors.newCachedThreadPool();
+    private final static int GZIP_MAGIC = 0x8b1f;
+    private final IntList blockSizes = new IntArrayList();
+    private int level = Deflater.BEST_SPEED;
+    private int strategy = Deflater.DEFAULT_STRATEGY;
+    private final ExecutorService executor;
+    private final int nthreads;
+    private final CRC32 crc = new CRC32();
+    private final BlockingQueue<Future<byte[]>> emitQueue;
+    private PGZIPBlock block = new PGZIPBlock(this/* 0 */);
+    /**
+     * Used as a sentinel for 'closed'.
+     */
+    private int bytesWritten = 0;
+    // Master thread only
+    public PGZIPOutputStream(OutputStream out, ExecutorService executor, int nthreads) throws IOException {
+        super(out);
+        this.executor = executor;
+        this.nthreads = nthreads;
+        this.emitQueue = new ArrayBlockingQueue<>(nthreads);
+        writeHeader();
+    }
+    /**
+     * Creates a PGZIPOutputStream
+     * using {@link PGZIPOutputStream#getSharedThreadPool()}.
+     *
+     * @param out the eventual output stream for the compressed data.
+     * @throws java.io.IOException if it all goes wrong.
+     */
+    public PGZIPOutputStream(OutputStream out, int nthreads) throws IOException {
+        this(out, PGZIPOutputStream.getSharedThreadPool(), nthreads);
+    }
+    /**
+     * Creates a PGZIPOutputStream
+     * using {@link PGZIPOutputStream#getSharedThreadPool()}
+     * and {@link Runtime#availableProcessors()}.
+     *
+     * @param out the eventual output stream for the compressed data.
+     * @throws java.io.IOException if it all goes wrong.
+     */
+    public PGZIPOutputStream(OutputStream out) throws IOException {
+        this(out, Runtime.getRuntime().availableProcessors());
+    }
 
     public static ExecutorService getSharedThreadPool() {
         return EXECUTOR;
     }
-
-    private final static int GZIP_MAGIC = 0x8b1f;
-
-    private final IntList blockSizes = new IntArrayList();
-
-    private int level = Deflater.BEST_SPEED;
-    private int strategy = Deflater.DEFAULT_STRATEGY;
 
     protected Deflater newDeflater() {
         Deflater def = new Deflater(level, true);
@@ -50,48 +85,6 @@ public class PGZIPOutputStream extends FilterOutputStream {
 
     protected static DeflaterOutputStream newDeflaterOutputStream(OutputStream out, Deflater deflater) {
         return new DeflaterOutputStream(out, deflater, 512, true);
-    }
-
-    private final ExecutorService executor;
-    private final int nthreads;
-    private final CRC32 crc = new CRC32();
-    private final BlockingQueue<Future<byte[]>> emitQueue;
-    private PGZIPBlock block = new PGZIPBlock(this/* 0 */);
-    /**
-     * Used as a sentinel for 'closed'.
-     */
-    private int bytesWritten = 0;
-
-    // Master thread only
-    public PGZIPOutputStream(OutputStream out, ExecutorService executor, int nthreads) throws IOException {
-        super(out);
-        this.executor = executor;
-        this.nthreads = nthreads;
-        this.emitQueue = new ArrayBlockingQueue<>(nthreads);
-        writeHeader();
-    }
-
-    /**
-     * Creates a PGZIPOutputStream
-     * using {@link PGZIPOutputStream#getSharedThreadPool()}.
-     *
-     * @param out the eventual output stream for the compressed data.
-     * @throws java.io.IOException if it all goes wrong.
-     */
-    public PGZIPOutputStream(OutputStream out, int nthreads) throws IOException {
-        this(out, PGZIPOutputStream.getSharedThreadPool(), nthreads);
-    }
-
-    /**
-     * Creates a PGZIPOutputStream
-     * using {@link PGZIPOutputStream#getSharedThreadPool()}
-     * and {@link Runtime#availableProcessors()}.
-     *
-     * @param out the eventual output stream for the compressed data.
-     * @throws java.io.IOException if it all goes wrong.
-     */
-    public PGZIPOutputStream(OutputStream out) throws IOException {
-        this(out, Runtime.getRuntime().availableProcessors());
     }
 
     /*

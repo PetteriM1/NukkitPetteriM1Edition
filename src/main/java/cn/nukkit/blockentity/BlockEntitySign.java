@@ -7,6 +7,7 @@ import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.ByteTag;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.IntTag;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
 import cn.nukkit.utils.DyeColor;
 import cn.nukkit.utils.TextFormat;
@@ -126,7 +127,7 @@ public class BlockEntitySign extends BlockEntitySpawnable {
         }
         String[] lines = new String[4];
         Arrays.fill(lines, "");
-        String receivedText = nbt.getCompound("FrontText").getString("Text");
+        String receivedText = player.protocol >= ProtocolInfo.v1_19_80 ? nbt.getCompound("FrontText").getString("Text") : nbt.getString("Text");
         String[] splitLines = receivedText.split("\n", 4);
         System.arraycopy(splitLines, 0, lines, 0, splitLines.length);
 

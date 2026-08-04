@@ -1,5 +1,8 @@
 package cn.nukkit.block;
 
+import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.utils.material.BlockType;
+
 public class BlockCopperBulbExposedWaxed extends BlockCopperBulbExposed {
 
     public BlockCopperBulbExposedWaxed() {
@@ -19,5 +22,13 @@ public class BlockCopperBulbExposedWaxed extends BlockCopperBulbExposed {
     @Override
     public boolean isWaxed() {
         return true;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        if (protocol >= ProtocolInfo.v1_17_0) {
+            return BlockTypes.WAXED_EXPOSED_COPPER;
+        }
+        return BlockTypes.IRON_BLOCK;
     }
 }

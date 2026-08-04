@@ -16,13 +16,7 @@ public class BlockRedSandstone extends BlockSandstone {
     public BlockRedSandstone(int meta) {
         super(meta);
     }
-
-    @Override
-    public int getId() {
-        return RED_SANDSTONE;
-    }
-
-    private static final String[] NAMES = {
+    private static final String[] names = {
             "Red Sandstone",
             "Chiseled Red Sandstone",
             "Cut Red Sandstone",
@@ -30,8 +24,13 @@ public class BlockRedSandstone extends BlockSandstone {
     };
 
     @Override
+    public int getId() {
+        return RED_SANDSTONE;
+    }
+
+    @Override
     public String getName() {
-        return NAMES[this.getDamage() & 0x03];
+        return names[this.getDamage() & 0x03];
     }
 
     @Override

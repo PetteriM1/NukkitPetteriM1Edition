@@ -29,7 +29,7 @@ public class BlockInfestedDeepslate extends BlockDeepslate {
 
     @Override
     public double getResistance() {
-        return 0.75;
+        return 3.75;
     }
 
     @Override

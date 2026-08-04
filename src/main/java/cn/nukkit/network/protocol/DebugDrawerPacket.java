@@ -42,68 +42,156 @@ public class DebugDrawerPacket extends DataPacket {
             putOptionalNull(shape.getScale(), BinaryStream::putLFloat);
             putOptionalNull(shape.getRotation(), BinaryStream::putVector3f);
             putOptionalNull(shape.getTotalTimeLeft(), BinaryStream::putLFloat);
-            putOptionalNull(shape.getMaximumRenderDistance(), BinaryStream::putLFloat);
+
+            if (protocol >= ProtocolInfo.v1_26_20_26) {
+                putOptionalNull(shape.getMaximumRenderDistance(), BinaryStream::putLFloat);
+            }
 
             if (shape.getColor() != null) {
                 putBoolean(true);
                 putLInt(shape.getColor().getRGB());
             } else putBoolean(false);
 
-            putOptionalNull(shape.getDimension(), BinaryStream::putVarInt);
+            if (protocol >= ProtocolInfo.v1_21_120) {
+                if (protocol >= ProtocolInfo.v1_26_0) {
+                    putOptionalNull(shape.getDimension(), BinaryStream::putVarInt);
+                } else {
+                    putVarInt(shape.getDimension() == null ? 0 : shape.getDimension());
+                }
+            }
 
-            if (shape.getAttachedToEntityId() != null) {
-                putBoolean(true);
-                putUnsignedVarLong(shape.getAttachedToEntityId());
-            } else putBoolean(false);
+            if (protocol >= ProtocolInfo.v1_26_0) {
+                if (shape.getAttachedToEntityId() != null) {
+                    putBoolean(true);
+                    putUnsignedVarLong(shape.getAttachedToEntityId());
+                } else putBoolean(false);
+            }
 
-            putUnsignedVarInt(toPayloadType(shape.getType()));
+            if (protocol >= ProtocolInfo.v1_21_120) {
+                putUnsignedVarInt(toPayloadType(shape.getType()));
+            }
 
             if (shape.getType() == null) {
                 continue;
             }
 
-            switch (shape.getType()) {
-                case ARROW:
-                    DebugArrow arrow = (DebugArrow) shape;
-                    putOptionalNull(arrow.getArrowEndPosition(), BinaryStream::putVector3f);
-                    putOptionalNull(arrow.getArrowHeadLength(), BinaryStream::putLFloat);
-                    putOptionalNull(arrow.getArrowHeadRadius(), BinaryStream::putLFloat);
+            if (protocol >= ProtocolInfo.v1_21_120) {
+                switch (shape.getType()) {
+                    case ARROW:
+                        DebugArrow arrow = (DebugArrow) shape;
+                        putOptionalNull(arrow.getArrowEndPosition(), BinaryStream::putVector3f);
+                        putOptionalNull(arrow.getArrowHeadLength(), BinaryStream::putLFloat);
+                        putOptionalNull(arrow.getArrowHeadRadius(), BinaryStream::putLFloat);
 
-                    if (arrow.getArrowHeadSegments() != null) {
-                        putBoolean(true);
-                        putByte(arrow.getArrowHeadSegments().byteValue());
-                    } else putBoolean(false);
-                    break;
-                case BOX:
-                    DebugBox box = (DebugBox) shape;
-                    putVector3f(box.getBoxBounds());
-                    break;
-                case CIRCLE:
-                    DebugCircle circle = (DebugCircle) shape;
-                    putByte(circle.getSegments().byteValue());
-                    break;
-                case LINE:
-                    DebugLine line = (DebugLine) shape;
-                    putVector3f(line.getLineEndPosition());
-                    break;
-                case SPHERE:
-                    DebugSphere sphere = (DebugSphere) shape;
-                    putByte(sphere.getSegments().byteValue());
-                    break;
-                case TEXT:
-                    DebugText text = (DebugText) shape;
-                    putString(text.getText());
-                    putBoolean(text.isUseRotation());
+                        if (arrow.getArrowHeadSegments() != null) {
+                            putBoolean(true);
+                            putByte(arrow.getArrowHeadSegments().byteValue());
+                        } else putBoolean(false);
+                        break;
+                    case BOX:
+                        DebugBox box = (DebugBox) shape;
+                        putVector3f(box.getBoxBounds());
+                        break;
+                    case CIRCLE:
+                        DebugCircle circle = (DebugCircle) shape;
+                        putByte(circle.getSegments().byteValue());
+                        break;
+                    case LINE:
+                        DebugLine line = (DebugLine) shape;
+                        putVector3f(line.getLineEndPosition());
+                        break;
+                    case SPHERE:
+                        DebugSphere sphere = (DebugSphere) shape;
+                        putByte(sphere.getSegments().byteValue());
+                        break;
+                    case TEXT:
+                        DebugText text = (DebugText) shape;
+                        putString(text.getText());
 
-                    if (text.getBackgroundColor() != null) {
-                        putBoolean(true);
-                        putLInt(text.getBackgroundColor().getRGB());
-                    } else putBoolean(false);
+                        if (protocol >= ProtocolInfo.v1_26_20_26) {
+                            putBoolean(text.isUseRotation());
 
-                    putBoolean(text.isDepthTest());
-                    putBoolean(text.isShowBackface());
-                    putBoolean(text.isShowTextBackface());
-                    break;
+                            if (text.getBackgroundColor() != null) {
+                                putBoolean(true);
+                                putLInt(text.getBackgroundColor().getRGB());
+                            } else putBoolean(false);
+
+                            putBoolean(text.isDepthTest());
+                            putBoolean(text.isShowBackface());
+                            putBoolean(text.isShowTextBackface());
+                        }
+                        break;
+                }
+            } else {
+                switch (shape.getType()) {
+                    case ARROW:
+                        DebugArrow arrow = (DebugArrow) shape;
+                        putBoolean(false);
+                        putBoolean(false);
+                        putOptionalNull(arrow.getArrowEndPosition(), BinaryStream::putVector3f);
+                        putOptionalNull(arrow.getArrowHeadLength(), BinaryStream::putLFloat);
+                        putOptionalNull(arrow.getArrowHeadRadius(), BinaryStream::putLFloat);
+
+                        if (arrow.getArrowHeadSegments() != null) {
+                            putBoolean(true);
+                            putByte(arrow.getArrowHeadSegments().byteValue());
+                        } else putBoolean(false);
+                        break;
+                    case BOX:
+                        DebugBox box = (DebugBox) shape;
+                        putBoolean(false);
+                        putOptionalNull(box.getBoxBounds(), BinaryStream::putVector3f);
+                        putBoolean(false);
+                        putBoolean(false);
+                        putBoolean(false);
+                        putBoolean(false);
+                        break;
+                    case CIRCLE:
+                        DebugCircle circle = (DebugCircle) shape;
+                        putBoolean(false);
+                        putBoolean(false);
+                        putBoolean(false);
+                        putBoolean(false);
+                        putBoolean(false);
+
+                        if (circle.getSegments() != null) {
+                            putBoolean(true);
+                            putByte(circle.getSegments().byteValue());
+                        } else putBoolean(false);
+                        break;
+                    case LINE:
+                        DebugLine line = (DebugLine) shape;
+                        putBoolean(false);
+                        putBoolean(false);
+                        putOptionalNull(line.getLineEndPosition(), BinaryStream::putVector3f);
+                        putBoolean(false);
+                        putBoolean(false);
+                        putBoolean(false);
+                        break;
+                    case SPHERE:
+                        DebugSphere sphere = (DebugSphere) shape;
+                        putBoolean(false);
+                        putBoolean(false);
+                        putBoolean(false);
+                        putBoolean(false);
+                        putBoolean(false);
+
+
+                        if (sphere.getSegments() != null) {
+                            putBoolean(true);
+                            putByte(sphere.getSegments().byteValue());
+                        } else putBoolean(false);
+                        break;
+                    case TEXT:
+                        DebugText text = (DebugText) shape;
+                        putOptionalNull(text.getText(), BinaryStream::putString);
+                        putBoolean(false);
+                        putBoolean(false);
+                        putBoolean(false);
+                        putBoolean(false);
+                        putBoolean(false);
+                        break;
+                }
             }
         }
     }

@@ -3,6 +3,8 @@ package cn.nukkit.block;
 import cn.nukkit.AdventureSettings;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
+import cn.nukkit.block.custom.CustomBlockManager;
+import cn.nukkit.block.properties.BlockNotImplemented;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
@@ -35,8 +37,7 @@ import java.util.Optional;
  */
 public abstract class Block extends Position implements Metadatable, Cloneable, AxisAlignedBB, BlockID {
 
-    @SuppressWarnings("UnnecessaryBoxing")
-    public static final int MAX_BLOCK_ID = Integer.valueOf("2048");
+    public static final int MAX_BLOCK_ID = 2048;
     public static final int DATA_BITS = 6;
     public static final int DATA_SIZE = 1 << DATA_BITS;
     public static final int DATA_MASK = DATA_SIZE - 1;
@@ -64,7 +65,21 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
     protected static final int[] FACES2534 = {2, 5, 3, 4};
 
     protected Block() {
+    }
 
+    public enum WaterloggingType {
+        /**
+         * Block is not waterloggable
+         */
+        NO_WATERLOGGING,
+        /**
+         * If possible, water will be set to second layer when the block is placed into water
+         */
+        WHEN_PLACED_IN_WATER,
+        /**
+         * Water will flow into the block and water will be set to second layer
+         */
+        FLOW_INTO_BLOCK
     }
 
     public static void init() {
@@ -78,6 +93,13 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
             transparent = new boolean[MAX_BLOCK_ID];
             hasMeta = new boolean[MAX_BLOCK_ID];
 
+            // Do this here so implemented blocks get replaced with proper implementation
+            if (Server.getInstance().getPropertyBoolean("new-blocks-preview", false)) {
+                for (int id = 0; id < MAX_BLOCK_ID; id++) {
+                    list[id] = BlockNotImplemented.class;
+                }
+            }
+
             Blocks.init();
 
             for (int id = 0; id < MAX_BLOCK_ID; id++) {
@@ -85,30 +107,41 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
                 if (c != null) {
                     Block block;
                     try {
-                        block = (Block) c.newInstance();
-                        try {
-                            @SuppressWarnings("rawtypes")
-                            Constructor constructor = c.getDeclaredConstructor(int.class);
+                        if (c.isAssignableFrom(BlockNotImplemented.class)) {
+                            Constructor<?> constructor = c.getDeclaredConstructor(int.class, int.class);
                             constructor.setAccessible(true);
+                            block = (Block) constructor.newInstance(id, 0);
                             for (int data = 0; data < (1 << DATA_BITS); ++data) {
                                 int fullId = (id << DATA_BITS) | data;
-                                Block blockState;
-                                try {
-                                    blockState = (Block) constructor.newInstance(data);
-                                    if (blockState.getDamage() != data) {
-                                        blockState = new BlockUnknown(id, data);
-                                    }
-                                } catch (Exception e) {
-                                    Server.getInstance().getLogger().error("Error while registering " + c.getName(), e);
-                                    blockState = new BlockUnknown(id, data);
-                                }
-                                fullList[fullId] = blockState;
+                                fullList[fullId] = (Block) constructor.newInstance(id, data);
                             }
                             hasMeta[id] = true;
-                        } catch (NoSuchMethodException ignore) {
-                            for (int data = 0; data < DATA_SIZE; ++data) {
-                                int fullId = (id << DATA_BITS) | data;
-                                fullList[fullId] = block;
+                        } else {
+                            block = (Block) c.newInstance();
+                            try {
+                                @SuppressWarnings("rawtypes")
+                                Constructor constructor = c.getDeclaredConstructor(int.class);
+                                constructor.setAccessible(true);
+                                for (int data = 0; data < (1 << DATA_BITS); ++data) {
+                                    int fullId = (id << DATA_BITS) | data;
+                                    Block blockState;
+                                    try {
+                                        blockState = (Block) constructor.newInstance(data);
+                                        if (blockState.getDamage() != data) {
+                                            blockState = new BlockUnknown(id, data);
+                                        }
+                                    } catch (Exception e) {
+                                        Server.getInstance().getLogger().error("Error while registering " + c.getName(), e);
+                                        blockState = new BlockUnknown(id, data);
+                                    }
+                                    fullList[fullId] = blockState;
+                                }
+                                hasMeta[id] = true;
+                            } catch (NoSuchMethodException ignore) {
+                                for (int data = 0; data < DATA_SIZE; ++data) {
+                                    int fullId = (id << DATA_BITS) | data;
+                                    fullList[fullId] = block;
+                                }
                             }
                         }
                     } catch (Exception e) {
@@ -131,7 +164,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
                             lightFilter[id] = 1;
                         } else if (id == CAULDRON_BLOCK) {
                             lightFilter[id] = 3;
-                        }else {
+                        } else {
                             lightFilter[id] = 15;
                         }
                     } else {
@@ -163,6 +196,9 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
             id = 255 - id;
         }
 
+        if (id >= CustomBlockManager.LOWEST_CUSTOM_BLOCK_ID) {
+            return CustomBlockManager.get().getBlock(id, 0);
+        }
         return fullList[id << DATA_BITS].clone();
     }
 
@@ -171,7 +207,10 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
             id = 255 - id;
         }
 
-        int fullId = meta == null ? (id << DATA_BITS ) : ((id << DATA_BITS) | meta);
+        int fullId = meta == null ? (id << DATA_BITS) : ((id << DATA_BITS) | meta);
+        if (id >= CustomBlockManager.LOWEST_CUSTOM_BLOCK_ID) {
+            return CustomBlockManager.get().getBlock(fullId);
+        }
 
         return fullList[fullId].clone();
     }
@@ -186,7 +225,10 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
         }
 
         Block block;
-        if (meta != null && meta > DATA_SIZE) {
+        if (id >= CustomBlockManager.LOWEST_CUSTOM_BLOCK_ID) {
+            int fullId = (meta != null && meta > DATA_SIZE) ? (id << DATA_BITS) : ((id << DATA_BITS) | (meta == null ? 0 : meta));
+            block = CustomBlockManager.get().getBlock(fullId);
+        } else if (meta != null && meta > DATA_SIZE) {
             block = fullList[id << DATA_BITS].clone();
             block.setDamage(meta);
         } else {
@@ -208,8 +250,10 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
             id = 255 - id;
         }
 
-        int fullId = (id << DATA_BITS ) | data;
-
+        int fullId = (id << DATA_BITS) | data;
+        if (id >= CustomBlockManager.LOWEST_CUSTOM_BLOCK_ID) {
+            return CustomBlockManager.get().getBlock(fullId);
+        }
         return fullList[fullId].clone();
     }
 
@@ -218,7 +262,12 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
     }
 
     public static Block get(int fullId, Level level, int x, int y, int z, BlockLayer layer) {
-        Block block = fullList[fullId].clone();
+        Block block;
+        if ((fullId >> DATA_BITS) >= CustomBlockManager.LOWEST_CUSTOM_BLOCK_ID) {
+            block = CustomBlockManager.get().getBlock(fullId);
+        } else {
+            block = fullList[fullId].clone();
+        }
 
         block.x = x;
         block.y = y;
@@ -229,18 +278,30 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
     }
 
     public static int getBlockLight(int blockId) {
+        if (blockId >= CustomBlockManager.LOWEST_CUSTOM_BLOCK_ID) {
+            return light[0]; // TODO: just temporary
+        }
         return light[blockId];
     }
 
     public static int getBlockLightFilter(int blockId) {
+        if (blockId >= CustomBlockManager.LOWEST_CUSTOM_BLOCK_ID) {
+            return lightFilter[0]; // TODO: just temporary
+        }
         return lightFilter[blockId];
     }
 
     public static boolean isBlockSolidById(int blockId) {
+        if (blockId >= CustomBlockManager.LOWEST_CUSTOM_BLOCK_ID) {
+            return solid[1]; // TODO: just temporary
+        }
         return solid[blockId];
     }
 
     public static boolean isBlockTransparentById(int blockId) {
+        if (blockId >= CustomBlockManager.LOWEST_CUSTOM_BLOCK_ID) {
+            return transparent[1]; // TODO: just temporary
+        }
         return transparent[blockId];
     }
 
@@ -258,21 +319,6 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
 
     public WaterloggingType getWaterloggingType() {
         return WaterloggingType.NO_WATERLOGGING;
-    }
-
-    public enum WaterloggingType {
-        /**
-         * Block is not waterloggable
-         */
-        NO_WATERLOGGING,
-        /**
-         * If possible, water will be set to second layer when the block is placed into water
-         */
-        WHEN_PLACED_IN_WATER,
-        /**
-         * Water will flow into the block and water will be set to second layer
-         */
-        FLOW_INTO_BLOCK
     }
 
     public final boolean canWaterloggingFlowInto() {
@@ -412,6 +458,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
 
     /**
      * The full id is a combination of the id and data.
+     *
      * @return full id
      */
     public int getFullId() {
@@ -460,54 +507,6 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
         return new Item[0];
     }
 
-    private static double toolBreakTimeBonus0(int toolType, int toolTier, int blockId) {
-        if (toolType == ItemTool.TYPE_SWORD) return blockId == Block.COBWEB ? 15.0 : 1.0;
-        if (toolType == ItemTool.TYPE_SHEARS) {
-            if (blockId == Block.WOOL || blockId == LEAVES || blockId == LEAVES2) {
-                return 5.0;
-            } else if (blockId == COBWEB) {
-                return 15.0;
-            }
-            return 1.0;
-        }
-        if (toolType == ItemTool.TYPE_NONE) return 1.0;
-        switch (toolTier) {
-            case ItemTool.TIER_WOODEN:
-                return 2.0;
-            case ItemTool.TIER_STONE:
-                return 4.0;
-            case ItemTool.TIER_IRON:
-                return 6.0;
-            case ItemTool.TIER_DIAMOND:
-                return 8.0;
-            case ItemTool.TIER_NETHERITE:
-                return 9.0;
-            case ItemTool.TIER_GOLD:
-                return 12.0;
-            default:
-                return 1.0;
-        }
-    }
-
-    private static double speedBonusByEfficiencyLore0(int efficiencyLoreLevel) {
-        if (efficiencyLoreLevel == 0) return 0;
-        return efficiencyLoreLevel * efficiencyLoreLevel + 1;
-    }
-
-    private static double speedRateByHasteLore0(int hasteLoreLevel) {
-        return 1.0 + (0.2 * hasteLoreLevel);
-    }
-
-    private static int toolType0(Item item) {
-        if (item.isSword()) return ItemTool.TYPE_SWORD;
-        if (item.isShovel()) return ItemTool.TYPE_SHOVEL;
-        if (item.isPickaxe()) return ItemTool.TYPE_PICKAXE;
-        if (item.isAxe()) return ItemTool.TYPE_AXE;
-        if (item.isHoe()) return ItemTool.TYPE_HOE;
-        if (item.isShears()) return ItemTool.TYPE_SHEARS;
-        return ItemTool.TYPE_NONE;
-    }
-
     private static boolean correctTool0(int blockToolType, Item item, int blockId) {
         if (item.isShears() && (blockId == COBWEB || blockId == LEAVES || blockId == LEAVES2)) {
             return true;
@@ -531,49 +530,82 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
                 blockToolType == ItemTool.TYPE_NONE;
     }
 
-    //http://minecraft.gamepedia.com/Breaking
-    private static double breakTime0(double blockHardness, boolean correctTool, boolean canHarvestWithHand,
-                                     int blockId, int toolType, int toolTier, int efficiencyLoreLevel, int hasteEffectLevel,
-                                     boolean insideOfWaterWithoutAquaAffinity, boolean outOfWaterButNotOnGround) {
-        double baseTime = ((correctTool || canHarvestWithHand) ? 1.5 : 5.0) * blockHardness;
-        double speed = 1.0 / baseTime;
-        if (correctTool) speed *= toolBreakTimeBonus0(toolType, toolTier, blockId);
-        speed += correctTool ? speedBonusByEfficiencyLore0(efficiencyLoreLevel) : 0;
-        speed *= speedRateByHasteLore0(hasteEffectLevel);
-        if (insideOfWaterWithoutAquaAffinity) speed *= 0.2;
-        if (outOfWaterButNotOnGround) speed *= 0.2;
-        return 1.0 / speed;
-    }
-
+    /**
+     * Calculate block break time
+     *
+     * @param item   item used to break the block
+     * @param player player who is breaking the block
+     * @return break time in seconds
+     */
     public double getBreakTime(Item item, Player player) {
         Objects.requireNonNull(item, "getBreakTime: Item can not be null");
         Objects.requireNonNull(player, "getBreakTime: Player can not be null");
         double blockHardness = getHardness();
-
         if (blockHardness == 0) {
             return 0;
         }
-
         int blockId = getId();
-        boolean correctTool = correctTool0(getToolType(), item, blockId)
-                || item.isShears() && (blockId == COBWEB || blockId == LEAVES || blockId == LEAVES2);
-        boolean canHarvestWithHand = canHarvestWithHand();
-        int itemToolType = toolType0(item);
-        int itemTier = item.getTier();
-        int efficiencyLoreLevel = Optional.ofNullable(item.getEnchantment(Enchantment.ID_EFFICIENCY))
-                .map(Enchantment::getLevel).orElse(0);
-        int hasteEffectLevel = Optional.ofNullable(player.getEffect(Effect.HASTE))
-                .map(Effect::getAmplifier).orElse(0);
-        boolean insideOfWaterWithoutAquaAffinity = player.isInsideOfWater() &&
-                Optional.ofNullable(player.getInventory().getHelmet().getEnchantment(Enchantment.ID_WATER_WORKER))
-                        .map(Enchantment::getLevel).map(l -> l >= 1).orElse(false);
-        boolean outOfWaterButNotOnGround = !player.isOnGround() && !player.getAdventureSettings().get(AdventureSettings.Type.FLYING) && !player.isInsideOfWater();
-        return breakTime0(blockHardness, correctTool, canHarvestWithHand, blockId, itemToolType, itemTier,
-                efficiencyLoreLevel, hasteEffectLevel, insideOfWaterWithoutAquaAffinity, outOfWaterButNotOnGround);
+        if (blockId == BAMBOO && item.isSword()) {
+            return 0;
+        }
+        double breakingTimeMultiplier;
+        if (blockId == COBWEB && item.isSword()) {
+            breakingTimeMultiplier = 0.1;
+        } else if ((blockId == WOOL || blockId == COBWEB || blockId == LEAVES || blockId == LEAVES2) && item.isShears()) {
+            breakingTimeMultiplier = blockId == WOOL ? 0.3 : 0.1;
+        } else {
+            boolean submerged = player.isSubmerged();
+            boolean inWater = submerged && !player.getInventory().getHelmetFast().hasEnchantment(Enchantment.ID_WATER_WORKER);
+            boolean correctTool = item.isTool() && correctTool(getToolType(), item);
+            double miningMultiplier = item.isSword() ? 1.5 : 1;
+            if (correctTool) {
+                miningMultiplier = getMiningMultiplier(item);
+                int efficiencyLevel = Optional.ofNullable(item.getEnchantment(Enchantment.ID_EFFICIENCY)).map(Enchantment::getLevel).orElse(0);
+                if (efficiencyLevel > 0) miningMultiplier += efficiencyLevel * efficiencyLevel + 1;
+            }
+            int hasteLevel = Optional.ofNullable(player.getEffect(Effect.HASTE)).map(Effect::getAmplifier).orElse(-1) + 1;
+            if (hasteLevel > 0) miningMultiplier *= 0.2 * hasteLevel + 1;
+            int miningFatigueLevel = Optional.ofNullable(player.getEffect(Effect.MINING_FATIGUE)).map(Effect::getAmplifier).orElse(-1) + 1;
+            if (miningFatigueLevel > 0) miningMultiplier *= Math.pow(0.3, miningFatigueLevel);
+            if (inWater) {
+                miningMultiplier /= 5;
+            } else if (!player.isOnGround() && !player.getAdventureSettings().get(AdventureSettings.Type.FLYING) && !submerged) {
+                miningMultiplier /= 5;
+            }
+            double t;
+            if (correctTool) {
+                t = inWater ? 1.5 : 1;
+            } else if (this.canHarvestWithHand()) {
+                t = 1.5;
+            } else {
+                t = 5;
+            }
+            breakingTimeMultiplier = t / miningMultiplier;
+        }
+        return breakingTimeMultiplier * blockHardness;
+    }
+
+    private static double getMiningMultiplier(Item item) {
+        switch (item.getTier()) {
+            case ItemTool.TIER_WOODEN:
+                return 2;
+            case ItemTool.TIER_STONE:
+                return 4;
+            case ItemTool.TIER_IRON:
+                return 6;
+            case ItemTool.TIER_DIAMOND:
+                return 8;
+            case ItemTool.TIER_NETHERITE:
+                return 9;
+            case ItemTool.TIER_GOLD:
+                return 12;
+        }
+        return 1;
     }
 
     /**
      * Deprecated: This function lacks the Player and is not accurate enough, use getBreakTime(Item, Player) instead
+     *
      * @param item item used to break the block
      * @return break time in seconds
      */
@@ -1038,6 +1070,22 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
 
     public Block setUpdatePos(Vector3 pos) {
         return this; // Only need to save this for observers
+    }
+
+    public int getMinimumVersion() {
+        return 0;
+    }
+
+    public BlockType getAlternateBlock(int protocol) {
+        return this.getBlockType();
+    }
+
+    public int getAlternateMeta(int protocol) {
+        return 0;
+    }
+
+    public final int getAlternateFullId(int protocol) {
+        return (this.getAlternateBlock(protocol).getLegacyId() << DATA_BITS) | this.getAlternateMeta(protocol);
     }
 
     public PersistentDataContainer getPersistentDataContainer() {

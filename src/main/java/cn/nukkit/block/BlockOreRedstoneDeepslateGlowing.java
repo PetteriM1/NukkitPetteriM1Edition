@@ -4,6 +4,7 @@ import cn.nukkit.event.block.BlockFadeEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.level.Level;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockOreRedstoneDeepslateGlowing extends BlockOreRedstoneDeepslate {
 
@@ -43,5 +44,10 @@ public class BlockOreRedstoneDeepslateGlowing extends BlockOreRedstoneDeepslate 
         }
 
         return 0;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.LIT_REDSTONE_ORE;
     }
 }

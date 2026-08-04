@@ -10,15 +10,9 @@ import cn.nukkit.math.Vector3;
 
 public class PlayerTeleportEvent extends PlayerEvent implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
-
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private TeleportCause cause;
     private Location from;
     private Location to;
-
     private PlayerTeleportEvent(Player player) {
         this.player = player;
     }
@@ -37,6 +31,20 @@ public class PlayerTeleportEvent extends PlayerEvent implements Cancellable {
         this.cause = cause;
     }
 
+    public enum TeleportCause {
+        COMMAND,       // For Nukkit tp command only
+        PLUGIN,        // Every plugin
+        NETHER_PORTAL, // Teleport using nether portal
+        END_PORTAL,    // Teleport using end portal
+        ENDER_PEARL,   // Teleport by ender pearl
+        CHORUS_FRUIT,  // Teleport by chorus fruit
+        UNKNOWN        // Unknown cause
+    }
+
+    public static HandlerList getHandlers() {
+        return handlers;
+    }
+
     public Location getFrom() {
         return from;
     }
@@ -53,16 +61,5 @@ public class PlayerTeleportEvent extends PlayerEvent implements Cancellable {
         if (vector instanceof Location) return (Location) vector;
         if (vector instanceof Position) return ((Position) vector).getLocation();
         return new Location(vector.getX(), vector.getY(), vector.getZ(), 0, 0, baseLevel);
-    }
-
-
-    public enum TeleportCause {
-        COMMAND,       // For Nukkit tp command only
-        PLUGIN,        // Every plugin
-        NETHER_PORTAL, // Teleport using nether portal
-        END_PORTAL,    // Teleport using end portal
-        ENDER_PEARL,   // Teleport by ender pearl
-        CHORUS_FRUIT,  // Teleport by chorus fruit
-        UNKNOWN        // Unknown cause
     }
 }

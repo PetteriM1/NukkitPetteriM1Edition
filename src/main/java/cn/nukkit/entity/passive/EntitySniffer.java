@@ -43,4 +43,9 @@ public class EntitySniffer extends EntityWalkingAnimal {
     public int getNetworkId() {
         return NETWORK_ID;
     }
+
+    @Override
+    public boolean canDespawn() {
+        return false;
+    }
 }

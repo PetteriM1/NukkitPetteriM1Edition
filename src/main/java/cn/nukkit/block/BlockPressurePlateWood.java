@@ -43,7 +43,7 @@ public class BlockPressurePlateWood extends BlockPressurePlateBase {
 
     @Override
     public double getResistance() {
-        return 0.5D;
+        return 2.5;
     }
 
     @Override

@@ -1,5 +1,7 @@
 package cn.nukkit.item;
 
+import cn.nukkit.network.protocol.ProtocolInfo;
+
 public class ItemEchoShard extends Item {
 
     public ItemEchoShard() {
@@ -12,5 +14,10 @@ public class ItemEchoShard extends Item {
 
     public ItemEchoShard(Integer meta, int count) {
         super(ECHO_SHARD, meta, count, "Echo Shard");
+    }
+
+    @Override
+    public boolean isSupportedOn(int protocol) {
+        return protocol >= ProtocolInfo.v1_19_0_29;
     }
 }

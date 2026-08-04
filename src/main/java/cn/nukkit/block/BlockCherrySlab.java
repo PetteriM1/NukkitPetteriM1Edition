@@ -2,7 +2,9 @@ package cn.nukkit.block;
 
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockCherrySlab extends BlockSlabWood {
 
@@ -22,6 +24,16 @@ public class BlockCherrySlab extends BlockSlabWood {
     @Override
     public int getId() {
         return CHERRY_SLAB;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_20_0_23;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.WOODEN_SLABS;
     }
 
     @Override

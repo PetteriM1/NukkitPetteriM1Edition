@@ -1,7 +1,9 @@
 package cn.nukkit.block;
 
 import cn.nukkit.item.ItemID;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockOreIronDeepslate extends BlockOreIron {
 
@@ -31,5 +33,15 @@ public class BlockOreIronDeepslate extends BlockOreIron {
     @Override
     public BlockColor getColor() {
         return BlockColor.DEEPSLATE_GRAY_BLOCK_COLOR;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_17_0;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.IRON_ORE;
     }
 }

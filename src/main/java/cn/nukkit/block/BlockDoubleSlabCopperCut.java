@@ -5,11 +5,11 @@ import cn.nukkit.block.properties.OxidizationLevel;
 import java.util.Locale;
 
 public class BlockDoubleSlabCopperCut extends BlockDoubleSlabCopperBase {
-    
+
     public BlockDoubleSlabCopperCut() {
         this(0);
     }
-    
+
     public BlockDoubleSlabCopperCut(int meta) {
         super(meta);
     }
@@ -51,13 +51,13 @@ public class BlockDoubleSlabCopperCut extends BlockDoubleSlabCopperBase {
         }
         switch (oxidizationLevel) {
             case UNAFFECTED:
-                return waxed? WAXED_DOUBLE_CUT_COPPER_SLAB : DOUBLE_CUT_COPPER_SLAB;
+                return waxed ? WAXED_DOUBLE_CUT_COPPER_SLAB : DOUBLE_CUT_COPPER_SLAB;
             case EXPOSED:
-                return waxed? WAXED_EXPOSED_DOUBLE_CUT_COPPER_SLAB : EXPOSED_DOUBLE_CUT_COPPER_SLAB;
+                return waxed ? WAXED_EXPOSED_DOUBLE_CUT_COPPER_SLAB : EXPOSED_DOUBLE_CUT_COPPER_SLAB;
             case WEATHERED:
-                return waxed? WAXED_WEATHERED_DOUBLE_CUT_COPPER_SLAB : WEATHERED_DOUBLE_CUT_COPPER_SLAB;
+                return waxed ? WAXED_WEATHERED_DOUBLE_CUT_COPPER_SLAB : WEATHERED_DOUBLE_CUT_COPPER_SLAB;
             case OXIDIZED:
-                return waxed? WAXED_OXIDIZED_DOUBLE_CUT_COPPER_SLAB : OXIDIZED_DOUBLE_CUT_COPPER_SLAB;
+                return waxed ? WAXED_OXIDIZED_DOUBLE_CUT_COPPER_SLAB : OXIDIZED_DOUBLE_CUT_COPPER_SLAB;
             default:
                 return getId();
         }

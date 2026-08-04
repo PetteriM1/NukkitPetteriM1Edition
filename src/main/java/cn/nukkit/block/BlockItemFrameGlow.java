@@ -7,6 +7,8 @@ import cn.nukkit.math.BlockFace;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.Tag;
 import cn.nukkit.network.protocol.LevelEventPacket;
+import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockItemFrameGlow extends BlockItemFrame {
 
@@ -31,6 +33,16 @@ public class BlockItemFrameGlow extends BlockItemFrame {
     @Override
     public Item toItem() {
         return Item.get(Item.GLOW_ITEM_FRAME);
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_17_0;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.ITEM_FRAME_BLOCK;
     }
 
     @Override
@@ -59,4 +71,3 @@ public class BlockItemFrameGlow extends BlockItemFrame {
         return false;
     }
 }
-

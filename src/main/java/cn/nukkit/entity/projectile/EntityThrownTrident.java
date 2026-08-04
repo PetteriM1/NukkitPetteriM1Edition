@@ -51,6 +51,14 @@ public class EntityThrownTrident extends EntityProjectile {
 
     private static final BlockVector3 defaultStuckToBlockPos = new BlockVector3(0, 0, 0);
 
+    public EntityThrownTrident(FullChunk chunk, CompoundTag nbt) {
+        this(chunk, nbt, null);
+    }
+
+    public EntityThrownTrident(FullChunk chunk, CompoundTag nbt, Entity shootingEntity) {
+        super(chunk, nbt, shootingEntity);
+    }
+
     @Override
     public int getNetworkId() {
         return NETWORK_ID;
@@ -79,14 +87,6 @@ public class EntityThrownTrident extends EntityProjectile {
     @Override
     public float getDrag() {
         return 0.01f;
-    }
-
-    public EntityThrownTrident(FullChunk chunk, CompoundTag nbt) {
-        this(chunk, nbt, null);
-    }
-
-    public EntityThrownTrident(FullChunk chunk, CompoundTag nbt, Entity shootingEntity) {
-        super(chunk, nbt, shootingEntity);
     }
 
     @Override

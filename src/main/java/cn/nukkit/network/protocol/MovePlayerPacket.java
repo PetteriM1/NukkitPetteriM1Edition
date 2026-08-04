@@ -40,11 +40,15 @@ public class MovePlayerPacket extends DataPacket {
         this.mode = this.getByte();
         this.onGround = this.getBoolean();
         this.ridingEid = this.getEntityRuntimeId();
-        if (this.mode == MODE_TELEPORT) {
+
+        if ((protocol >= ProtocolInfo.v1_26_40 && this.getBoolean()) || (protocol < ProtocolInfo.v1_26_40 && this.mode == MODE_TELEPORT)) {
             this.teleportCause = this.getLInt();
             this.teleportItem = this.getLInt();
         }
-        this.frame = this.getUnsignedVarLong();
+
+        if (protocol >= ProtocolInfo.v1_16_100) {
+            this.frame = this.getUnsignedVarLong();
+        }
     }
 
     @Override
@@ -58,11 +62,20 @@ public class MovePlayerPacket extends DataPacket {
         this.putByte((byte) this.mode);
         this.putBoolean(this.onGround);
         this.putEntityRuntimeId(this.ridingEid);
+
         if (this.mode == MODE_TELEPORT) {
+            if (protocol >= ProtocolInfo.v1_26_40) {
+                this.putBoolean(true); // optional present
+            }
             this.putLInt(this.teleportCause);
             this.putLInt(this.teleportItem);
+        } else if (protocol >= ProtocolInfo.v1_26_40) {
+            this.putBoolean(false); // optional not present
         }
-        this.putUnsignedVarLong(this.frame);
+
+        if (protocol >= ProtocolInfo.v1_16_100) {
+            this.putUnsignedVarLong(this.frame);
+        }
     }
 
     @Override

@@ -4,6 +4,15 @@ import cn.nukkit.level.MovingObjectPosition;
 
 public interface AxisAlignedBB extends Cloneable {
 
+    interface BBConsumer<T> {
+
+        void accept(int x, int y, int z);
+
+        default T get() {
+            return null;
+        }
+    }
+
     default AxisAlignedBB setBounds(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
         this.setMinX(minX);
         this.setMinY(minY);
@@ -38,9 +47,7 @@ public interface AxisAlignedBB extends Cloneable {
         return new SimpleAxisAlignedBB(this.getMinX() - x, this.getMinY() - y, this.getMinZ() - z, this.getMaxX() + x, this.getMaxY() + y, this.getMaxZ() + z);
     }
 
-    default AxisAlignedBB expand(double x, double y, double z)
-
-    {
+    default AxisAlignedBB expand(double x, double y, double z) {
         this.setMinX(this.getMinX() - x);
         this.setMinY(this.getMinY() - y);
         this.setMinZ(this.getMinZ() - z);
@@ -297,12 +304,16 @@ public interface AxisAlignedBB extends Cloneable {
         throw new UnsupportedOperationException("Not mutable");
     }
 
-
     double getMinX();
+
     double getMinY();
+
     double getMinZ();
+
     double getMaxX();
+
     double getMaxY();
+
     double getMaxZ();
 
     AxisAlignedBB clone();
@@ -322,16 +333,6 @@ public interface AxisAlignedBB extends Cloneable {
                     action.accept(x, y, z);
                 }
             }
-        }
-    }
-
-
-    interface BBConsumer<T> {
-
-        void accept(int x, int y, int z);
-
-        default T get() {
-            return null;
         }
     }
 }

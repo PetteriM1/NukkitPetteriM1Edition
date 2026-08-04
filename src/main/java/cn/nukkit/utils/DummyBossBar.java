@@ -1,6 +1,7 @@
 package cn.nukkit.utils;
 
 import cn.nukkit.Player;
+import cn.nukkit.Server;
 import cn.nukkit.entity.Attribute;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.data.EntityMetadata;
@@ -10,6 +11,7 @@ import cn.nukkit.network.protocol.*;
 /**
  * DummyBossBar
  * ===============
+ *
  * @author boybook
  * Nukkit Project
  * ===============
@@ -59,6 +61,22 @@ public class DummyBossBar {
 
         public Builder color(BossBarColor color) {
             this.color = color;
+            return this;
+        }
+
+        /**
+         * For legacy plugin support! Do not use!
+         */
+        public Builder color(BlockColor color) {
+            Server.getInstance().getLogger().warning("Unsupported API usage: DummyBossBar.Builder.color(BlockColor)");
+            return this;
+        }
+
+        /**
+         * For legacy plugin support! Do not use!
+         */
+        public Builder color(int red, int green, int blue) {
+            Server.getInstance().getLogger().warning("Unsupported API usage: DummyBossBar.Builder.color(int,int,int)");
             return this;
         }
 
@@ -131,6 +149,7 @@ public class DummyBossBar {
 
     /**
      * Set boss bar color. Requires client version 1.18 or newer.
+     *
      * @param color the boss bar color
      */
     public void setColor(BossBarColor color) {
@@ -142,10 +161,25 @@ public class DummyBossBar {
 
     /**
      * Get boss bar color
+     *
      * @return current color of the boss bar
      */
     public BossBarColor getColor() {
         return this.color;
+    }
+
+    /**
+     * For legacy plugin support! Do not use!
+     */
+    public void setColor(BlockColor color) {
+        Server.getInstance().getLogger().warning("Unsupported API usage: DummyBossBar.setColor(BlockColor)");
+    }
+
+    /**
+     * For legacy plugin support! Do not use!
+     */
+    public void setColor(int red, int green, int blue) {
+        Server.getInstance().getLogger().warning("Unsupported API usage: DummyBossBar.setColor(int,int,int)");
     }
 
     private void createBossEntity() {
@@ -185,7 +219,7 @@ public class DummyBossBar {
         pkBoss.bossEid = bossBarId;
         pkBoss.type = BossEventPacket.TYPE_SHOW;
         pkBoss.title = text;
-        pkBoss.healthPercent = this.length / 100;
+        pkBoss.healthPercent = player.protocol >= 361 ? this.length / 100 : this.length;
         player.dataPacket(pkBoss);
     }
 
@@ -209,16 +243,18 @@ public class DummyBossBar {
         pkBoss.bossEid = bossBarId;
         pkBoss.type = BossEventPacket.TYPE_TITLE;
         pkBoss.title = text;
-        pkBoss.healthPercent = this.length / 100;
+        pkBoss.healthPercent = player.protocol >= 361 ? this.length / 100 : this.length;
         player.dataPacket(pkBoss);
     }
 
     private void sendSetBossBarLength() {
-        BossEventPacket pkBoss = new BossEventPacket();
-        pkBoss.bossEid = bossBarId;
-        pkBoss.type = BossEventPacket.TYPE_HEALTH_PERCENT;
-        pkBoss.healthPercent = this.length / 100;
-        player.dataPacket(pkBoss);
+        if (player.protocol >= 361) { // Again, what the hell is this and where is the documentation?
+            BossEventPacket pkBoss = new BossEventPacket();
+            pkBoss.bossEid = bossBarId;
+            pkBoss.type = BossEventPacket.TYPE_HEALTH_PERCENT;
+            pkBoss.healthPercent = this.length / 100;
+            player.dataPacket(pkBoss);
+        }
     }
 
     /**

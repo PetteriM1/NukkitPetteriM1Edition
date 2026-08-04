@@ -2,7 +2,6 @@ package cn.nukkit.level.format.leveldb.serializer;
 
 import cn.nukkit.level.DimensionData;
 import cn.nukkit.level.format.Chunk;
-import cn.nukkit.level.format.generic.EmptyChunkSection;
 import cn.nukkit.level.format.leveldb.BlockStateMapping;
 import cn.nukkit.level.format.leveldb.LevelDBKey;
 import cn.nukkit.level.format.leveldb.structure.ChunkBuilder;
@@ -17,7 +16,7 @@ import it.unimi.dsi.fastutil.ints.Int2ShortOpenHashMap;
 import org.iq80.leveldb.DB;
 import org.iq80.leveldb.WriteBatch;
 
-import static cn.nukkit.level.format.leveldb.LevelDBConstants.*;
+import static cn.nukkit.level.format.leveldb.LevelDBConstants.LATEST_SUBCHUNK_VERSION;
 
 public class ChunkSerializerV3 implements ChunkSerializer {
     public static final ChunkSerializer INSTANCE = new ChunkSerializerV3();
@@ -49,10 +48,7 @@ public class ChunkSerializerV3 implements ChunkSerializer {
 
             buffer = ByteBufAllocator.DEFAULT.ioBuffer();
             try {
-                byte[] blockLight = section.getLightArray();
-                if (blockLight != EmptyChunkSection.EMPTY_LIGHT_ARR) {
-                    db.put(LevelDBKey.NUKKIT_BLOCK_LIGHT.getKey(chunk.getX(), chunk.getZ(), ySection, chunk.getProvider().getLevel().getDimension()), blockLight);
-                }
+                db.put(LevelDBKey.NUKKIT_BLOCK_LIGHT.getKey(chunk.getX(), chunk.getZ(), ySection, chunk.getProvider().getLevel().getDimension()), section.getLightArray());
             } finally {
                 buffer.release();
             }

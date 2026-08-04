@@ -1,5 +1,8 @@
 package cn.nukkit.block;
 
+import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.utils.material.BlockType;
+
 public class BlockCopperGrateOxidizedWaxed extends BlockCopperGrateOxidized {
 
     public BlockCopperGrateOxidizedWaxed() {
@@ -19,5 +22,13 @@ public class BlockCopperGrateOxidizedWaxed extends BlockCopperGrateOxidized {
     @Override
     public boolean isWaxed() {
         return true;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        if (protocol >= ProtocolInfo.v1_17_0) {
+            return BlockTypes.WAXED_OXIDIZED_COPPER;
+        }
+        return BlockTypes.IRON_BLOCK;
     }
 }

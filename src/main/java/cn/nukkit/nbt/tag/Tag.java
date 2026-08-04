@@ -1,5 +1,6 @@
 package cn.nukkit.nbt.tag;
 
+import cn.nukkit.Server;
 import cn.nukkit.nbt.stream.NBTInputStream;
 import cn.nukkit.nbt.stream.NBTOutputStream;
 
@@ -23,14 +24,6 @@ public abstract class Tag {
 
     private String name;
 
-    abstract void write(NBTOutputStream dos) throws IOException;
-
-    abstract void load(NBTInputStream dis) throws IOException;
-
-    public abstract String toString();
-
-    public abstract byte getId();
-
     protected Tag(String name) {
         if (name == null) {
             this.name = "";
@@ -38,6 +31,14 @@ public abstract class Tag {
             this.name = name;
         }
     }
+
+    abstract void write(NBTOutputStream dos) throws IOException;
+
+    abstract void load(NBTInputStream dis, int nested) throws IOException;
+
+    public abstract String toString();
+
+    public abstract byte getId();
 
     @Override
     public boolean equals(Object obj) {
@@ -61,7 +62,7 @@ public abstract class Tag {
             out.print("(\"" + name + "\")");
         }
         out.print(": ");
-        out.println(toString());
+        out.println(this);
     }
 
     public Tag setName(String name) {
@@ -79,14 +80,22 @@ public abstract class Tag {
     }
 
     public static Tag readNamedTag(NBTInputStream dis) throws IOException {
+        return readNamedTag(dis, 0);
+    }
+
+    static Tag readNamedTag(NBTInputStream dis, int nested) throws IOException {
         byte type = dis.readByte();
         if (type == 0) return new EndTag();
 
-        String name = dis.readUTF(1024);
+        if (nested > 512) {
+            throw new RuntimeException("Tag too nested");
+        }
+
+        String name = dis.readUTF(Server.getInstance().suomiCraftPEMode() ? 1024 : -1);
 
         Tag tag = newTag(type, name);
 
-        tag.load(dis);
+        tag.load(dis, nested + 1);
         return tag;
     }
 

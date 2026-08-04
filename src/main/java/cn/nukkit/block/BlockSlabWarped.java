@@ -42,7 +42,7 @@ public class BlockSlabWarped extends BlockSlab {
 
     @Override
     public Item[] getDrops(Item item) {
-        return new Item[]{ this.toItem() };
+        return new Item[]{this.toItem()};
     }
 
     @Override

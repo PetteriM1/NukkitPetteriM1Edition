@@ -67,13 +67,13 @@ public abstract class BaseLevelProvider implements LevelProvider {
             Server.getInstance().getLogger().error("Failed to load level.dat in " + file_path.getPath(), ex1);
 
             try {
-                File backup = new File(this.path + "level.dat_old");
+                File backup = new File(this.path + "level.dat.bak");
 
                 if (backup.exists()) {
-                    Server.getInstance().getLogger().warning("Attempting to load level.dat_old in " + file_path.getPath());
+                    Server.getInstance().getLogger().warning("Attempting to load level.dat.bak in " + file_path.getPath());
 
                     // Save a copy of the corrupted one
-                    com.google.common.io.Files.copy(levelDat, new File(this.path + "level.dat_invalid"));
+                    com.google.common.io.Files.copy(levelDat, new File(this.path + "level.dat.invalid"));
 
                     // Replace the corrupted one with a backup
                     com.google.common.io.Files.copy(backup, levelDat);
@@ -81,7 +81,7 @@ public abstract class BaseLevelProvider implements LevelProvider {
                     levelData = NBTIO.readCompressed(Files.newInputStream(levelDat.toPath()), ByteOrder.BIG_ENDIAN);
                 }
             } catch (Exception ex2) {
-                Server.getInstance().getLogger().error("Failed to load level.dat_old in " + file_path.getPath(), ex2);
+                Server.getInstance().getLogger().error("Failed to load level.dat.bak in " + file_path.getPath(), ex2);
             }
         }
 

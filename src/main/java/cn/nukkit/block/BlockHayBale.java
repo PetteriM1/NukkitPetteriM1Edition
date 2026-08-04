@@ -13,7 +13,7 @@ import cn.nukkit.utils.Faceable;
  */
 public class BlockHayBale extends BlockSolidMeta implements Faceable {
 
-    private static final short[] FACES = {
+    private static final short[] faces = {
             0,
             0,
             0b1000,
@@ -28,7 +28,7 @@ public class BlockHayBale extends BlockSolidMeta implements Faceable {
 
     public BlockHayBale(int meta) {
         super(meta);
-     }
+    }
 
     @Override
     public int getId() {
@@ -67,7 +67,7 @@ public class BlockHayBale extends BlockSolidMeta implements Faceable {
 
     @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        this.setDamage((this.getDamage() & 0x03) | FACES[face.getIndex()]);
+        this.setDamage((this.getDamage() & 0x03) | faces[face.getIndex()]);
         this.getLevel().setBlock(block, this, true, true);
 
         return true;

@@ -40,13 +40,7 @@ public class BlockSapling extends BlockFlowable {
     public BlockSapling(int meta) {
         super(meta);
     }
-
-    @Override
-    public int getId() {
-        return SAPLING;
-    }
-
-    private static final String[] NAMES = {
+    private static final String[] names = {
             "Oak Sapling",
             "Spruce Sapling",
             "Birch Sapling",
@@ -56,10 +50,23 @@ public class BlockSapling extends BlockFlowable {
             "",
             ""
     };
+    private static final Vector2[][] VALID_SAPLINGS = new Vector2[4][4];
+
+    static {
+        VALID_SAPLINGS[0] = new Vector2[]{new Vector2(0, 0), new Vector2(1, 0), new Vector2(0, 1), new Vector2(1, 1)};
+        VALID_SAPLINGS[1] = new Vector2[]{new Vector2(0, 0), new Vector2(-1, 0), new Vector2(0, -1), new Vector2(-1, -1)};
+        VALID_SAPLINGS[2] = new Vector2[]{new Vector2(0, 0), new Vector2(1, 0), new Vector2(0, -1), new Vector2(1, -1)};
+        VALID_SAPLINGS[3] = new Vector2[]{new Vector2(0, 0), new Vector2(-1, 0), new Vector2(0, 1), new Vector2(-1, 1)};
+    }
+
+    @Override
+    public int getId() {
+        return SAPLING;
+    }
 
     @Override
     public String getName() {
-        return NAMES[this.getDamage() & 0x07];
+        return names[this.getDamage() & 0x07];
     }
 
     @Override
@@ -71,7 +78,7 @@ public class BlockSapling extends BlockFlowable {
 
         Block down = this.down();
         int id = down.getId();
-        if (id == Block.GRASS || id == Block.DIRT || id == Block.FARMLAND || id == Block.PODZOL || id == MYCELIUM || id == MOSS_BLOCK || id == MUD) {
+        if (id == Block.GRASS || id == Block.DIRT || id == Block.FARMLAND || id == Block.PODZOL || id == MYCELIUM || id == MOSS_BLOCK || id == MUD || id == MUDDY_MANGROVE_ROOTS) {
             this.getLevel().setBlock(block, this, true, true);
             return true;
         }
@@ -243,14 +250,6 @@ public class BlockSapling extends BlockFlowable {
     @Override
     public boolean breakWhenPushed() {
         return true;
-    }
-
-    private static final Vector2[][] VALID_SAPLINGS = new Vector2[4][4];
-    static {
-        VALID_SAPLINGS[0] = new Vector2[]{new Vector2(0, 0), new Vector2(1, 0), new Vector2(0, 1), new Vector2(1, 1)};
-        VALID_SAPLINGS[1] = new Vector2[]{new Vector2(0, 0), new Vector2(-1, 0), new Vector2(0, -1), new Vector2(-1, -1)};
-        VALID_SAPLINGS[2] = new Vector2[]{new Vector2(0, 0), new Vector2(1, 0), new Vector2(0, -1), new Vector2(1, -1)};
-        VALID_SAPLINGS[3] = new Vector2[]{new Vector2(0, 0), new Vector2(-1, 0), new Vector2(0, 1), new Vector2(-1, 1)};
     }
 
     private Vector2 findSaplings(int type) {

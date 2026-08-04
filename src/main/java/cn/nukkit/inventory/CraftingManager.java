@@ -6,6 +6,7 @@ import cn.nukkit.block.BlockID;
 import cn.nukkit.item.*;
 import cn.nukkit.network.protocol.BatchPacket;
 import cn.nukkit.network.protocol.CraftingDataPacket;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.*;
 import cn.nukkit.utils.material.tags.MaterialTags;
 import io.netty.util.collection.CharObjectHashMap;
@@ -21,8 +22,52 @@ import java.util.zip.Deflater;
  */
 public class CraftingManager {
 
-    private static BatchPacket packet;
-    /* Keep these public for backwards compatibility */
+    private static BatchPacket packet354;
+    private static BatchPacket packet361;
+    private static BatchPacket packet388;
+    private static BatchPacket packet407;
+    private static BatchPacket packet419;
+    private static BatchPacket packet431;
+    private static BatchPacket packet440;
+    private static BatchPacket packet448;
+    private static BatchPacket packet465;
+    private static BatchPacket packet471; // 1.18 (475) doesn't have its own block palette or other changes so 1.17.40 (471) packet can be used
+    private static BatchPacket packet486;
+    private static BatchPacket packet503;
+    private static BatchPacket packet527;
+    private static BatchPacket packet544;
+    private static BatchPacket packet554;
+    private static BatchPacket packet560;
+    private static BatchPacket packet567;
+    private static BatchPacket packet575;
+    private static BatchPacket packet582;
+    private static BatchPacket packet589;
+    private static BatchPacket packet594;
+    private static BatchPacket packet618;
+    private static BatchPacket packet622;
+    private static BatchPacket packet630;
+    private static BatchPacket packet649;
+    private static BatchPacket packet662;
+    private static BatchPacket packet671;
+    private static BatchPacket packet685;
+    private static BatchPacket packet712;
+    private static BatchPacket packet729;
+    private static BatchPacket packet748;
+    private static BatchPacket packet766;
+    private static BatchPacket packet776;
+    private static BatchPacket packet786;
+    private static BatchPacket packet800;
+    private static BatchPacket packet818;
+    private static BatchPacket packet827;
+    private static BatchPacket packet843;
+    private static BatchPacket packet859;
+    private static BatchPacket packet897;
+    private static BatchPacket packet944;
+    private static BatchPacket packet975;
+    private static BatchPacket packet1001;
+    private static BatchPacket packet2168;
+
+    /* Keep these public for compatibility with official Nukkit */
 
     @Getter
     public final Collection<Recipe> recipes = new ArrayList<>();
@@ -70,7 +115,7 @@ public class CraftingManager {
 
         Map<String, Object> root = new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("recipes.json")).getRootSection();
 
-        RuntimeItemMapping itemMapping = RuntimeItems.getMapping();
+        RuntimeItemMapping itemMapping = RuntimeItems.getMapping((int) root.get("version"));
 
         for (Map recipe : (List<Map>) root.get("recipes")) {
             try {
@@ -594,32 +639,250 @@ public class CraftingManager {
      * Rebuild cached CraftingDataPacket for all protocols after the recipe list has been changed
      */
     public void rebuildPacket() {
+        packet2168 = null;
+        packet1001 = null;
+        packet975 = null;
+        packet944 = null;
+        packet897 = null;
+        packet859 = null;
+        packet843 = null;
+        packet827 = null;
+        packet818 = null;
+        packet800 = null;
+        packet786 = null;
+        packet776 = null;
+        packet766 = null;
+        packet748 = null;
+        packet729 = null;
+        packet712 = null;
+        packet685 = null;
+        packet671 = null;
+        packet662 = null;
+        packet649 = null;
+        packet630 = null;
+        packet622 = null;
+        packet618 = null;
+        packet594 = null;
+        packet589 = null;
+        packet582 = null;
+        packet575 = null;
+        packet567 = null;
+        packet560 = null;
+        packet554 = null;
+        packet544 = null;
+        packet527 = null;
+        packet503 = null;
+        packet486 = null;
+        packet471 = null;
+        packet465 = null;
+        packet448 = null;
+        packet440 = null;
+        packet431 = null;
+        packet419 = null;
+        packet407 = null;
+        packet388 = null;
+        packet361 = null;
+        packet354 = null;
+        this.getCachedPacket(ProtocolInfo.CURRENT_PROTOCOL); // Always cache the packet for the current protocol
+    }
+
+    public BatchPacket getCachedPacket(int protocol) { // Remember to update rebuildPacket
+        if (protocol >= ProtocolInfo.v1_26_40) {
+            if (packet2168 == null) packet2168 = packetFor(protocol);
+            return packet2168;
+        } else if (protocol >= ProtocolInfo.v1_26_30) {
+            if (packet1001 == null) packet1001 = packetFor(protocol);
+            return packet1001;
+        } else if (protocol >= ProtocolInfo.v1_26_20_26) {
+            if (packet975 == null) packet975 = packetFor(protocol);
+            return packet975;
+        } else if (protocol >= ProtocolInfo.v1_26_10) {
+            if (packet944 == null) packet944 = packetFor(protocol);
+            return packet944;
+        } else if (protocol >= ProtocolInfo.v1_21_130_28) {
+            if (packet897 == null) packet897 = packetFor(protocol);
+            return packet897;
+        } else if (protocol >= ProtocolInfo.v1_21_120) {
+            if (packet859 == null) packet859 = packetFor(protocol);
+            return packet859;
+        } else if (protocol >= ProtocolInfo.v1_21_110) {
+            if (packet843 == null) packet843 = packetFor(protocol);
+            return packet843;
+        } else if (protocol >= ProtocolInfo.v1_21_100) {
+            if (packet827 == null) packet827 = packetFor(protocol);
+            return packet827;
+        } else if (protocol >= ProtocolInfo.v1_21_90) {
+            if (packet818 == null) packet818 = packetFor(protocol);
+            return packet818;
+        } else if (protocol >= ProtocolInfo.v1_21_80) {
+            if (packet800 == null) packet800 = packetFor(protocol);
+            return packet800;
+        } else if (protocol >= ProtocolInfo.v1_21_70_24) {
+            if (packet786 == null) packet786 = packetFor(protocol);
+            return packet786;
+        } else if (protocol >= ProtocolInfo.v1_21_60) {
+            if (packet776 == null) packet776 = packetFor(protocol);
+            return packet776;
+        } else if (protocol >= ProtocolInfo.v1_21_50_28) {
+            if (packet766 == null) packet766 = packetFor(protocol);
+            return packet766;
+        } else if (protocol >= ProtocolInfo.v1_21_40) {
+            if (packet748 == null) packet748 = packetFor(protocol);
+            return packet748;
+        } else if (protocol >= ProtocolInfo.v1_21_30) {
+            if (packet729 == null) packet729 = packetFor(protocol);
+            return packet729;
+        } else if (protocol >= ProtocolInfo.v1_21_20) {
+            if (packet712 == null) packet712 = packetFor(protocol);
+            return packet712;
+        } else if (protocol >= ProtocolInfo.v1_21_0) {
+            if (packet685 == null) packet685 = packetFor(protocol);
+            return packet685;
+        } else if (protocol >= ProtocolInfo.v1_20_80) {
+            if (packet671 == null) packet671 = packetFor(protocol);
+            return packet671;
+        } else if (protocol >= ProtocolInfo.v1_20_70) {
+            if (packet662 == null) packet662 = packetFor(protocol);
+            return packet662;
+        } else if (protocol >= ProtocolInfo.v1_20_60) {
+            if (packet649 == null) packet649 = packetFor(protocol);
+            return packet649;
+        } else if (protocol >= ProtocolInfo.v1_20_50) {
+            if (packet630 == null) packet630 = packetFor(protocol);
+            return packet630;
+        } else if (protocol >= ProtocolInfo.v1_20_40) {
+            if (packet622 == null) packet622 = packetFor(protocol);
+            return packet622;
+        } else if (protocol >= ProtocolInfo.v1_20_30) {
+            if (packet618 == null) packet618 = packetFor(protocol);
+            return packet618;
+        } else if (protocol >= ProtocolInfo.v1_20_10_21) {
+            if (packet594 == null) packet594 = packetFor(protocol);
+            return packet594;
+        } else if (protocol >= ProtocolInfo.v1_20_0_23) {
+            if (packet589 == null) packet589 = packetFor(protocol);
+            return packet589;
+        } else if (protocol >= ProtocolInfo.v1_19_80) {
+            if (packet582 == null) packet582 = packetFor(protocol);
+            return packet582;
+        } else if (protocol >= ProtocolInfo.v1_19_70_24) {
+            if (packet575 == null) packet575 = packetFor(protocol);
+            return packet575;
+        } else if (protocol >= ProtocolInfo.v1_19_60) {
+            if (packet567 == null) packet567 = packetFor(protocol);
+            return packet567;
+        } else if (protocol >= ProtocolInfo.v1_19_50) {
+            if (packet560 == null) packet560 = packetFor(protocol);
+            return packet560;
+        } else if (protocol >= ProtocolInfo.v1_19_30_23) {
+            if (packet554 == null) packet554 = packetFor(protocol);
+            return packet554;
+        } else if (protocol >= ProtocolInfo.v1_19_20) {
+            if (packet544 == null) packet544 = packetFor(protocol);
+            return packet544;
+        } else if (protocol >= ProtocolInfo.v1_19_0_29) {
+            if (packet527 == null) packet527 = packetFor(protocol);
+            return packet527;
+        } else if (protocol >= ProtocolInfo.v1_18_30) {
+            if (packet503 == null) packet503 = packetFor(protocol);
+            return packet503;
+        } else if (protocol >= ProtocolInfo.v1_18_10_26) {
+            if (packet486 == null) packet486 = packetFor(protocol);
+            return packet486;
+        } else if (protocol >= ProtocolInfo.v1_17_40) {
+            if (packet471 == null) packet471 = packetFor(protocol);
+            return packet471;
+        } else if (protocol >= ProtocolInfo.v1_17_30) {
+            if (packet465 == null) packet465 = packetFor(protocol);
+            return packet465;
+        } else if (protocol >= ProtocolInfo.v1_17_10) {
+            if (packet448 == null) packet448 = packetFor(protocol);
+            return packet448;
+        } else if (protocol >= ProtocolInfo.v1_17_0) {
+            if (packet440 == null) packet440 = packetFor(protocol);
+            return packet440;
+        } else if (protocol >= ProtocolInfo.v1_16_220) {
+            if (packet431 == null) packet431 = packetFor(protocol);
+            return packet431;
+        } else if (protocol >= ProtocolInfo.v1_16_100) {
+            if (packet419 == null) packet419 = packetFor(protocol);
+            return packet419;
+        } else if (protocol >= ProtocolInfo.v1_16_0) {
+            if (packet407 == null) packet407 = packetFor(protocol);
+            return packet407;
+        } else if (protocol >= ProtocolInfo.v1_13_0) {
+            if (packet388 == null) packet388 = packetFor(protocol);
+            return packet388;
+        } else if (protocol >= ProtocolInfo.v1_12_0) {
+            if (packet361 == null) packet361 = packetFor(protocol);
+            return packet361;
+        } else if (protocol >= ProtocolInfo.v1_11_0) {
+            if (packet354 == null) packet354 = packetFor(protocol);
+            return packet354;
+        }
+        return null;
+    }
+
+    private BatchPacket packetFor(int protocol) {
         CraftingDataPacket pk = new CraftingDataPacket();
+        pk.protocol = protocol;
+        top:
         for (Recipe recipe : this.recipes) {
             if (recipe instanceof ShapedRecipe) {
+                for (Item item : ((ShapedRecipe) recipe).getAllResults()) {
+                    if (!item.isSupportedOn(protocol)) {
+                        continue top;
+                    }
+                }
+                for (Item item : ((ShapedRecipe) recipe).getIngredientList()) {
+                    if (!item.isSupportedOn(protocol)) {
+                        continue top;
+                    }
+                }
                 pk.addShapedRecipe((ShapedRecipe) recipe);
             } else if (recipe instanceof ShapelessRecipe) {
-                pk.addShapelessRecipe((ShapelessRecipe) recipe);
+                if (!recipe.getResult().isSupportedOn(protocol)) {
+                    continue;
+                }
+                for (Item item : ((ShapelessRecipe) recipe).getIngredientList()) {
+                    if (!item.isSupportedOn(protocol)) {
+                        continue top;
+                    }
+                }
+                if (recipe instanceof SmithingRecipe) {
+                    pk.addSmithingRecipe((SmithingRecipe) recipe);
+                } else {
+                    pk.addShapelessRecipe((ShapelessRecipe) recipe);
+                }
             } else if (recipe instanceof FurnaceRecipe) {
+                if (!((FurnaceRecipe) recipe).getInput().isSupportedOn(protocol) || !recipe.getResult().isSupportedOn(protocol)) {
+                    continue;
+                }
                 pk.addFurnaceRecipe((FurnaceRecipe) recipe);
             }
         }
-        for (BrewingRecipe recipe : this.brewingRecipes.values()) {
-            pk.addBrewingRecipe(recipe);
-        }
-        for (ContainerRecipe recipe : this.containerRecipes.values()) {
-            pk.addContainerRecipe(recipe);
-        }
-        // Note: Currently not implemented
-        for (MultiRecipe recipe : this.multiRecipes.values()) {
-            pk.addMultiRecipe(recipe);
+        if (protocol >= ProtocolInfo.v1_13_0) {
+            for (BrewingRecipe recipe : this.brewingRecipes.values()) {
+                if (!recipe.getInput().isSupportedOn(protocol) || !recipe.getIngredient().isSupportedOn(protocol) || !recipe.getResult().isSupportedOn(protocol)) {
+                    continue;
+                }
+                pk.addBrewingRecipe(recipe);
+            }
+            for (ContainerRecipe recipe : this.containerRecipes.values()) {
+                if (!recipe.getInput().isSupportedOn(protocol) || !recipe.getIngredient().isSupportedOn(protocol) || !recipe.getResult().isSupportedOn(protocol)) {
+                    continue;
+                }
+                pk.addContainerRecipe(recipe);
+            }
+            if (protocol >= ProtocolInfo.v1_16_0) {
+                // Note: Currently not implemented
+                for (MultiRecipe recipe : this.multiRecipes.values()) {
+                    pk.addMultiRecipe(recipe);
+                }
+            }
         }
         pk.tryEncode();
-        CraftingManager.packet = pk.compress(Deflater.BEST_COMPRESSION);
-    }
-
-    public BatchPacket getCachedPacket() {
-        return packet;
+        return pk.compress(Deflater.BEST_COMPRESSION);
     }
 
     /* Register recipes start */

@@ -1,6 +1,8 @@
 package cn.nukkit.block;
 
+import cn.nukkit.Server;
 import cn.nukkit.item.ItemID;
+import cn.nukkit.item.ItemTool;
 
 /**
  * @author MagicDroidX
@@ -15,11 +17,16 @@ public class BlockOreGold extends BlockOre {
 
     @Override
     protected int getRawMaterial() {
-        return ItemID.RAW_GOLD;
+        return Server.getInstance().useRawOres ? ItemID.RAW_GOLD : AIR;
     }
 
     @Override
     public String getName() {
         return "Gold Ore";
+    }
+
+    @Override
+    public int getToolTier() {
+        return ItemTool.TIER_IRON;
     }
 }

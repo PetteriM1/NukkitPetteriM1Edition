@@ -23,6 +23,24 @@ public class EntityArrow extends EntityProjectile {
     private int arrowData;
     private boolean isFromCrossbow;
 
+    public EntityArrow(FullChunk chunk, CompoundTag nbt) {
+        this(chunk, nbt, null);
+    }
+
+    public EntityArrow(FullChunk chunk, CompoundTag nbt, Entity shootingEntity) {
+        this(chunk, nbt, shootingEntity, false);
+    }
+
+    public EntityArrow(FullChunk chunk, CompoundTag nbt, Entity shootingEntity, boolean critical) {
+        this(chunk, nbt, shootingEntity, critical, false);
+    }
+
+    public EntityArrow(FullChunk chunk, CompoundTag nbt, Entity shootingEntity, boolean critical, boolean isFromCrossbow) {
+        super(chunk, nbt, shootingEntity);
+        this.setCritical(critical);
+        this.isFromCrossbow = isFromCrossbow;
+    }
+
     @Override
     public int getNetworkId() {
         return NETWORK_ID;
@@ -51,24 +69,6 @@ public class EntityArrow extends EntityProjectile {
     @Override
     public float getDrag() {
         return 0.01f;
-    }
-
-    public EntityArrow(FullChunk chunk, CompoundTag nbt) {
-        this(chunk, nbt, null);
-    }
-
-    public EntityArrow(FullChunk chunk, CompoundTag nbt, Entity shootingEntity) {
-        this(chunk, nbt, shootingEntity, false);
-    }
-
-    public EntityArrow(FullChunk chunk, CompoundTag nbt, Entity shootingEntity, boolean critical) {
-        this(chunk, nbt, shootingEntity, critical, false);
-    }
-
-    public EntityArrow(FullChunk chunk, CompoundTag nbt, Entity shootingEntity, boolean critical, boolean isFromCrossbow) {
-        super(chunk, nbt, shootingEntity);
-        this.setCritical(critical);
-        this.isFromCrossbow = isFromCrossbow;
     }
 
     /**

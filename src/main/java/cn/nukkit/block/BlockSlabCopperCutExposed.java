@@ -4,7 +4,7 @@ import cn.nukkit.block.properties.OxidizationLevel;
 import cn.nukkit.utils.BlockColor;
 
 public class BlockSlabCopperCutExposed extends BlockSlabCopperCut {
-    
+
     public BlockSlabCopperCutExposed() {
         this(0);
     }
@@ -12,7 +12,7 @@ public class BlockSlabCopperCutExposed extends BlockSlabCopperCut {
     public BlockSlabCopperCutExposed(int meta) {
         super(meta, EXPOSED_DOUBLE_CUT_COPPER_SLAB);
     }
-    
+
     protected BlockSlabCopperCutExposed(int meta, int doubleSlab) {
         super(meta, doubleSlab);
     }

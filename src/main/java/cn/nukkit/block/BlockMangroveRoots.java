@@ -1,7 +1,9 @@
 package cn.nukkit.block;
 
 import cn.nukkit.item.ItemTool;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockMangroveRoots extends BlockTransparent {
 
@@ -22,12 +24,22 @@ public class BlockMangroveRoots extends BlockTransparent {
 
     @Override
     public double getResistance() {
-        return 0.7;
+        return 3.5;
     }
 
     @Override
     public int getToolType() {
         return ItemTool.TYPE_AXE;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_19_0;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.LEAVES;
     }
 
     @Override

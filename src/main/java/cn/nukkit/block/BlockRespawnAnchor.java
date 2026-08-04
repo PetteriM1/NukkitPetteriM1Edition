@@ -9,6 +9,8 @@ import cn.nukkit.level.GameRule;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
+import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockRespawnAnchor extends BlockSolidMeta {
 
@@ -117,7 +119,7 @@ public class BlockRespawnAnchor extends BlockSolidMeta {
             return true;
         }
 
-        if (player != null && chargeLevel > 0 && this.level.getDimension() == Level.DIMENSION_NETHER) {
+        if (level.getServer().bedSpawnpoints && player != null && chargeLevel > 0 && this.level.getDimension() == Level.DIMENSION_NETHER) {
             if (player.distanceSquared(this) > 36) {
                 return false;
             }
@@ -138,9 +140,9 @@ public class BlockRespawnAnchor extends BlockSolidMeta {
     public boolean onBreak(Item item) {
         boolean r = super.onBreak(item);
         if (r) {
-            if (level.getDimension() == Level.DIMENSION_NETHER) {
+            if (level.getServer().bedSpawnpoints && level.getDimension() == Level.DIMENSION_NETHER) {
                 Vector3 safeSpawn = null;
-                for (Player player : level.getServer().getOnlinePlayers().values()) {
+                for (Player player : level.getServer().getOnlinePlayersList()) {
                     if (this.equals(player.getSpawnPosition())) {
                         player.setSpawn(safeSpawn == null ? (safeSpawn = level.getServer().getDefaultLevel().getSafeSpawn()) : safeSpawn);
                     }
@@ -148,6 +150,16 @@ public class BlockRespawnAnchor extends BlockSolidMeta {
             }
         }
         return r;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_16_0;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.OBSIDIAN;
     }
 
     @Override

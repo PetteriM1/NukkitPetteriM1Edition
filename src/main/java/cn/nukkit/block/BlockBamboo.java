@@ -47,9 +47,7 @@ public class BlockBamboo extends BlockTransparentMeta {
             this.level.useBreakOn(this, null, null, true);
         } else if (type == Level.BLOCK_UPDATE_RANDOM) {
             Block up;
-            int time = level.getTime() % Level.TIME_FULL;
-            boolean canGrow = time < 13184 || time > 22800;
-            if (this.getAge() == 0 && (up = this.up()).getId() == AIR && canGrow/*this.level.getFullLight(up) >= BlockCrops.MINIMUM_LIGHT_LEVEL*/ && ThreadLocalRandom.current().nextInt(3) == 0) {
+            if (this.getAge() == 0 && (up = this.up()).getId() == AIR && level.isAnimalSpawningAllowedByTime()/*this.level.getFullLight(up) >= BlockCrops.MINIMUM_LIGHT_LEVEL*/ && ThreadLocalRandom.current().nextInt(3) == 0) {
                 this.grow(up);
             }
             return type;
@@ -115,7 +113,8 @@ public class BlockBamboo extends BlockTransparentMeta {
                 this.getLevel().addChunkPacket(player.getChunkX(), player.getChunkZ(), animatePacket);
             }
             this.setLeafSize(LEAF_SIZE_SMALL);
-        } if (down instanceof BlockBamboo) {
+        }
+        if (down instanceof BlockBamboo) {
             BlockBamboo bambooDown = (BlockBamboo) down;
             canGrow = bambooDown.getAge() == 0;
             boolean thick = bambooDown.isThick();
@@ -171,7 +170,7 @@ public class BlockBamboo extends BlockTransparentMeta {
             return false;
         }
 
-        int height = canGrow? this.countHeight() : 0;
+        int height = canGrow ? this.countHeight() : 0;
         if (!canGrow || height >= 15 || height >= 11 && ThreadLocalRandom.current().nextFloat() < 0.25F) {
             this.setAge(1);
         }
@@ -229,7 +228,7 @@ public class BlockBamboo extends BlockTransparentMeta {
     }
 
     public void setThick(boolean thick) {
-        this.setDamage(this.getDamage() & (15 ^ 0x1) | (thick? 0x1 : 0x0));
+        this.setDamage(this.getDamage() & (15 ^ 0x1) | (thick ? 0x1 : 0x0));
     }
 
     @Override
@@ -282,7 +281,7 @@ public class BlockBamboo extends BlockTransparentMeta {
 
             boolean success = false;
 
-            Block block = this.up(top - (int)y + 1);
+            Block block = this.up(top - (int) y + 1);
             if (block.getId() == BlockID.AIR) {
                 success = this.grow(block);
             }

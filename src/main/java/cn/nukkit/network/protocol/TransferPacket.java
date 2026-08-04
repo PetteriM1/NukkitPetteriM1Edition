@@ -20,7 +20,12 @@ public class TransferPacket extends DataPacket {
         this.reset();
         this.putString(address);
         this.putLShort(port);
-        this.putBoolean(false); // reloadWorld
+        if (protocol >= ProtocolInfo.v1_21_30) {
+            this.putBoolean(false); // reloadWorld
+            if (protocol >= ProtocolInfo.v1_26_40) {
+                this.putBoolean(false); // has gatheringsConfig
+            }
+        }
     }
 
     @Override

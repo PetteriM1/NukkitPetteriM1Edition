@@ -15,6 +15,7 @@ public class NBTEntityData extends EntityData<CompoundTag> {
 
     public NBTEntityData(int id, CompoundTag tag) {
         super(id);
+        if (tag == null) throw new NullPointerException("data must not be null");
         this.tag = tag;
     }
 
@@ -31,6 +32,7 @@ public class NBTEntityData extends EntityData<CompoundTag> {
 
     @Override
     public void setData(CompoundTag tag) {
+        if (tag == null) throw new NullPointerException("data must not be null");
         this.tag = tag;
     }
 

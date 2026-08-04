@@ -1,5 +1,6 @@
 package cn.nukkit.utils;
 
+import cn.nukkit.Server;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockID;
 import cn.nukkit.entity.Attribute;
@@ -20,13 +21,16 @@ import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.nbt.tag.StringTag;
 import cn.nukkit.network.LittleEndianByteBufInputStream;
 import cn.nukkit.network.LittleEndianByteBufOutputStream;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.network.protocol.types.EntityLink;
 import cn.nukkit.network.protocol.types.ExperimentData;
-import org.cloudburstmc.nbt.NBTOutputStream;
-import org.cloudburstmc.nbt.NbtUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
+import it.unimi.dsi.fastutil.io.FastByteArrayInputStream;
+import org.cloudburstmc.nbt.NBTOutputStream;
+import org.cloudburstmc.nbt.NbtUtils;
 
+import java.awt.Color;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Array;
@@ -48,7 +52,7 @@ public class BinaryStream {
     private byte[] buffer;
     protected int count;
 
-    private static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8;
+    private static final int MAX_ARRAY_SIZE = 2147483639;
 
     public BinaryStream() {
         this.buffer = new byte[32];
@@ -65,6 +69,7 @@ public class BinaryStream {
         this.offset = offset;
         this.count = buffer.length;
     }
+    private static byte[] steveSkinDecoded;
 
     public BinaryStream reset() {
         this.offset = 0;
@@ -274,56 +279,157 @@ public class BinaryStream {
     }
 
     public void putSkin(Skin skin) {
+        Server.mvw("BinaryStream#putSkin(Skin)");
+        this.putSkin(ProtocolInfo.CURRENT_PROTOCOL, skin);
+    }
+
+    public void putSkin(int protocol, Skin skin) {
         this.putString(skin.getSkinId());
 
-        this.putString(skin.getPlayFabId());
-        this.putString(skin.getSkinResourcePatch());
-        this.putImage(skin.getSkinData());
+        if (protocol < ProtocolInfo.v1_13_0) {
+            if (skin.isPersona()) { // Hack: Replace persona skins with steve skins for < 1.13 players to avoid invisible skins
+                this.putByteArray(steveSkinDecoded != null ? steveSkinDecoded : (steveSkinDecoded = Base64.getDecoder().decode(Skin.STEVE_SKIN)));
+                if (protocol >= ProtocolInfo.v1_2_13) {
+                    this.putByteArray(skin.getCapeData().data);
+                }
+                this.putString("geometry.humanoid.custom");
+                this.putString(Skin.STEVE_GEOMETRY);
+            } else {
+                this.putByteArray(skin.getSkinData().data);
+                if (protocol >= ProtocolInfo.v1_2_13) {
+                    this.putByteArray(skin.getCapeData().data);
+                }
+                this.putString(skin.isLegacySlim ? "geometry.humanoid.customSlim" : "geometry.humanoid.custom");
+                this.putString(skin.getGeometryData());
+            }
+        } else {
+            if (protocol >= ProtocolInfo.v1_16_210) {
+                this.putString(skin.getPlayFabId());
+            }
 
-        List<SkinAnimation> animations = skin.getAnimations();
-        this.putLInt(animations.size());
-        for (SkinAnimation animation : animations) {
-            this.putImage(animation.image);
-            this.putLInt(animation.type);
-            this.putLFloat(animation.frames);
-            this.putLInt(animation.expression);
-        }
+            this.putString(skin.getSkinResourcePatch());
+            this.putImage(skin.getSkinData());
 
-        this.putImage(skin.getCapeData());
-        this.putString(skin.getGeometryData());
-        this.putString(skin.getGeometryDataEngineVersion());
-        this.putString(skin.getAnimationData());
-        this.putString(skin.getCapeId());
-        this.putString(skin.getFullSkinId());
-        this.putString(skin.getArmSize());
-        this.putString(skin.getSkinColor());
+            List<SkinAnimation> animations = skin.getAnimations();
+            if (protocol >= ProtocolInfo.v1_26_40) {
+                this.putUnsignedVarInt(animations.size());
+            } else {
+                this.putLInt(animations.size());
+            }
 
-        List<PersonaPiece> pieces = skin.getPersonaPieces();
-        this.putLInt(pieces.size());
-        for (PersonaPiece piece : pieces) {
-            this.putString(piece.id);
-            this.putString(piece.type);
-            this.putString(piece.packId);
-            this.putBoolean(piece.isDefault);
-            this.putString(piece.productId);
-        }
+            for (SkinAnimation animation : animations) {
+                this.putImage(animation.image);
 
-        List<PersonaPieceTint> tints = skin.getTintColors();
-        this.putLInt(tints.size());
-        for (PersonaPieceTint tint : tints) {
-            this.putString(tint.pieceType);
-            List<String> colors = tint.colors;
-            this.putLInt(colors.size());
-            for (String color : colors) {
-                this.putString(color);
+                if (protocol >= ProtocolInfo.v1_26_40) {
+                    this.putUnsignedVarInt(animation.type);
+                } else {
+                    this.putLInt(animation.type);
+                }
+
+                this.putLFloat(animation.frames);
+
+                if (protocol >= ProtocolInfo.v1_16_100) {
+                    if (protocol >= ProtocolInfo.v1_26_40) {
+                        this.putUnsignedVarInt(animation.expression);
+                    } else {
+                        this.putLInt(animation.expression);
+                    }
+                }
+            }
+
+            this.putImage(skin.getCapeData());
+            this.putString(skin.getGeometryData());
+
+            if (protocol >= ProtocolInfo.v1_17_30) {
+                this.putString(skin.getGeometryDataEngineVersion());
+            }
+
+            this.putString(skin.getAnimationData());
+
+            if (protocol < ProtocolInfo.v1_17_30) {
+                this.putBoolean(skin.isPremium());
+                this.putBoolean(skin.isPersona());
+                this.putBoolean(skin.isCapeOnClassic());
+            }
+
+            this.putString(skin.getCapeId());
+            this.putString(skin.getFullSkinId());
+
+            if (protocol >= ProtocolInfo.v1_14_60) {
+                if (protocol >= ProtocolInfo.v1_26_40) {
+                    this.putByte((byte) ("slim".equalsIgnoreCase(skin.getArmSize()) ? 0 : 1));
+                    this.putLInt(skin.getColor().getRGB());
+                } else {
+                    this.putString(skin.getArmSize());
+                    this.putString(skin.getSkinColor());
+                }
+
+                List<PersonaPiece> pieces = skin.getPersonaPieces();
+                if (protocol >= ProtocolInfo.v1_26_40) {
+                    this.putUnsignedVarInt(pieces.size());
+                } else {
+                    this.putLInt(pieces.size());
+                }
+
+                for (PersonaPiece piece : pieces) {
+                    this.putString(piece.id);
+
+                    if (protocol >= ProtocolInfo.v1_26_40) {
+                        this.putLInt(piece.type.ordinal());
+                        this.putUUID(piece.packId);
+                    } else {
+                        this.putString(piece.type.getSerializeName());
+                        this.putString(piece.packId.toString());
+                    }
+
+                    this.putBoolean(piece.isDefault);
+                    this.putString(piece.productId);
+                }
+
+                List<PersonaPieceTint> tints = skin.getTintColors();
+                if (protocol >= ProtocolInfo.v1_26_40) {
+                    this.putUnsignedVarInt(tints.size());
+                } else {
+                    this.putLInt(tints.size());
+                }
+
+                for (PersonaPieceTint tint : tints) {
+                    this.putString(tint.pieceType.getSerializeName());
+
+                    if (protocol >= ProtocolInfo.v1_26_40) {
+                        List<Color> colorsNew = tint.getColorsNew();
+                        for (int i = 0; i < 4; i++) {
+                            if (i >= colorsNew.size()) {
+                                this.putLInt(0);
+                            } else {
+                                this.putLInt(colorsNew.get(i).getRGB());
+                            }
+                        }
+                    } else {
+                        this.putLInt(tint.getColors().size());
+                        for (String color : tint.getColors()) {
+                            this.putString(color);
+                        }
+                    }
+                }
+
+                if (protocol >= ProtocolInfo.v1_17_30) {
+                    this.putBoolean(skin.isPremium());
+                    this.putBoolean(skin.isPersona());
+                    this.putBoolean(skin.isCapeOnClassic());
+                    this.putBoolean(skin.isPrimaryUser());
+
+                    if (protocol >= ProtocolInfo.v1_19_63) {
+                        this.putBoolean(skin.isOverridingPlayerAppearance());
+
+                        if (protocol >= ProtocolInfo.v1_26_40) {
+                            this.putString(Boolean.toString(skin.isTrusted()));
+                            this.putString(skin.getProfileHash());
+                        }
+                    }
+                }
             }
         }
-
-        this.putBoolean(skin.isPremium());
-        this.putBoolean(skin.isPersona());
-        this.putBoolean(skin.isCapeOnClassic());
-        this.putBoolean(skin.isPrimaryUser());
-        this.putBoolean(skin.isOverridingPlayerAppearance());
     }
 
     public void putImage(SerializedImage image) {
@@ -340,60 +446,268 @@ public class BinaryStream {
     }
 
     public Skin getSkin() {
+        Server.mvw("BinaryStream#getSkin()");
+        return getSkin(ProtocolInfo.CURRENT_PROTOCOL);
+    }
+
+    public Skin getSkin(int protocol) { // Can be used only with protocol >= 388
         Skin skin = new Skin();
         skin.setSkinId(this.getString());
-        skin.setPlayFabId(this.getString());
+
+        if (protocol >= ProtocolInfo.v1_16_210) {
+            skin.setPlayFabId(this.getString());
+        }
+
         skin.setSkinResourcePatch(this.getString());
         skin.setSkinData(this.getImage());
 
-        int animationCount = this.getLInt();
-        for (int i = 0; i < animationCount; i++) {
+        int animationCount = protocol >= ProtocolInfo.v1_26_40 ? (int) this.getUnsignedVarInt() : this.getLInt();
+
+        for (int i = 0; i < Math.min(animationCount, 1024); i++) {
             SerializedImage image = this.getImage();
-            int type = this.getLInt();
+            int type = protocol >= ProtocolInfo.v1_26_40 ? (int) this.getUnsignedVarInt() : this.getLInt();
             float frames = this.getLFloat();
-            int expression = this.getLInt();
+            int expression = protocol >= ProtocolInfo.v1_26_40 ? (int) this.getUnsignedVarInt() : protocol >= ProtocolInfo.v1_16_100 ? this.getLInt() : 0;
             skin.getAnimations().add(new SkinAnimation(image, type, frames, expression));
         }
 
         skin.setCapeData(this.getImage());
         skin.setGeometryData(this.getString());
-        skin.setGeometryDataEngineVersion(this.getString());
+
+        if (protocol >= ProtocolInfo.v1_17_30) {
+            skin.setGeometryDataEngineVersion(this.getString());
+        }
+
         skin.setAnimationData(this.getString());
+
+        if (protocol < ProtocolInfo.v1_17_30) {
+            skin.setPremium(this.getBoolean());
+            skin.setPersona(this.getBoolean());
+            skin.setCapeOnClassic(this.getBoolean());
+        }
+
         skin.setCapeId(this.getString());
         skin.setFullSkinId(this.getString());
-        skin.setArmSize(this.getString());
-        skin.setSkinColor(this.getString());
 
-        int piecesLength = this.getLInt();
-        for (int i = 0; i < piecesLength; i++) {
-            String pieceId = this.getString();
-            String pieceType = this.getString();
-            String packId = this.getString();
-            boolean isDefault = this.getBoolean();
-            String productId = this.getString();
-            skin.getPersonaPieces().add(new PersonaPiece(pieceId, pieceType, packId, isDefault, productId));
-        }
-
-        int tintsLength = this.getLInt();
-        for (int i = 0; i < tintsLength; i++) {
-            String pieceType = this.getString();
-            List<String> colors = new ArrayList<>();
-            int colorsLength = this.getLInt();
-            for (int i2 = 0; i2 < colorsLength; i2++) {
-                colors.add(this.getString());
+        if (protocol >= ProtocolInfo.v1_14_60) {
+            if (protocol >= ProtocolInfo.v1_26_40) {
+                skin.setArmSize(this.getByte() == 1 ? "wide" : "slim");
+                skin.setColor(new Color(this.getLInt(), true));
+            } else {
+                skin.setArmSize(this.getString());
+                skin.setSkinColor(this.getString());
             }
-            skin.getTintColors().add(new PersonaPieceTint(pieceType, colors));
-        }
 
-        skin.setPremium(this.getBoolean());
-        skin.setPersona(this.getBoolean());
-        skin.setCapeOnClassic(this.getBoolean());
-        skin.setPrimaryUser(this.getBoolean());
-        this.getBoolean(); //skin.setOverridingPlayerAppearance(this.getBoolean());
+            int piecesLength = protocol >= ProtocolInfo.v1_26_40 ? (int) this.getUnsignedVarInt() : this.getLInt();
+            for (int i = 0; i < Math.min(piecesLength, 1024); i++) {
+                String pieceId = this.getString();
+
+                PersonaPieceType pieceType;
+                UUID packId;
+                if (protocol >= ProtocolInfo.v1_26_40) {
+                    pieceType = PersonaPieceType.values()[this.getLInt()];
+                    packId = this.getUUID();
+                } else {
+                    pieceType = PersonaPieceType.fromName(this.getString());
+                    packId = UUID.fromString(this.getString());
+                }
+
+                boolean isDefault = this.getBoolean();
+                String productId = this.getString();
+
+                if (pieceType != PersonaPieceType.UNKNOWN && pieceType != PersonaPieceType.UNSUPPORTED) {
+                    skin.getPersonaPieces().add(new PersonaPiece(pieceId, pieceType, packId, isDefault, productId));
+                }
+            }
+
+            int tintsLength = protocol >= ProtocolInfo.v1_26_40 ? (int) this.getUnsignedVarInt() : this.getLInt();
+            for (int i = 0; i < Math.min(tintsLength, 1024); i++) {
+                if (protocol >= ProtocolInfo.v1_26_40) {
+                    PersonaPieceType pieceType = PersonaPieceType.fromName(this.getString());
+
+                    List<Color> colors = new ArrayList<>(4);
+                    for (int i2 = 0; i2 < 4; i2++) {
+                        colors.add(new Color(this.getLInt(), true));
+                    }
+
+                    if (pieceType != PersonaPieceType.UNKNOWN && pieceType != PersonaPieceType.UNSUPPORTED) {
+                        skin.getTintColors().add(new PersonaPieceTint(pieceType, colors));
+                    }
+                } else {
+                    String pieceType = this.getString();
+
+                    List<String> colors = new ArrayList<>(4);
+                    int colorsLength = this.getLInt();
+                    for (int i2 = 0; i2 < Math.min(colorsLength, 128); i2++) {
+                        colors.add(this.getString());
+                    }
+
+                    if (!pieceType.endsWith("unknown") && !pieceType.endsWith("unsupported")) {
+                        skin.getTintColors().add(new PersonaPieceTint(pieceType, colors));
+                    }
+                }
+            }
+
+            if (protocol >= ProtocolInfo.v1_17_30) {
+                skin.setPremium(this.getBoolean());
+                skin.setPersona(this.getBoolean());
+                skin.setCapeOnClassic(this.getBoolean());
+                skin.setPrimaryUser(this.getBoolean());
+
+                if (protocol >= ProtocolInfo.v1_19_63) {
+                    this.getBoolean(); //skin.setOverridingPlayerAppearance(this.getBoolean());
+
+                    if (protocol >= ProtocolInfo.v1_26_40) {
+                        this.getString(); //skin.setTrusted("true".equalsIgnoreCase(this.getString()));
+                        this.getString(); //skin.setProfileHash(this.getString());
+                    }
+                }
+            }
+        }
         return skin;
     }
 
     public Item getSlot() {
+        Server.mvw("BinaryStream#getSlot()");
+        return this.getSlot(ProtocolInfo.CURRENT_PROTOCOL);
+    }
+
+    public Item getSlot(int protocol) {
+        if (protocol >= ProtocolInfo.v1_26_40) {
+            return getNetworkItemStackDescriptor(protocol);
+        }
+
+        if (protocol >= ProtocolInfo.v1_16_220) {
+            return this.getSlotNew(protocol);
+        }
+
+        int runtimeId = this.getVarInt();
+        if (runtimeId == 0) {
+            return Item.get(Item.AIR, 0, 0);
+        }
+
+        int auxValue = this.getVarInt();
+        int damage = auxValue >> 8;
+        if (damage == Short.MAX_VALUE) {
+            damage = -1;
+        }
+
+        int id;
+        if (protocol < ProtocolInfo.v1_16_100) {
+            id = runtimeId;
+        } else {
+            RuntimeItemMapping mapping = RuntimeItems.getMapping(protocol);
+            LegacyEntry legacyEntry = mapping.fromRuntime(runtimeId);
+            id = legacyEntry.getLegacyId();
+            if (legacyEntry.isHasDamage()) {
+                damage = legacyEntry.getDamage();
+            }
+        }
+
+        int cnt = auxValue & 0xff;
+
+        int nbtLen = this.getLShort();
+        byte[] nbt = new byte[0];
+        if (nbtLen < Short.MAX_VALUE) {
+            nbt = this.get(nbtLen);
+        } else if (nbtLen == 65535) {
+            int nbtTagCount = (int) getUnsignedVarInt();
+            int offset = this.offset;
+            FastByteArrayInputStream stream = new FastByteArrayInputStream(get());
+            for (int i = 0; i < nbtTagCount; i++) {
+                try {
+                    // TODO: 05/02/2019 This hack is necessary because we keep the raw NBT tag. Try to remove it.
+                    CompoundTag tag = NBTIO.readSafely(stream, ByteOrder.LITTLE_ENDIAN, true);
+                    // Hack for tool damage
+                    if (tag.contains("Damage")) {
+                        damage = tag.getInt("Damage");
+                        tag.remove("Damage");
+                    }
+                    if (tag.contains("__DamageConflict__")) {
+                        tag.put("Damage", tag.removeAndGet("__DamageConflict__"));
+                    }
+                    if (!tag.getAllTags().isEmpty()) {
+                        nbt = NBTIO.write(tag, ByteOrder.LITTLE_ENDIAN, false);
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            setOffset(offset + (int) stream.position());
+        }
+
+        int canPlaceOnCount = this.getVarInt();
+        if (canPlaceOnCount > 4096) {
+            throw new RuntimeException("Too many CanPlaceOn blocks: " + canPlaceOnCount);
+        }
+
+        String[] canPlaceOn = new String[canPlaceOnCount];
+        for (int i = 0; i < canPlaceOn.length; ++i) {
+            canPlaceOn[i] = this.getString();
+        }
+
+        int canDestroyCount = this.getVarInt();
+        if (canDestroyCount > 4096) {
+            throw new RuntimeException("Too many CanDestroy blocks: " + canDestroyCount);
+        }
+
+        String[] canDestroy = new String[canDestroyCount];
+        for (int i = 0; i < canDestroy.length; ++i) {
+            canDestroy[i] = this.getString();
+        }
+
+        if (id == ItemID.SHIELD && protocol >= ProtocolInfo.v1_11_0) {
+            this.getVarLong();
+        }
+
+        if (cnt <= 0) {
+            return Item.get(Item.AIR, 0, 0);
+        }
+
+        try {
+            CompoundTag compoundTag;
+            if (nbt.length > 0 && (compoundTag = NBTIO.readSafely(new FastByteArrayInputStream(nbt), ByteOrder.LITTLE_ENDIAN, false)).contains("mv_origin_id") && compoundTag.contains("mv_origin_meta")) {
+                Item item = Item.get(compoundTag.getInt("mv_origin_id"), compoundTag.getInt("mv_origin_meta"), cnt);
+                if (compoundTag.contains("mv_origin_nbt")) {
+                    item.setNamedTag(compoundTag.getCompound("mv_origin_nbt"));
+                }
+                return item;
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+
+        Item item = Item.get(id, damage, cnt, nbt);
+
+        if (canDestroy.length > 0 || canPlaceOn.length > 0) {
+            CompoundTag namedTag = item.getNamedTag();
+            if (namedTag == null) {
+                namedTag = new CompoundTag();
+            }
+
+            if (canDestroy.length > 0) {
+                ListTag<StringTag> listTag = new ListTag<>("CanDestroy");
+                for (String blockName : canDestroy) {
+                    listTag.add(new StringTag("", blockName));
+                }
+                namedTag.put("CanDestroy", listTag);
+            }
+
+            if (canPlaceOn.length > 0) {
+                ListTag<StringTag> listTag = new ListTag<>("CanPlaceOn");
+                for (String blockName : canPlaceOn) {
+                    listTag.add(new StringTag("", blockName));
+                }
+                namedTag.put("CanPlaceOn", listTag);
+            }
+
+            item.setNamedTag(namedTag);
+        }
+
+        return item;
+    }
+
+    private Item getSlotNew(int protocol) {
         int runtimeId = this.getVarInt();
         if (runtimeId == 0) {
             return Item.get(Item.AIR, 0, 0);
@@ -402,7 +716,7 @@ public class BinaryStream {
         int count = this.getLShort();
         int damage = (int) this.getUnsignedVarInt();
 
-        RuntimeItemMapping mapping = RuntimeItems.getMapping();
+        RuntimeItemMapping mapping = RuntimeItems.getMapping(protocol);
         LegacyEntry legacyEntry = mapping.fromRuntime(runtimeId);
 
         int id = legacyEntry.getLegacyId();
@@ -415,14 +729,19 @@ public class BinaryStream {
         }
 
         int blockRuntimeId = this.getVarInt();
-        /*if (id < 256 && id != 166) { // ItemBlock
-            int fullId = GlobalBlockPalette.getLegacyFullId(blockRuntimeId);
+        if (protocol >= ProtocolInfo.v1_19_0_31 && id < 256 && id != 166 && !(id == -212 && legacyEntry.getDamage() == 0) && !legacyEntry.isHasDamage() && (protocol < ProtocolInfo.v1_21_30 || id == BlockID.RED_MUSHROOM_BLOCK || id == BlockID.BROWN_MUSHROOM_BLOCK)) { // ItemBlock
+            int fullId = GlobalBlockPalette.getLegacyFullId(protocol, blockRuntimeId);
             if (fullId != -1) {
                 damage = fullId & 0x3f;
             }
-        }*/
+        }
 
         byte[] bytes = this.getByteArray();
+
+        if (count <= 0) {
+            return Item.get(Item.AIR, 0, 0);
+        }
+
         ByteBuf buf = ByteBufAllocator.DEFAULT.ioBuffer(bytes.length);
         buf.writeBytes(bytes);
 
@@ -435,11 +754,11 @@ public class BinaryStream {
 
             CompoundTag compoundTag = null;
             if (nbtSize > 0) {
-                compoundTag = NBTIO.read(stream, ByteOrder.LITTLE_ENDIAN);
+                compoundTag = NBTIO.readSafely(stream, ByteOrder.LITTLE_ENDIAN, false);
             } else if (nbtSize == -1) {
                 int tagCount = stream.readUnsignedByte();
                 if (tagCount != 1) throw new IllegalArgumentException("Expected 1 tag but got " + tagCount);
-                compoundTag = NBTIO.read(stream, ByteOrder.LITTLE_ENDIAN);
+                compoundTag = NBTIO.readSafely(stream, ByteOrder.LITTLE_ENDIAN, false);
             }
 
             if (compoundTag != null && !compoundTag.getAllTags().isEmpty()) {
@@ -462,7 +781,7 @@ public class BinaryStream {
 
             canPlace = new String[canPlaceCount];
             for (int i = 0; i < canPlace.length; i++) {
-                canPlace[i] = stream.readUTF();
+                canPlace[i] = stream.readUTF(1024);
             }
 
             int canBreakCount = stream.readInt();
@@ -472,11 +791,19 @@ public class BinaryStream {
 
             canBreak = new String[canBreakCount];
             for (int i = 0; i < canBreak.length; i++) {
-                canBreak[i] = stream.readUTF();
+                canBreak[i] = stream.readUTF(1024);
             }
 
             if (id == ItemID.SHIELD) {
                 stream.readLong();
+            }
+
+            if (compoundTag != null && compoundTag.contains("mv_origin_id") && compoundTag.contains("mv_origin_meta")) {
+                Item item = Item.get(compoundTag.getInt("mv_origin_id"), compoundTag.getInt("mv_origin_meta"), count);
+                if (compoundTag.contains("mv_origin_nbt")) {
+                    item.setNamedTag(compoundTag.getCompound("mv_origin_nbt"));
+                }
+                return item;
             }
         } catch (IOException e) {
             throw new IllegalStateException("Unable to read item user data", e);
@@ -514,14 +841,361 @@ public class BinaryStream {
         return item;
     }
 
-    public void putSlot(Item item) {
-        this.putSlot(item, false);
+    protected void getDummySlot(int protocol) {
+        if (protocol >= ProtocolInfo.v1_26_40) {
+            getDummyNetworkItemStackDescriptor(protocol);
+            return;
+        }
+
+        int runtimeId = this.getVarInt();
+        if (runtimeId == 0) {
+            return;
+        }
+
+        if (protocol < ProtocolInfo.v1_16_220) {
+            this.getVarInt(); // auxValue
+
+            int id;
+            if (protocol < ProtocolInfo.v1_16_100) {
+                id = runtimeId;
+            } else {
+                LegacyEntry legacyEntry = RuntimeItems.getMapping(protocol).fromRuntime(runtimeId);
+                id = legacyEntry.getLegacyId();
+            }
+
+            int nbtLen = this.getLShort();
+            if (nbtLen < Short.MAX_VALUE) {
+                this.get(nbtLen);
+            } else if (nbtLen == 65535) {
+                int nbtTagCount = (int) getUnsignedVarInt();
+                int offset = this.offset;
+                FastByteArrayInputStream stream = new FastByteArrayInputStream(get());
+                for (int i = 0; i < nbtTagCount; i++) {
+                    try {
+                        NBTIO.readSafely(stream, ByteOrder.LITTLE_ENDIAN, true);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                setOffset(offset + (int) stream.position());
+            }
+
+            int canPlaceOnCount = this.getVarInt();
+            if (canPlaceOnCount > 4096) {
+                throw new RuntimeException("Too many CanPlaceOn blocks: " + canPlaceOnCount);
+            }
+
+            for (int i = 0; i < canPlaceOnCount; ++i) {
+                this.getString();
+            }
+
+            int canDestroyCount = this.getVarInt();
+            if (canDestroyCount > 4096) {
+                throw new RuntimeException("Too many CanDestroy blocks: " + canDestroyCount);
+            }
+
+            for (int i = 0; i < canDestroyCount; ++i) {
+                this.getString();
+            }
+
+            if (id == ItemID.SHIELD && protocol >= ProtocolInfo.v1_11_0) {
+                this.getVarLong();
+            }
+
+            return;
+        }
+
+        this.getLShort(); // count
+        this.getUnsignedVarInt(); // damage
+
+        if (this.getBoolean()) { // hasNetId
+            this.getVarInt(); // netId
+        }
+
+        this.getVarInt(); // blockRuntimeId
+
+        this.getByteArray(); // data
     }
 
-    public void putSlot(Item item, boolean instanceItem) {
+    protected void getDummyNetworkItemStackDescriptor(int protocol) {
+        if (protocol < ProtocolInfo.v1_26_20_26) {
+            getDummySlot(protocol);
+            return;
+        }
+
+        this.getLShort(); // runtimeId
+        this.getLShort(); // count
+        this.getUnsignedVarInt(); // damage
+
+        if (this.getBoolean()) { // hasNetId
+            if (protocol < ProtocolInfo.v1_26_40) {
+                this.getUnsignedVarInt(); // netIdVariant
+            }
+            this.getVarInt(); // netId
+        }
+
+        this.getUnsignedVarInt(); // blockRuntimeId
+
+        this.getByteArray(); // bytes
+    }
+
+    public void putSlot(Item item) {
+        Server.mvw("BinaryStream#putSlot(Item)");
+        this.putSlot(ProtocolInfo.CURRENT_PROTOCOL, item);
+    }
+
+    public void putSlot(int protocol, Item item) {
+        this.putSlot(protocol, item, false);
+    }
+
+    public void putSlot(int protocol, Item item, boolean instanceItem) {
+        if (protocol >= ProtocolInfo.v1_26_40) {
+            putNetworkItemStackDescriptor(protocol, item, instanceItem);
+            return;
+        }
+
+        if (protocol >= ProtocolInfo.v1_19_0_31) {
+            this.putSlot_1_19_0(protocol, item, instanceItem);
+        } else if (protocol >= ProtocolInfo.v1_16_220) {
+            this.putSlot_1_16_220(protocol, item, instanceItem);
+        } else {
+            this.putSlotLegacy(protocol, item, instanceItem);
+        }
+    }
+
+    private void putSlotLegacy(int protocol, Item item, boolean instanceItem) {
+        if (item == null || item.getId() == Item.AIR) {
+            this.putVarInt(0);
+            return;
+        }
+
+        Item alternate = null;
+        if (item instanceof ItemBlock && protocol < item.getBlockUnsafe().getMinimumVersion()) {
+            alternate = Item.get(item.getBlockUnsafe().getAlternateBlock(protocol), item.getBlockUnsafe().getAlternateMeta(protocol), item.getCount());
+        } else if (!item.isSupportedOn(protocol)) {
+            alternate = Item.get(Item.INFO_UPDATE, 0, item.getCount());
+        }
+
+        if (alternate != null) {
+            Item original = item;
+            item = alternate;
+
+            CompoundTag originalNBT = original.getNamedTag();
+            if (originalNBT != null) {
+                item.setNamedTag(new CompoundTag().putCompound("mv_origin_nbt", originalNBT));
+            }
+            item.setCustomName("§r§f" + original.getName());
+            item.setNamedTag(item.getNamedTag().putInt("mv_origin_id", original.getId()).putInt("mv_origin_meta", original.getDamage()));
+        }
+
+        int runtimeId = item.getId();
+        int damage = item.hasMeta() ? item.getDamage() : -1;
+
+        if (protocol >= ProtocolInfo.v1_16_100) {
+            RuntimeItemMapping mapping = RuntimeItems.getMapping(protocol);
+            RuntimeEntry runtimeEntry = mapping.toRuntime(item.getId(), item.getDamage());
+            runtimeId = runtimeEntry.getRuntimeId();
+            damage = runtimeEntry.isHasDamage() ? 0 : item.getDamage();
+        }
+
+        this.putVarInt(runtimeId);
+
+        int auxValue;
+        boolean isDurable = item instanceof ItemDurable;
+
+        if (protocol >= ProtocolInfo.v1_12_0) {
+            auxValue = item.getCount();
+            if (!isDurable) {
+                int meta;
+                if (protocol < ProtocolInfo.v1_16_100) {
+                    meta = item.hasMeta() ? item.getDamage() : -1;
+                } else {
+                    meta = damage;
+                }
+                auxValue |= ((meta & 0x7fff) << 8);
+            }
+        } else {
+            auxValue = (((item.hasMeta() ? item.getDamage() : -1) & 0x7fff) << 8) | item.getCount();
+        }
+
+        this.putVarInt(auxValue);
+
+        // Hack: fix recipe list not displaying some items
+        if (instanceItem) {
+            this.putLShort(0);
+            this.putVarInt(0);
+            this.putVarInt(0);
+            if (item.getId() == ItemID.SHIELD && protocol >= ProtocolInfo.v1_11_0) {
+                this.putVarLong(0);
+            }
+            return;
+        }
+
+        if (item.hasCompoundTag() || (isDurable && protocol >= ProtocolInfo.v1_12_0)) {
+            if (protocol < ProtocolInfo.v1_12_0) {
+                byte[] nbt = item.getCompoundTag();
+                this.putLShort(nbt.length);
+                this.put(nbt);
+            } else {
+                try {
+                    // Hack for tool damage
+                    byte[] nbt = item.getCompoundTag();
+                    CompoundTag tag;
+                    if (nbt == null || nbt.length == 0) {
+                        tag = new CompoundTag();
+                    } else {
+                        tag = NBTIO.read(nbt, ByteOrder.LITTLE_ENDIAN, false);
+                    }
+                    if (tag.contains("Damage")) {
+                        tag.put("__DamageConflict__", tag.removeAndGet("Damage"));
+                    }
+                    if (isDurable) {
+                        tag.putInt("Damage", item.getDamage());
+                    }
+
+                    this.putLShort(0xffff);
+                    this.putByte((byte) 1);
+                    this.put(NBTIO.write(tag, ByteOrder.LITTLE_ENDIAN, true));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        } else {
+            this.putLShort(0);
+        }
+        List<String> canPlaceOn = extractStringList(item, "CanPlaceOn");
+        List<String> canDestroy = extractStringList(item, "CanDestroy");
+        this.putVarInt(canPlaceOn.size());
+        for (String block : canPlaceOn) {
+            this.putString(block);
+        }
+        this.putVarInt(canDestroy.size());
+        for (String block : canDestroy) {
+            this.putString(block);
+        }
+
+        if (item.getId() == ItemID.SHIELD && protocol >= ProtocolInfo.v1_11_0) {
+            this.putVarLong(0); //"blocking tick" (ffs mojang)
+        }
+    }
+
+    private void putSlot_1_16_220(int protocol, Item item, boolean instanceItem) {
         if (item == null || item.getId() == Item.AIR) {
             this.putByte((byte) 0);
             return;
+        }
+
+        Item alternate = null;
+        if (item instanceof ItemBlock && protocol < item.getBlockUnsafe().getMinimumVersion()) {
+            alternate = Item.get(item.getBlockUnsafe().getAlternateBlock(protocol), item.getBlockUnsafe().getAlternateMeta(protocol), item.getCount());
+        } else if (!item.isSupportedOn(protocol)) {
+            alternate = Item.get(Item.INFO_UPDATE, 0, item.getCount());
+        }
+
+        if (alternate != null) {
+            Item original = item;
+            item = alternate;
+
+            CompoundTag originalNBT = original.getNamedTag();
+            if (originalNBT != null) {
+                item.setNamedTag(new CompoundTag().putCompound("mv_origin_nbt", originalNBT));
+            }
+            item.setCustomName("§r§f" + original.getName());
+            item.setNamedTag(item.getNamedTag().putInt("mv_origin_id", original.getId()).putInt("mv_origin_meta", original.getDamage()));
+        }
+
+        RuntimeItemMapping mapping = RuntimeItems.getMapping(protocol);
+        RuntimeEntry runtimeEntry = mapping.toRuntime(item.getId(), item.getDamage());
+        int runtimeId = runtimeEntry.getRuntimeId();
+        int damage = runtimeEntry.isHasDamage() ? 0 : item.getDamage();
+
+        this.putVarInt(runtimeId);
+        this.putLShort(item.getCount());
+        this.putUnsignedVarInt(damage);
+
+        if (!instanceItem) {
+            this.putBoolean(true);
+            this.putVarInt(1); // Item is present
+        }
+
+        Block block = item.getBlockUnsafe();
+        int blockRuntimeId = block == null ? 0 : GlobalBlockPalette.getOrCreateRuntimeId(protocol, block.getId(), block.getDamage());
+        this.putVarInt(blockRuntimeId);
+
+        ByteBuf userDataBuf = ByteBufAllocator.DEFAULT.ioBuffer();
+        try (LittleEndianByteBufOutputStream stream = new LittleEndianByteBufOutputStream(userDataBuf)) {
+            if (((item instanceof ItemDurable && item.getDamage() > 0) || block != null && block.getDamage() > 0) && !runtimeEntry.isHasDamage()) {
+                byte[] nbt = item.getCompoundTag();
+                CompoundTag tag;
+                if (nbt == null || nbt.length == 0) {
+                    tag = new CompoundTag();
+                } else {
+                    tag = NBTIO.read(nbt, ByteOrder.LITTLE_ENDIAN);
+                }
+                if (tag.contains("Damage")) {
+                    tag.put("__DamageConflict__", tag.removeAndGet("Damage"));
+                }
+                tag.putInt("Damage", item.getDamage());
+                stream.writeShort(-1);
+                stream.writeByte(1); // Hardcoded in current version
+                stream.write(NBTIO.write(tag, ByteOrder.LITTLE_ENDIAN));
+            } else if (item.hasCompoundTag()) {
+                stream.writeShort(-1);
+                stream.writeByte(1); // Hardcoded in current version
+                stream.write(item.getCompoundTag());
+            } else {
+                userDataBuf.writeShortLE(0);
+            }
+
+            List<String> canPlaceOn = extractStringList(item, "CanPlaceOn");
+            stream.writeInt(canPlaceOn.size());
+            for (String string : canPlaceOn) {
+                stream.writeUTF(string);
+            }
+
+            List<String> canDestroy = extractStringList(item, "CanDestroy");
+            stream.writeInt(canDestroy.size());
+            for (String string : canDestroy) {
+                stream.writeUTF(string);
+            }
+
+            if (item.getId() == ItemID.SHIELD) {
+                stream.writeLong(0);
+            }
+
+            byte[] bytes = new byte[userDataBuf.readableBytes()];
+            userDataBuf.readBytes(bytes);
+            putByteArray(bytes);
+        } catch (IOException e) {
+            throw new IllegalStateException("Unable to write item user data", e);
+        } finally {
+            userDataBuf.release();
+        }
+    }
+
+    private void putSlot_1_19_0(int protocol, Item item, boolean instanceItem) {
+        if (item == null || item.getId() == Item.AIR) {
+            this.putByte((byte) 0);
+            return;
+        }
+
+        Item alternate = null;
+        if (item instanceof ItemBlock && protocol < item.getBlockUnsafe().getMinimumVersion()) {
+            alternate = Item.get(item.getBlockUnsafe().getAlternateBlock(protocol), item.getBlockUnsafe().getAlternateMeta(protocol), item.getCount());
+        } else if (!item.isSupportedOn(protocol)) {
+            alternate = Item.get(Item.INFO_UPDATE, 0, item.getCount());
+        }
+
+        if (alternate != null) {
+            Item original = item;
+            item = alternate;
+
+            CompoundTag originalNBT = original.getNamedTag();
+            if (originalNBT != null) {
+                item.setNamedTag(new CompoundTag().putCompound("mv_origin_nbt", originalNBT));
+            }
+            item.setCustomName("§r§f" + original.getName());
+            item.setNamedTag(item.getNamedTag().putInt("mv_origin_id", original.getId()).putInt("mv_origin_meta", original.getDamage()));
         }
 
         int id = item.getId();
@@ -529,7 +1203,7 @@ public class BinaryStream {
         boolean isBlock = item instanceof ItemBlock;
         boolean isDurable = item instanceof ItemDurable;
 
-        RuntimeItemMapping mapping = RuntimeItems.getMapping();
+        RuntimeItemMapping mapping = RuntimeItems.getMapping(protocol);
         RuntimeEntry runtimeEntry = mapping.toRuntime(id, meta);
         int runtimeId = runtimeEntry.getRuntimeId();
         int damage = isBlock || isDurable || runtimeEntry.isHasDamage() ? 0 : meta;
@@ -544,7 +1218,7 @@ public class BinaryStream {
         }
 
         Block block = isBlock ? item.getBlockUnsafe() : null;
-        int blockRuntimeId = block == null ? 0 : GlobalBlockPalette.getOrCreateRuntimeId(block.getId(), block.getDamage());
+        int blockRuntimeId = block == null ? 0 : GlobalBlockPalette.getOrCreateRuntimeId(protocol, block.getId(), block.getDamage());
         this.putVarInt(blockRuntimeId);
 
         ByteBuf userDataBuf = ByteBufAllocator.DEFAULT.ioBuffer();
@@ -598,9 +1272,39 @@ public class BinaryStream {
         }
     }
 
-    public void putNetworkItemStackDescriptor(Item item) {
+    public void putNetworkItemStackDescriptor(int protocol, Item item) {
+        putNetworkItemStackDescriptor(protocol, item, false);
+    }
+
+    public void putNetworkItemStackDescriptor(int protocol, Item item, boolean instanceItem) {
+        if (protocol < ProtocolInfo.v1_26_20_26) {
+            putSlot(protocol, item, instanceItem);
+            return;
+        }
+
         if (item == null) {
             item = Item.get(Item.AIR);
+        }
+
+        Item alternate = null;
+        if (item.getId() != Item.AIR) {
+            if (item instanceof ItemBlock && protocol < item.getBlockUnsafe().getMinimumVersion()) {
+                alternate = Item.get(item.getBlockUnsafe().getAlternateBlock(protocol), item.getBlockUnsafe().getAlternateMeta(protocol), item.getCount());
+            } else if (!item.isSupportedOn(protocol)) {
+                alternate = Item.get(Item.INFO_UPDATE, 0, item.getCount());
+            }
+
+            if (alternate != null) {
+                Item original = item;
+                item = alternate;
+
+                CompoundTag originalNBT = original.getNamedTag();
+                if (originalNBT != null) {
+                    item.setNamedTag(new CompoundTag().putCompound("mv_origin_nbt", originalNBT));
+                }
+                item.setCustomName("§r§f" + original.getName());
+                item.setNamedTag(item.getNamedTag().putInt("mv_origin_id", original.getId()).putInt("mv_origin_meta", original.getDamage()));
+            }
         }
 
         int id = item.getId();
@@ -610,25 +1314,33 @@ public class BinaryStream {
 
         RuntimeEntry runtimeEntry = null;
         if (id != Item.AIR) {
-            runtimeEntry = RuntimeItems.getMapping().toRuntime(id, meta);
+            runtimeEntry = RuntimeItems.getMapping(protocol).toRuntime(id, meta);
         }
 
         int runtimeId = runtimeEntry == null ? 0 : runtimeEntry.getRuntimeId();
         int damage = isBlock || isDurable || runtimeEntry == null || runtimeEntry.isHasDamage() ? 0 : meta;
 
-        this.putLShort(runtimeId);
+        if (instanceItem) {
+            this.putVarInt(runtimeId);
+        } else {
+            this.putLShort(runtimeId);
+        }
         this.putLShort(item.getCount());
         this.putUnsignedVarInt(damage);
 
-        boolean hasNetId = id != Item.AIR;
-        this.putBoolean(hasNetId); // hasNetId
-        if (hasNetId) {
-            this.putUnsignedVarInt(0); // netIdVariant ItemStackNetId
-            this.putVarInt(1); // netId 1 = Item is present
+        if (!instanceItem) {
+            boolean hasNetId = id != Item.AIR;
+            this.putBoolean(hasNetId); // hasNetId
+            if (hasNetId) {
+                if (protocol < ProtocolInfo.v1_26_40) {
+                    this.putUnsignedVarInt(0); // netIdVariant ItemStackNetId
+                }
+                this.putVarInt(1); // netId 1 = Item is present
+            }
         }
 
         Block block = isBlock && id != Item.AIR ? item.getBlockUnsafe() : null;
-        int blockRuntimeId = block == null ? 0 : GlobalBlockPalette.getOrCreateRuntimeId(block.getId(), block.getDamage());
+        int blockRuntimeId = block == null ? 0 : GlobalBlockPalette.getOrCreateRuntimeId(protocol, block.getId(), block.getDamage());
         this.putUnsignedVarInt(blockRuntimeId);
 
         if (id == Item.AIR) {
@@ -638,7 +1350,7 @@ public class BinaryStream {
 
         ByteBuf userDataBuf = ByteBufAllocator.DEFAULT.ioBuffer();
         try (LittleEndianByteBufOutputStream stream = new LittleEndianByteBufOutputStream(userDataBuf)) {
-            if (isDurable && runtimeEntry != null && !runtimeEntry.isHasDamage()) {
+            if (!instanceItem && isDurable && runtimeEntry != null && !runtimeEntry.isHasDamage()) {
                 byte[] nbt = item.getCompoundTag();
                 CompoundTag tag;
                 if (nbt == null || nbt.length == 0) {
@@ -687,7 +1399,11 @@ public class BinaryStream {
         }
     }
 
-    public Item getNetworkItemStackDescriptor() {
+    public Item getNetworkItemStackDescriptor(int protocol) {
+        if (protocol < ProtocolInfo.v1_26_20_26) {
+            return getSlot(protocol);
+        }
+
         int id = 0;
         short runtimeId = (short) this.getLShort(); // signed short
         int count = this.getLShort();
@@ -696,7 +1412,7 @@ public class BinaryStream {
         LegacyEntry legacyEntry = null;
 
         if (runtimeId != 0) {
-            legacyEntry = RuntimeItems.getMapping().fromRuntime(runtimeId);
+            legacyEntry = RuntimeItems.getMapping(protocol).fromRuntime(runtimeId);
 
             id = legacyEntry.getLegacyId();
 
@@ -706,14 +1422,16 @@ public class BinaryStream {
         }
 
         if (this.getBoolean()) { // hasNetId
-            this.getUnsignedVarInt(); // netIdVariant
+            if (protocol < ProtocolInfo.v1_26_40) {
+                this.getUnsignedVarInt(); // netIdVariant
+            }
             this.getVarInt(); // netId
         }
 
         int blockRuntimeId = (int) this.getUnsignedVarInt();
 
         if (id != Item.AIR && id < 256 && id != 166 && !(id == -212 && legacyEntry.getDamage() == 0) && !legacyEntry.isHasDamage() && (id == BlockID.RED_MUSHROOM_BLOCK || id == BlockID.BROWN_MUSHROOM_BLOCK)) { // ItemBlock
-            int fullId = GlobalBlockPalette.getLegacyFullId(blockRuntimeId);
+            int fullId = GlobalBlockPalette.getLegacyFullId(protocol, blockRuntimeId);
             if (fullId != -1) {
                 damage = fullId & 0x3f;
             }
@@ -725,6 +1443,10 @@ public class BinaryStream {
 
         byte[] bytes = this.getByteArray();
 
+        if (count <= 0) {
+            return Item.get(Item.AIR, 0, 0);
+        }
+
         if (bytes.length != 0) {
             ByteBuf buf = ByteBufAllocator.DEFAULT.ioBuffer(bytes.length);
             buf.writeBytes(bytes);
@@ -734,11 +1456,11 @@ public class BinaryStream {
 
                 CompoundTag compoundTag = null;
                 if (nbtSize > 0) {
-                    compoundTag = NBTIO.read(stream, ByteOrder.LITTLE_ENDIAN);
+                    compoundTag = NBTIO.readSafely(stream, ByteOrder.LITTLE_ENDIAN, false);
                 } else if (nbtSize == -1) {
                     int tagCount = stream.readUnsignedByte();
                     if (tagCount != 1) throw new IllegalArgumentException("Expected 1 tag but got " + tagCount);
-                    compoundTag = NBTIO.read(stream, ByteOrder.LITTLE_ENDIAN);
+                    compoundTag = NBTIO.readSafely(stream, ByteOrder.LITTLE_ENDIAN, false);
                 }
 
                 if (compoundTag != null && !compoundTag.getAllTags().isEmpty()) {
@@ -761,7 +1483,7 @@ public class BinaryStream {
 
                 canPlace = new String[canPlaceCount];
                 for (int i = 0; i < canPlace.length; i++) {
-                    canPlace[i] = stream.readUTF();
+                    canPlace[i] = stream.readUTF(1024);
                 }
 
                 int canBreakCount = stream.readInt();
@@ -771,11 +1493,19 @@ public class BinaryStream {
 
                 canBreak = new String[canBreakCount];
                 for (int i = 0; i < canBreak.length; i++) {
-                    canBreak[i] = stream.readUTF();
+                    canBreak[i] = stream.readUTF(1024);
                 }
 
                 if (id == ItemID.SHIELD) {
                     stream.readLong();
+                }
+
+                if (compoundTag != null && compoundTag.contains("mv_origin_id") && compoundTag.contains("mv_origin_meta")) {
+                    Item item = Item.get(compoundTag.getInt("mv_origin_id"), compoundTag.getInt("mv_origin_meta"), count);
+                    if (compoundTag.contains("mv_origin_nbt")) {
+                        item.setNamedTag(compoundTag.getCompound("mv_origin_nbt"));
+                    }
+                    return item;
                 }
             } catch (IOException e) {
                 throw new IllegalStateException("Unable to read item user data", e);
@@ -814,55 +1544,60 @@ public class BinaryStream {
         return item;
     }
 
-    @Deprecated
-    public Item getRecipeIngredient() {
-        int runtimeId = this.getVarInt();
-        if (runtimeId == 0) {
-            return Item.get(Item.AIR, 0, 0);
-        }
-
-        int damage = this.getVarInt();
-        if (damage == 0x7fff) {
-            damage = -1;
-        }
-
-        int id;
-        RuntimeItemMapping mapping = RuntimeItems.getMapping();
-        LegacyEntry legacyEntry = mapping.fromRuntime(runtimeId);
-        id = legacyEntry.getLegacyId();
-        if (legacyEntry.isHasDamage()) {
-            damage = legacyEntry.getDamage();
-        }
-
-        int count = this.getVarInt();
-        return Item.get(id, damage, count);
-    }
-
-    public void putRecipeIngredient(Item item) {
-        if (item == null || item.getId() == Item.AIR) {
-            this.putBoolean(false); // isValid? - false
-            this.putVarInt(0); // item == null ? 0 : item.getCount()
+    public void putRecipeIngredient(int protocol, Item item) {
+        if (protocol >= ProtocolInfo.v1_26_40) {
+            if (item.isNull()) {
+                this.putUnsignedVarInt(0); // type
+                this.putVarInt(0); // meta
+                this.putVarInt(0); // count
+            } else {
+                this.putUnsignedVarInt(1); // type
+                this.putString("name"); // type
+                RuntimeEntry runtime = RuntimeItems.getMapping(protocol).toRuntime(item.getId(), item.getDamage());
+                this.putString(runtime.getIdentifier());
+                this.putVarInt(runtime.isHasDamage() ? 0 : item.getDamage());
+                this.putVarInt(item.getCount());
+            }
             return;
         }
 
-        this.putBoolean(true); // isValid? - true
-
-        int runtimeId;
-        int damage = item.hasMeta() ? item.getDamage() : 0x7fff;
-
-        RuntimeItemMapping mapping = RuntimeItems.getMapping();
-        if (!item.hasMeta()) {
-            RuntimeEntry runtimeEntry = mapping.toRuntime(item.getId(), 0);
-            runtimeId = runtimeEntry.getRuntimeId();
-            damage = 0x7fff;
-        } else {
-            RuntimeEntry runtimeEntry = mapping.toRuntime(item.getId(), item.getDamage());
-            runtimeId = runtimeEntry.getRuntimeId();
-            damage = runtimeEntry.isHasDamage() ? 0 : item.getDamage();
+        if (item == null || item.getId() == Item.AIR) {
+            if (protocol >= ProtocolInfo.v1_19_30_23) {
+                this.putBoolean(false); // isValid? - false
+                this.putVarInt(0); // item == null ? 0 : item.getCount()
+            } else {
+                this.putVarInt(0);
+            }
+            return;
         }
 
-        this.putLShort(runtimeId);
-        this.putLShort(damage);
+        if (protocol >= ProtocolInfo.v1_19_30_23) {
+            this.putBoolean(true); // isValid? - true
+        }
+
+        int runtimeId = item.getId();
+        int damage = item.hasMeta() ? item.getDamage() : 0x7fff;
+
+        if (protocol >= ProtocolInfo.v1_16_100) {
+            RuntimeItemMapping mapping = RuntimeItems.getMapping(protocol);
+            if (!item.hasMeta()) {
+                RuntimeEntry runtimeEntry = mapping.toRuntime(item.getId(), 0);
+                runtimeId = runtimeEntry.getRuntimeId();
+                damage = 0x7fff;
+            } else {
+                RuntimeEntry runtimeEntry = mapping.toRuntime(item.getId(), item.getDamage());
+                runtimeId = runtimeEntry.getRuntimeId();
+                damage = runtimeEntry.isHasDamage() ? 0 : item.getDamage();
+            }
+        }
+
+        if (protocol >= ProtocolInfo.v1_19_30_23) {
+            this.putLShort(runtimeId);
+            this.putLShort(damage);
+        } else {
+            this.putVarInt(runtimeId);
+            this.putVarInt(damage);
+        }
         this.putVarInt(item.getCount());
     }
 
@@ -940,7 +1675,12 @@ public class BinaryStream {
     }
 
     public BlockVector3 getBlockVector3() {
-        return new BlockVector3(this.getVarInt(), this.getVarInt(), this.getVarInt());
+        Server.mvw("BinaryStream#getBlockVector3()");
+        return getBlockVector3(ProtocolInfo.CURRENT_PROTOCOL);
+    }
+
+    public BlockVector3 getBlockVector3(int protocol) {
+        return new BlockVector3(this.getVarInt(), protocol >= ProtocolInfo.v1_26_10 ? this.getVarInt() : (int) this.getUnsignedVarInt(), this.getVarInt());
     }
 
     public BlockVector3 getSignedBlockPosition() {
@@ -954,13 +1694,27 @@ public class BinaryStream {
     }
 
     public void putBlockVector3(BlockVector3 v) {
-        this.putBlockVector3(v.x, v.y, v.z);
+        Server.mvw("BinaryStream#putBlockVector3(BlockVector3)");
+        putBlockVector3(ProtocolInfo.CURRENT_PROTOCOL, v.x, v.y, v.z);
+    }
+
+    public void putBlockVector3(int protocol, BlockVector3 v) {
+        putBlockVector3(protocol, v.x, v.y, v.z);
     }
 
     public void putBlockVector3(int x, int y, int z) {
-        this.putVarInt(x);
-        this.putVarInt(y);
-        this.putVarInt(z);
+        Server.mvw("BinaryStream#putBlockVector3(int, int, int)");
+        putBlockVector3(ProtocolInfo.CURRENT_PROTOCOL, x, y, z);
+    }
+
+    public void putBlockVector3(int protocol, int x, int y, int z) {
+        putVarInt(x);
+        if (protocol >= ProtocolInfo.v1_26_10) {
+            putVarInt(y);
+        } else {
+            putUnsignedVarInt(Integer.toUnsignedLong(y));
+        }
+        putVarInt(z);
     }
 
     public Vector3f getVector3f() {
@@ -982,27 +1736,40 @@ public class BinaryStream {
     }
 
     public void putGameRules(GameRules gameRules, boolean startGame) {
-        Map<GameRule, GameRules.Value> rulesToSend = new HashMap<>(gameRules.getGameRules());
-        this.putUnsignedVarInt(rulesToSend.size());
-        rulesToSend.forEach((gameRule, value) -> {
-            putString(gameRule.getName().toLowerCase(Locale.ROOT));
-            value.write(this, startGame);
-        });
+        Server.mvw("BinaryStream#putGameRules(GameRules, boolean)");
+        this.putGameRules(ProtocolInfo.CURRENT_PROTOCOL, gameRules, startGame);
     }
 
-    public void putGameRulesMap(Map<GameRule, GameRules.Value> allGameRules, boolean startGame) {
-        Map<GameRule, GameRules.Value> rulesToSend = new HashMap<>();
+    public void putGameRules(int protocol, GameRules gameRules, boolean startGame) {
+        Map<GameRule, GameRules.Value> allGameRules = gameRules.getGameRules();
+        Map<GameRule, GameRules.Value> rulesToSend = new HashMap<>(allGameRules.size(), 1);
         allGameRules.forEach((gameRule, value) -> {
-            if (gameRule == GameRule.NATURAL_REGENERATION) {
-                rulesToSend.put(gameRule, new GameRules.Value<>(GameRules.Type.BOOLEAN, false)); // Fix client-side desync?
-            } else {
+            if (protocol > value.getMinProtocol()) {
                 rulesToSend.put(gameRule, value);
             }
         });
         this.putUnsignedVarInt(rulesToSend.size());
         rulesToSend.forEach((gameRule, value) -> {
             putString(gameRule.getName().toLowerCase(Locale.ROOT));
-            value.write(this, startGame);
+            value.write(protocol, this, startGame);
+        });
+    }
+
+    public void putGameRulesMap(int protocol, Map<GameRule, cn.nukkit.level.GameRules.Value> allGameRules, boolean startGame) {
+        Map<GameRule, GameRules.Value> rulesToSend = new HashMap<>(allGameRules.size(), 1);
+        allGameRules.forEach((gameRule, value) -> {
+            if (protocol > value.getMinProtocol()) {
+                if (gameRule == GameRule.NATURAL_REGENERATION) {
+                    rulesToSend.put(gameRule, new GameRules.Value<>(GameRules.Type.BOOLEAN, false)); // Fix client-side desync?
+                } else {
+                    rulesToSend.put(gameRule, value);
+                }
+            }
+        });
+        this.putUnsignedVarInt(rulesToSend.size());
+        rulesToSend.forEach((gameRule, value) -> {
+            putString(gameRule.getName().toLowerCase(Locale.ROOT));
+            value.write(protocol, this, startGame);
         });
     }
 
@@ -1045,22 +1812,32 @@ public class BinaryStream {
     }
 
     public void putEntityLink(EntityLink link) {
+        Server.mvw("BinaryStream#putEntityLink(EntityLink)");
+        this.putEntityLink(ProtocolInfo.CURRENT_PROTOCOL, link);
+    }
+
+    public void putEntityLink(int protocol, EntityLink link) {
         putEntityUniqueId(link.fromEntityUniquieId);
         putEntityUniqueId(link.toEntityUniquieId);
         putByte(link.type);
         putBoolean(link.immediate);
-        putBoolean(link.riderInitiated);
-        putLFloat(link.vehicleAngularVelocity);
+        if (protocol >= 407) {
+            putBoolean(link.riderInitiated);
+            if (protocol >= ProtocolInfo.v1_21_20) {
+                putLFloat(link.vehicleAngularVelocity);
+            }
+        }
     }
 
     public EntityLink getEntityLink() {
+        Server.mvw("BinaryStream#getEntityLink()");
         return new EntityLink(
                 getEntityUniqueId(),
                 getEntityUniqueId(),
                 (byte) getByte(),
                 getBoolean(),
-                getBoolean(),
-                getLFloat()
+                getBoolean(), //1.16+
+                getLFloat() // v1_21_20
         );
     }
 

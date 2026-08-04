@@ -13,6 +13,17 @@ public class PlayerArmorDamagePacket extends DataPacket {
     public final Set<PlayerArmorDamageFlag> flags = EnumSet.noneOf(PlayerArmorDamageFlag.class);
     public final int[] damage = new int[4];
 
+    public enum PlayerArmorDamageFlag {
+        HELMET,
+        CHESTPLATE,
+        LEGGINGS,
+        BOOTS,
+        /**
+         * @since v705
+         */
+        BODY
+    }
+
     @Override
     public byte pid() {
         return NETWORK_ID;
@@ -35,13 +46,5 @@ public class PlayerArmorDamagePacket extends DataPacket {
         for (PlayerArmorDamageFlag flag : this.flags) {
             this.putVarInt(this.damage[flag.ordinal()]);
         }
-    }
-
-    public enum PlayerArmorDamageFlag {
-        HELMET,
-        CHESTPLATE,
-        LEGGINGS,
-        BOOTS,
-        BODY
     }
 }

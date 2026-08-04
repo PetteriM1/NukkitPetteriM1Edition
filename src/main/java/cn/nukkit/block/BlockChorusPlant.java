@@ -28,7 +28,7 @@ public class BlockChorusPlant extends BlockTransparent {
 
     @Override
     public double getResistance() {
-        return 0.4;
+        return 2;
     }
 
     @Override

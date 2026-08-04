@@ -20,8 +20,7 @@ public class Attribute implements Cloneable {
     public static final int MAX_HEALTH = 4;
     public static final int MOVEMENT_SPEED = 5;
     public static final int FOLLOW_RANGE = 6;
-    public static final int FOOD = 7, MAX_HUNGER = FOOD;
-    public static final int ATTACK_DAMAGE = 8;
+    public static final int ATTACK_DAMAGE = 8;    public static final int FOOD = 7, MAX_HUNGER = FOOD;
     public static final int EXPERIENCE_LEVEL = 9;
     public static final int EXPERIENCE = 10;
     public static final int UNDERWATER_MOVEMENT = 11;
@@ -30,9 +29,7 @@ public class Attribute implements Cloneable {
     public static final int HORSE_JUMP_STRENGTH = 14;
     public static final int ZOMBIE_SPAWN_REINFORCEMENTS = 15;
     public static final int LAVA_MOVEMENT = 16;
-
     protected static Int2ObjectMap<Attribute> attributes = new Int2ObjectOpenHashMap<>();
-
     protected float minValue;
     protected float maxValue;
     protected float defaultValue;
@@ -40,7 +37,6 @@ public class Attribute implements Cloneable {
     protected String name;
     protected boolean shouldSend;
     private final int id;
-
     private Attribute(int id, String name, float minValue, float maxValue, float defaultValue, boolean shouldSend) {
         this.id = id;
         this.name = name;
@@ -189,4 +185,6 @@ public class Attribute implements Cloneable {
                 ", val=" + currentValue +
                 '}';
     }
+
+
 }

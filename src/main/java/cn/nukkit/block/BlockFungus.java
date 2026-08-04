@@ -9,7 +9,9 @@ import cn.nukkit.level.Position;
 import cn.nukkit.level.generator.object.tree.ObjectNetherTree;
 import cn.nukkit.level.particle.BoneMealParticle;
 import cn.nukkit.math.NukkitRandom;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.DyeColor;
+import cn.nukkit.utils.material.BlockType;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -69,6 +71,16 @@ public abstract class BlockFungus extends BlockFlowable {
     @Override
     public boolean canBeActivated() {
         return true;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_16_0;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.BROWN_MUSHROOM;
     }
 
     private boolean growTreeHere() {

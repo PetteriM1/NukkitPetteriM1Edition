@@ -28,7 +28,9 @@ public class SetEntityMotionPacket extends DataPacket {
         this.motionX = this.getLFloat();
         this.motionY = this.getLFloat();
         this.motionZ = this.getLFloat();
-        this.tick = this.getUnsignedVarLong();
+        if (protocol >= ProtocolInfo.v1_20_70) {
+            this.tick = this.getUnsignedVarLong();
+        }
     }
 
     @Override
@@ -36,6 +38,8 @@ public class SetEntityMotionPacket extends DataPacket {
         this.reset();
         this.putEntityRuntimeId(this.eid);
         this.putVector3f(this.motionX, this.motionY, this.motionZ);
-        this.putUnsignedVarLong(this.tick);
+        if (protocol >= ProtocolInfo.v1_20_70) {
+            this.putUnsignedVarLong(this.tick);
+        }
     }
 }
