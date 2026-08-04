@@ -23,7 +23,7 @@ public class BlockSlabWood extends BlockSlab {
         super(meta, doubleSlab);
     }
 
-    private static final String[] NAMES = {
+    private static final String[] names = {
             "Oak",
             "Spruce",
             "Birch",
@@ -36,7 +36,7 @@ public class BlockSlabWood extends BlockSlab {
 
     @Override
     public String getName() {
-        return (((this.getDamage() & 0x08) == 0x08) ? "Upper " : "") + NAMES[this.getDamage() & 0x07] + " Slab";
+        return (((this.getDamage() & 0x08) == 0x08) ? "Upper " : "") + names[this.getDamage() & 0x07] + " Slab";
     }
 
     @Override

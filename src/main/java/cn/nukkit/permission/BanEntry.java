@@ -27,6 +27,9 @@ public class BanEntry {
         this.creationDate = new Date();
     }
 
+    private static class TreeMapTypeToken extends TypeToken<TreeMap<String, String>> {
+    }
+
     public String getName() {
         return name;
     }
@@ -107,8 +110,5 @@ public class BanEntry {
         banEntry.setSource(map.get("source"));
         banEntry.setReason(map.get("reason"));
         return banEntry;
-    }
-
-    private static class TreeMapTypeToken extends TypeToken<TreeMap<String, String>> {
     }
 }

@@ -1,5 +1,7 @@
 package cn.nukkit.entity.passive;
 
+import cn.nukkit.Player;
+import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.data.IntEntityData;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
@@ -65,6 +67,18 @@ public class EntityHorse extends EntityHorseBase {
     }
 
     @Override
+    public boolean targetOption(EntityCreature creature, double distance) {
+        boolean canTarget = super.targetOption(creature, distance);
+
+        if (canTarget && (creature instanceof Player)) {
+            Player player = (Player) creature;
+            return player.spawned && player.isAlive() && !player.closed &&
+                    this.isFeedItem(player.getInventory().getItemInHandFast()) && distance <= 49;
+        }
+        return false;
+    }
+
+    @Override
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
 
@@ -74,10 +88,19 @@ public class EntityHorse extends EntityHorseBase {
             }
         }
 
+        if (this.isSaddled()) {
+            drops.add(Item.get(Item.SADDLE, 0, 1));
+        }
+
         return drops.toArray(new Item[0]);
     }
 
     private static int getRandomVariant() {
         return VARIANTS[Utils.rand(0, VARIANTS.length - 1)];
+    }
+
+    @Override
+    public double getHorseJumpSpeed() {
+        return 0.07;
     }
 }

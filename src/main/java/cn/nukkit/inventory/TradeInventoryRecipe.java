@@ -85,7 +85,7 @@ public class TradeInventoryRecipe {
     public CompoundTag toNBT() {
         CompoundTag nbt = new CompoundTag();
         nbt.putCompound("buyA", NBTIO.putItemHelper(buyItem, -1));
-        nbt.putCompound("buyB", NBTIO.putItemHelper(secondBuyItem,-1));
+        nbt.putCompound("buyB", NBTIO.putItemHelper(secondBuyItem, -1));
         nbt.putCompound("sell", NBTIO.putItemHelper(sellItem, -1));
         nbt.putInt("tier", tier);
         nbt.putInt("buyCountA", buyCountA);

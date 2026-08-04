@@ -64,6 +64,25 @@ public class Effect implements Cloneable {
     public static final int BREATH_OF_THE_NAUTILUS = 37;
 
     protected static Effect[] effects;
+    protected final int id;
+    protected final String name;
+    protected int duration;
+    protected int amplifier;
+    protected int color;
+    protected boolean show = true;
+    protected boolean ambient;
+    protected final boolean bad;
+
+    public Effect(int id, String name, int r, int g, int b) {
+        this(id, name, r, g, b, false);
+    }
+
+    public Effect(int id, String name, int r, int g, int b, boolean isBad) {
+        this.id = id;
+        this.name = name;
+        this.bad = isBad;
+        this.setColor(r, g, b);
+    }
 
     public static void init() {
         effects = new Effect[256];
@@ -125,33 +144,6 @@ public class Effect implements Cloneable {
         } catch (Exception e) {
             return null;
         }
-    }
-
-    protected final int id;
-
-    protected final String name;
-
-    protected int duration;
-
-    protected int amplifier;
-
-    protected int color;
-
-    protected boolean show = true;
-
-    protected boolean ambient;
-
-    protected final boolean bad;
-
-    public Effect(int id, String name, int r, int g, int b) {
-        this(id, name, r, g, b, false);
-    }
-
-    public Effect(int id, String name, int r, int g, int b, boolean isBad) {
-        this.id = id;
-        this.name = name;
-        this.bad = isBad;
-        this.setColor(r, g, b);
     }
 
     public String getName() {

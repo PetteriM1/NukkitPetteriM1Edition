@@ -3,6 +3,7 @@ package cn.nukkit.nbt;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.RuntimeItemMapping;
 import cn.nukkit.item.RuntimeItems;
+import cn.nukkit.level.format.leveldb.LevelDBConstants;
 import cn.nukkit.nbt.stream.FastByteArrayOutputStream;
 import cn.nukkit.nbt.stream.NBTInputStream;
 import cn.nukkit.nbt.stream.NBTOutputStream;
@@ -45,9 +46,9 @@ public class NBTIO {
         return tag;
     }
 
-    public static CompoundTag putNetworkItemHelper(Item item) {
+    public static CompoundTag putNetworkItemHelper(int protocol, Item item) {
         CompoundTag tag = new CompoundTag(null)
-                .putString("Name", RuntimeItems.getMapping().toRuntime(item.getId(), item.getDamage()).getIdentifier())
+                .putString("Name", RuntimeItems.getMapping(protocol).toRuntime(item.getId(), item.getDamage()).getIdentifier())
                 .putByte("Count", item.getCount())
                 .putShort("Damage", item.getDamage());
 
@@ -73,9 +74,9 @@ public class NBTIO {
             );
         }
 
-        // Vanilla format (current version only)
+        // Vanilla format (current leveldb version only)
         if (tag.contains("Name")) {
-            RuntimeItemMapping.LegacyEntry legacy = RuntimeItems.getMapping().fromIdentifier(tag.getString("Name"));
+            RuntimeItemMapping.LegacyEntry legacy = RuntimeItems.getMapping(LevelDBConstants.PALETTE_VERSION).fromIdentifier(tag.getString("Name"));
             if (legacy == null) {
                 return Item.get(0);
             }
@@ -110,6 +111,16 @@ public class NBTIO {
 
     public static CompoundTag read(InputStream inputStream, ByteOrder endianness, boolean network) throws IOException {
         try (NBTInputStream stream = new NBTInputStream(inputStream, endianness, network)) {
+            Tag tag = Tag.readNamedTag(stream);
+            if (tag instanceof CompoundTag) {
+                return (CompoundTag) tag;
+            }
+            throw new IOException("Root tag must be a named compound tag");
+        }
+    }
+
+    public static CompoundTag readSafely(InputStream inputStream, ByteOrder endianness, boolean network) throws IOException {
+        try (NBTInputStream stream = new NBTInputStream(inputStream, endianness, network).readSafely()) {
             Tag tag = Tag.readNamedTag(stream);
             if (tag instanceof CompoundTag) {
                 return (CompoundTag) tag;

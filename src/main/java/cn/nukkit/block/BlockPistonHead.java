@@ -35,7 +35,7 @@ public class BlockPistonHead extends BlockTransparentMeta implements Faceable {
 
     @Override
     public double getHardness() {
-        return 1.5;
+        return 0.5; // 1.5
     }
 
     @Override

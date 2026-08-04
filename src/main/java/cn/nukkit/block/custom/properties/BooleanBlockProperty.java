@@ -62,7 +62,7 @@ public class BooleanBlockProperty extends BlockProperty<Boolean> {
 
     @Override
     public int getIntValue(int currentMeta, int bitOffset) {
-        return this.getBooleanValue(currentMeta, bitOffset)? 1 : 0;
+        return this.getBooleanValue(currentMeta, bitOffset) ? 1 : 0;
     }
 
     @Override
@@ -75,7 +75,7 @@ public class BooleanBlockProperty extends BlockProperty<Boolean> {
 
     @Override
     public int getMetaForValue(Boolean value) {
-        return Boolean.TRUE.equals(value)? 1 : 0;
+        return Boolean.TRUE.equals(value) ? 1 : 0;
     }
 
     @Override

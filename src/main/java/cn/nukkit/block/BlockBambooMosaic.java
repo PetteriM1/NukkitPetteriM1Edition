@@ -7,7 +7,7 @@ public class BlockBambooMosaic extends BlockBambooPlanks {
     }
 
     public BlockBambooMosaic(int meta) {
-         super(0);
+        super(0);
     }
 
     @Override

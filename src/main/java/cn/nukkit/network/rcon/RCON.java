@@ -66,6 +66,7 @@ public class RCON {
                 serverThread.close();
                 serverThread.wait(5000);
             }
-        } catch (InterruptedException ignored) {}
+        } catch (InterruptedException ignored) {
+        }
     }
 }

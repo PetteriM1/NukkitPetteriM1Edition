@@ -11,7 +11,6 @@ public class PopulatorSeagrass extends PopulatorOceanFloorSurfaceBlock {
 
     @Override
     protected boolean canStay(int x, int y, int z, FullChunk chunk) {
-        if (chunk instanceof cn.nukkit.level.format.anvil.Chunk) return false;
         int down;
         return EnsureCover.ensureWaterCover(x, y, z, chunk) && ((down = chunk.getBlockId(x, y - 1, z)) == DIRT || down == SAND || down == GRAVEL);
     }

@@ -1,9 +1,11 @@
 package cn.nukkit.inventory;
 
 import cn.nukkit.Player;
+import cn.nukkit.Server;
 import cn.nukkit.entity.EntityHuman;
 import cn.nukkit.entity.EntityHumanType;
 import cn.nukkit.item.Item;
+import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.InventoryContentPacket;
 import cn.nukkit.network.protocol.InventorySlotPacket;
 import cn.nukkit.network.protocol.MobEquipmentPacket;
@@ -33,7 +35,19 @@ public class PlayerOffhandInventory extends BaseInventory {
 
     @Override
     public void sendContents(Player... players) {
-        Item item = this.getItem(0);
+        Item item = this.getItemFast(0);
+
+        Item clean = null;
+        boolean reduceTraffic = Server.getInstance().reduceTraffic;
+        if (reduceTraffic) {
+            clean = Item.get(item.getId(), item.getDamage(), 1);
+
+            CompoundTag oldTag = item.getNamedTag();
+
+            if (oldTag != null) {
+                clean.setNamedTag(CompoundTag.sanitize(oldTag));
+            }
+        }
 
         for (Player player : players) {
             if (player == this.getHolder()) {
@@ -42,7 +56,7 @@ public class PlayerOffhandInventory extends BaseInventory {
                 pk.slots = new Item[]{item};
                 player.dataPacket(pk);
             } else {
-                MobEquipmentPacket pk = this.createMobEquipmentPacket(item);
+                MobEquipmentPacket pk = this.createMobEquipmentPacket(reduceTraffic ? clean : item);
                 player.dataPacket(pk);
             }
         }
@@ -50,7 +64,19 @@ public class PlayerOffhandInventory extends BaseInventory {
 
     @Override
     public void sendSlot(int index, Player... players) {
-        Item item = this.getItem(0);
+        Item item = this.getItemFast(0);
+
+        Item clean = null;
+        boolean reduceTraffic = Server.getInstance().reduceTraffic;
+        if (reduceTraffic) {
+            clean = Item.get(item.getId(), item.getDamage(), 1);
+
+            CompoundTag oldTag = item.getNamedTag();
+
+            if (oldTag != null) {
+                clean.setNamedTag(CompoundTag.sanitize(oldTag));
+            }
+        }
 
         for (Player player : players) {
             if (player == this.getHolder()) {
@@ -59,7 +85,7 @@ public class PlayerOffhandInventory extends BaseInventory {
                 pk.item = item;
                 player.dataPacket(pk);
             } else {
-                MobEquipmentPacket pk = this.createMobEquipmentPacket(item);
+                MobEquipmentPacket pk = this.createMobEquipmentPacket(reduceTraffic ? clean : item);
                 player.dataPacket(pk);
             }
         }

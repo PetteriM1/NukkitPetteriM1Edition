@@ -1,11 +1,15 @@
 package cn.nukkit.level.format.leveldb.structure;
 
 import cn.nukkit.block.Block;
+import cn.nukkit.block.BlockID;
 import cn.nukkit.level.DimensionData;
+import cn.nukkit.level.Level;
 import cn.nukkit.level.biome.Biome;
 import cn.nukkit.level.format.ChunkSection;
 import cn.nukkit.level.format.LevelProvider;
 import cn.nukkit.level.format.generic.BaseChunk;
+import cn.nukkit.level.generator.Generator;
+import cn.nukkit.level.generator.Normal;
 import cn.nukkit.level.util.BitArrayVersion;
 import cn.nukkit.level.util.PalettedBlockStorage;
 import cn.nukkit.nbt.tag.CompoundTag;
@@ -13,7 +17,8 @@ import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -131,7 +136,7 @@ public class LevelDBChunk extends BaseChunk {
         }
 
         if (this.biomes3d[index] == null) {
-            for (int i = index; i >= 0 ; i--) {
+            for (int i = index; i >= 0; i--) {
                 if (this.biomes3d[i] != null) {
                     this.biomes3d[index] = this.biomes3d[i].copy();
                     break;
@@ -358,5 +363,87 @@ public class LevelDBChunk extends BaseChunk {
 
     public Lock writeLock() {
         return this.writeLock;
+    }
+
+    @Override
+    public void initChunk() {
+        super.initChunk();
+
+        // SCPE: Lower sea height by 2 blocks
+        // Do it here to make sure changes are not reverted
+        if (Normal.seaHeight == 62 && this.provider != null) {
+            Level lvl = this.provider.getLevel();
+
+            if (lvl != null && lvl.getServer().suomiCraftPEMode() && this.sections != null && this.sections.length > 0 && lvl.getGenerator().getId() == Generator.TYPE_INFINITE && this.isGenerated() && lvl.getName().equals("factions")) {
+                ChunkSection secY0 = this.sections[4];
+                if (secY0.getBlockId(0, 0, 0) == BlockID.BEDROCK && secY0.getBlockId(0, 1, 0) == BlockID.BEDROCK) {
+                    // Use this to mark processed chunks, there's two layers of bedrock anyway
+                    secY0.setBlock(0, 0, 0, BlockID.INVISIBLE_BEDROCK);
+                } else {
+                    return;
+                }
+
+                ChunkSection sectionLower = this.sections[7];
+                ChunkSection sectionUpper = this.sections[8];
+
+                boolean changed = false;
+                for (int x = 0; x < 16; x++) {
+                    for (int z = 0; z < 16; z++) {
+                        // New gen doesn't have 2 layer bedrock bug so we must adapt
+                        if (secY0.getBlockId(x, 1, z) != BlockID.BEDROCK) {
+                            secY0.setBlock(0, 0, 0, BlockID.INVISIBLE_BEDROCK);
+                            secY0.setBlock(0, 1, 0, BlockID.BEDROCK);
+                            this.changes++;
+                            return;
+                        }
+
+                        int id64 = sectionUpper.getBlockId(x, 0, z);
+
+                        if (id64 == BlockID.STILL_WATER || id64 == BlockID.SEAGRASS || id64 == BlockID.BLOCK_KELP || id64 == BlockID.ICE) {
+                            int id63 = sectionLower.getBlockId(x, 15, z);
+
+                            if (id63 == BlockID.STILL_WATER || id63 == BlockID.SEAGRASS || id63 == BlockID.BLOCK_KELP) {
+                                sectionLower.setBlock(x, 15, z, BlockID.AIR, 0); // y63
+
+                                int id62 = sectionLower.getBlockId(x, 14, z);
+
+                                if (id64 == BlockID.ICE && id62 == BlockID.STILL_WATER) {
+                                    sectionLower.setBlock(x, 14, z, BlockID.ICE, 0); // y62
+                                } else if (id62 == BlockID.DIRT || id62 == BlockID.CLAY_BLOCK) {
+                                    sectionLower.setBlock(x, 14, z, BlockID.GRASS, 0); // y62
+                                } else if (id62 == BlockID.SANDSTONE) {
+                                    sectionLower.setBlock(x, 14, z, BlockID.SAND, 0); // y62
+                                } else if (id62 == BlockID.SEAGRASS && sectionLower.getBlockId(x, 13, z) != BlockID.SEAGRASS) { // y61
+                                    sectionLower.setBlock(x, 14, z, BlockID.SEAGRASS, 0); // convert bottom parts
+                                }
+
+                                changed = true;
+                            }
+
+                            int id65 = sectionUpper.getBlockId(x, 1, z);
+                            if (id65 == BlockID.AIR || id65 == BlockID.LILY_PAD || id65 == BlockID.VINES) {
+                                sectionUpper.setBlock(x, 0, z, BlockID.AIR, 0); // y64
+
+                                if (id65 == BlockID.LILY_PAD) {
+                                    sectionUpper.setBlock(x, 1, z, BlockID.AIR, 0); // y65
+                                }
+
+                                if (id63 == BlockID.DIRT || id63 == BlockID.CLAY_BLOCK) {
+                                    sectionLower.setBlock(x, 15, z, BlockID.GRASS, 0); // y63
+                                } else if (id63 == BlockID.SANDSTONE) {
+                                    sectionLower.setBlock(x, 15, z, BlockID.SAND, 0); // y63
+                                }
+
+                                changed = true;
+                            }
+                        }
+                    }
+                }
+
+                if (changed) {
+                    this.changes++;
+                }
+            }
+        }
     }
 }

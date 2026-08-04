@@ -33,7 +33,9 @@ public class SpawnParticleEffectPacket extends DataPacket {
         this.putEntityUniqueId(uniqueEntityId);
         this.putVector3f(this.position);
         this.putString(this.identifier);
-        this.putBoolean(this.molangVariablesJson.isPresent());
-        this.molangVariablesJson.ifPresent(this::putString);
+        if (protocol >= ProtocolInfo.v1_18_30) {
+            this.putBoolean(this.molangVariablesJson.isPresent());
+            this.molangVariablesJson.ifPresent(this::putString);
+        }
     }
 }

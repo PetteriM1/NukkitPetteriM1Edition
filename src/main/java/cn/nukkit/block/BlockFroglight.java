@@ -4,6 +4,8 @@ import cn.nukkit.Player;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.utils.material.BlockType;
 
 public abstract class BlockFroglight extends BlockSolidMeta {
 
@@ -13,7 +15,7 @@ public abstract class BlockFroglight extends BlockSolidMeta {
 
     @Override
     public double getResistance() {
-        return 0.3;
+        return 1.5;
     }
 
     @Override
@@ -61,5 +63,15 @@ public abstract class BlockFroglight extends BlockSolidMeta {
             default:
                 return BlockFace.Axis.Y;
         }
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_19_0_29;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.SEA_LANTERN;
     }
 }

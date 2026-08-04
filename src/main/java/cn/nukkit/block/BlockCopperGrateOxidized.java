@@ -1,7 +1,9 @@
 package cn.nukkit.block;
 
 import cn.nukkit.block.properties.OxidizationLevel;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockCopperGrateOxidized extends BlockCopperGrate {
 
@@ -27,5 +29,13 @@ public class BlockCopperGrateOxidized extends BlockCopperGrate {
     @Override
     public OxidizationLevel getOxidizationLevel() {
         return OxidizationLevel.OXIDIZED;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        if (protocol >= ProtocolInfo.v1_17_0) {
+            return BlockTypes.OXIDIZED_COPPER;
+        }
+        return BlockTypes.IRON_BLOCK;
     }
 }

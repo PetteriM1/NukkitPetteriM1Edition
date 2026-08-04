@@ -15,35 +15,8 @@ public class AnimatePacket extends DataPacket {
     public long eid;
     public Action action;
     public float data;
-    @Deprecated
     public float rowingTime;
-
-    @Override
-    public void decode() {
-        this.action = Action.fromId(this.getByte());
-        if (this.action == null) {
-            this.action = Action.NO_ACTION;
-        }
-        this.eid = getEntityRuntimeId();
-        this.data = this.getLFloat();
-        if (this.getBoolean()) {
-            this.getString(); // Swing source
-        }
-    }
-
-    @Override
-    public void encode() {
-        this.reset();
-        this.putByte((byte) this.action.getId());
-        this.putEntityRuntimeId(this.eid);
-        this.putLFloat(this.data);
-        this.putBoolean(false); // Swing source (optional)
-    }
-
-    @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
+    public int hand;
 
     public enum Action {
         NO_ACTION(0),
@@ -75,5 +48,58 @@ public class AnimatePacket extends DataPacket {
         public static Action fromId(int id) {
             return ID_LOOKUP.get(id);
         }
+    }
+
+    @Override
+    public void decode() {
+        if (protocol >= ProtocolInfo.v1_21_130_28) {
+            this.action = Action.fromId(this.getByte());
+        } else {
+            this.action = Action.fromId(this.getVarInt());
+        }
+        if (this.action == null) {
+            this.action = Action.NO_ACTION;
+        }
+        this.eid = getEntityRuntimeId();
+        if (protocol >= ProtocolInfo.v1_21_120) {
+            this.data = this.getLFloat();
+        }
+        if (protocol < ProtocolInfo.v1_21_130_28 && (this.action == Action.ROW_RIGHT || this.action == Action.ROW_LEFT)) {
+            this.rowingTime = this.getLFloat();
+        }
+        if (protocol >= ProtocolInfo.v1_21_130_28 && this.getBoolean()) {
+            this.getString(); // Swing source
+        }
+        if (protocol >= ProtocolInfo.v1_26_60_29) {
+            this.hand = this.getByte();
+        }
+    }
+
+    @Override
+    public void encode() {
+        this.reset();
+        if (protocol >= ProtocolInfo.v1_21_130_28) {
+            this.putByte((byte) this.action.id);
+        } else {
+            this.putVarInt(this.action.id);
+        }
+        this.putEntityRuntimeId(this.eid);
+        if (protocol >= ProtocolInfo.v1_21_120) {
+            this.putLFloat(this.data);
+        }
+        if (protocol < ProtocolInfo.v1_21_130_28 && (this.action == Action.ROW_RIGHT || this.action == Action.ROW_LEFT)) {
+            this.putLFloat(this.rowingTime);
+        }
+        if (protocol >= ProtocolInfo.v1_21_130_28) {
+            this.putBoolean(false); // Swing source (optional)
+        }
+        if (protocol >= ProtocolInfo.v1_26_60_29) {
+            this.putByte((byte) this.hand);
+        }
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

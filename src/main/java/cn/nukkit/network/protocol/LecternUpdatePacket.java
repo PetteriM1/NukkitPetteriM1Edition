@@ -22,7 +22,10 @@ public class LecternUpdatePacket extends DataPacket {
     public void decode() {
         this.page = this.getByte();
         this.totalPages = this.getByte();
-        this.blockPosition = this.getBlockVector3();
+        this.blockPosition = this.getBlockVector3(protocol);
+        if (protocol < ProtocolInfo.v1_20_70) {
+            this.dropBook = this.getBoolean();
+        }
     }
 
     @Override

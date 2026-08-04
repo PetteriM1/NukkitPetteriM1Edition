@@ -18,7 +18,8 @@ public class NibbleArray implements Cloneable {
     }
 
     public byte get(int index) {
-        if (index >= data.length << 1) throw new IndexOutOfBoundsException("index=" + index + ", data.length=" + data.length);
+        if (index >= data.length << 1)
+            throw new IndexOutOfBoundsException("index=" + index + ", data.length=" + data.length);
         byte val = data[index >> 1];
         if ((index & 1) == 0) {
             return (byte) (val & 0x0f);

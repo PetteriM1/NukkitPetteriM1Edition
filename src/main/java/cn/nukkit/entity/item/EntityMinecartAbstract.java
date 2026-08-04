@@ -61,13 +61,15 @@ public abstract class EntityMinecartAbstract extends EntityVehicle implements En
     private double flyingZ = 0.95;
     private double maxSpeed = 0.4D;
 
-    public abstract MinecartType getType();
-
-    public abstract boolean isRideable();
-
     public EntityMinecartAbstract(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
     }
+    private boolean hasUpdated = false;
+    private final Vector3 tempMoveVec = new Vector3(0, 0, 0);
+
+    public abstract MinecartType getType();
+
+    public abstract boolean isRideable();
 
     @Override
     public float getHeight() {
@@ -157,7 +159,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle implements En
         double diffZ = this.lastZ - this.z;
         double yawToChange = yaw;
         if (diffX * diffX + diffZ * diffZ > 0.001D) {
-            yawToChange = (Math.atan2(diffZ, diffX) * 180 / Math.PI);
+            yawToChange = (FastMathLite.atan2(diffZ, diffX) * 180 / Math.PI);
         }
 
         // Reverse yaw if yaw is below 0
@@ -171,14 +173,16 @@ public abstract class EntityMinecartAbstract extends EntityVehicle implements En
         Location from = new Location(lastX, lastY, lastZ, lastYaw, lastPitch, level);
         Location to = new Location(this.x, this.y, this.z, this.yaw, this.pitch, level);
 
-        this.getServer().getPluginManager().callEvent(new VehicleUpdateEvent(this));
+        if (!this.getServer().suomiCraftPEMode()) {
+            this.getServer().getPluginManager().callEvent(new VehicleUpdateEvent(this));
+        }
 
         if (!from.equals(to)) {
             this.getServer().getPluginManager().callEvent(new VehicleMoveEvent(this, from, to));
         }
 
         // Collisions
-        if (this instanceof InventoryHolder) {
+        if (this instanceof InventoryHolder && (!server.suomiCraftPEMode() || this.age % 2 == 1)) {
             for (Entity entity : level.getNearbyEntities(boundingBox.grow(0.2D, 0, 0.2D), this)) {
                 if (entity instanceof EntityMinecartAbstract && !passengers.contains(entity)) {
                     entity.applyEntityCollision(this);
@@ -186,7 +190,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle implements En
             }
         }
 
-        if (this instanceof InventoryHolder) {
+        if (this instanceof InventoryHolder && (!server.suomiCraftPEMode() || this.age % 2 == 0)) {
             AxisAlignedBB pickupArea = new SimpleAxisAlignedBB(this.x, this.y - 1, this.z, this.x + 1, this.y, this.z + 1);
             Block[] hopperPickupArray = this.level.getCollisionBlocks(this, pickupArea, false);
             if (hopperPickupArray.length >= 1) {
@@ -377,8 +381,6 @@ public abstract class EntityMinecartAbstract extends EntityVehicle implements En
     protected void activate(int x, int y, int z, boolean flag) {
     }
 
-    private boolean hasUpdated = false;
-
     private void setFalling() {
         motionX = NukkitMath.clamp(motionX, -maxSpeed, maxSpeed);
         motionZ = NukkitMath.clamp(motionZ, -maxSpeed, maxSpeed);
@@ -405,8 +407,6 @@ public abstract class EntityMinecartAbstract extends EntityVehicle implements En
             motionZ *= flyingZ;
         }
     }
-
-    private final Vector3 tempMoveVec = new Vector3(0, 0, 0);
 
     private void processMovement(int dx, int dy, int dz, BlockRail block) {
         fallDistance = 0.0F;
@@ -717,7 +717,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle implements En
     /**
      * Set the minecart display block
      *
-     * @param block The block that will changed. Set {@code null} for BlockAir
+     * @param block  The block that will changed. Set {@code null} for BlockAir
      * @param update Do update for the block. (This state changes if you want to show the block)
      * @return {@code true} if the block is normal block
      */
@@ -819,6 +819,20 @@ public abstract class EntityMinecartAbstract extends EntityVehicle implements En
 
     public void setMaximumSpeed(double speed) {
         maxSpeed = speed;
+    }
+
+    @Override
+    public boolean goToNewChunk(FullChunk chunk) {
+        if (chunk.getEntities().size() > 200) {
+            if (!this.isClosed() && this.isAlive()) {
+                if (level.getGameRules().getBoolean(GameRule.DO_ENTITY_DROPS)) {
+                    this.dropItem();
+                }
+            }
+            this.close();
+            return false;
+        }
+        return true;
     }
 
     @Override

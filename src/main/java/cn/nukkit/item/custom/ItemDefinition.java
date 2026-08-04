@@ -1,8 +1,10 @@
 package cn.nukkit.item.custom;
 
+import cn.nukkit.Server;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemEdible;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import lombok.Builder;
 import lombok.Data;
 
@@ -57,7 +59,8 @@ public class ItemDefinition {
     /**
      * Whether item can be used to destroy blocks on creative (disable to match sword behavior)
      */
-    @Builder.Default private final boolean canDestroyInCreative = true;
+    @Builder.Default
+    private final boolean canDestroyInCreative = true;
 
     /**
      * Allow plugins to provide properties we haven't implemented yet
@@ -69,10 +72,25 @@ public class ItemDefinition {
      */
     private final List<CompoundTag> customComponents;
 
+    public enum CreativeCategory {
+        ALL,
+        CONSTRUCTION,
+        NATURE,
+        EQUIPMENT,
+        ITEMS,
+        ITEM_COMMAND_ONLY,
+        NONE
+    }
+
+    public CompoundTag getNetworkData() {
+        Server.mvw("ItemDefinition#getNetworkData()");
+        return this.getNetworkData(ProtocolInfo.CURRENT_PROTOCOL);
+    }
+
     /**
      * Get the nbt tag that is sent to client
      */
-    public CompoundTag getNetworkData() {
+    public CompoundTag getNetworkData(int protocol) {
         try {
             Item item = this.implementation.getConstructor(Integer.class, int.class).newInstance(0, 1);
             if (!(item instanceof CustomItem)) {
@@ -85,11 +103,17 @@ public class ItemDefinition {
                     .putBoolean("allow_off_hand", item.allowOffhand())
                     .putBoolean("can_destroy_in_creative", this.canDestroyInCreative);
 
-            properties.putCompound("minecraft:icon", new CompoundTag()
-                    .putCompound("textures", new CompoundTag()
-                            .putString("default", this.texture)
-                    )
-            );
+            if (protocol >= ProtocolInfo.v1_20_60) {
+                properties.putCompound("minecraft:icon", new CompoundTag()
+                        .putCompound("textures", new CompoundTag()
+                                .putString("default", this.texture)
+                        )
+                );
+            } else {
+                properties.putCompound("minecraft:icon", new CompoundTag()
+                        .putString("texture", this.texture)
+                );
+            }
 
             if (this.creativeCategory != null) {
                 properties.putInt("creative_category", this.creativeCategory.ordinal());
@@ -167,15 +191,5 @@ public class ItemDefinition {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public enum CreativeCategory {
-        ALL,
-        CONSTRUCTION,
-        NATURE,
-        EQUIPMENT,
-        ITEMS,
-        ITEM_COMMAND_ONLY,
-        NONE
     }
 }

@@ -1,5 +1,7 @@
 package cn.nukkit.item;
 
+import cn.nukkit.network.protocol.ProtocolInfo;
+
 public class ItemHoeNetherite extends ItemTool {
 
     public ItemHoeNetherite() {
@@ -27,5 +29,10 @@ public class ItemHoeNetherite extends ItemTool {
     @Override
     public int getMaxDurability() {
         return ItemTool.DURABILITY_NETHERITE;
+    }
+
+    @Override
+    public boolean isSupportedOn(int protocol) {
+        return protocol >= ProtocolInfo.v1_16_0;
     }
 }

@@ -43,4 +43,9 @@ public class EntityGoat extends EntityWalkingAnimal {
     public int getNetworkId() {
         return NETWORK_ID;
     }
+
+    @Override
+    public double getSpeed() {
+        return 1.1;
+    }
 }

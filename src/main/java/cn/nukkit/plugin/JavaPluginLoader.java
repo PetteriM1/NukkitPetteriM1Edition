@@ -28,6 +28,7 @@ public class JavaPluginLoader implements PluginLoader {
     public JavaPluginLoader(Server server) {
         this.server = server;
     }
+    private static final Pattern[] FILTERS = new Pattern[]{Pattern.compile("^.+\\.jar$")};
 
     @Override
     public Plugin loadPlugin(File file) throws Exception {
@@ -101,8 +102,6 @@ public class JavaPluginLoader implements PluginLoader {
     public PluginDescription getPluginDescription(String filename) {
         return this.getPluginDescription(new File(filename));
     }
-
-    private static final Pattern[] FILTERS = new Pattern[]{Pattern.compile("^.+\\.jar$")};
 
     @Override
     public Pattern[] getPluginFilters() {

@@ -3,7 +3,7 @@ package cn.nukkit.block;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.utils.BlockColor;
 
-public class BlockDoubleSlabStone3 extends BlockDoubleSlabBase  {
+public class BlockDoubleSlabStone3 extends BlockDoubleSlabBase {
 
     public static final int END_STONE_BRICKS = 0;
     public static final int SMOOTH_RED_SANDSTONE = 1;

@@ -14,7 +14,6 @@ public class PopulatorSweetBerryBush extends PopulatorSurfaceBlock {
 
     @Override
     protected boolean canStay(int x, int y, int z, FullChunk chunk) {
-        if (chunk instanceof cn.nukkit.level.format.anvil.Chunk) return false;
         return EnsureCover.ensureCover(x, y, z, chunk) && EnsureBelow.ensureBelow(x, y, z, GRASS, chunk);
     }
 

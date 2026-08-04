@@ -9,7 +9,7 @@ import java.util.List;
 public class ElementStepSlider extends Element {
 
     @SuppressWarnings("unused")
-    private final String type = "step_slider"; //This variable is used for JSON import operations. Do NOT delete :) -- @Snake1999
+    private final String type = "step_slider";
     private String text = "";
     @SuppressWarnings("FieldMayBeFinal")
     private List<String> steps;

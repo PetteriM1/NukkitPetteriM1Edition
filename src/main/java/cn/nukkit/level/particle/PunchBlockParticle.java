@@ -27,13 +27,14 @@ public class PunchBlockParticle extends Particle {
     }
 
     @Override
-    public DataPacket[] encode() {
+    public DataPacket[] mvEncode(int protocol) {
         LevelEventPacket packet = new LevelEventPacket();
         packet.evid = LevelEventPacket.EVENT_PARTICLE_PUNCH_BLOCK;
         packet.x = (float) this.x;
         packet.y = (float) this.y;
         packet.z = (float) this.z;
-        packet.data = GlobalBlockPalette.getOrCreateRuntimeId(blockId, blockDamage) | index;
+        packet.data = GlobalBlockPalette.getOrCreateRuntimeId(protocol, blockId, blockDamage) | index;
+        packet.protocol = protocol;
         packet.tryEncode();
         return new DataPacket[]{packet};
     }

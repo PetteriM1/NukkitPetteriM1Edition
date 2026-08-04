@@ -38,7 +38,7 @@ public abstract class BlockDoubleSlabBase extends BlockSolidMeta {
         if (isCorrectTool(item)) {
             Item slab = toItem();
             slab.setCount(2);
-            return new Item[]{ slab };
+            return new Item[]{slab};
         } else {
             return new Item[0];
         }

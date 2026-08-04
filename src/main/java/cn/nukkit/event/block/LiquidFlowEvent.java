@@ -11,18 +11,14 @@ import cn.nukkit.event.HandlerList;
 public class LiquidFlowEvent extends BlockEvent implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
-
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private final Block to;
     private final BlockLiquid source;
     private final int newFlowDecay;
     /**
      * Event for liquid flowing (water/lava).
-     * @param to Flowing from one place to another.
-     * @param source Source of liquid flow.
+     *
+     * @param to           Flowing from one place to another.
+     * @param source       Source of liquid flow.
      * @param newFlowDecay Number for when water stops flowing.
      */
     public LiquidFlowEvent(Block to, BlockLiquid source, int newFlowDecay) {
@@ -30,6 +26,10 @@ public class LiquidFlowEvent extends BlockEvent implements Cancellable {
         this.to = to;
         this.source = source;
         this.newFlowDecay = newFlowDecay;
+    }
+
+    public static HandlerList getHandlers() {
+        return handlers;
     }
 
     public int getNewFlowDecay() {

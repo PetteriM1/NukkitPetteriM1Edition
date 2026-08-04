@@ -7,7 +7,7 @@ import cn.nukkit.utils.BlockColor;
  * Created on 2015/12/2 by xtypr.
  * Package cn.nukkit.block in project Nukkit .
  */
-public class BlockDoubleSlabWood extends BlockDoubleSlabBase  {
+public class BlockDoubleSlabWood extends BlockDoubleSlabBase {
 
     private static final String[] NAMES = {
             "Oak",

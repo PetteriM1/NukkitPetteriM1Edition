@@ -36,7 +36,7 @@ public class BlockHoneyBlock extends BlockSolid {
         if (!entity.onGround && entity.motionY <= 0.08 && !(entity instanceof Player)) {
             double ex = Math.abs(x + 0.5D - entity.x);
             double ez = Math.abs(z + 0.5D - entity.z);
-            double width = 0.4375D + (double)(entity.getWidth() / 2.0F);
+            double width = 0.4375D + (double) (entity.getWidth() / 2.0F);
             if (ex + 1.0E-3D > width || ez + 1.0E-3D > width) {
                 Vector3 motion = entity.getMotion();
                 motion.y = -0.05;

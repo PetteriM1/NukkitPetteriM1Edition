@@ -24,18 +24,17 @@ import cn.nukkit.utils.BlockUpdateEntry;
 import cn.nukkit.utils.ChunkException;
 import cn.nukkit.utils.LevelException;
 import cn.nukkit.utils.MainLogger;
+import cn.nukkit.utils.bugreport.ExceptionHandler;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.netty.buffer.*;
+import it.unimi.dsi.fastutil.ints.IntSet;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMaps;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
-import net.daporkchop.ldbjni.DBProvider;
-import net.daporkchop.ldbjni.LevelDB;
-import net.daporkchop.lib.natives.FeatureBuilder;
 import org.cloudburstmc.nbt.NbtMap;
 import org.cloudburstmc.nbt.NbtMapBuilder;
 import org.cloudburstmc.nbt.NbtType;
@@ -44,9 +43,12 @@ import org.iq80.leveldb.CompressionType;
 import org.iq80.leveldb.DB;
 import org.iq80.leveldb.Options;
 import org.iq80.leveldb.WriteBatch;
+import org.iq80.leveldb.impl.Iq80DBFactory;
 
+import javax.annotation.Nullable;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.nio.ByteOrder;
 import java.nio.file.Files;
@@ -78,7 +80,7 @@ public class LevelDBProvider implements LevelProvider {
 
     private volatile boolean closed;
 
-    private static final DBProvider JAVA_LDB_PROVIDER = (DBProvider) FeatureBuilder.create(LevelDBProvider.class).addJava("net.daporkchop.ldbjni.java.JavaDBProvider").build();
+    private static final int LATEST_WORLD_GEN_VERSION = 2;
 
     public LevelDBProvider(Level level, String path) throws IOException {
         this.level = level;
@@ -88,14 +90,19 @@ public class LevelDBProvider implements LevelProvider {
         Files.createDirectories(dbPath);
         Preconditions.checkArgument(Files.isDirectory(dbPath), "db is not a directory");
 
+        File file = dbPath.toFile();
         Options options = new Options()
                 .createIfMissing(true)
                 .compressionType(CompressionType.ZLIB_RAW)
-                .cacheSize(1024L * 1024L * level.getServer().getConfig("leveldb.cache-size-mb", 80))
+                .cacheSize(1024L * 1024L * level.getServer().getPropertyInt("leveldb-cache-mb", 80))
                 .blockSize(64 * 1024);
 
-        this.db = level.getServer().getConfig("leveldb.use-native", false) ?
-                LevelDB.PROVIDER.open(dbPath.toFile(), options) : JAVA_LDB_PROVIDER.open(dbPath.toFile(), options);
+        if (level.getServer().getPropertyBoolean("use-old-leveldb", false)) {
+            level.getServer().getLogger().debug("db: Using old LevelDB");
+            this.db = org.iq80.oldleveldb.impl.Iq80DBFactory.factory.open(file, options);
+        } else {
+            this.db = Iq80DBFactory.factory.open(file, options);
+        }
 
         this.levelData = loadLevelData(this.path);
 
@@ -121,6 +128,7 @@ public class LevelDBProvider implements LevelProvider {
         builder.setNameFormat("LevelDB Executor for " + this.getName());
         builder.setUncaughtExceptionHandler((thread, ex) -> {
             Server.getInstance().getLogger().error("Exception in " + thread.getName(), ex);
+            ExceptionHandler.handleSilently(ex);
         });
         this.executor = Executors.newSingleThreadExecutor(builder.build());
     }
@@ -153,7 +161,7 @@ public class LevelDBProvider implements LevelProvider {
         }
 
         CompoundTag levelData = new CompoundTag()
-                .putInt("PM1EGen", (generator == cn.nukkit.level.generator.Void.class ? 0 : 2)) // Don't set for converted worlds
+                .putInt("PM1EGen", (generator == cn.nukkit.level.generator.Void.class ? 0 : LATEST_WORLD_GEN_VERSION)) // Don't set for converted worlds
                 .putLong("DayTime", 0)
                 .putInt("GameType", 0)
                 .putInt("Generator", Generator.getGeneratorType(generator))
@@ -170,7 +178,7 @@ public class LevelDBProvider implements LevelProvider {
                 .putInt("thunderTime", 0)
                 .putLong("Time", 0);
 
-        saveLevelData(levelData, worldPath);
+        saveLevelData(levelData, worldPath, null);
     }
 
     @Override
@@ -273,6 +281,7 @@ public class LevelDBProvider implements LevelProvider {
             chunk = this.readChunk(chunkX, chunkZ);
         } catch (Exception ex) {
             Server.getInstance().getLogger().error("Failed to read chunk " + chunkX + ", " + chunkZ, ex);
+            ExceptionHandler.handleSilently(ex);
         }
 
         if (chunk == null && create) {
@@ -325,53 +334,6 @@ public class LevelDBProvider implements LevelProvider {
         return chunkBuilder.build();
     }
 
-    private void loadPendingBlockUpdates(byte[] data) {
-        NbtMap ticks;
-        try (ByteBufInputStream stream = new ByteBufInputStream(Unpooled.wrappedBuffer(data))) {
-            ticks = (NbtMap) NbtUtils.createReaderLE(stream).readTag();
-        } catch (IOException ex) {
-            throw new ChunkException("Corrupted block ticking data", ex);
-        }
-
-        int currentTick = ticks.getInt("currentTick");
-
-        for (NbtMap nbtMap : ticks.getList("tickList", NbtType.COMPOUND)) {
-            Block block = null;
-
-            NbtMap state = nbtMap.getCompound("blockState");
-            //noinspection ResultOfMethodCallIgnored
-            state.hashCode();
-
-            if (state.containsKey("name")) {
-                BlockStateSnapshot blockState = BlockStateMapping.get().getStateUnsafe(state);
-                if (blockState == null) {
-                    NbtMap updatedState = BlockStateMapping.get().updateVanillaState(state);
-                    blockState = BlockStateMapping.get().getUpdatedOrCustom(state, updatedState);
-                }
-                block = Block.get(blockState.getLegacyId(), blockState.getLegacyData());
-            } else if (nbtMap.containsKey("tileID")) {
-                block = Block.get(nbtMap.getByte("tileID") & 0xff);
-            }
-
-            if (block == null) {
-                if (Nukkit.DEBUG > 1) {
-                    Server.getInstance().getLogger().debug("Invalid block ticking entry: " + nbtMap);
-                }
-                continue;
-            }
-
-            block.x = nbtMap.getInt("x");
-            block.y = nbtMap.getInt("y");
-            block.z = nbtMap.getInt("z");
-            block.level = level;
-
-            int delay = (int) (nbtMap.getLong("time") - currentTick);
-            int priority = nbtMap.getInt("p");
-
-            level.scheduleUpdate(block, block, delay, priority, false);
-        }
-    }
-
     @Override
     public void saveChunk(int chunkX, int chunkZ) {
         BaseFullChunk chunk = this.getChunk(chunkX, chunkZ);
@@ -388,8 +350,8 @@ public class LevelDBProvider implements LevelProvider {
     public CompletableFuture<Void> saveChunkFuture(int chunkX, int chunkZ, FullChunk chunk0) {
         if (!(chunk0 instanceof LevelDBChunk)) throw new IllegalArgumentException("Only LevelDB chunks are supported");
         LevelDBChunk chunk = (LevelDBChunk) chunk0;
-        chunk.setX(chunkX);
-        chunk.setZ(chunkZ);
+        chunk.setPosition(chunkX, chunkZ);
+
         if (!chunk.isGenerated()) {
             return CompletableFuture.completedFuture(null);
         }
@@ -402,8 +364,8 @@ public class LevelDBProvider implements LevelProvider {
     public void saveChunkSync(int chunkX, int chunkZ, FullChunk chunk0) {
         if (!(chunk0 instanceof LevelDBChunk)) throw new IllegalArgumentException("Only LevelDB chunks are supported");
         LevelDBChunk chunk = (LevelDBChunk) chunk0;
-        chunk.setX(chunkX);
-        chunk.setZ(chunkZ);
+        chunk.setPosition(chunkX, chunkZ);
+
         if (!chunk.isGenerated()) {
             return;
         }
@@ -464,31 +426,6 @@ public class LevelDBProvider implements LevelProvider {
         return batch;
     }
 
-    private NbtMap savePendingBlockUpdates(Set<BlockUpdateEntry> entries, long currentTick) {
-        ObjectArrayList<NbtMap> list = new ObjectArrayList<>();
-
-        for (BlockUpdateEntry entry : entries) {
-            NbtMap blockTag = BlockStateMapping.get().getState(entry.block.getId(), entry.block.getDamage()).getVanillaState();
-
-            NbtMapBuilder tag = NbtMap.builder()
-                    .putInt("x", entry.pos.getFloorX())
-                    .putInt("y", entry.pos.getFloorY())
-                    .putInt("z", entry.pos.getFloorZ())
-                    .putCompound("blockState", blockTag)
-                    .putLong("time", entry.delay - currentTick);
-
-            if (entry.priority != 0) {
-                tag.putInt("p", entry.priority);
-            }
-
-            list.add(tag.build());
-        }
-
-        return list.isEmpty() ? null : NbtMap.builder()
-                .putInt("currentTick", 0)
-                .putList("tickList", NbtType.COMPOUND, list).build();
-    }
-
     private void saveChunkCallback(WriteBatch batch, LevelDBChunk chunk) {
         chunk.writeLock().lock();
         try {
@@ -509,6 +446,18 @@ public class LevelDBProvider implements LevelProvider {
                 this.saveChunk(chunk.getX(), chunk.getZ(), chunk);
             }
         }
+    }
+
+    @Override
+    public CompletableFuture<Void> saveChunksFuture() {
+        List<CompletableFuture<?>> futures = new ObjectArrayList<>();
+
+        for (BaseFullChunk chunk : this.chunks.values()) {
+            if (chunk.hasChanged()) {
+                futures.add(this.saveChunkFuture(chunk.getX(), chunk.getZ(), chunk));
+            }
+        }
+        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
     }
 
     @Override
@@ -561,7 +510,7 @@ public class LevelDBProvider implements LevelProvider {
     }
 
     @Override
-    public void requestChunkTask(int chunkX, int chunkZ) {
+    public void requestChunkTask(IntSet protocols, int chunkX, int chunkZ) {
         LevelDBChunk chunk = (LevelDBChunk) this.getChunk(chunkX, chunkZ, false);
         if (chunk == null) {
             throw new ChunkException("Invalid chunk");
@@ -569,7 +518,7 @@ public class LevelDBProvider implements LevelProvider {
 
         long timestamp = chunk.getChanges();
 
-        level.asyncChunk(chunk.cloneForChunkSending(), timestamp, chunkX, chunkZ);
+        level.asyncChunk(protocols, chunk.cloneForChunkSending(), timestamp, chunkX, chunkZ);
     }
 
     @Override
@@ -587,7 +536,7 @@ public class LevelDBProvider implements LevelProvider {
         Map<String, Object> options = new HashMap<>();
         options.put("preset", this.levelData.getString("generatorOptions"));
         options.put("__LevelDB", true);
-        options.put("__Version", this.levelData.getInt("PM1EGen"));
+        options.put("__Version", Server.getInstance().getPropertyBoolean("force-new-generator", false) ? LATEST_WORLD_GEN_VERSION : this.levelData.getInt("PM1EGen"));
         return options;
     }
 
@@ -765,22 +714,35 @@ public class LevelDBProvider implements LevelProvider {
         throw new LevelException("Invalid level.dat");
     }
 
-    private static void saveLevelData(CompoundTag levelData, Path path) {
+    private static void saveLevelData(CompoundTag levelData, Path path, @Nullable ExecutorService executor) {
         // Update storage version values to latest supported
         levelData.putInt("NetworkVersion", PALETTE_VERSION);
         levelData.putInt("StorageVersion", LATEST_SUBCHUNK_VERSION);
 
-        Path savePath = path.resolve("level.dat");
         try {
-            if (Files.exists(savePath)) {
-                Files.copy(savePath, path.resolve("level.dat_old"), StandardCopyOption.REPLACE_EXISTING);
-            }
-
             byte[] tagBytes;
             try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
                  NBTOutputStream stream = new NBTOutputStream(outputStream, ByteOrder.LITTLE_ENDIAN)) {
                 Tag.writeNamedTag(levelData, stream);
                 tagBytes = outputStream.toByteArray();
+            }
+
+            if (executor != null) {
+                executor.execute(() -> writeLevelData(path, tagBytes));
+            } else {
+                writeLevelData(path, tagBytes);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static void writeLevelData(Path path, byte[] tagBytes) {
+        try {
+            Path savePath = path.resolve("level.dat");
+
+            if (Files.exists(savePath)) {
+                Files.copy(savePath, path.resolve("level.dat_old"), StandardCopyOption.REPLACE_EXISTING);
             }
 
             try (NBTOutputStream stream = new NBTOutputStream(Files.newOutputStream(savePath), ByteOrder.LITTLE_ENDIAN)) {
@@ -795,7 +757,12 @@ public class LevelDBProvider implements LevelProvider {
 
     @Override
     public void saveLevelData() {
-        saveLevelData(this.levelData, this.path);
+        saveLevelData(false);
+    }
+
+    @Override
+    public void saveLevelData(boolean allowAsync) {
+        saveLevelData(this.levelData, this.path, allowAsync ? this.executor : null);
     }
 
     @Override
@@ -809,6 +776,7 @@ public class LevelDBProvider implements LevelProvider {
         this.level = null;
         this.executor.shutdown();
         try {
+            //noinspection ResultOfMethodCallIgnored
             this.executor.awaitTermination(1, TimeUnit.DAYS);
         } catch (InterruptedException e) {
             Server.getInstance().getLogger().error("Stopping LevelDB Executor interrupted", e);
@@ -858,5 +826,77 @@ public class LevelDBProvider implements LevelProvider {
             }
         }
         this.lastGcPosition += iterations;
+    }
+
+    private void loadPendingBlockUpdates(byte[] data) {
+        NbtMap ticks;
+        try (ByteBufInputStream stream = new ByteBufInputStream(Unpooled.wrappedBuffer(data))) {
+            ticks = (NbtMap) NbtUtils.createReaderLE(stream).readTag();
+        } catch (IOException ex) {
+            throw new ChunkException("Corrupted block ticking data", ex);
+        }
+
+        int currentTick = ticks.getInt("currentTick");
+
+        for (NbtMap nbtMap : ticks.getList("tickList", NbtType.COMPOUND)) {
+            Block block = null;
+
+            NbtMap state = nbtMap.getCompound("blockState");
+            //noinspection ResultOfMethodCallIgnored
+            state.hashCode();
+
+            if (state.containsKey("name")) {
+                BlockStateSnapshot blockState = BlockStateMapping.get().getStateUnsafe(state);
+                if (blockState == null) {
+                    NbtMap updatedState = BlockStateMapping.get().updateVanillaState(state);
+                    blockState = BlockStateMapping.get().getUpdatedOrCustom(state, updatedState);
+                }
+                block = Block.get(blockState.getLegacyId(), blockState.getLegacyData());
+            } else if (nbtMap.containsKey("tileID")) {
+                block = Block.get(nbtMap.getByte("tileID") & 0xff);
+            }
+
+            if (block == null) {
+                if (Nukkit.DEBUG > 1) {
+                    Server.getInstance().getLogger().debug("Invalid block ticking entry: " + nbtMap);
+                }
+                continue;
+            }
+
+            block.x = nbtMap.getInt("x");
+            block.y = nbtMap.getInt("y");
+            block.z = nbtMap.getInt("z");
+            block.level = level;
+
+            int delay = (int) (nbtMap.getLong("time") - currentTick);
+            int priority = nbtMap.getInt("p"); // Nukkit only
+
+            level.scheduleUpdate(block, block, delay, priority, false);
+        }
+    }
+
+    private NbtMap savePendingBlockUpdates(Set<BlockUpdateEntry> entries, long currentTick) {
+        ObjectArrayList<NbtMap> list = new ObjectArrayList<>();
+
+        for (BlockUpdateEntry entry : entries) {
+            NbtMap blockTag = BlockStateMapping.get().getState(entry.block.getId(), entry.block.getDamage()).getVanillaState();
+
+            NbtMapBuilder tag = NbtMap.builder()
+                    .putInt("x", entry.pos.getFloorX())
+                    .putInt("y", entry.pos.getFloorY())
+                    .putInt("z", entry.pos.getFloorZ())
+                    .putCompound("blockState", blockTag)
+                    .putLong("time", entry.delay - currentTick);
+
+            if (entry.priority != 0) {
+                tag.putInt("p", entry.priority); // Nukkit only
+            }
+
+            list.add(tag.build());
+        }
+
+        return list.isEmpty() ? null : NbtMap.builder()
+                .putInt("currentTick", 0)
+                .putList("tickList", NbtType.COMPOUND, list).build();
     }
 }

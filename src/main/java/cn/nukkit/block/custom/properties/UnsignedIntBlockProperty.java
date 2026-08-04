@@ -44,7 +44,7 @@ public class UnsignedIntBlockProperty extends BlockProperty<Integer> {
         if (value == null) {
             return 0;
         }
-        
+
         long unsigned = removeSign(value);
         try {
             this.validateDirectly(unsigned);
@@ -68,7 +68,7 @@ public class UnsignedIntBlockProperty extends BlockProperty<Integer> {
         }
         return (int) (this.minValue + meta);
     }
-    
+
     @Override
     protected void validateDirectly(Integer value) {
         if (value == null) {
@@ -81,7 +81,7 @@ public class UnsignedIntBlockProperty extends BlockProperty<Integer> {
         Preconditions.checkArgument(unsigned >= this.minValue, "New value (%s) must be higher or equals to %s", unsigned, this.minValue);
         Preconditions.checkArgument(this.maxValue >= unsigned, "New value (%s) must be less or equals to %s", unsigned, this.maxValue);
     }
-    
+
     @Override
     protected void validateMetaDirectly(int meta) {
         long max = this.maxValue - this.minValue;
@@ -110,7 +110,7 @@ public class UnsignedIntBlockProperty extends BlockProperty<Integer> {
     public boolean isDefaultIntValue(int value) {
         return removeSign(value) == this.minValue;
     }
-    
+
     @Override
     public int getDefaultIntValue() {
         return (int) this.minValue;

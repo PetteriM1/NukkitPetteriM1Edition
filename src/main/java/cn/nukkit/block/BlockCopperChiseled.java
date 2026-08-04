@@ -1,7 +1,9 @@
 package cn.nukkit.block;
 
 import cn.nukkit.block.properties.OxidizationLevel;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockCopperChiseled extends BlockCopperBase {
 
@@ -27,6 +29,19 @@ public class BlockCopperChiseled extends BlockCopperBase {
     @Override
     public OxidizationLevel getOxidizationLevel() {
         return OxidizationLevel.UNAFFECTED;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_21_0;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        if (protocol >= ProtocolInfo.v1_17_0) {
+            return BlockTypes.COPPER_BLOCK;
+        }
+        return BlockTypes.IRON_BLOCK;
     }
 
     @Override

@@ -1,10 +1,15 @@
 package cn.nukkit.entity.passive;
 
+import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.data.IntEntityData;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
+import cn.nukkit.level.particle.ItemBreakParticle;
+import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.network.protocol.LevelSoundEventPacket;
 import cn.nukkit.utils.Utils;
 
 import java.util.ArrayList;
@@ -50,6 +55,15 @@ public class EntityMooshroom extends EntityWalkingAnimal {
     }
 
     @Override
+    public boolean targetOption(EntityCreature creature, double distance) {
+        if (creature instanceof Player) {
+            Player player = (Player) creature;
+            return player.spawned && player.isAlive() && !player.closed && player.getInventory().getItemInHandFast().getId() == Item.WHEAT && distance <= 49;
+        }
+        return super.targetOption(creature, distance);
+    }
+
+    @Override
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
 
@@ -72,6 +86,40 @@ public class EntityMooshroom extends EntityWalkingAnimal {
     }
 
     @Override
+    public boolean onInteract(Player player, Item item, Vector3 clickedPos) {
+        if (item.getId() == Item.BOWL) {
+            if (!player.isCreative()) {
+                player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
+            }
+            player.getInventory().addItem(Item.get(Item.MUSHROOM_STEW, 0, 1));
+            this.level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_MILK_SUSPICIOUSLY);
+            return false;
+        } else if (item.getId() == Item.BUCKET) {
+            if (!player.isCreative()) {
+                player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
+            }
+            Item newBucket = Item.get(Item.BUCKET, 1, 1);
+            if (player.getInventory().getItemFast(player.getInventory().getHeldItemIndex()).count > 0) {
+                if (player.getInventory().canAddItem(newBucket)) {
+                    player.getInventory().addItem(newBucket);
+                } else {
+                    player.dropItem(newBucket);
+                }
+            } else {
+                player.getInventory().setItemInHand(newBucket);
+            }
+            this.level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_MILK);
+            return false;
+        } else if (item.getId() == Item.WHEAT && !this.isBaby() && !this.isInLoveCooldown()) {
+            this.level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_EAT);
+            this.level.addParticle(new ItemBreakParticle(this.add(0, this.getMountedYOffset(), 0), item));
+            this.setInLove();
+            return false;
+        }
+        return super.onInteract(player, item, clickedPos);
+    }
+
+    @Override
     public void saveNBT() {
         super.saveNBT();
         this.namedTag.putInt("Variant", this.isBrown() ? 1 : 0);
@@ -89,5 +137,10 @@ public class EntityMooshroom extends EntityWalkingAnimal {
 
     public void setBrown(boolean brown) {
         this.setDataProperty(new IntEntityData(DATA_VARIANT, brown ? 1 : 0));
+    }
+
+    @Override
+    public boolean ignoredAsSaveReason() {
+        return !this.isBrown() && super.ignoredAsSaveReason();
     }
 }

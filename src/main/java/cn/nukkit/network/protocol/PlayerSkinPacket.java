@@ -24,10 +24,10 @@ public class PlayerSkinPacket extends DataPacket {
     @Override
     public void decode() {
         uuid = getUUID();
-        skin = getSkin();
+        skin = getSkin(protocol);
         newSkinName = getString();
         oldSkinName = getString();
-        if (!feof()) { // -facepalm-
+        if (protocol < ProtocolInfo.v1_26_40 && !feof()) {
             getBoolean(); // skin.setTrusted(getBoolean());
         }
         skin.setTrusted(false); // Don't trust player skins
@@ -37,9 +37,11 @@ public class PlayerSkinPacket extends DataPacket {
     public void encode() {
         reset();
         putUUID(uuid);
-        putSkin(skin);
+        putSkin(protocol, skin);
         putString(newSkinName);
         putString(oldSkinName);
-        putBoolean(skin.isTrusted());
+        if (protocol < ProtocolInfo.v1_26_40 && protocol >= ProtocolInfo.v1_14_60) {
+            putBoolean(skin.isTrusted());
+        }
     }
 }

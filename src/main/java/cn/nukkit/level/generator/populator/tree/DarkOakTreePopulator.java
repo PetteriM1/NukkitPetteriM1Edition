@@ -20,7 +20,8 @@ public class DarkOakTreePopulator extends Populator {
         this(BlockSapling.DARK_OAK);
     }
 
-    public DarkOakTreePopulator(int type) {}
+    public DarkOakTreePopulator(int type) {
+    }
 
     public void setRandomAmount(int randomAmount) {
         this.randomAmount = randomAmount;

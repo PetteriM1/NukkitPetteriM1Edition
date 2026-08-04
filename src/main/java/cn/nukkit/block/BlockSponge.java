@@ -36,6 +36,16 @@ public class BlockSponge extends BlockSolidMeta {
         super(meta);
     }
 
+    private static class Entry {
+        private final Block block;
+        private final int distance;
+
+        public Entry(Block block, int distance) {
+            this.block = block;
+            this.distance = distance;
+        }
+    }
+
     @Override
     public int getId() {
         return SPONGE;
@@ -120,15 +130,5 @@ public class BlockSponge extends BlockSolidMeta {
             }
         }
         return waterRemoved > 0;
-    }
-
-    private static class Entry {
-        private final Block block;
-        private final int distance;
-
-        public Entry(Block block, int distance) {
-            this.block = block;
-            this.distance = distance;
-        }
     }
 }

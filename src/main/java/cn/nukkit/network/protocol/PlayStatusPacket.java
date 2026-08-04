@@ -6,12 +6,6 @@ import lombok.ToString;
 public class PlayStatusPacket extends DataPacket {
 
     public static final byte NETWORK_ID = ProtocolInfo.PLAY_STATUS_PACKET;
-
-    @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
     /**
      * Sent to confirm login success and move onto resource pack sequence
      */
@@ -52,8 +46,12 @@ public class PlayStatusPacket extends DataPacket {
      * Unknown
      */
     public static final int LOGIN_FAILED_VANILLA_TO_EDITOR_MISMATCH = 9;
-
     public int status;
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
+    }
 
     @Override
     public void decode() {

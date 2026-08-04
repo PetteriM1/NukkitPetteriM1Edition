@@ -12,22 +12,30 @@ import cn.nukkit.network.protocol.LevelEventPacket;
  */
 public class DestroyBlockParticle extends Particle {
 
-    protected final int data;
+    protected final Block block;
 
     public DestroyBlockParticle(Vector3 pos, Block block) {
         super(pos.x, pos.y, pos.z);
-        this.data = GlobalBlockPalette.getOrCreateRuntimeId(block.getId(), block.getDamage());
+        this.block = block;
     }
 
     @Override
-    public DataPacket[] encode() {
+    public DataPacket[] mvEncode(int protocol) {
         LevelEventPacket packet = new LevelEventPacket();
         packet.evid = LevelEventPacket.EVENT_PARTICLE_DESTROY;
         packet.x = (float) this.x;
         packet.y = (float) this.y;
         packet.z = (float) this.z;
 
-        packet.data = this.data;
+        int data;
+        if (protocol < block.getMinimumVersion()) {
+            data = GlobalBlockPalette.getOrCreateRuntimeId(protocol, block.getAlternateBlock(protocol).getLegacyId(), block.getAlternateMeta(protocol));
+        } else {
+            data = GlobalBlockPalette.getOrCreateRuntimeId(protocol, block.getId(), block.getDamage());
+        }
+
+        packet.data = data;
+        packet.protocol = protocol;
         packet.tryEncode();
         return new DataPacket[]{packet};
     }

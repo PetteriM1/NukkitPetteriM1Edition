@@ -24,10 +24,6 @@ public class DimensionData {
         this.height = height;
     }
 
-    public int getSectionOffset() {
-        return (-this.minHeight) >> 4;
-    }
-
     private static class LegacyDimensionData extends DimensionData {
         public LegacyDimensionData() {
             super(0, 0, 255);
@@ -37,5 +33,9 @@ public class DimensionData {
         public int getHeight() {
             return DimensionEnum.OVERWORLD.getDimensionData().getHeight();
         }
+    }
+
+    public int getSectionOffset() {
+        return (-this.minHeight) >> 4;
     }
 }

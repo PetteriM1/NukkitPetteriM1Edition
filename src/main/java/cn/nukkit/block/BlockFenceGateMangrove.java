@@ -1,6 +1,8 @@
 package cn.nukkit.block;
 
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockFenceGateMangrove extends BlockFenceGate {
 
@@ -20,6 +22,16 @@ public class BlockFenceGateMangrove extends BlockFenceGate {
     @Override
     public int getId() {
         return MANGROVE_FENCE_GATE;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_17_0;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.FENCE_GATE_OAK;
     }
 
     @Override

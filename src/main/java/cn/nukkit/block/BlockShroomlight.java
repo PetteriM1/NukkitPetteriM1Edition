@@ -26,7 +26,7 @@ public class BlockShroomlight extends BlockSolid {
 
     @Override
     public double getResistance() {
-        return 1;
+        return 5;
     }
 
     @Override

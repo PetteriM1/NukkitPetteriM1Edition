@@ -2,103 +2,132 @@ package cn.nukkit.utils.bugreport;
 
 import cn.nukkit.Nukkit;
 import cn.nukkit.Server;
-import cn.nukkit.lang.BaseLang;
-import cn.nukkit.utils.Utils;
+import cn.nukkit.command.defaults.StatusCommand;
+import cn.nukkit.math.NukkitMath;
+import cn.nukkit.plugin.Plugin;
+import cn.nukkit.utils.TextFormat;
 import com.sun.management.OperatingSystemMXBean;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.lang.management.ManagementFactory;
-import java.nio.file.FileStore;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
+import java.util.Collection;
 
 public class BugReportGenerator extends Thread {
 
     private final Throwable throwable;
+    private final String message;
+    private final long lastResponse;
+
+    private static String lastReport;
+
+    /**
+     * Allow bug reports to be handled by a plugin
+     */
+    public static BugReportPlugin plugin;
 
     BugReportGenerator(Throwable throwable) {
+        setName("BugReportGenerator - Throwable");
         this.throwable = throwable;
+        this.message = null;
+        this.lastResponse = -1;
     }
 
-    //Code section from SOF
-    private static String getCount(long bytes) {
-        int unit = 1000;
-        if (bytes < unit) return bytes + " B";
-        int exp = (int) (Math.log(bytes) / Math.log(unit));
-        String pre = ("kMGTPE").charAt(exp - 1) + ("");
-        return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
+    public BugReportGenerator(String message, long lastResponse) {
+        setName("BugReportGenerator - Watchdog");
+        this.throwable = null;
+        this.message = message;
+        this.lastResponse = lastResponse;
     }
 
     @Override
     public void run() {
-        BaseLang baseLang = Server.getInstance().getLanguage();
-        try {
-            Server.getInstance().getLogger().info("[BugReport] " + baseLang.translateString("nukkit.bugreport.create"));
-            String path = generate();
-            Server.getInstance().getLogger().info("[BugReport] " + baseLang.translateString("nukkit.bugreport.archive", path));
-        } catch (Exception e) {
-            StringWriter stringWriter = new StringWriter();
-            e.printStackTrace(new PrintWriter(stringWriter));
-            Server.getInstance().getLogger().info("[BugReport] " + baseLang.translateString("nukkit.bugreport.error", stringWriter.toString()));
+        if (plugin != null) {
+            try {
+                plugin.bugReport(throwable, message);
+            } catch (Exception ex) {
+                Server.getInstance().getLogger().error("[BugReport] External bug report failed", ex);
+            }
+        }
+        if (ExceptionHandler.SENTRY != null) {
+            try {
+                sentry();
+            } catch (Exception ex) {
+                Server.getInstance().getLogger().error("[BugReport] Sentry bug report failed", ex);
+            }
         }
     }
 
-    private String generate() throws IOException {
-        File reports = new File(Nukkit.DATA_PATH, "logs/bug_reports");
-        if (!reports.isDirectory()) {
-            reports.mkdirs();
-        }
+    /**
+     * Send a bug report to Sentry
+     */
+    private void sentry() {
+        long id = System.currentTimeMillis();
+        Server.getInstance().getLogger().info("[BugReport] Creating a bug report (ID: " + id + ")...");
 
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-        String date = simpleDateFormat.format(new Date());
+        ExceptionHandler.SENTRY.getContext().clear();
 
-        StringBuilder model = new StringBuilder();
-        long totalDiskSpace = 0;
-        int diskNum = 0;
-        for (Path root : FileSystems.getDefault().getRootDirectories()) {
-            try {
-                FileStore store = Files.getFileStore(root);
-                model.append("Disk ").append(diskNum++).append(":(avail=").append(getCount(store.getUsableSpace())).append(", total=").append(getCount(store.getTotalSpace())).append(") ");
-                totalDiskSpace += store.getTotalSpace();
-            } catch (IOException ignore) {
+        if (throwable != null) {
+            StackTraceElement[] stackTrace = throwable.getStackTrace();
+            if (stackTrace.length > 0) {
+                String thisReport = stackTrace[0].toString();
+                if (lastReport != null && lastReport.equals(thisReport)) {
+                    Server.getInstance().getLogger().debug("[BugReport] Report equals the last report");
+                    return; // Try to filter error spam
+                }
+                lastReport = thisReport;
+            } else {
+                Server.getInstance().getLogger().debug("[BugReport] Empty stack trace");
+                return; // Don't send empty stack traces
             }
         }
 
-        StringWriter stringWriter = new StringWriter();
-        throwable.printStackTrace(new PrintWriter(stringWriter));
-
-        StackTraceElement[] stackTrace = throwable.getStackTrace();
-        boolean pluginError = false;
-        if (stackTrace.length > 0) {
-            pluginError = !throwable.getStackTrace()[0].getClassName().startsWith("cn.nukkit");
+        StringBuilder plugins = new StringBuilder();
+        Collection<Plugin> loadedPlugins = Server.getInstance().getPluginManager().getPlugins().values();
+        try {
+            for (Plugin plugin : loadedPlugins) {
+                if (plugins.length() > 0) {
+                    plugins.append(", ");
+                }
+                if (!plugin.isEnabled()) {
+                    plugins.append('*');
+                }
+                plugins.append(plugin.getDescription().getName()).append(" ").append(plugin.getDescription().getVersion());
+            }
+        } catch (Exception ex) {
+            Server.getInstance().getLogger().logException(ex);
         }
-
-        File mdReport = new File(reports, date + "_" + throwable.getClass().getSimpleName() + ".md");
-        mdReport.createNewFile();
-        String content = Utils.readFile(this.getClass().getClassLoader().getResourceAsStream("report_template.md"));
 
         String cpuType = System.getenv("PROCESSOR_IDENTIFIER");
         OperatingSystemMXBean osMXBean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
-        content = content.replace("${NUKKIT_VERSION}", Nukkit.VERSION);
-        content = content.replace("${JAVA_VERSION}", System.getProperty("java.vm.name") + " (" + System.getProperty("java.runtime.version") + ")");
-        content = content.replace("${HOSTOS}", osMXBean.getName() + "-" + osMXBean.getArch() + " [" + osMXBean.getVersion() + "]");
-        content = content.replace("${MEMORY}", getCount(osMXBean.getTotalPhysicalMemorySize()));
-        content = content.replace("${STORAGE_SIZE}", getCount(totalDiskSpace));
-        content = content.replace("${CPU_TYPE}", cpuType == null ? "UNKNOWN" : cpuType);
-        content = content.replace("${AVAILABLE_CORE}", String.valueOf(osMXBean.getAvailableProcessors()));
-        content = content.replace("${STACKTRACE}", stringWriter.toString());
-        content = content.replace("${PLUGIN_ERROR}", Boolean.toString(pluginError).toUpperCase(Locale.ROOT));
-        content = content.replace("${STORAGE_TYPE}", model.toString());
+        ExceptionHandler.SENTRY.getContext().addExtra("Nukkit Version", Nukkit.getBranch() + '/' + Nukkit.VERSION.substring(4) + " (" + Nukkit.BUILD_VERSION_NUMBER + ')');
+        ExceptionHandler.SENTRY.getContext().addExtra("Java Version", System.getProperty("java.vm.name") + " (" + System.getProperty("java.runtime.version") + ')');
+        ExceptionHandler.SENTRY.getContext().addExtra("Host OS", osMXBean.getName() + '-' + osMXBean.getArch() + " [" + osMXBean.getVersion() + ']');
+        Runtime runtime = Runtime.getRuntime();
+        double usedMB = NukkitMath.round((double) (runtime.totalMemory() - runtime.freeMemory()) / 1024 / 1024, 2);
+        double maxMB = NukkitMath.round(((double) runtime.maxMemory()) / 1024 / 1024, 2);
+        double usage = usedMB / maxMB * 100;
+        ExceptionHandler.SENTRY.getContext().addExtra("Memory", usedMB + " MB (" + NukkitMath.round(usage, 2) + "%) of " + maxMB + " MB");
+        ExceptionHandler.SENTRY.getContext().addExtra("CPU Type", cpuType == null ? "UNKNOWN" : cpuType);
+        ExceptionHandler.SENTRY.getContext().addExtra("Available Cores", String.valueOf(osMXBean.getAvailableProcessors()));
+        ExceptionHandler.SENTRY.getContext().addExtra("Uptime", TextFormat.clean(StatusCommand.formatUptime(System.currentTimeMillis() - Nukkit.START_TIME)));
+        ExceptionHandler.SENTRY.getContext().addExtra("Players", Server.getInstance().getOnlinePlayersCount() + "/" + Server.getInstance().getMaxPlayers());
+        ExceptionHandler.SENTRY.getContext().addExtra("Plugins (" + loadedPlugins.size() + ")", plugins.toString());
+        if (lastResponse > -1) {
+            ExceptionHandler.SENTRY.getContext().addExtra("Last Response", lastResponse + " seconds ago");
+        }
+        ExceptionHandler.SENTRY.getContext().addTag("nukkit_build", Nukkit.BUILD_VERSION_NUMBER);
+        ExceptionHandler.SENTRY.getContext().addTag("branch", Nukkit.getBranch());
+        ExceptionHandler.SENTRY.getContext().addTag("ID", String.valueOf(id));
 
-        Utils.writeFile(mdReport, content);
+        Server.getInstance().getLogger().debug("[BugReport] Sending a bug report to Sentry...");
 
-        return mdReport.getAbsolutePath();
+        if (throwable != null) {
+            ExceptionHandler.SENTRY.getContext().addTag("watchdog", String.valueOf(false));
+            ExceptionHandler.SENTRY.sendException(throwable);
+        } else if (message != null) {
+            ExceptionHandler.SENTRY.getContext().addTag("watchdog", String.valueOf(true));
+            ExceptionHandler.SENTRY.sendMessage(message);
+        } else {
+            Server.getInstance().getLogger().error("[BugReport] Failed to send a bug report: content cannot be null");
+        }
     }
 }

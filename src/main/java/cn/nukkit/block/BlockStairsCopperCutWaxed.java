@@ -1,7 +1,7 @@
 package cn.nukkit.block;
 
 public class BlockStairsCopperCutWaxed extends BlockStairsCopperCut {
-    
+
     public BlockStairsCopperCutWaxed() {
         this(0);
     }
@@ -15,7 +15,7 @@ public class BlockStairsCopperCutWaxed extends BlockStairsCopperCut {
         return WAXED_CUT_COPPER_STAIRS;
     }
 
-    
+
     @Override
     public boolean isWaxed() {
         return true;

@@ -3,6 +3,7 @@ package cn.nukkit.utils;
 import cn.nukkit.Nukkit;
 import cn.nukkit.Server;
 import cn.nukkit.scheduler.FileWriteTask;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -17,6 +18,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 /**
@@ -32,8 +36,8 @@ public class Config {
     public static final int CNF = Config.PROPERTIES; // .cnf
     public static final int JSON = 1; // .js, .json
     public static final int YAML = 2; // .yml, .yaml
-    //public static final int EXPORT = 3; // .export, .xport
-    //public static final int SERIALIZED = 4; // .sl
+    public static final int EXPORT = 3; // .export, .xport
+    public static final int SERIALIZED = 4; // .sl
     public static final int ENUM = 5; // .txt, .list, .enum
     public static final int ENUMERATION = Config.ENUM;
 
@@ -43,9 +47,11 @@ public class Config {
     private int type = Config.DETECT;
 
     /**
-     * List of supported config file formats and their types
+     * List of supported config file formats
      */
-    public static final Map<String, Integer> format = new TreeMap<>();
+    public static final Map<String, Integer> format = new HashMap<>();
+
+    private static final ExecutorService ORDERED_ASYNC_WRITER;
 
     static {
         format.put("properties", Config.PROPERTIES);
@@ -56,11 +62,18 @@ public class Config {
         format.put("json", Config.JSON);
         format.put("yml", Config.YAML);
         format.put("yaml", Config.YAML);
-        //format.put("sl", Config.SERIALIZED);
-        //format.put("serialize", Config.SERIALIZED);
+        format.put("sl", Config.SERIALIZED);
+        format.put("serialize", Config.SERIALIZED);
         format.put("txt", Config.ENUM);
         format.put("list", Config.ENUM);
         format.put("enum", Config.ENUM);
+
+        ThreadFactoryBuilder builder = new ThreadFactoryBuilder();
+        builder.setNameFormat("Ordered async Config writer");
+        builder.setUncaughtExceptionHandler((thread, ex) -> {
+            Server.getInstance().getLogger().error("Exception in " + thread.getName(), ex);
+        });
+        ORDERED_ASYNC_WRITER = Executors.newSingleThreadExecutor(builder.build());
     }
 
     /**
@@ -97,7 +110,6 @@ public class Config {
         this(file.toString(), type, new ConfigSection());
     }
 
-    @Deprecated
     public Config(String file, int type, LinkedHashMap<String, Object> defaultMap) {
         this.load(file, type, new ConfigSection(defaultMap));
     }
@@ -110,9 +122,12 @@ public class Config {
         this.load(file.toString(), type, defaultMap);
     }
 
-    @Deprecated
     public Config(File file, int type, LinkedHashMap<String, Object> defaultMap) {
         this(file.toString(), type, new ConfigSection(defaultMap));
+    }
+    private static final Pattern PROP_LINE_PATTERN = Pattern.compile("[a-zA-Z0-9\\-_.]*+=+[^\\r\\n]*");
+
+    private static class LinkedHashMapTypeToken extends TypeToken<LinkedHashMap<String, Object>> {
     }
 
     /**
@@ -149,8 +164,8 @@ public class Config {
     /**
      * Try to load a config file with a given type and default content
      *
-     * @param file file path
-     * @param type file type
+     * @param file       file path
+     * @param type       file type
      * @param defaultMap default content
      * @return loaded
      */
@@ -163,7 +178,7 @@ public class Config {
                 this.file.getParentFile().mkdirs();
                 this.file.createNewFile();
             } catch (IOException e) {
-                MainLogger.getLogger().error("Could not create Config " + this.file.toString(), e);
+                MainLogger.getLogger().error("Could not create Config " + this.file, e);
             }
             this.config = defaultMap;
             this.save();
@@ -261,7 +276,7 @@ public class Config {
     /**
      * Save configuration into provided file. Internal file object will be set to new file.
      *
-     * @param file file
+     * @param file  file
      * @param async async
      * @return save success
      */
@@ -297,9 +312,17 @@ public class Config {
      * @return saved
      */
     public boolean save(Boolean async) { // Note: do not change to 'boolean' or plugins will break
-        if (this.file == null) throw new IllegalStateException("Failed to save Config. File object is undefined.");
+        return save(async, false);
+    }
+
+    public boolean save(boolean fullyAsync, boolean orderedAsync) {
+        if (this.file == null) {
+            throw new IllegalStateException("Failed to save Config. File object is undefined.");
+        }
+
         if (this.correct) {
-            StringBuilder content = new StringBuilder();
+            final StringBuilder content;
+
             switch (this.type) {
                 case Config.PROPERTIES:
                     content = new StringBuilder(this.writeProperties());
@@ -316,14 +339,26 @@ public class Config {
                     content = new StringBuilder(yaml.dump(this.config));
                     break;
                 case Config.ENUM:
+                    content = new StringBuilder();
                     for (Object o : this.config.entrySet()) {
                         Map.Entry entry = (Map.Entry) o;
                         content.append(entry.getKey()).append("\r\n");
                     }
                     break;
+                default:
+                    return false;
             }
-            if (async) {
-                Server.getInstance().getScheduler().scheduleAsyncTask(null, new FileWriteTask(this.file, content.toString()));
+
+            if (fullyAsync) {
+                Server.getInstance().getScheduler().scheduleAsyncTask(new FileWriteTask(this.file, content));
+            } else if (orderedAsync) {
+                ORDERED_ASYNC_WRITER.execute(() -> {
+                    try {
+                        Utils.writeFile(this.file, content.toString());
+                    } catch (IOException e) {
+                        Server.getInstance().getLogger().logException(e);
+                    }
+                });
             } else {
                 try {
                     Utils.writeFile(this.file, content.toString());
@@ -340,7 +375,7 @@ public class Config {
     /**
      * Set a value in the config
      *
-     * @param key key
+     * @param key   key
      * @param value value
      */
     public void set(final String key, Object value) {
@@ -532,7 +567,6 @@ public class Config {
         return this.config.size() - size;
     }
 
-
     private ConfigSection fillDefaults(ConfigSection defaultMap, ConfigSection data) {
         for (String key : defaultMap.keySet()) {
             if (!data.containsKey(key)) {
@@ -566,8 +600,6 @@ public class Config {
         return content.toString();
     }
 
-    private static final Pattern PROP_LINE_PATTERN = Pattern.compile("[a-zA-Z0-9\\-_.]*+=+[^\\r\\n]*");
-
     private void parseProperties(String content) {
         for (final String line : content.split("\n")) {
             if (PROP_LINE_PATTERN.matcher(line).matches()) {
@@ -599,35 +631,19 @@ public class Config {
         }
     }
 
-    /**
-     * @deprecated use {@link #get(String)} instead
-     */
-    @Deprecated
     public Object getNested(String key) {
         return get(key);
     }
 
-    /**
-     * @deprecated use {@link #get(String, Object)} instead
-     */
-    @Deprecated
     public <T> T getNested(String key, T defaultValue) {
         return get(key, defaultValue);
     }
 
-    /**
-     * @deprecated use {@link #get(String)} instead
-     */
-    @Deprecated
     @SuppressWarnings("unchecked")
     public <T> T getNestedAs(String key, Class<T> type) {
         return (T) get(key);
     }
 
-    /**
-     * @deprecated use {@link #remove(String)} instead
-     */
-    @Deprecated
     public void removeNested(String key) {
         remove(key);
     }
@@ -651,7 +667,6 @@ public class Config {
                 Yaml yaml = new Yaml(new Constructor(loaderOptions), new Representer(dumperOptions), dumperOptions, loaderOptions, new Resolver());
                 this.config = new ConfigSection(yaml.loadAs(content, LinkedHashMap.class));
                 break;
-            // case Config.SERIALIZED
             case Config.ENUM:
                 this.parseList(content);
                 break;
@@ -670,6 +685,12 @@ public class Config {
         return new HashSet<>();
     }
 
-    private static class LinkedHashMapTypeToken extends TypeToken<LinkedHashMap<String, Object>> {
+    public static void shutdownWriter() {
+        try {
+            ORDERED_ASYNC_WRITER.shutdown();
+            ORDERED_ASYNC_WRITER.awaitTermination(1, TimeUnit.DAYS);
+        } catch (InterruptedException e) {
+            Server.getInstance().getLogger().error("Error while shutting down Ordered async Config writer", e);
+        }
     }
 }

@@ -1,5 +1,7 @@
 package cn.nukkit.item;
 
+import cn.nukkit.network.protocol.ProtocolInfo;
+
 public class ItemCoastArmorTrimSmithingTemplate extends Item implements ItemTrimPattern {
 
     public ItemCoastArmorTrimSmithingTemplate() {
@@ -17,5 +19,10 @@ public class ItemCoastArmorTrimSmithingTemplate extends Item implements ItemTrim
     @Override
     public ItemTrimPattern.Type getPattern() {
         return Type.COAST;
+    }
+
+    @Override
+    public boolean isSupportedOn(int protocol) {
+        return protocol >= ProtocolInfo.v1_20_0_23;
     }
 }

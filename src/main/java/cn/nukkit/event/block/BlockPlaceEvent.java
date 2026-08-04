@@ -8,30 +8,24 @@ import cn.nukkit.item.Item;
 
 /**
  * Event for a block being placed.
+ *
  * @author MagicDroidX
  */
 public class BlockPlaceEvent extends BlockEvent implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
-
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     protected final Player player;
-
     protected final Item item;
-
     protected final Block blockReplace;
     protected final Block blockAgainst;
-
     /**
      * This event is called when a block is placed.
-     * @param player Player who placed block.
-     * @param blockPlace Placed Block.
+     *
+     * @param player       Player who placed block.
+     * @param blockPlace   Placed Block.
      * @param blockReplace Block replace.
      * @param blockAgainst Block against.
-     * @param item Item that was placed.
+     * @param item         Item that was placed.
      */
     public BlockPlaceEvent(Player player, Block blockPlace, Block blockReplace, Block blockAgainst, Item item) {
         super(blockPlace);
@@ -39,6 +33,10 @@ public class BlockPlaceEvent extends BlockEvent implements Cancellable {
         this.blockAgainst = blockAgainst;
         this.item = item;
         this.player = player;
+    }
+
+    public static HandlerList getHandlers() {
+        return handlers;
     }
 
     public Player getPlayer() {

@@ -2,6 +2,8 @@ package cn.nukkit.block;
 
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
+import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockFenceCrimson extends BlockFence {
 
@@ -36,5 +38,15 @@ public class BlockFenceCrimson extends BlockFence {
     @Override
     public Item toItem() {
         return new ItemBlock(Block.get(this.getId(), 0), 0);
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_16_0;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.FENCE;
     }
 }

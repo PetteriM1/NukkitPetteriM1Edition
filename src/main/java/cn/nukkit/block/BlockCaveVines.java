@@ -10,6 +10,8 @@ import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.level.particle.BoneMealParticle;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.utils.material.BlockType;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -185,7 +187,7 @@ public class BlockCaveVines extends BlockTransparentMeta {
         if (!this.hasBerries()) {
             return new Item[0];
         }
-        return new Item[]{ Item.get(ItemID.GLOW_BERRIES, 0, 1) };
+        return new Item[]{Item.get(ItemID.GLOW_BERRIES, 0, 1)};
     }
 
     @Override
@@ -222,6 +224,16 @@ public class BlockCaveVines extends BlockTransparentMeta {
                 return true;
         }
         return false;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_17_0;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.VINES;
     }
 
     @Override

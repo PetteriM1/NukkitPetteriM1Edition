@@ -21,7 +21,7 @@ public class KickCommand extends VanillaCommand {
         this.commandParameters.clear();
         this.commandParameters.put("default", new CommandParameter[]{
                 CommandParameter.newType("player", CommandParamType.TARGET),
-                CommandParameter.newType("reason", true, CommandParamType.MESSAGE)
+                CommandParameter.newType("reason", true, CommandParamType.STRING)
         });
     }
 
@@ -48,7 +48,7 @@ public class KickCommand extends VanillaCommand {
 
         Player player = sender.getServer().getPlayerExact(name);
         if (player != null) {
-            player.kick(PlayerKickEvent.Reason.KICKED_BY_ADMIN, reason.toString(), true);
+            player.kick(PlayerKickEvent.Reason.KICKED_BY_ADMIN, reason.toString(), true, "source=" + sender.getName() + ", reason=" + reason);
             if (reason.length() >= 1) {
                 Command.broadcastCommandMessage(sender, new TranslationContainer("commands.kick.success.reason", player.getName(), reason.toString())
                 );

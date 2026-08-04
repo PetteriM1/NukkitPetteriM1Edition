@@ -8,8 +8,10 @@ import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.SimpleAxisAlignedBB;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
 import cn.nukkit.utils.Faceable;
+import cn.nukkit.utils.material.BlockType;
 
 public abstract class BlockAmethystBud extends BlockTransparentMeta implements Faceable {
 
@@ -83,7 +85,7 @@ public abstract class BlockAmethystBud extends BlockTransparentMeta implements F
 
     @Override
     public double getResistance() {
-        return 1.5;
+        return 7.5;
     }
 
     @Override
@@ -92,6 +94,7 @@ public abstract class BlockAmethystBud extends BlockTransparentMeta implements F
     }
 
     protected abstract int getCrystalHeight();
+
     protected abstract int getCrystalOffset();
 
     @Override
@@ -106,6 +109,16 @@ public abstract class BlockAmethystBud extends BlockTransparentMeta implements F
     @Override
     public WaterloggingType getWaterloggingType() {
         return WaterloggingType.WHEN_PLACED_IN_WATER;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_17_0;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.SKULL_BLOCK;
     }
 
     @Override

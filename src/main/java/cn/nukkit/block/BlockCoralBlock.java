@@ -13,7 +13,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class BlockCoralBlock extends BlockSolidMeta {
 
-    private static final String[] NAMES = {
+    private static final String[] names = {
             "Tube Coral Block",
             "Brain Coral Block",
             "Bubble Coral Block",
@@ -74,10 +74,10 @@ public class BlockCoralBlock extends BlockSolidMeta {
     public String getName() {
         int variant = this.getDamage() & 0x7;
         String name;
-        if (variant >= NAMES.length) {
-            name = NAMES[0];
+        if (variant >= names.length) {
+            name = names[0];
         } else {
-            name = NAMES[variant];
+            name = names[variant];
         }
         return this.isDead() ? "Dead " + name : name;
     }
@@ -101,9 +101,9 @@ public class BlockCoralBlock extends BlockSolidMeta {
     public Item[] getDrops(Item item) {
         if (item.isPickaxe() && item.getTier() >= ItemTool.TIER_WOODEN) {
             if (item.getEnchantment(Enchantment.ID_SILK_TOUCH) != null) {
-                return new Item[]{this.toItem() };
+                return new Item[]{this.toItem()};
             } else {
-                return new Item[]{ new ItemBlock(this.clone(), this.getDamage() | 0x8) };
+                return new Item[]{new ItemBlock(this.clone(), this.getDamage() | 0x8)};
             }
         } else {
             return new Item[0];

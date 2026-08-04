@@ -57,7 +57,7 @@ public class KillCommand extends VanillaCommand {
             } else if (args[0].equals("@e")) {
                 StringJoiner joiner = new StringJoiner(", ");
                 for (Level level : Server.getInstance().getLevels().values()) {
-                    for (Entity entity : level.getEntities()) {
+                    for (Entity entity : level.getEntitiesList()) {
                         if (!(entity instanceof Player)) {
                             EntityDamageEvent ev = new EntityDamageEvent(entity, DamageCause.SUICIDE, 1000);
                             sender.getServer().getPluginManager().callEvent(ev);
@@ -96,7 +96,7 @@ public class KillCommand extends VanillaCommand {
                 }
                 StringJoiner joiner = new StringJoiner(", ");
                 for (Level level : Server.getInstance().getLevels().values()) {
-                    for (Entity entity : level.getEntities()) {
+                    for (Entity entity : level.getEntitiesList()) {
                         if (entity instanceof Player) {
                             Player p = (Player) entity;
                             if (p.isCreative() || p.isSpectator()) {

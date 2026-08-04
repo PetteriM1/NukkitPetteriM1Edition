@@ -4,6 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.level.Sound;
 import cn.nukkit.math.Vector3;
+import cn.nukkit.network.protocol.ProtocolInfo;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -29,6 +30,11 @@ public class ItemGoatHorn extends Item {
     }
 
     @Override
+    public boolean isSupportedOn(int protocol) {
+        return protocol >= ProtocolInfo.v1_19_0;
+    }
+
+    @Override
     public boolean onClickAir(Player player, Vector3 directionVector) {
         if (!cooldown.getAndSet(true)) {
             this.playSound(player);
@@ -42,21 +48,29 @@ public class ItemGoatHorn extends Item {
 
     public void playSound(Player player) {
         switch (this.getDamage()) {
-            case 0: player.getLevel().addSound(player, Sound.HORN_CALL_0);
+            case 0:
+                player.getLevel().addSound(player, Sound.HORN_CALL_0);
                 break;
-            case 1: player.getLevel().addSound(player, Sound.HORN_CALL_1);
+            case 1:
+                player.getLevel().addSound(player, Sound.HORN_CALL_1);
                 break;
-            case 2: player.getLevel().addSound(player, Sound.HORN_CALL_2);
+            case 2:
+                player.getLevel().addSound(player, Sound.HORN_CALL_2);
                 break;
-            case 3: player.getLevel().addSound(player, Sound.HORN_CALL_3);
+            case 3:
+                player.getLevel().addSound(player, Sound.HORN_CALL_3);
                 break;
-            case 4: player.getLevel().addSound(player, Sound.HORN_CALL_4);
+            case 4:
+                player.getLevel().addSound(player, Sound.HORN_CALL_4);
                 break;
-            case 5: player.getLevel().addSound(player, Sound.HORN_CALL_5);
+            case 5:
+                player.getLevel().addSound(player, Sound.HORN_CALL_5);
                 break;
-            case 6: player.getLevel().addSound(player, Sound.HORN_CALL_6);
+            case 6:
+                player.getLevel().addSound(player, Sound.HORN_CALL_6);
                 break;
-            case 7: player.getLevel().addSound(player, Sound.HORN_CALL_7);
+            case 7:
+                player.getLevel().addSound(player, Sound.HORN_CALL_7);
                 break;
         }
     }

@@ -1,5 +1,6 @@
 package cn.nukkit.command;
 
+import cn.nukkit.Nukkit;
 import cn.nukkit.Server;
 import cn.nukkit.command.data.CommandParameter;
 import cn.nukkit.command.defaults.*;
@@ -58,19 +59,28 @@ public class SimpleCommandMap implements CommandMap {
         this.register("nukkit", new XpCommand("xp"));
         this.register("nukkit", new StatusCommand("status"));
         this.register("nukkit", new SummonCommand("summon"));
+        this.register("nukkit", new WorldCommand("world"));
+        this.register("nukkit", new GenerateWorldCommand("genworld"));
         this.register("nukkit", new WhitelistCommand("whitelist"));
         this.register("nukkit", new GameruleCommand("gamerule"));
+        this.register("nukkit", new SpawnCommand("spawn"));
         this.register("nukkit", new ConvertCommand("convert"));
-        this.register("nukkit", new DefaultGamemodeCommand("defaultgamemode"));
-        this.register("nukkit", new SayCommand("say"));
-        this.register("nukkit", new MeCommand("me"));
-        this.register("nukkit", new DifficultyCommand("difficulty"));
-        this.register("nukkit", new ParticleCommand("particle"));
-        this.register("nukkit", new SpawnpointCommand("spawnpoint"));
-        this.register("nukkit", new TitleCommand("title"));
-        this.register("nukkit", new SeedCommand("seed"));
-        this.register("nukkit", new PlaySoundCommand("playsound"));
-        this.register("nukkit", new GarbageCollectorCommand("gc"));
+        if (Nukkit.DEBUG > 1 || !Server.getInstance().suomiCraftPEMode()) {
+            this.register("nukkit", new DefaultGamemodeCommand("defaultgamemode"));
+            this.register("nukkit", new SayCommand("say"));
+            this.register("nukkit", new MeCommand("me"));
+            this.register("nukkit", new DifficultyCommand("difficulty"));
+            this.register("nukkit", new ParticleCommand("particle"));
+            this.register("nukkit", new SpawnpointCommand("spawnpoint"));
+            this.register("nukkit", new TitleCommand("title"));
+            this.register("nukkit", new TransferServerCommand("transfer"));
+            this.register("nukkit", new SeedCommand("seed"));
+            this.register("nukkit", new PlaySoundCommand("playsound"));
+            this.register("nukkit", new GarbageCollectorCommand("gc"));
+        }
+        if (Nukkit.DEBUG > 1) {
+            this.register("nukkit", new BiomeCommand("biome"));
+        }
     }
 
     @Override
@@ -274,45 +284,5 @@ public class SimpleCommandMap implements CommandMap {
 
     public Map<String, Command> getCommands() {
         return knownCommands;
-    }
-
-    public void registerServerAliases() {
-        Map<String, List<String>> values = this.server.getCommandAliases();
-        for (Map.Entry<String, List<String>> entry : values.entrySet()) {
-            String alias = entry.getKey();
-            List<String> commandStrings = entry.getValue();
-            if (alias.contains(" ") || alias.contains(":")) {
-                this.server.getLogger().warning(this.server.getLanguage().translateString("nukkit.command.alias.illegal", alias));
-                continue;
-            }
-            List<String> targets = new ArrayList<>();
-
-            StringBuilder bad = new StringBuilder();
-
-            for (String commandString : commandStrings) {
-                String[] args = commandString.split(" ");
-                Command command = this.getCommand(args[0]);
-
-                if (command == null) {
-                    if (bad.length() > 0) {
-                        bad.append(", ");
-                    }
-                    bad.append(commandString);
-                } else {
-                    targets.add(commandString);
-                }
-            }
-
-            if (bad.length() > 0) {
-                this.server.getLogger().warning(this.server.getLanguage().translateString("nukkit.command.alias.notFound", new String[]{alias, bad.toString()}));
-                continue;
-            }
-
-            if (!targets.isEmpty()) {
-                this.knownCommands.put(alias.toLowerCase(Locale.ROOT), new FormattedCommandAlias(alias.toLowerCase(Locale.ROOT), targets));
-            } else {
-                this.knownCommands.remove(alias.toLowerCase(Locale.ROOT));
-            }
-        }
     }
 }

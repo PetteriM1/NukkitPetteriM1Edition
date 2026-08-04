@@ -4,6 +4,8 @@ import cn.nukkit.Player;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockTorchflowerCrop extends BlockFlowable {
 
@@ -47,5 +49,20 @@ public class BlockTorchflowerCrop extends BlockFlowable {
         }
 
         return 0;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_20_0_23;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.FLOWER;
+    }
+
+    @Override
+    public int getAlternateMeta(int protocol) {
+        return BlockFlower.TYPE_ORANGE_TULIP;
     }
 }

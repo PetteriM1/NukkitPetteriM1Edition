@@ -5,7 +5,7 @@ import cn.nukkit.block.properties.OxidizationLevel;
 import java.util.Locale;
 
 public class BlockSlabCopperCut extends BlockSlabCopperBase {
-    
+
     public BlockSlabCopperCut() {
         this(0);
     }

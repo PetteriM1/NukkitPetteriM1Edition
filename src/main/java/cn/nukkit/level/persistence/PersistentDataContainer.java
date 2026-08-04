@@ -32,7 +32,8 @@ public interface PersistentDataContainer {
         Tag tag = this.getReadStorage().get(key);
         if (tag != null && type.validate(tag)) {
             return type.deserialize(tag);
-        } if (tag != null) {
+        }
+        if (tag != null) {
             this.remove(key);
         }
         return null;

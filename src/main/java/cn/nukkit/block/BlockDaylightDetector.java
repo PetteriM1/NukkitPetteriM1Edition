@@ -56,8 +56,7 @@ public class BlockDaylightDetector extends BlockTransparent {
 
     @Override
     public int getWeakPower(BlockFace face) {
-        int time = level.getTime() % Level.TIME_FULL;
-        return time < 13184 || time > 22800 ? 15 : 0;
+        return this.level.isAnimalSpawningAllowedByTime() ? 15 : 0;
     }
 
     @Override

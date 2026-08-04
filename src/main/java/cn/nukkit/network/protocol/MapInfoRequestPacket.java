@@ -20,6 +20,9 @@ public class MapInfoRequestPacket extends DataPacket {
     @Override
     public void decode() {
         mapId = this.getEntityUniqueId();
+        if (protocol > ProtocolInfo.v1_19_20) {
+            this.getLInt(); // pixels count
+        }
     }
 
     @Override

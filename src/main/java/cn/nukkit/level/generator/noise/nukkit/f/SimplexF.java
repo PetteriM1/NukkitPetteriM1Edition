@@ -34,8 +34,8 @@ public class SimplexF extends PerlinF {
         F2 = 0.5f * (SQRT_3 - 1f);
         G2 = (3f - SQRT_3) / 6f;
         G22 = G2 * 2.0f - 1f;
-        F3 = 1.0f / 3.0f;
-        G3 = 1.0f / 6.0f;
+        F3 = 0.33333334f;
+        G3 = 0.16666667f;
         F4 = (SQRT_5 - 1.0f) / 4.0f;
         G4 = (5.0f - SQRT_5) / 20.0f;
         G42 = G4 * 2.0f;
@@ -51,8 +51,8 @@ public class SimplexF extends PerlinF {
         F2 = 0.5f * (SQRT_3 - 1f);
         G2 = (3f - SQRT_3) / 6f;
         G22 = G2 * 2.0f - 1f;
-        F3 = 1.0f / 3.0f;
-        G3 = 1.0f / 6.0f;
+        F3 = 0.33333334f;
+        G3 = 0.16666667f;
         F4 = (SQRT_5 - 1.0f) / 4.0f;
         G4 = (5.0f - SQRT_5) / 20.0f;
         G42 = G4 * 2.0f;

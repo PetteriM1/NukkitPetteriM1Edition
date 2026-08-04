@@ -7,7 +7,7 @@ import cn.nukkit.utils.BlockColor;
  * @author MagicDroidX
  * Nukkit Project
  */
-public class BlockDoubleSlabStone extends BlockDoubleSlabBase  {
+public class BlockDoubleSlabStone extends BlockDoubleSlabBase {
 
     public static final int STONE = 0;
     public static final int SANDSTONE = 1;

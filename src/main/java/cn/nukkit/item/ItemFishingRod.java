@@ -32,8 +32,8 @@ public class ItemFishingRod extends ItemTool {
             }
 
             player.stopFishing(true);
-		} else {
-			player.startFishing(this);
+        } else {
+            player.startFishing(this);
         }
 
         return true;

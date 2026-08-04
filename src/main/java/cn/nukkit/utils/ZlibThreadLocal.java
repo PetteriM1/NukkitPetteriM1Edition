@@ -38,6 +38,7 @@ public final class ZlibThreadLocal implements ZlibProvider {
             bos.write(buffer, 0, i);
         }
         //Deflater::end is called the time when the process exits.
+        deflater.reset();
         return bos.toByteArray();
     }
 
@@ -56,6 +57,7 @@ public final class ZlibThreadLocal implements ZlibProvider {
             bos.write(buffer, 0, i);
         }
         //Deflater::end is called the time when the process exits.
+        deflater.reset();
         return bos.toByteArray();
     }
 
@@ -81,6 +83,7 @@ public final class ZlibThreadLocal implements ZlibProvider {
             bos.write(buffer, 0, i);
         }
         //Deflater::end is called the time when the process exits.
+        deflater.reset();
         return bos.toByteArray();
     }
 
@@ -99,6 +102,7 @@ public final class ZlibThreadLocal implements ZlibProvider {
             bos.write(buffer, 0, i);
         }
         //Deflater::end is called the time when the process exits.
+        deflater.reset();
         return bos.toByteArray();
     }
 
@@ -125,6 +129,7 @@ public final class ZlibThreadLocal implements ZlibProvider {
                 }
                 bos.write(buffer, 0, i);
             }
+            inflater.reset();
             return bos.toByteArray();
         } catch (DataFormatException e) {
             throw new IOException("Unable to inflate Zlib stream", e);
@@ -154,6 +159,7 @@ public final class ZlibThreadLocal implements ZlibProvider {
                 }
                 bos.write(buffer, 0, i);
             }
+            inflater.reset();
             return bos.toByteArray();
         } catch (DataFormatException e) {
             throw new IOException("Unable to inflate Zlib stream", e);

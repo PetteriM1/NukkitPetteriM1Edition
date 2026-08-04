@@ -9,7 +9,7 @@ import cn.nukkit.math.NukkitRandom;
  * Nukkit Project
  * <p>
  * make sure this is touching another extreme hills type or it'll look dumb
- *
+ * <p>
  * very smooth hills with flat areas between
  */
 public class ExtremeHillsMBiome extends ExtremeHillsPlusBiome {

@@ -1,7 +1,9 @@
 package cn.nukkit.block;
 
 import cn.nukkit.item.ItemTool;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockDoubleSlabTileDeepslate extends BlockDoubleSlabBase {
 
@@ -12,12 +14,12 @@ public class BlockDoubleSlabTileDeepslate extends BlockDoubleSlabBase {
     protected BlockDoubleSlabTileDeepslate(int meta) {
         super(meta);
     }
-    
+
     @Override
     public int getId() {
         return DEEPSLATE_TILE_DOUBLE_SLAB;
     }
-    
+
     @Override
     public int getSingleSlabId() {
         return DEEPSLATE_TILE_SLAB;
@@ -32,34 +34,44 @@ public class BlockDoubleSlabTileDeepslate extends BlockDoubleSlabBase {
     public String getSlabName() {
         return "Double Deepslate Tile Slab";
     }
-    
+
     @Override
     public double getHardness() {
         return 3.5;
     }
-    
+
     @Override
     public double getResistance() {
         return 6;
     }
-    
+
     @Override
     public boolean canHarvestWithHand() {
         return false;
     }
-    
+
     @Override
     public int getToolTier() {
         return ItemTool.TIER_WOODEN;
     }
-    
+
     @Override
     public int getToolType() {
         return ItemTool.TYPE_PICKAXE;
     }
-    
+
     @Override
     public BlockColor getColor() {
         return BlockColor.DEEPSLATE_GRAY_BLOCK_COLOR;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_17_0;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.DOUBLE_STONE_SLAB;
     }
 }

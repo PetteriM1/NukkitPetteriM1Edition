@@ -32,9 +32,11 @@ public class ChangeDimensionPacket extends DataPacket {
         this.putVarInt(this.dimension);
         this.putVector3f(this.x, this.y, this.z);
         this.putBoolean(this.respawn);
-        this.putBoolean(this.loadingScreenId != null);
-        if (this.loadingScreenId != null) {
-            this.putLInt(this.loadingScreenId);
+        if (this.protocol >= ProtocolInfo.v1_21_20) {
+            this.putBoolean(this.loadingScreenId != null);
+            if (this.loadingScreenId != null) {
+                this.putLInt(this.loadingScreenId);
+            }
         }
     }
 

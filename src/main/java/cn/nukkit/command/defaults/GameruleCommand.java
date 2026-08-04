@@ -84,7 +84,7 @@ public class GameruleCommand extends VanillaCommand {
             case 0:
                 int splitCounter = 0;
                 StringJoiner rulesJoiner = new StringJoiner("\n");
-                for (GameRule rule: rules.getRules()) {
+                for (GameRule rule : rules.getRules()) {
                     rulesJoiner.add(rule.getName().toLowerCase(Locale.ROOT) + " = " + rules.getString(rule));
 
                     // 1.21 disconnects on too long message
@@ -119,7 +119,7 @@ public class GameruleCommand extends VanillaCommand {
                     rules.setGameRules(optionalRule.get(), args[1]);
                     sender.sendMessage(new TranslationContainer("commands.gamerule.success", optionalRule.get().getName().toLowerCase(Locale.ROOT), args[1]));
                 } catch (IllegalArgumentException e) {
-                    sender.sendMessage(new TranslationContainer("commands.generic.syntax", "/gamerule "  + args[0] + ' ', args[1], ' ' + String.join(" ", Arrays.copyOfRange(args, 2, args.length))));
+                    sender.sendMessage(new TranslationContainer("commands.generic.syntax", "/gamerule " + args[0] + ' ', args[1], ' ' + String.join(" ", Arrays.copyOfRange(args, 2, args.length))));
                 }
                 return true;
         }

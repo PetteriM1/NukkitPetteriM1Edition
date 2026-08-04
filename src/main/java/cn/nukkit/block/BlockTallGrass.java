@@ -24,13 +24,7 @@ public class BlockTallGrass extends BlockFlowable {
     public BlockTallGrass(int meta) {
         super(meta);
     }
-
-    @Override
-    public int getId() {
-        return TALL_GRASS;
-    }
-
-    private static final String[] NAMES = {
+    private static final String[] names = {
             "Grass",
             "Grass",
             "Fern",
@@ -38,8 +32,13 @@ public class BlockTallGrass extends BlockFlowable {
     };
 
     @Override
+    public int getId() {
+        return TALL_GRASS;
+    }
+
+    @Override
     public String getName() {
-        return NAMES[this.getDamage() & 0x03];
+        return names[this.getDamage() & 0x03];
     }
 
     @Override

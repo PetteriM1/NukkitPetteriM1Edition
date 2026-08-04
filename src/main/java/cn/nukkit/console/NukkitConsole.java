@@ -1,5 +1,6 @@
 package cn.nukkit.console;
 
+import cn.nukkit.Nukkit;
 import cn.nukkit.Server;
 import cn.nukkit.event.server.ServerCommandEvent;
 import lombok.RequiredArgsConstructor;
@@ -53,7 +54,7 @@ public class NukkitConsole extends SimpleTerminalConsole {
     @Override
     protected LineReader buildReader(LineReaderBuilder builder) {
         builder.completer(new NukkitConsoleCompleter());
-        builder.appName("Nukkit");
+        builder.appName(Nukkit.NUKKIT_PM1E);
         builder.option(LineReader.Option.HISTORY_BEEP, false);
         builder.option(LineReader.Option.HISTORY_IGNORE_DUPS, true);
         builder.option(LineReader.Option.HISTORY_IGNORE_SPACE, true);

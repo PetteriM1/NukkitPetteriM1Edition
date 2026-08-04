@@ -18,6 +18,8 @@ import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.potion.Effect;
 import cn.nukkit.potion.InstantEffect;
 import cn.nukkit.potion.Potion;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +35,9 @@ public class EntityAreaEffectCloud extends Entity {
     private int nextApply;
     public List<Effect> cloudEffects;
     private int lastAge;
+    @Setter
+    @Getter
+    private boolean fromDragon;
 
     public EntityAreaEffectCloud(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);

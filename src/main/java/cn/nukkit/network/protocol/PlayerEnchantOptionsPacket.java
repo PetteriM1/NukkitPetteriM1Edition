@@ -13,6 +13,23 @@ public class PlayerEnchantOptionsPacket extends DataPacket {
 
     public final List<EnchantOptionData> options = new ArrayList<>();
 
+    @Value
+    public class EnchantOptionData {
+        private final int minLevel;
+        private final int primarySlot;
+        private final List<EnchantData> enchants0;
+        private final List<EnchantData> enchants1;
+        private final List<EnchantData> enchants2;
+        private final String enchantName;
+        private final int enchantNetId;
+    }
+
+    @Value
+    public class EnchantData {
+        private final int type;
+        private final int level;
+    }
+
     @Override
     public byte pid() {
         return NETWORK_ID;
@@ -49,22 +66,5 @@ public class PlayerEnchantOptionsPacket extends DataPacket {
             this.putUnsignedVarInt(option.getEnchantNetId());
         }
 
-    }
-
-    @Value
-    public class EnchantOptionData {
-        private final int minLevel;
-        private final int primarySlot;
-        private final List<EnchantData> enchants0;
-        private final List<EnchantData> enchants1;
-        private final List<EnchantData> enchants2;
-        private final String enchantName;
-        private final int enchantNetId;
-    }
-
-    @Value
-    public class EnchantData {
-        private final int type;
-        private final int level;
     }
 }

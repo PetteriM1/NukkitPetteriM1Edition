@@ -6,15 +6,9 @@ import cn.nukkit.lang.TextContainer;
 
 public class PlayerQuitEvent extends PlayerEvent {
     private static final HandlerList handlers = new HandlerList();
-
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     protected TextContainer quitMessage;
     protected boolean autoSave;
     protected String reason;
-
     public PlayerQuitEvent(Player player, TextContainer quitMessage, String reason) {
         this(player, quitMessage, true, reason);
     }
@@ -48,6 +42,10 @@ public class PlayerQuitEvent extends PlayerEvent {
         this.quitMessage = quitMessage;
         this.autoSave = autoSave;
         this.reason = reason;
+    }
+
+    public static HandlerList getHandlers() {
+        return handlers;
     }
 
     public TextContainer getQuitMessage() {

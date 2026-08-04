@@ -53,6 +53,7 @@ public class BlockDragonEgg extends BlockFallable {
     }
 
     public void teleport() {
+        if (!level.randomTickingEnabled()) return;
         ThreadLocalRandom random = ThreadLocalRandom.current();
         for (int i = 0; i < 1000; ++i) {
             Block to = this.getLevel().getBlock(this.add(random.nextInt(-16, 16), random.nextInt(-16, 16), random.nextInt(-16, 16)));

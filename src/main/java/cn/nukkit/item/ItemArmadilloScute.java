@@ -1,5 +1,7 @@
 package cn.nukkit.item;
 
+import cn.nukkit.network.protocol.ProtocolInfo;
+
 public class ItemArmadilloScute extends Item {
 
     public ItemArmadilloScute() {
@@ -12,5 +14,10 @@ public class ItemArmadilloScute extends Item {
 
     public ItemArmadilloScute(Integer meta, int count) {
         super(ARMADILLO_SCUTE, meta, count, "Armadillo Scute");
+    }
+
+    @Override
+    public boolean isSupportedOn(int protocol) {
+        return protocol >= ProtocolInfo.v1_20_80;
     }
 }

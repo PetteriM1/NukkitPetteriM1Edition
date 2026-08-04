@@ -36,4 +36,9 @@ public class EntityAllay extends EntityFlyingAnimal {
     public int getKillExperience() {
         return 0;
     }
+
+    @Override
+    public boolean canDespawn() {
+        return false;
+    }
 }

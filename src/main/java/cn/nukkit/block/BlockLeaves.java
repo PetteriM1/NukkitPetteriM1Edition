@@ -33,6 +33,12 @@ public class BlockLeaves extends BlockTransparentMeta {
     public BlockLeaves(int meta) {
         super(meta);
     }
+    private static final String[] names = {
+            "Oak Leaves",
+            "Spruce Leaves",
+            "Birch Leaves",
+            "Jungle Leaves"
+    };
 
     @Override
     public int getId() {
@@ -41,7 +47,7 @@ public class BlockLeaves extends BlockTransparentMeta {
 
     @Override
     public double getHardness() {
-        return 0.2;
+        return 0.1; //0.2
     }
 
     @Override
@@ -49,16 +55,9 @@ public class BlockLeaves extends BlockTransparentMeta {
         return ItemTool.TYPE_HOE;
     }
 
-    private static final String[] NAMES = {
-            "Oak Leaves",
-            "Spruce Leaves",
-            "Birch Leaves",
-            "Jungle Leaves"
-    };
-
     @Override
     public String getName() {
-        return NAMES[this.getDamage() & 0x03];
+        return names[this.getDamage() & 0x03];
     }
 
     @Override

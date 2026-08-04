@@ -55,7 +55,7 @@ public class BlockOreGoldNether extends BlockOre {
                 break;
         }
 
-        return new Item[]{ Item.get(Item.GOLD_NUGGET, 0, count) };
+        return new Item[]{Item.get(Item.GOLD_NUGGET, 0, count)};
     }
 
     @Override

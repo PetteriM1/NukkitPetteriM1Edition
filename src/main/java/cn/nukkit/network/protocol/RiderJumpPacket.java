@@ -2,9 +2,8 @@ package cn.nukkit.network.protocol;
 
 import lombok.ToString;
 
-@Deprecated
 @ToString
-public class RiderJumpPacket extends DataPacket {
+public class RiderJumpPacket extends DataPacket { // Called PassengerJumpPacket since 1.21.40
 
     public static final byte NETWORK_ID = ProtocolInfo.RIDER_JUMP_PACKET;
 

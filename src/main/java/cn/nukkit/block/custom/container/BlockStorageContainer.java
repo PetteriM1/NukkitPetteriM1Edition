@@ -9,6 +9,7 @@ import java.io.Serializable;
 public interface BlockStorageContainer extends BlockContainer {
 
     int getStorage();
+
     void setStorage(int damage);
 
     BlockProperties getBlockProperties();

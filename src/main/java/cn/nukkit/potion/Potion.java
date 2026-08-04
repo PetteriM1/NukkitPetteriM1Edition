@@ -73,6 +73,33 @@ public class Potion implements Cloneable {
     public static final int INFESTED = 46;
 
     protected static Potion[] potions;
+    @Getter
+    protected final int id;
+    @Getter
+    protected final int level;
+    @Getter
+    protected final int duration;
+    protected boolean splash;
+    public Potion(int id) {
+        this(id, 1);
+    }
+    public Potion(int id, int level) {
+        this(id, level, false);
+    }
+    public Potion(int id, int level, boolean splash) {
+        this(id, level, 0, splash);
+    }
+
+    public Potion(int id, int level, int durationSeconds) {
+        this(id, level, durationSeconds, false);
+    }
+
+    public Potion(int id, int level, int durationSeconds, boolean splash) {
+        this.id = id;
+        this.level = level;
+        this.duration = durationSeconds * 20;
+        this.splash = splash;
+    }
 
     public static void init() {
         potions = new Potion[256];
@@ -119,7 +146,7 @@ public class Potion implements Cloneable {
         potions[Potion.TURTLE_MASTER_II] = new Potion(Potion.TURTLE_MASTER_II, 2, 20);
         potions[Potion.SLOW_FALLING] = new Potion(Potion.SLOW_FALLING, 1, 90);
         potions[Potion.SLOW_FALLING_LONG] = new Potion(Potion.SLOW_FALLING_LONG, 1, 240);
-        potions[Potion.SLOWNESS_IV] = new Potion(Potion.SLOWNESS, 4, 20);
+        potions[Potion.SLOWNESS_IV] = new Potion(Potion.SLOWNESS_IV, 4, 20);
         potions[Potion.WIND_CHARGED] = new Potion(Potion.WIND_CHARGED, 1, 180);
         potions[Potion.WEAVING] = new Potion(Potion.WEAVING, 1, 180);
         potions[Potion.OOZING] = new Potion(Potion.OOZING, 1, 180);
@@ -143,37 +170,6 @@ public class Potion implements Cloneable {
         } catch (Exception e) {
             return null;
         }
-    }
-
-    @Getter
-    protected final int id;
-    @Getter
-    protected final int level;
-    @Getter
-    protected final int duration;
-    protected boolean splash;
-
-    public Potion(int id) {
-        this(id, 1);
-    }
-
-    public Potion(int id, int level) {
-        this(id, level, false);
-    }
-
-    public Potion(int id, int level, boolean splash) {
-        this(id, level, 0, splash);
-    }
-
-    public Potion(int id, int level, int durationSeconds) {
-        this(id, level, durationSeconds, false);
-    }
-
-    public Potion(int id, int level, int durationSeconds, boolean splash) {
-        this.id = id;
-        this.level = level;
-        this.duration = durationSeconds * 20;
-        this.splash = splash;
     }
 
     /**
@@ -366,6 +362,10 @@ public class Potion implements Cloneable {
             case INFESTED:
                 effect = Effect.getEffect(Effect.INFESTED);
                 break;
+            case SLOW_FALLING:
+            case SLOW_FALLING_LONG:
+                effect = Effect.getEffect(Effect.SLOW_FALLING);
+                break;
         }
 
         if (effect == null) {
@@ -375,7 +375,7 @@ public class Potion implements Cloneable {
         Potion potion = getPotion(potionType);
         if (potion != null) {
             if (potion.getLevel() > 1) {
-                effect.setAmplifier(1);
+                effect.setAmplifier(potion.getLevel() - 1);
             }
 
             if (potion.getDuration() > 0) {

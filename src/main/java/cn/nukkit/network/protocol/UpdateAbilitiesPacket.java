@@ -33,6 +33,21 @@ public class UpdateAbilitiesPacket extends DataPacket {
     private CommandPermission commandPermission;
     private final List<AbilityLayer> abilityLayers = new ObjectArrayList<>(2);
 
+    public enum PlayerPermission {
+        VISITOR,
+        MEMBER,
+        OPERATOR,
+        CUSTOM
+    }
+
+    public enum CommandPermission {
+        NORMAL,
+        OPERATOR,
+        HOST,
+        AUTOMATION,
+        ADMIN
+    }
+
     @Override
     public void decode() {
         this.decodeUnsupported();
@@ -52,7 +67,9 @@ public class UpdateAbilitiesPacket extends DataPacket {
         buffer.putLInt(getAbilitiesNumber(abilityLayer.getAbilitiesSet()));
         buffer.putLInt(getAbilitiesNumber(abilityLayer.getAbilityValues()));
         buffer.putLFloat(abilityLayer.getFlySpeed());
-        buffer.putLFloat(abilityLayer.getVerticalFlySpeed());
+        if (protocol >= ProtocolInfo.v1_21_60) {
+            buffer.putLFloat(abilityLayer.getVerticalFlySpeed());
+        }
         buffer.putLFloat(abilityLayer.getWalkSpeed());
     }
 
@@ -67,20 +84,5 @@ public class UpdateAbilitiesPacket extends DataPacket {
     @Override
     public byte pid() {
         return NETWORK_ID;
-    }
-
-    public enum PlayerPermission {
-        VISITOR,
-        MEMBER,
-        OPERATOR,
-        CUSTOM
-    }
-
-    public enum CommandPermission {
-        NORMAL,
-        OPERATOR,
-        HOST,
-        AUTOMATION,
-        ADMIN
     }
 }

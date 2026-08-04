@@ -2,6 +2,7 @@ package cn.nukkit.level.util;
 
 import cn.nukkit.Server;
 import cn.nukkit.level.GlobalBlockPalette;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BinaryStream;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.ints.Int2IntFunction;
@@ -15,12 +16,34 @@ public class PalettedBlockStorage {
     private final IntList palette;
     private BitArray bitArray;
 
+    private PalettedBlockStorage(BitArrayVersion version, int defaultState) {
+        this.bitArray = version.createPalette(SIZE);
+        this.palette = new IntArrayList(16);
+        this.palette.add(defaultState);
+    }
+
+    private PalettedBlockStorage(BitArray bitArray, IntList palette) {
+        this.palette = palette;
+        this.bitArray = bitArray;
+    }
+
     public static PalettedBlockStorage createFromBlockPalette() {
         return createFromBlockPalette(BitArrayVersion.V2);
     }
 
     public static PalettedBlockStorage createFromBlockPalette(BitArrayVersion version) {
-        int runtimeId = GlobalBlockPalette.getOrCreateRuntimeId(0);
+        return createFromBlockPalette(version, 0);
+    }
+
+    public static PalettedBlockStorage createFromBlockPalette(int protocol) {
+        return createFromBlockPalette(BitArrayVersion.V2, protocol);
+    }
+
+    public static PalettedBlockStorage createFromBlockPalette(BitArrayVersion version, int protocol) {
+        int runtimeId = 0;
+        if (protocol >= ProtocolInfo.v1_16_100) {
+            runtimeId = GlobalBlockPalette.getOrCreateRuntimeId(protocol, 0);
+        }
         return new PalettedBlockStorage(version, runtimeId);
     }
 
@@ -36,17 +59,6 @@ public class PalettedBlockStorage {
         return new PalettedBlockStorage(bitArray, palette);
     }
 
-    private PalettedBlockStorage(BitArrayVersion version, int defaultState) {
-        this.bitArray = version.createPalette(SIZE);
-        this.palette = new IntArrayList(16);
-        this.palette.add(defaultState);
-    }
-
-    private PalettedBlockStorage(BitArray bitArray, IntList palette) {
-        this.palette = palette;
-        this.bitArray = bitArray;
-    }
-
     private int getPaletteHeader(BitArrayVersion version, boolean runtime) {
         return (version.getId() << 1) | (runtime ? 1 : 0);
     }
@@ -55,16 +67,16 @@ public class PalettedBlockStorage {
         return BitArrayVersion.get(header >> 1, true);
     }
 
-    private int getIndex(int x, int y, int z) {
+    private static int getIndex(int x, int y, int z) {
         return (x << 8) | (z << 4) | y;
     }
 
     public void setBlock(int x, int y, int z, int runtimeId) {
-        this.setBlock(this.getIndex(x, y, z), runtimeId);
+        this.setBlock(getIndex(x, y, z), runtimeId);
     }
 
     public int getBlock(int x, int y, int z) {
-        int index = this.getIndex(x, y, z);
+        int index = getIndex(x, y, z);
         return this.palette.getInt(this.bitArray.get(index));
     }
 
@@ -73,7 +85,7 @@ public class PalettedBlockStorage {
             int id = this.idFor(runtimeId);
             this.bitArray.set(index, id);
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Unable to set block runtime ID: " + runtimeId + ", palette: " + palette, e);
+            throw new IllegalArgumentException("Unable to set block runtime ID: " + runtimeId + ", palette: " + this.palette, e);
         }
     }
 
@@ -101,6 +113,7 @@ public class PalettedBlockStorage {
         for (int i = 0; i < paletteSize; i++) {
             int id = buffer.readIntLE();
             this.palette.add(id);
+
             if (id < 0) {
                 Server.getInstance().getLogger().warning("Negative biome ID " + id);
             }
@@ -125,7 +138,17 @@ public class PalettedBlockStorage {
     }
 
     public void writeTo(BinaryStream stream) {
-        this.writeTo(stream, i -> i);
+        stream.putByte((byte) getPaletteHeader(this.bitArray.getVersion(), true));
+        if (this.bitArray.getVersion() != BitArrayVersion.V0) {
+            for (int word : this.bitArray.getWords()) {
+                stream.putLInt(word);
+            }
+            stream.putVarInt(this.palette.size());
+        }
+
+        for (int runtimeId : this.palette) {
+            stream.putVarInt(runtimeId);
+        }
     }
 
     public void writeTo(BinaryStream stream, Int2IntFunction mapper) {

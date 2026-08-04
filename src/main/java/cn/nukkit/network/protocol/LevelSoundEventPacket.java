@@ -620,6 +620,7 @@ public class LevelSoundEventPacket extends DataPacket {
     public Vector3f fireAtPosition;
 
     private static final Int2ObjectOpenHashMap<String> SOUND_ID = new Int2ObjectOpenHashMap<>(1024);
+
     static {
         SOUND_ID.put(0, "item.use.on");
         SOUND_ID.put(1, "hit");
@@ -1193,22 +1194,72 @@ public class LevelSoundEventPacket extends DataPacket {
 
     @Override
     public void decode() {
-        if (Nukkit.DEBUG > 1) {
-            Server.getInstance().getLogger().debug("decode(): Ignored incoming LevelSoundEventPacket");
+        if (protocol >= ProtocolInfo.v1_26_30) {
+            if (Nukkit.DEBUG > 1) {
+                Server.getInstance().getLogger().debug("decode(): Ignored incoming LevelSoundEventPacket");
+            }
+            return;
+        }
+
+        this.sound = (int) this.getUnsignedVarInt();
+        Vector3f v = this.getVector3f();
+        this.x = v.x;
+        this.y = v.y;
+        this.z = v.z;
+        this.extraData = this.getVarInt();
+        this.entityIdentifier = this.getString();
+        this.isBabyMob = this.getBoolean();
+        this.isGlobal = this.getBoolean();
+        if (protocol >= ProtocolInfo.v1_21_70_24) {
+            this.entityUniqueId = this.getLLong();
+            if (protocol >= ProtocolInfo.v1_26_20_26) {
+                if (this.getBoolean()) {
+                    this.fireAtPosition = this.getVector3f();
+                }
+            }
         }
     }
 
     @Override
     public void encode() {
         this.reset();
-        this.putString(SOUND_ID.getOrDefault(this.sound, "undefined"));
+        if (protocol >= ProtocolInfo.v1_26_30) {
+            this.putString(SOUND_ID.getOrDefault(this.sound, "undefined"));
+        } else {
+            this.putUnsignedVarInt(this.sound);
+        }
         this.putVector3f(this.x, this.y, this.z);
-        this.putVarInt(this.extraData);
+        if (this.sound == SOUND_NOTE && this.protocol < ProtocolInfo.v1_21_50) {
+            // Instrument enum order changed so map IDs back for old versions
+            int instrumentId = this.extraData >> 8;
+            int strength = this.extraData & 0xFF;
+            switch (instrumentId) {
+                case 6: // GLOCKENSPIEL
+                    instrumentId = 5;
+                    break;
+                case 5: // FLUTE
+                    instrumentId = 6;
+                    break;
+                case 8: // CHIME
+                    instrumentId = 7;
+                    break;
+                case 7: // GUITAR
+                    instrumentId = 8;
+                    break;
+            }
+            this.putVarInt(instrumentId << 8 | strength);
+        } else {
+            this.putVarInt(this.extraData);
+        }
         this.putString(this.entityIdentifier);
         this.putBoolean(this.isBabyMob);
         this.putBoolean(this.isGlobal);
-        this.putLLong(this.entityUniqueId);
-        this.putOptionalNull(this.fireAtPosition, BinaryStream::putVector3f);
+        if (protocol >= ProtocolInfo.v1_21_70_24) {
+            this.putLLong(this.entityUniqueId);
+            if (protocol >= ProtocolInfo.v1_26_20_26) {
+                this.putOptionalNull(this.fireAtPosition, BinaryStream::putVector3f);
+            }
+        }
     }
 
     @Override

@@ -1,6 +1,7 @@
 package cn.nukkit.block;
 
 import cn.nukkit.Player;
+import cn.nukkit.Server;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.event.block.BlockGrowEvent;
 import cn.nukkit.event.block.BlockSpreadEvent;
@@ -45,11 +46,6 @@ public class BlockVine extends BlockTransparentMeta {
     }
 
     @Override
-    public double getResistance() {
-        return 1;
-    }
-
-    @Override
     public boolean canPassThrough() {
         return true;
     }
@@ -81,6 +77,10 @@ public class BlockVine extends BlockTransparentMeta {
 
     @Override
     protected AxisAlignedBB recalculateBoundingBox() {
+        if (Thread.currentThread() != Server.getInstance().getPrimaryThread()) {
+            return this; // Hack: Fix asynchronous calls (mob AI) causing issues by trying to load chunks
+        }
+
         double f1 = 1;
         double f2 = 1;
         double f3 = 1;

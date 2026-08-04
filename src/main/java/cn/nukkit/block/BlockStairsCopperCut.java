@@ -5,11 +5,11 @@ import cn.nukkit.block.properties.OxidizationLevel;
 import java.util.Locale;
 
 public class BlockStairsCopperCut extends BlockStairsCopperBase {
-    
+
     public BlockStairsCopperCut() {
         this(0);
     }
-    
+
     public BlockStairsCopperCut(int meta) {
         super(meta);
     }

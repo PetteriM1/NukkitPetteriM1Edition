@@ -31,37 +31,6 @@ public class BlockTrapdoor extends BlockTransparentMeta implements Faceable {
     public BlockTrapdoor(int meta) {
         super(meta);
     }
-
-    @Override
-    public int getId() {
-        return TRAPDOOR;
-    }
-
-    @Override
-    public String getName() {
-        return "Oak Trapdoor";
-    }
-
-    @Override
-    public double getHardness() {
-        return 3;
-    }
-
-    @Override
-    public double getResistance() {
-        return 15;
-    }
-
-    @Override
-    public boolean canBeActivated() {
-        return true;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_AXE;
-    }
-
     private static final AxisAlignedBB[] BOUNDING_BOX_DAMAGE = new AxisAlignedBB[16];
 
     static {
@@ -130,6 +99,36 @@ public class BlockTrapdoor extends BlockTransparentMeta implements Faceable {
             }
             BOUNDING_BOX_DAMAGE[damage] = bb;
         }
+    }
+
+    @Override
+    public int getId() {
+        return TRAPDOOR;
+    }
+
+    @Override
+    public String getName() {
+        return "Oak Trapdoor";
+    }
+
+    @Override
+    public double getHardness() {
+        return 3;
+    }
+
+    @Override
+    public double getResistance() {
+        return 15;
+    }
+
+    @Override
+    public boolean canBeActivated() {
+        return true;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_AXE;
     }
 
     private AxisAlignedBB getRelativeBoundingBox() {

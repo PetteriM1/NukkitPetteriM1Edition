@@ -1,5 +1,6 @@
 package cn.nukkit.network;
 
+import cn.nukkit.Server;
 import cn.nukkit.network.protocol.types.PacketCompressionAlgorithm;
 import cn.nukkit.utils.BinaryStream;
 import cn.nukkit.utils.SnappyCompression;
@@ -26,6 +27,23 @@ public interface CompressionProvider {
         @Override
         public byte getPrefix() {
             return (byte) 0xff;
+        }
+    };
+
+    CompressionProvider ZLIB = new CompressionProvider() {
+        @Override
+        public byte[] compress(BinaryStream packet, int level) throws Exception {
+            return Zlib.deflatePre16Packet(packet.getBuffer(), level);
+        }
+
+        @Override
+        public byte[] decompress(byte[] compressed) throws Exception {
+            return Zlib.inflate(compressed, 6291456);
+        }
+
+        @Override
+        public byte[] decompress(byte[] compressed, int maxSize) throws Exception {
+            return Zlib.inflate(compressed, maxSize);
         }
     };
 
@@ -75,17 +93,18 @@ public interface CompressionProvider {
 
 
     byte[] compress(BinaryStream packet, int level) throws Exception;
+
     byte[] decompress(byte[] compressed) throws Exception;
 
     default byte[] decompress(byte[] compressed, int maxSize) throws Exception {
         return this.decompress(compressed);
     }
 
-    static CompressionProvider from(PacketCompressionAlgorithm algorithm) {
+    static CompressionProvider from(PacketCompressionAlgorithm algorithm, int raknetVersion) {
         if (algorithm == null) {
             return NONE;
         } else if (algorithm == PacketCompressionAlgorithm.ZLIB) {
-            return ZLIB_RAW;
+            return raknetVersion < 10 ? ZLIB : ZLIB_RAW;
         } else if (algorithm == PacketCompressionAlgorithm.SNAPPY) {
             return SNAPPY;
         }
@@ -101,6 +120,9 @@ public interface CompressionProvider {
             case 0x00:
                 return ZLIB_RAW;
             case 0x01:
+                if (Server.getInstance().blockSnappy) {
+                    throw new IllegalArgumentException("Received Snappy compressed batch while block-snappy=on");
+                }
                 return SNAPPY;
             case (byte) 0xff:
                 return NONE;

@@ -6,7 +6,9 @@ import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemDye;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.level.particle.BoneMealParticle;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.material.BlockType;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -109,6 +111,16 @@ public class BlockMoss extends BlockDirt {
             return new Item[]{this.toItem()};
         }
         return new Item[0];
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_17_0;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.GRASS;
     }
 
     @Override

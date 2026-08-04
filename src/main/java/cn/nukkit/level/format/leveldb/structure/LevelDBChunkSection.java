@@ -5,6 +5,7 @@ import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockLayer;
 import cn.nukkit.level.format.ChunkSection;
 import cn.nukkit.level.format.generic.EmptyChunkSection;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.Binary;
 import cn.nukkit.utils.BinaryStream;
 import cn.nukkit.utils.Utils;
@@ -222,21 +223,29 @@ public class LevelDBChunkSection implements ChunkSection {
     }
 
     @Override
+    public byte[] getIdArray(int ver) {
+        // We don't support old byte format
+        return new byte[0];
+    }
+
+    @Override
     public byte[] getDataArray() {
         // We don't support old byte format
         return new byte[0];
     }
 
     @Override
-    public void writeTo(BinaryStream stream) {
+    public void writeTo(int protocol, BinaryStream stream, boolean obfuscated) {
         synchronized (this.storages) {
             boolean waterLogging = this.hasSecondLayer();
-            stream.putByte((byte) 9); // SubChunk version
+            stream.putByte(protocol >= ProtocolInfo.v1_19_80 ? (byte) 9 : (byte) 8); // SubChunk version
             stream.putByte((byte) (waterLogging ? 2 : 1)); // layers
-            stream.putByte((byte) this.y);
-            this.storages[0].writeTo(stream);
+            if (protocol >= ProtocolInfo.v1_19_80) {
+                stream.putByte((byte) this.y);
+            }
+            this.storages[0].writeTo(protocol, stream, obfuscated);
             if (waterLogging) {
-                this.storages[1].writeTo(stream);
+                this.storages[1].writeTo(protocol, stream, obfuscated);
             }
         }
     }
@@ -298,6 +307,18 @@ public class LevelDBChunkSection implements ChunkSection {
     @Override
     public boolean isEmpty() {
         return false;
+    }
+
+    @Override
+    public byte[] getBytes(boolean obfuscated) {
+        synchronized (this.storages) {
+            byte[] ids = this.storages[0].getBlockIds();
+            byte[] data = this.storages[0].getBlockData();
+            byte[] merged = new byte[ids.length + data.length];
+            System.arraycopy(ids, 0, merged, 0, ids.length);
+            System.arraycopy(data, 0, merged, ids.length, data.length);
+            return merged;
+        }
     }
 
     @Override

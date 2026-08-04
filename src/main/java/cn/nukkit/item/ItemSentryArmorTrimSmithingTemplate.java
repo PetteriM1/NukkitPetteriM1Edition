@@ -1,5 +1,7 @@
 package cn.nukkit.item;
 
+import cn.nukkit.network.protocol.ProtocolInfo;
+
 public class ItemSentryArmorTrimSmithingTemplate extends Item implements ItemTrimPattern {
 
     public ItemSentryArmorTrimSmithingTemplate() {
@@ -17,5 +19,10 @@ public class ItemSentryArmorTrimSmithingTemplate extends Item implements ItemTri
     @Override
     public Type getPattern() {
         return Type.SENTRY;
+    }
+
+    @Override
+    public boolean isSupportedOn(int protocol) {
+        return protocol >= ProtocolInfo.v1_20_0_23;
     }
 }

@@ -21,6 +21,7 @@ public class BlockWoodStrippedSpruce extends BlockWoodStripped {
     public int getId() {
         return STRIPPED_SPRUCE_LOG;
     }
+
     @Override
     public BlockColor getColor() {
         return BlockColor.SPRUCE_BLOCK_COLOR;

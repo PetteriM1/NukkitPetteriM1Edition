@@ -1,6 +1,7 @@
 package cn.nukkit.block;
 
 import cn.nukkit.Player;
+import cn.nukkit.Server;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.item.enchantment.Enchantment;
@@ -52,7 +53,7 @@ public class BlockSnow extends BlockSolid {
     public boolean canHarvestWithHand() {
         return false;
     }
-    
+
     @Override
     public boolean canSilkTouch() {
         return true;
@@ -65,7 +66,7 @@ public class BlockSnow extends BlockSolid {
 
     @Override
     public boolean onActivate(Item item, Player player) {
-        if (item.isShovel() && (player == null || (player.gamemode & 0x2) == 0)) {
+        if (item.isShovel() && !Server.getInstance().suomiCraftPEMode() && (player == null || (player.gamemode & 0x2) == 0)) {
             item.useOn(this);
             this.level.useBreakOn(this, item.clone().clearNamedTag(), null, true);
             return true;

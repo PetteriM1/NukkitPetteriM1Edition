@@ -9,7 +9,9 @@ import cn.nukkit.item.ItemBlock;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.material.BlockType;
 
 import java.util.EnumSet;
 import java.util.Set;
@@ -69,7 +71,7 @@ public class BlockGlowLichen extends BlockTransparentMeta implements BlockProper
     @Override
     public Item[] getDrops(Item item) {
         if (item.isShears()) {
-            return new Item[] { this.toItem() };
+            return new Item[]{this.toItem()};
         }
         return new Item[0];
     }
@@ -79,7 +81,7 @@ public class BlockGlowLichen extends BlockTransparentMeta implements BlockProper
         if (type == Level.BLOCK_UPDATE_SCHEDULED) {
             this.getLevel().useBreakOn(this, null, null, true);
         } else if (type != Level.BLOCK_UPDATE_NORMAL) {
-           return type;
+            return type;
         }
 
         boolean update = false;
@@ -200,5 +202,15 @@ public class BlockGlowLichen extends BlockTransparentMeta implements BlockProper
     @Override
     public WaterloggingType getWaterloggingType() {
         return WaterloggingType.WHEN_PLACED_IN_WATER;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_17_0;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.AIR;
     }
 }

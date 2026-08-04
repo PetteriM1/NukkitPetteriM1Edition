@@ -7,6 +7,8 @@ import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemDye;
 import cn.nukkit.level.Sound;
 import cn.nukkit.level.particle.BoneMealParticle;
+import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockDirtRooted extends BlockDirt {
 
@@ -76,6 +78,16 @@ public class BlockDirtRooted extends BlockDirt {
 
     @Override
     public Item[] getDrops(Item item) {
-        return new Item[]{ this.toItem() };
+        return new Item[]{this.toItem()};
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_17_0;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.DIRT;
     }
 }

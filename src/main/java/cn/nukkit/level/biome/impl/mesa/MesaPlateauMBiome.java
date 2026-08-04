@@ -4,6 +4,7 @@ package cn.nukkit.level.biome.impl.mesa;
  * @author DaPorkchop_
  */
 public class MesaPlateauMBiome extends MesaBiome {
+
     public MesaPlateauMBiome() {
         super();
 

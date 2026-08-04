@@ -85,6 +85,7 @@ public class EntityPufferfish extends EntityFish {
 
     /**
      * Is puffed
+     *
      * @return whether the pufferfish is puffed
      */
     public boolean isPuffed() {

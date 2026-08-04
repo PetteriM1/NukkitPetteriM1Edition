@@ -21,6 +21,7 @@ public class BlockWoodStrippedOak extends BlockWoodStripped {
     public int getId() {
         return STRIPPED_OAK_LOG;
     }
+
     @Override
     public BlockColor getColor() {
         return BlockColor.WOOD_BLOCK_COLOR;

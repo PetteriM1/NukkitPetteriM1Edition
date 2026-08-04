@@ -12,7 +12,7 @@ import cn.nukkit.math.Vector3;
 
 /**
  * @author DaPorkchop_
- *
+ * <p>
  * Used for the dense foliage on the floor in the jungle M biome
  */
 public class JungleFloorPopulator extends Populator {
@@ -24,7 +24,8 @@ public class JungleFloorPopulator extends Populator {
         this(BlockSapling.JUNGLE);
     }
 
-    public JungleFloorPopulator(int type) {}
+    public JungleFloorPopulator(int type) {
+    }
 
     public void setRandomAmount(int randomAmount) {
         this.randomAmount = randomAmount;

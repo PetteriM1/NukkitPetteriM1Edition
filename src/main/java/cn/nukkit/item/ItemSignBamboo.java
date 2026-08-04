@@ -2,6 +2,7 @@ package cn.nukkit.item;
 
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockID;
+import cn.nukkit.network.protocol.ProtocolInfo;
 
 public class ItemSignBamboo extends Item {
 
@@ -21,5 +22,10 @@ public class ItemSignBamboo extends Item {
     @Override
     public int getMaxStackSize() {
         return 16;
+    }
+
+    @Override
+    public boolean isSupportedOn(int protocol) {
+        return protocol >= ProtocolInfo.v1_20_0;
     }
 }

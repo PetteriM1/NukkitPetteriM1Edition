@@ -33,6 +33,10 @@ public class BlockLadder extends BlockTransparentMeta implements Faceable {
 
         this.calculateOffsets();
     }
+    private double offMinX;
+    private double offMinZ;
+    private double offMaxX;
+    private double offMaxZ;
 
     @Override
     public String getName() {
@@ -68,11 +72,6 @@ public class BlockLadder extends BlockTransparentMeta implements Faceable {
     public double getResistance() {
         return 2;
     }
-
-    private double offMinX;
-    private double offMinZ;
-    private double offMaxX;
-    private double offMaxZ;
 
     private void calculateOffsets() {
         double f = 0.1875;

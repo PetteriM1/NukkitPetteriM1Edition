@@ -6,7 +6,10 @@ import cn.nukkit.item.Item;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.particle.DestroyBlockParticle;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.DyeColor;
+import cn.nukkit.utils.material.BlockType;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -22,7 +25,7 @@ public class BlockBuddingAmethyst extends BlockSolid {
 
     @Override
     public double getResistance() {
-        return 1.5;
+        return 7.5;
     }
 
     @Override
@@ -92,5 +95,20 @@ public class BlockBuddingAmethyst extends BlockSolid {
     @Override
     public BlockColor getColor() {
         return BlockColor.PURPLE_BLOCK_COLOR;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_17_0;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.CONCRETE;
+    }
+
+    @Override
+    public int getAlternateMeta(int protocol) {
+        return DyeColor.PURPLE.getWoolData();
     }
 }

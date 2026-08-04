@@ -30,7 +30,7 @@ package cn.nukkit.event;
  *     }
  * }
  * </pre>
- *
+ * <p>
  * 关于注册监听类，请看：{@link cn.nukkit.plugin.PluginManager#registerEvents}.<br>
  * For registering listener class, See: {@link cn.nukkit.plugin.PluginManager#registerEvents}.
  * <p>

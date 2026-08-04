@@ -23,6 +23,101 @@ public class BlockLever extends BlockFlowable implements Faceable {
         super(meta);
     }
 
+    public enum LeverOrientation {
+        DOWN_X(0, "down_x", BlockFace.DOWN),
+        EAST(1, "east", BlockFace.EAST),
+        WEST(2, "west", BlockFace.WEST),
+        SOUTH(3, "south", BlockFace.SOUTH),
+        NORTH(4, "north", BlockFace.NORTH),
+        UP_Z(5, "up_z", BlockFace.UP),
+        UP_X(6, "up_x", BlockFace.UP),
+        DOWN_Z(7, "down_z", BlockFace.DOWN);
+
+        private static final LeverOrientation[] META_LOOKUP = new LeverOrientation[values().length];
+        private final int meta;
+        private final String name;
+        private final BlockFace facing;
+
+        LeverOrientation(int meta, String name, BlockFace face) {
+            this.meta = meta;
+            this.name = name;
+            this.facing = face;
+        }
+
+        static {
+            for (LeverOrientation face : values()) {
+                META_LOOKUP[face.meta] = face;
+            }
+        }
+
+        public int getMetadata() {
+            return this.meta;
+        }
+
+        public BlockFace getFacing() {
+            return this.facing;
+        }
+
+        public String toString() {
+            return this.name;
+        }
+
+        public static LeverOrientation byMetadata(int meta) {
+            if (meta < 0 || meta >= META_LOOKUP.length) {
+                meta = 0;
+            }
+
+            return META_LOOKUP[meta];
+        }
+
+        public static LeverOrientation forFacings(BlockFace clickedSide, BlockFace playerDirection) {
+            switch (clickedSide) {
+                case DOWN:
+                    switch (playerDirection.getAxis()) {
+                        case X:
+                            return DOWN_X;
+
+                        case Z:
+                            return DOWN_Z;
+
+                        default:
+                            throw new IllegalArgumentException("Invalid entityFacing " + playerDirection + " for facing " + clickedSide);
+                    }
+
+                case UP:
+                    switch (playerDirection.getAxis()) {
+                        case X:
+                            return UP_X;
+
+                        case Z:
+                            return UP_Z;
+
+                        default:
+                            throw new IllegalArgumentException("Invalid entityFacing " + playerDirection + " for facing " + clickedSide);
+                    }
+
+                case NORTH:
+                    return NORTH;
+
+                case SOUTH:
+                    return SOUTH;
+
+                case WEST:
+                    return WEST;
+
+                case EAST:
+                    return EAST;
+
+                default:
+                    throw new IllegalArgumentException("Invalid facing: " + clickedSide);
+            }
+        }
+
+        public String getName() {
+            return this.name;
+        }
+    }
+
     @Override
     public String getName() {
         return "Lever";
@@ -147,101 +242,6 @@ public class BlockLever extends BlockFlowable implements Faceable {
     @Override
     public boolean isPowerSource() {
         return true;
-    }
-
-    public enum LeverOrientation {
-        DOWN_X(0, "down_x", BlockFace.DOWN),
-        EAST(1, "east", BlockFace.EAST),
-        WEST(2, "west", BlockFace.WEST),
-        SOUTH(3, "south", BlockFace.SOUTH),
-        NORTH(4, "north", BlockFace.NORTH),
-        UP_Z(5, "up_z", BlockFace.UP),
-        UP_X(6, "up_x", BlockFace.UP),
-        DOWN_Z(7, "down_z", BlockFace.DOWN);
-
-        private static final LeverOrientation[] META_LOOKUP = new LeverOrientation[values().length];
-        private final int meta;
-        private final String name;
-        private final BlockFace facing;
-
-        LeverOrientation(int meta, String name, BlockFace face) {
-            this.meta = meta;
-            this.name = name;
-            this.facing = face;
-        }
-
-        public int getMetadata() {
-            return this.meta;
-        }
-
-        public BlockFace getFacing() {
-            return this.facing;
-        }
-
-        public String toString() {
-            return this.name;
-        }
-
-        public static LeverOrientation byMetadata(int meta) {
-            if (meta < 0 || meta >= META_LOOKUP.length) {
-                meta = 0;
-            }
-
-            return META_LOOKUP[meta];
-        }
-
-        public static LeverOrientation forFacings(BlockFace clickedSide, BlockFace playerDirection) {
-            switch (clickedSide) {
-                case DOWN:
-                    switch (playerDirection.getAxis()) {
-                        case X:
-                            return DOWN_X;
-
-                        case Z:
-                            return DOWN_Z;
-
-                        default:
-                            throw new IllegalArgumentException("Invalid entityFacing " + playerDirection + " for facing " + clickedSide);
-                    }
-
-                case UP:
-                    switch (playerDirection.getAxis()) {
-                        case X:
-                            return UP_X;
-
-                        case Z:
-                            return UP_Z;
-
-                        default:
-                            throw new IllegalArgumentException("Invalid entityFacing " + playerDirection + " for facing " + clickedSide);
-                    }
-
-                case NORTH:
-                    return NORTH;
-
-                case SOUTH:
-                    return SOUTH;
-
-                case WEST:
-                    return WEST;
-
-                case EAST:
-                    return EAST;
-
-                default:
-                    throw new IllegalArgumentException("Invalid facing: " + clickedSide);
-            }
-        }
-
-        public String getName() {
-            return this.name;
-        }
-
-        static {
-            for (LeverOrientation face : values()) {
-                META_LOOKUP[face.meta] = face;
-            }
-        }
     }
 
     @Override

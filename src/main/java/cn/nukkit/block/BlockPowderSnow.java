@@ -1,7 +1,9 @@
 package cn.nukkit.block;
 
 import cn.nukkit.item.Item;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockPowderSnow extends BlockTransparent {
 
@@ -21,12 +23,12 @@ public class BlockPowderSnow extends BlockTransparent {
 
     @Override
     public double getHardness() {
-        return 0.25;
+        return 0; //0.25
     }
 
     @Override
     public double getResistance() {
-        return 0.25;
+        return 1.25;
     }
 
     @Override
@@ -42,6 +44,16 @@ public class BlockPowderSnow extends BlockTransparent {
     @Override
     public boolean canHarvestWithHand() {
         return false;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_17_0;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.SNOW_BLOCK;
     }
 
     @Override

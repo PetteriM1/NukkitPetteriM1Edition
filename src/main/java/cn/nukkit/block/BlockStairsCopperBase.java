@@ -4,6 +4,8 @@ import cn.nukkit.Player;
 import cn.nukkit.block.properties.OxidizationLevel;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
+import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.utils.material.BlockType;
 
 public abstract class BlockStairsCopperBase extends BlockStairs implements Waxable, Oxidizable {
 
@@ -83,4 +85,14 @@ public abstract class BlockStairsCopperBase extends BlockStairs implements Waxab
     }
 
     protected abstract int getCopperId(boolean waxed, OxidizationLevel oxidizationLevel);
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_17_0;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.GRANITE_STAIRS;
+    }
 }

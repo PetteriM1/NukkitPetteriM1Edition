@@ -42,7 +42,7 @@ public class BlockSnowLayer extends BlockFallableMeta {
 
     @Override
     public double getResistance() {
-        return 0.5;
+        return 2.5;
     }
 
     @Override
@@ -158,14 +158,14 @@ public class BlockSnowLayer extends BlockFallableMeta {
         } else if (item.getId() == SNOW_LAYER && (player == null || (player.gamemode & 0x2) == 0)) {
             if ((this.getDamage() & 0x7) != 0x7) {
                 this.setDamage(this.getDamage() + 1);
-                this.level.setBlock(this ,this, true);
+                this.level.setBlock(this, this, true);
 
                 if (player != null && (player.gamemode & 0x1) == 0) {
                     item.count--;
                 }
                 return true;
             } else {
-                this.level.setBlock(this ,this, true);
+                this.level.setBlock(this, this, true);
             }
         }
         return false;

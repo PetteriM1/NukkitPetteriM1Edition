@@ -6,6 +6,11 @@ package cn.nukkit.level.biome.impl.taiga;
  */
 public class ColdTaigaMBiome extends ColdTaigaBiome {
 
+    public ColdTaigaMBiome() {
+        super();
+
+    }
+
     @Override
     public String getName() {
         return "Cold Taiga M";

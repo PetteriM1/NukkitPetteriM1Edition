@@ -14,6 +14,14 @@ public class BlockEntityFlowerPot extends BlockEntitySpawnable {
     public BlockEntityFlowerPot(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
     }
+    private static final Int2ObjectOpenHashMap<String> HAS_STRING_ITEM_OVERRIDE = new Int2ObjectOpenHashMap<>();
+
+    static {
+        HAS_STRING_ITEM_OVERRIDE.put(BlockID.CRIMSON_ROOTS, "minecraft:crimson_roots");
+        HAS_STRING_ITEM_OVERRIDE.put(BlockID.WARPED_ROOTS, "minecraft:warped_roots");
+        HAS_STRING_ITEM_OVERRIDE.put(BlockID.CRIMSON_FUNGUS, "minecraft:crimson_fungus");
+        HAS_STRING_ITEM_OVERRIDE.put(BlockID.WARPED_FUNGUS, "minecraft:warped_fungus");
+    }
 
     @Override
     protected void initBlockEntity() {
@@ -36,15 +44,6 @@ public class BlockEntityFlowerPot extends BlockEntitySpawnable {
     @Override
     public boolean isBlockEntityValid() {
         return level.getBlockIdAt(chunk, (int) x, (int) y, (int) z) == Block.FLOWER_POT_BLOCK;
-    }
-
-    private static final Int2ObjectOpenHashMap<String> HAS_STRING_ITEM_OVERRIDE = new Int2ObjectOpenHashMap<>();
-
-    static {
-        HAS_STRING_ITEM_OVERRIDE.put(BlockID.CRIMSON_ROOTS, "minecraft:crimson_roots");
-        HAS_STRING_ITEM_OVERRIDE.put(BlockID.WARPED_ROOTS, "minecraft:warped_roots");
-        HAS_STRING_ITEM_OVERRIDE.put(BlockID.CRIMSON_FUNGUS, "minecraft:crimson_fungus");
-        HAS_STRING_ITEM_OVERRIDE.put(BlockID.WARPED_FUNGUS, "minecraft:warped_fungus");
     }
 
     @Override

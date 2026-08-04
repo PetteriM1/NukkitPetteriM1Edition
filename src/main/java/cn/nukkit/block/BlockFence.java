@@ -1,5 +1,6 @@
 package cn.nukkit.block;
 
+import cn.nukkit.Server;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemTool;
@@ -27,6 +28,16 @@ public class BlockFence extends BlockTransparentMeta {
     public BlockFence(int meta) {
         super(meta);
     }
+    private static final String[] names = {
+            "Oak Fence",
+            "Spruce Fence",
+            "Birch Fence",
+            "Jungle Fence",
+            "Acacia Fence",
+            "Dark Oak Fence",
+            "",
+            ""
+    };
 
     @Override
     public int getId() {
@@ -48,23 +59,23 @@ public class BlockFence extends BlockTransparentMeta {
         return ItemTool.TYPE_AXE;
     }
 
-    private static final String[] NAMES = {
-            "Oak Fence",
-            "Spruce Fence",
-            "Birch Fence",
-            "Jungle Fence",
-            "Acacia Fence",
-            "Dark Oak Fence",
-            "",
-            ""
-    };
-
     @Override
     public String getName() {
-        return NAMES[this.getDamage() & 0x07];
+        return names[this.getDamage() & 0x07];
     }
 
     protected AxisAlignedBB recalculateBoundingBox() {
+        if (Thread.currentThread() != Server.getInstance().getPrimaryThread()) {
+            return new SimpleAxisAlignedBB(
+                    this.x + 1,
+                    this.y,
+                    this.z + 1,
+                    this.x + 1,
+                    this.y + 1.5,
+                    this.z + 1
+            ); // Hack: Fix asynchronous calls (mob AI) causing issues by trying to load chunks
+        }
+
         boolean north = this.canConnect(this.north());
         boolean south = this.canConnect(this.south());
         boolean west = this.canConnect(this.west());

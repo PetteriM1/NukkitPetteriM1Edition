@@ -12,7 +12,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class BlockCoralFan extends BlockCoral implements Faceable {
 
-    private static final String[] NAMES = {
+    private static final String[] names = {
             "Tube Coral Fan",
             "Brain Coral Fan",
             "Bubble Coral Fan",
@@ -90,13 +90,13 @@ public class BlockCoralFan extends BlockCoral implements Faceable {
             if (rotation < 0) {
                 rotation += 360.0;
             }
-            int axisBit = rotation >= 0 && rotation < 12 || (342 <= rotation && rotation < 360)? 0x0 : 0x8;
+            int axisBit = rotation >= 0 && rotation < 12 || (342 <= rotation && rotation < 360) ? 0x0 : 0x8;
             this.setDamage(this.getDamage() & 0x7 | axisBit);
             this.getLevel().setBlock(this, BlockLayer.NORMAL, hasWater ? new BlockCoralFan(this.getDamage()) : new BlockCoralFanDead(this.getDamage()), true, true);
         } else {
             int type = this.getType();
             int typeBit = type % 2;
-            int deadBit = this.isDead()? 0x1 : 0;
+            int deadBit = this.isDead() ? 0x1 : 0;
             int faceBit;
             switch (face) {
                 case WEST:
@@ -139,10 +139,10 @@ public class BlockCoralFan extends BlockCoral implements Faceable {
     public String getName() {
         int variant = this.getType();
         String name;
-        if (variant >= NAMES.length) {
-            name = NAMES[0];
+        if (variant >= names.length) {
+            name = names[0];
         } else {
-            name = NAMES[variant];
+            name = names[variant];
         }
         return name;
     }

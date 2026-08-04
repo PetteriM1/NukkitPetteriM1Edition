@@ -75,24 +75,25 @@ public class EntityEventPacket extends DataPacket {
     public static final int SHAKE_WETNESS_STOP = 79;
     public static final int KINETIC_DAMAGE_DEALT = 80;
     public static final int HURT_WITHOUT_RECEIVING_DAMAGE = 81;
-
-    @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
     public long eid;
     public int event;
     public int data = 0;
     public Vector3f fireAtPosition;
 
     @Override
+    public byte pid() {
+        return NETWORK_ID;
+    }
+
+    @Override
     public void decode() {
         this.eid = this.getEntityRuntimeId();
         this.event = this.getByte();
         this.data = this.getVarInt();
-        if (this.getBoolean()) {
-            this.fireAtPosition = this.getVector3f();
+        if (protocol >= ProtocolInfo.v1_26_20_26) {
+            if (this.getBoolean()) {
+                this.fireAtPosition = this.getVector3f();
+            }
         }
     }
 
@@ -102,6 +103,8 @@ public class EntityEventPacket extends DataPacket {
         this.putEntityRuntimeId(this.eid);
         this.putByte((byte) this.event);
         this.putVarInt(this.data);
-        this.putOptionalNull(this.fireAtPosition, BinaryStream::putVector3f);
+        if (protocol >= ProtocolInfo.v1_26_20_26) {
+            this.putOptionalNull(this.fireAtPosition, BinaryStream::putVector3f);
+        }
     }
 }

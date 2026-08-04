@@ -87,7 +87,7 @@ public abstract class ItemTool extends Item implements ItemDurable {
             return true;
         }
 
-        if (this.isHoe() && ((block.getId() == GRASS || block.getId() == DIRT))) {
+        if (this.isHoe() && (block.getId() == GRASS || block.getId() == DIRT)) {
             this.meta++;
             return true;
         }
@@ -147,6 +147,7 @@ public abstract class ItemTool extends Item implements ItemDurable {
 
     /**
      * No damage to item when it's used to attack entities
+     *
      * @return whether the item should take damage when used to attack entities
      */
     public boolean noDamageOnAttack() {
@@ -155,6 +156,7 @@ public abstract class ItemTool extends Item implements ItemDurable {
 
     /**
      * No damage to item when it's used to break blocks
+     *
      * @return whether the item should take damage when used to break blocks
      */
     public boolean noDamageOnBreak() {

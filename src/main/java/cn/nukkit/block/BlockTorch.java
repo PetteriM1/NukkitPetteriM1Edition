@@ -14,7 +14,7 @@ import cn.nukkit.utils.Faceable;
  */
 public class BlockTorch extends BlockFlowable implements Faceable {
 
-    private static final short[] FACES = {
+    private static final short[] faces = {
             0, //0, never used
             5, //1
             4, //2
@@ -23,7 +23,7 @@ public class BlockTorch extends BlockFlowable implements Faceable {
             1, //5
     };
 
-    private static final short[] FACES_2 = {
+    private static final short[] faces2 = {
             0, //0
             4, //1
             5, //2
@@ -60,7 +60,7 @@ public class BlockTorch extends BlockFlowable implements Faceable {
     public int onUpdate(int type) {
         if (type == Level.BLOCK_UPDATE_NORMAL) {
             int side = this.getDamage();
-            if ((side != 0 && !Block.canConnectToFullSolid(this.getSide(BlockFace.fromIndex(FACES_2[side])))) || (side == 0 && !isSupportValidBelow())) {
+            if ((side != 0 && !Block.canConnectToFullSolid(this.getSide(BlockFace.fromIndex(faces2[side])))) || (side == 0 && !isSupportValidBelow())) {
                 this.getLevel().useBreakOn(this);
                 return Level.BLOCK_UPDATE_NORMAL;
             }
@@ -75,9 +75,9 @@ public class BlockTorch extends BlockFlowable implements Faceable {
             return false;
         }
 
-        int side = FACES[face.getIndex()];
+        int side = faces[face.getIndex()];
         if (face != BlockFace.UP) {
-            if (Block.canConnectToFullSolid(this.getSide(BlockFace.fromIndex(FACES_2[side])))) {
+            if (Block.canConnectToFullSolid(this.getSide(BlockFace.fromIndex(faces2[side])))) {
                 this.setDamage(side);
                 return this.getLevel().setBlock(this, this, true, true);
             }

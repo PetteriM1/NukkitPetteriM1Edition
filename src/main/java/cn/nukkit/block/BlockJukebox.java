@@ -30,7 +30,7 @@ public class BlockJukebox extends BlockSolid {
 
     @Override
     public double getHardness() {
-        return 2;
+        return 0.8; //2
     }
 
     @Override

@@ -1,7 +1,9 @@
 package cn.nukkit.block;
 
 import cn.nukkit.item.ItemTool;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockMudBrickStairs extends BlockStairs {
 
@@ -31,6 +33,16 @@ public class BlockMudBrickStairs extends BlockStairs {
     @Override
     public double getResistance() {
         return 3;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_19_0;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.SANDSTONE_STAIRS;
     }
 
     @Override

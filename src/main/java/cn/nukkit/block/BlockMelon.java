@@ -59,7 +59,7 @@ public class BlockMelon extends BlockSolid {
     public BlockColor getColor() {
         return BlockColor.LIME_BLOCK_COLOR;
     }
-    
+
     @Override
     public boolean canSilkTouch() {
         return true;

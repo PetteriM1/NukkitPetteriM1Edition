@@ -173,7 +173,7 @@ public abstract class BaseInventory implements Inventory {
             ((BlockEntity) holder).setDirty();
         }
 
-        Item old = this.getItem(index);
+        Item old = Server.getInstance().suomiCraftPEMode() ? null : this.getItem(index);
         this.slots.put(index, item.clone());
         this.onSlotChange(index, old, send);
         return true;
@@ -255,7 +255,7 @@ public abstract class BaseInventory implements Inventory {
             this.setItem(slot, item);
         }
     }
-    
+
     @Override
     public boolean canAddItem(Item item) {
         int count = item.getCount();

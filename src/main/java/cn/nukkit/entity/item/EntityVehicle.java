@@ -25,6 +25,7 @@ public abstract class EntityVehicle extends Entity implements EntityRideable, En
     public EntityVehicle(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
     }
+    protected boolean rollingDirection = true;
 
     public int getRollingAmplitude() {
         return hurtTime;
@@ -71,8 +72,6 @@ public abstract class EntityVehicle extends Entity implements EntityRideable, En
 
         return super.entityBaseTick(tickDiff);
     }
-
-    protected boolean rollingDirection = true;
 
     protected boolean performHurtAnimation() {
         setRollingAmplitude(9);

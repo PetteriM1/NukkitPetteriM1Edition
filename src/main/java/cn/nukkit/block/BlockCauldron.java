@@ -41,6 +41,12 @@ public class BlockCauldron extends BlockTransparentMeta {
         super(meta);
     }
 
+    private static int potion2arrow(int potion) {
+        int id = potion & 0xffff;
+        if (id < 5 || id > 43) return 1; // if it fails don't create game crashing arrows
+        return id < 43 ? id + 1 : id;
+    }
+
     @Override
     public int getId() {
         return CAULDRON_BLOCK;
@@ -321,12 +327,6 @@ public class BlockCauldron extends BlockTransparentMeta {
 
         this.level.updateComparatorOutputLevel(this);
         return true;
-    }
-
-    private static int potion2arrow(int potion) {
-        int id = potion & 0xffff;
-        if (id < 5 || id > 43) return 1; // if it fails don't create game crashing arrows
-        return id < 43 ? id + 1 : id;
     }
 
     protected void replaceBucket(Item oldBucket, Player player, Item newBucket) {

@@ -1,7 +1,10 @@
 package cn.nukkit.block;
 
 import cn.nukkit.item.Item;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.DyeColor;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockGlassTinted extends BlockGlass {
 
@@ -21,12 +24,27 @@ public class BlockGlassTinted extends BlockGlass {
 
     @Override
     public Item[] getDrops(Item item) {
-        return new Item[] { this.toItem() };
+        return new Item[]{this.toItem()};
     }
 
     @Override
     public boolean canSilkTouch() {
         return false;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_17_0;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.GLASS;
+    }
+
+    @Override
+    public int getAlternateMeta(int protocol) {
+        return DyeColor.GRAY.getWoolData();
     }
 
     @Override

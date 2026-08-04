@@ -21,6 +21,7 @@ public class BlockWitherRose extends BlockFlower {
     public int getId() {
         return WITHER_ROSE;
     }
+
     @Override
     public boolean canBeActivated() {
         return false;

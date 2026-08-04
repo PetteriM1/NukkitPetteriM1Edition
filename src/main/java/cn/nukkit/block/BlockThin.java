@@ -1,5 +1,6 @@
 package cn.nukkit.block;
 
+import cn.nukkit.Server;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.SimpleAxisAlignedBB;
 import cn.nukkit.utils.LevelException;
@@ -19,6 +20,10 @@ public abstract class BlockThin extends BlockTransparent {
     }
 
     protected AxisAlignedBB recalculateBoundingBox() {
+        if (Thread.currentThread() != Server.getInstance().getPrimaryThread()) {
+            return this; // Hack: Fix asynchronous calls (mob AI) causing issues by trying to load chunks
+        }
+
         double f = 0.4375;
         double f1 = 0.5625;
         double f2 = 0.4375;
@@ -48,7 +53,8 @@ public abstract class BlockThin extends BlockTransparent {
                 f2 = 0;
                 f3 = 1;
             }
-        } catch (LevelException ignore) {}
+        } catch (LevelException ignore) {
+        }
         return new SimpleAxisAlignedBB(
                 this.x + f,
                 this.y,

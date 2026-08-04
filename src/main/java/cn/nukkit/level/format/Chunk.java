@@ -8,6 +8,16 @@ public interface Chunk extends FullChunk {
 
     byte SECTION_COUNT = 16;
 
+    class Entry {
+        public final int chunkX;
+        public final int chunkZ;
+
+        public Entry(int chunkX, int chunkZ) {
+            this.chunkX = chunkX;
+            this.chunkZ = chunkZ;
+        }
+    }
+
     boolean isSectionEmpty(float fY);
 
     ChunkSection getSection(float fY);
@@ -18,15 +28,5 @@ public interface Chunk extends FullChunk {
 
     default int getSectionOffset() {
         return 0;
-    }
-
-    class Entry {
-        public final int chunkX;
-        public final int chunkZ;
-
-        public Entry(int chunkX, int chunkZ) {
-            this.chunkX = chunkX;
-            this.chunkZ = chunkZ;
-        }
     }
 }

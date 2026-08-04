@@ -25,7 +25,7 @@ public class BlockIce extends BlockTransparent {
 
     @Override
     public double getResistance() {
-        return 0.5;
+        return 2.5;
     }
 
     @Override
@@ -78,7 +78,7 @@ public class BlockIce extends BlockTransparent {
     public BlockColor getColor() {
         return BlockColor.ICE_BLOCK_COLOR;
     }
-    
+
     @Override
     public boolean canSilkTouch() {
         return true;

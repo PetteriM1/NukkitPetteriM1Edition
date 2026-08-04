@@ -5,7 +5,6 @@ import lombok.ToString;
 /**
  * @author Nukkit Project Team
  */
-@Deprecated
 @ToString
 public class PlayerInputPacket extends DataPacket {
 

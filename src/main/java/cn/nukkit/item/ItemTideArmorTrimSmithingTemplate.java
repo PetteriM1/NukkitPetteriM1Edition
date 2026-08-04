@@ -1,5 +1,7 @@
 package cn.nukkit.item;
 
+import cn.nukkit.network.protocol.ProtocolInfo;
+
 public class ItemTideArmorTrimSmithingTemplate extends Item implements ItemTrimPattern {
 
     public ItemTideArmorTrimSmithingTemplate() {
@@ -17,5 +19,10 @@ public class ItemTideArmorTrimSmithingTemplate extends Item implements ItemTrimP
     @Override
     public Type getPattern() {
         return Type.TIDE;
+    }
+
+    @Override
+    public boolean isSupportedOn(int protocol) {
+        return protocol >= ProtocolInfo.v1_20_0_23;
     }
 }

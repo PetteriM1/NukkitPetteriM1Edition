@@ -19,7 +19,7 @@ public class ConfigSection extends LinkedHashMap<String, Object> {
     /**
      * Constructor of ConfigSection that contains initial key/value data
      *
-     * @param key key
+     * @param key   key
      * @param value value
      */
     public ConfigSection(String key, Object value) {
@@ -32,17 +32,21 @@ public class ConfigSection extends LinkedHashMap<String, Object> {
      *
      * @param map map
      */
-    @SuppressWarnings("unchecked")
     public ConfigSection(LinkedHashMap<String, Object> map) {
+        this((Map<String, Object>) map);
+    }
+
+    @SuppressWarnings("unchecked")
+    public ConfigSection(Map<String, Object> map) {
         this();
         if (map == null || map.isEmpty()) return;
         for (Map.Entry<String, Object> entry : map.entrySet()) {
-            if (entry.getValue() instanceof LinkedHashMap) {
-                super.put(entry.getKey(), new ConfigSection((LinkedHashMap) entry.getValue()));
+            if (entry.getValue() instanceof Map) {
+                super.put(String.valueOf(entry.getKey()), new ConfigSection((Map<String, Object>) entry.getValue()));
             } else if (entry.getValue() instanceof List) {
-                super.put(entry.getKey(), parseList((List) entry.getValue()));
+                super.put(String.valueOf(entry.getKey()), parseList((List) entry.getValue()));
             } else {
-                super.put(entry.getKey(), entry.getValue());
+                super.put(String.valueOf(entry.getKey()), entry.getValue());
             }
         }
     }
@@ -52,8 +56,8 @@ public class ConfigSection extends LinkedHashMap<String, Object> {
         List<Object> newList = new ArrayList<>();
 
         for (Object o : list) {
-            if (o instanceof LinkedHashMap) {
-                newList.add(new ConfigSection((LinkedHashMap) o));
+            if (o instanceof Map) {
+                newList.add(new ConfigSection((Map<String, Object>) o));
             } else {
                 newList.add(o);
             }
@@ -91,7 +95,7 @@ public class ConfigSection extends LinkedHashMap<String, Object> {
     /**
      * Get object by key. If section does not contain value, return default value
      *
-     * @param key key
+     * @param key          key
      * @param defaultValue default value
      * @return object by key or default value
      */
@@ -112,7 +116,7 @@ public class ConfigSection extends LinkedHashMap<String, Object> {
     /**
      * Store value into config section
      *
-     * @param key key
+     * @param key   key
      * @param value value
      */
     public void set(String key, Object value) {
@@ -663,7 +667,7 @@ public class ConfigSection extends LinkedHashMap<String, Object> {
     /**
      * Check existence of config section element
      *
-     * @param key key
+     * @param key        key
      * @param ignoreCase ignore case
      * @return existence of config section element
      */

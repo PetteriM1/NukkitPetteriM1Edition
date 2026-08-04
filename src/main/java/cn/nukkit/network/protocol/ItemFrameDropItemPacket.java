@@ -6,7 +6,6 @@ import lombok.ToString;
 /**
  * Created by Pub4Game on 03.07.2016.
  */
-@Deprecated
 @ToString
 public class ItemFrameDropItemPacket extends DataPacket {
 
@@ -18,7 +17,7 @@ public class ItemFrameDropItemPacket extends DataPacket {
 
     @Override
     public void decode() {
-        BlockVector3 v = this.getBlockVector3();
+        BlockVector3 v = this.getBlockVector3(protocol);
         this.z = v.z;
         this.y = v.y;
         this.x = v.x;

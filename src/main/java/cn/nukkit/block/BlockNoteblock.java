@@ -18,6 +18,35 @@ import cn.nukkit.utils.BlockColor;
  */
 public class BlockNoteblock extends BlockSolid {
 
+    public enum Instrument {
+        PIANO(Sound.NOTE_HARP),
+        BASS_DRUM(Sound.NOTE_BD),
+        DRUM(Sound.NOTE_SNARE),
+        STICKS(Sound.NOTE_HAT),
+        BASS(Sound.NOTE_BASS),
+        FLUTE(Sound.NOTE_FLUTE),
+        GLOCKENSPIEL(Sound.NOTE_BELL),
+        GUITAR(Sound.NOTE_GUITAR),
+        CHIME(Sound.NOTE_CHIME),
+        XYLOPHONE(Sound.NOTE_XYLOPHONE),
+        VIBRAPHONE(Sound.NOTE_IRON_XYLOPHONE),
+        COW_BELL(Sound.NOTE_COW_BELL),
+        DIDGERIDOO(Sound.NOTE_DIDGERIDOO),
+        SQUARE_WAVE(Sound.NOTE_BIT),
+        BANJO(Sound.NOTE_BANJO),
+        ELECTRIC_PIANO(Sound.NOTE_PLING);
+
+        private final Sound sound;
+
+        Instrument(Sound sound) {
+            this.sound = sound;
+        }
+
+        public Sound getSound() {
+            return sound;
+        }
+    }
+
     @Override
     public String getName() {
         return "Note Block";
@@ -258,35 +287,6 @@ public class BlockNoteblock extends BlockSolid {
             return (BlockEntityMusic) blockEntity;
         }
         return null;
-    }
-
-    public enum Instrument {
-        PIANO(Sound.NOTE_HARP),
-        BASS_DRUM(Sound.NOTE_BD),
-        DRUM(Sound.NOTE_SNARE),
-        STICKS(Sound.NOTE_HAT),
-        BASS(Sound.NOTE_BASS),
-        FLUTE(Sound.NOTE_FLUTE),
-        GLOCKENSPIEL(Sound.NOTE_BELL),
-        GUITAR(Sound.NOTE_GUITAR),
-        CHIME(Sound.NOTE_CHIME),
-        XYLOPHONE(Sound.NOTE_XYLOPHONE),
-        VIBRAPHONE(Sound.NOTE_IRON_XYLOPHONE),
-        COW_BELL(Sound.NOTE_COW_BELL),
-        DIDGERIDOO(Sound.NOTE_DIDGERIDOO),
-        SQUARE_WAVE(Sound.NOTE_BIT),
-        BANJO(Sound.NOTE_BANJO),
-        ELECTRIC_PIANO(Sound.NOTE_PLING);
-
-        private final Sound sound;
-
-        Instrument(Sound sound) {
-            this.sound = sound;
-        }
-
-        public Sound getSound() {
-            return sound;
-        }
     }
 
     @Override

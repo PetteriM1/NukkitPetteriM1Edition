@@ -6,6 +6,7 @@ import java.io.IOException;
 
 /**
  * Implements data compression and decompression using Snappy, powered by snappy-java (org.xerial.snappy)
+ *
  * @author PetteriM1
  */
 public class SnappyCompression {

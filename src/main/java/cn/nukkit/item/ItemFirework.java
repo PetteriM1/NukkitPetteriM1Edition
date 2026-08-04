@@ -52,6 +52,68 @@ public class ItemFirework extends Item {
         }
     }
 
+    public static class FireworkExplosion {
+
+        private final List<DyeColor> colors = new ArrayList<>();
+        private final List<DyeColor> fades = new ArrayList<>();
+        private boolean flicker = false;
+        private boolean trail = false;
+        private ExplosionType type = ExplosionType.CREEPER_SHAPED;
+
+        public enum ExplosionType {
+            SMALL_BALL,
+            LARGE_BALL,
+            STAR_SHAPED,
+            CREEPER_SHAPED,
+            BURST
+        }
+
+        public List<DyeColor> getColors() {
+            return this.colors;
+        }
+
+        public List<DyeColor> getFades() {
+            return this.fades;
+        }
+
+        public boolean hasFlicker() {
+            return this.flicker;
+        }
+
+        public boolean hasTrail() {
+            return this.trail;
+        }
+
+        public ExplosionType getType() {
+            return this.type;
+        }
+
+        public FireworkExplosion setFlicker(boolean flicker) {
+            this.flicker = flicker;
+            return this;
+        }
+
+        public FireworkExplosion setTrail(boolean trail) {
+            this.trail = trail;
+            return this;
+        }
+
+        public FireworkExplosion type(ExplosionType type) {
+            this.type = type;
+            return this;
+        }
+
+        public FireworkExplosion addColor(DyeColor color) {
+            colors.add(color);
+            return this;
+        }
+
+        public FireworkExplosion addFade(DyeColor fade) {
+            fades.add(fade);
+            return this;
+        }
+    }
+
     @Override
     public boolean canBeActivated() {
         return true;
@@ -59,7 +121,7 @@ public class ItemFirework extends Item {
 
     @Override
     public boolean onActivate(Level level, Player player, Block block, Block target, BlockFace face, double fx, double fy, double fz) {
-        if (player.isAdventure()) {
+        if (player.isAdventure() && !player.getServer().suomiCraftPEMode()) { //SCPE: allow fireworks in adventure mode
             return false;
         }
 
@@ -158,68 +220,6 @@ public class ItemFirework extends Item {
         CompoundTag tag = this.getNamedTag();
         tag.putCompound("Fireworks", tag.getCompound("Fireworks").putByte("Flight", flight));
         this.setNamedTag(tag);
-    }
-
-    public static class FireworkExplosion {
-
-        private final List<DyeColor> colors = new ArrayList<>();
-        private final List<DyeColor> fades = new ArrayList<>();
-        private boolean flicker = false;
-        private boolean trail = false;
-        private ExplosionType type = ExplosionType.CREEPER_SHAPED;
-
-        public List<DyeColor> getColors() {
-            return this.colors;
-        }
-
-        public List<DyeColor> getFades() {
-            return this.fades;
-        }
-
-        public boolean hasFlicker() {
-            return this.flicker;
-        }
-
-        public boolean hasTrail() {
-            return this.trail;
-        }
-
-        public ExplosionType getType() {
-            return this.type;
-        }
-
-        public FireworkExplosion setFlicker(boolean flicker) {
-            this.flicker = flicker;
-            return this;
-        }
-
-        public FireworkExplosion setTrail(boolean trail) {
-            this.trail = trail;
-            return this;
-        }
-
-        public FireworkExplosion type(ExplosionType type) {
-            this.type = type;
-            return this;
-        }
-
-        public FireworkExplosion addColor(DyeColor color) {
-            colors.add(color);
-            return this;
-        }
-
-        public FireworkExplosion addFade(DyeColor fade) {
-            fades.add(fade);
-            return this;
-        }
-
-        public enum ExplosionType {
-            SMALL_BALL,
-            LARGE_BALL,
-            STAR_SHAPED,
-            CREEPER_SHAPED,
-            BURST
-        }
     }
 
     @Override

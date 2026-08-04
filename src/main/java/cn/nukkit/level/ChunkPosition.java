@@ -5,7 +5,7 @@ import cn.nukkit.math.Vector3;
 
 /**
  * @author Adam Matthew
- * 
+ * <p>
  * Nukkit Project
  */
 public class ChunkPosition {

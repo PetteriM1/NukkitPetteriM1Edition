@@ -1,13 +1,16 @@
 package cn.nukkit.inventory.transaction;
 
+import cn.nukkit.Nukkit;
 import cn.nukkit.Player;
 import cn.nukkit.event.inventory.LoomItemEvent;
 import cn.nukkit.inventory.Inventory;
 import cn.nukkit.inventory.LoomInventory;
 import cn.nukkit.inventory.transaction.action.InventoryAction;
 import cn.nukkit.inventory.transaction.action.LoomItemAction;
+import cn.nukkit.inventory.transaction.action.SlotChangeAction;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemID;
+import cn.nukkit.nbt.tag.CompoundTag;
 
 import java.util.List;
 
@@ -28,6 +31,12 @@ public class LoomTransaction extends InventoryTransaction {
                 return;
             }
             this.outputItem = action.getSourceItem();
+        } else if (!(action instanceof SlotChangeAction)) {
+            this.invalid = true;
+            if (Nukkit.DEBUG > 1) {
+                source.getServer().getLogger().debug(this.getClass().getSimpleName() + " unexpected addAction: " + action);
+            }
+            return;
         }
         super.addAction(action);
     }
@@ -43,14 +52,14 @@ public class LoomTransaction extends InventoryTransaction {
             return false;
         }
 
-        if (outputItem == null) {
+        if (outputItem == null || outputItem.isNull()) {
             return false;
         }
 
         LoomInventory loomInventory = (LoomInventory) inventory;
         Item banner = loomInventory.getBanner();
         Item dye = loomInventory.getDye();
-        if (banner.getId() != Item.BANNER || dye.getId() != Item.DYE || banner.getDamage() != outputItem.getDamage()) {
+        if (banner.getId() != Item.BANNER || outputItem.getId() != Item.BANNER || dye.getId() != Item.DYE || banner.getDamage() != outputItem.getDamage()) {
             return false;
         }
 
@@ -59,10 +68,6 @@ public class LoomTransaction extends InventoryTransaction {
         }
 
         int patternCount = outputItem.getNamedTag().getList("Patterns").size();
-        if (banner.getNamedTag() == null) {
-            return patternCount == 1;
-        }
-
         if (patternCount > 6) {
             return false;
         }
@@ -72,7 +77,19 @@ public class LoomTransaction extends InventoryTransaction {
             return false;
         }
 
-        return banner.getNamedTag().getList("Patterns").size() + 1 == patternCount;
+        CompoundTag a = banner.getNamedTag();
+        a = a == null ? new CompoundTag() : a.clone().remove("Patterns");
+        CompoundTag b = this.outputItem.getNamedTag();
+        b = b == null ? new CompoundTag() : b.clone().remove("Patterns");
+        if (!a.equals(b)) {
+            if (Nukkit.DEBUG > 1) {
+                source.getServer().getLogger().debug("NBT check failed: input=" + a + ", output=" + b);
+            }
+            return false;
+        }
+
+        CompoundTag nbt = banner.getNamedTag();
+        return (nbt == null ? 0 : nbt.getList("Patterns").size()) + 1 == patternCount;
     }
 
     @Override

@@ -14,16 +14,9 @@ import cn.nukkit.item.Item;
 public class InventoryMoveItemEvent extends InventoryEvent implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
-
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private final Inventory targetInventory;
     private final InventoryHolder source;
-
     private Item item;
-
     private final Action action;
 
     public InventoryMoveItemEvent(Inventory from, Inventory targetInventory, InventoryHolder source, Item item, Action action) {
@@ -32,6 +25,17 @@ public class InventoryMoveItemEvent extends InventoryEvent implements Cancellabl
         this.source = source;
         this.item = item;
         this.action = action;
+    }
+
+    public enum Action {
+        SLOT_CHANGE, //transaction between 2 inventories
+        PICKUP,
+        DROP,
+        DISPENSE
+    }
+
+    public static HandlerList getHandlers() {
+        return handlers;
     }
 
     public Inventory getTargetInventory() {
@@ -52,12 +56,5 @@ public class InventoryMoveItemEvent extends InventoryEvent implements Cancellabl
 
     public Action getAction() {
         return action;
-    }
-
-    public enum Action {
-        SLOT_CHANGE, //transaction between 2 inventories
-        PICKUP,
-        DROP,
-        DISPENSE
     }
 }

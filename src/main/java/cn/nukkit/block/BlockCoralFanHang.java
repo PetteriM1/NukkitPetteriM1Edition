@@ -78,6 +78,6 @@ public class BlockCoralFanHang extends BlockCoralFan {
 
     @Override
     public Item toItem() {
-        return new ItemBlock(this.isDead()? new BlockCoralFanDead() : new BlockCoralFan(), this.getType());
+        return new ItemBlock(this.isDead() ? new BlockCoralFanDead() : new BlockCoralFan(), this.getType());
     }
 }

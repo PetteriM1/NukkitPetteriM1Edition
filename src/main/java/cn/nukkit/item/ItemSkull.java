@@ -5,6 +5,7 @@ import cn.nukkit.entity.mob.EntityCreeper;
 import cn.nukkit.entity.mob.EntitySkeleton;
 import cn.nukkit.entity.mob.EntityWitherSkeleton;
 import cn.nukkit.entity.mob.EntityZombie;
+import cn.nukkit.network.protocol.ProtocolInfo;
 
 /**
  * Created by Snake1999 on 2016/2/3.
@@ -35,7 +36,7 @@ public class ItemSkull extends Item {
 
     public static String getItemSkullName(int meta) {
         switch (meta) {
-            case WITHER_SKELETON_SKULL :
+            case WITHER_SKELETON_SKULL:
                 return "Wither Skeleton Skull";
             case ZOMBIE_HEAD:
                 return "Zombie Head";
@@ -71,5 +72,10 @@ public class ItemSkull extends Item {
             default:
                 return null;
         }
+    }
+
+    @Override
+    public boolean isSupportedOn(int protocol) {
+        return protocol >= ProtocolInfo.v1_20_0_23 || this.getDamage() < PIGLIN_HEAD;
     }
 }
