@@ -1,0 +1,6 @@
+nukkit_seedcrack
+*.o
+*.class
+selftest.log
+__pycache__/
+!*.md
